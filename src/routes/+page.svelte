@@ -1,2 +1,2 @@
-<h1>Kaffe diem frontend</h1>
+<h1 class="text-4xl">Kaffe diem frontend</h1>
 Dette er en veldig fin side 👍
