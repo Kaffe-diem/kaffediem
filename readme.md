@@ -34,7 +34,7 @@ npm run build
 node build
 ```
 
-### Hvis dependencies ikke er installert:
+### Hvis dependencies ikke er installert (for eksempel på rpi):
 
 1. Kopier `package.json` og `package-lock.json` til `build/`
 
