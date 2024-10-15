@@ -13,6 +13,7 @@ npm ci
 
 ```bash
 npm run dev
+npm run dev -- --host # for å åpne til nettverk
 ```
 
 ## Deploy
