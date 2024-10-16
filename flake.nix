@@ -31,6 +31,7 @@
               nodePackages.typescript
               emmet-ls
               vscode-langservers-extracted
+              prettierd
             ];
           };
         }
