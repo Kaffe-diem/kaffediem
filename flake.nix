@@ -29,7 +29,6 @@
               nodePackages.npm
               nodePackages.typescript-language-server
               nodePackages.typescript
-              prettierd
               emmet-ls
               vscode-langservers-extracted
             ];
