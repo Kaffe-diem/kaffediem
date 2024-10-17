@@ -1,16 +1,16 @@
 enum State {
-	Production,
-	Complete
+  Production,
+  Complete
 }
 
 class Order {
-	id: number;
-	state: State;
+  id: number;
+  state: State;
 
-	constructor(id: number, state = State.Production) {
-		this.id = id;
-		this.state = state;
-	}
+  constructor(id: number, state = State.Production) {
+    this.id = id;
+    this.state = state;
+  }
 }
 
 export { State, Order };
