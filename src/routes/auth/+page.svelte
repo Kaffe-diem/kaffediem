@@ -6,7 +6,24 @@
 
   async function login(form: HTMLFormElement) {
     try {
-      await pb.collection("users").authWithOAuth2({ provider: "google" });
+      const authData = await pb.collection("users").authWithOAuth2({ provider: "google" });
+
+      const meta = authData.meta;
+
+      if (meta?.isNew) {
+        const formData = new FormData();
+
+        const response = await fetch(meta.avatarUrl);
+
+        if (response.ok) {
+          const file = await response.blob();
+          formData.append("avatar", file);
+        }
+
+        formData.append("name", meta.name);
+
+        await pb.collection("users").update(authData.record.id, formData);
+      }
       form.token.value = pb.authStore.token;
       form.submit();
     } catch (err) {
@@ -14,8 +31,3 @@
     }
   }
 </script>
-
-<form method="post" on:submit|preventDefault={(e) => login(e.currentTarget)}>
-  <input name="token" type="hidden" />
-  <button>Login using Google</button>
-</form>

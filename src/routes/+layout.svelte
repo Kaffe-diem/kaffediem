@@ -4,7 +4,8 @@
 
   const navItems = [
     { href: "/drinks", text: "Meny" },
-    { href: "/display", text: "Visning" }
+    { href: "/display", text: "Visning" },
+    { href: "/auth", text: "Logg inn" }
   ];
 </script>
 
