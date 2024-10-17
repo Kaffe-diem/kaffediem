@@ -1,4 +1,1 @@
-
-<main>
-	Hei
-</main>
+Hei
