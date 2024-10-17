@@ -2,6 +2,12 @@
 
 ## Development
 
+### .env
+
+PB_HOST=https://kodekafe-pocketbase.fly.dev
+PB_USER=
+PB_PASS=
+
 1. Clone repoen
 
 2. Installer dependencies
