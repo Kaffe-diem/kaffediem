@@ -1,5 +1,6 @@
 <script>
   import "../app.css";
+  import { page } from '$app/stores';  
 
   const navItems = [
     { href: "/drinks", text: "Meny" },
@@ -7,22 +8,26 @@
   ];
 </script>
 
-<div class="app w-8/12 mx-auto">
-  <header class="flex py-2 items-center justify-between">
-    <h1 class="text-4xl font-bold">
-      <a href="/">Kaffe Diem</a>
-    </h1>
-    <nav>
-      <ul class="flex items-center space-x-4">
-        {#each navItems as item}
-          <li>
-            <a href={item.href} class="hover:underline">{item.text}</a>
-          </li>
-        {/each}
-      </ul>
-    </nav>
-  </header>
-  <main>
-    <slot />
-  </main>
-</div>
+{#if $page.url.pathname.includes("display")}
+  <slot />
+{:else}
+  <div class="app mx-auto w-8/12">
+    <header class="flex items-center justify-between py-2">
+      <h1 class="text-4xl font-bold">
+        <a href="/">Kaffe Diem</a>
+      </h1>
+      <nav>
+        <ul class="flex items-center space-x-4">
+          {#each navItems as item}
+            <li>
+              <a href={item.href} class="hover:underline">{item.text}</a>
+            </li>
+          {/each}
+        </ul>
+      </nav>
+    </header>
+    <main class="mt-16">
+      <slot />
+    </main>
+  </div>
+{/if}
