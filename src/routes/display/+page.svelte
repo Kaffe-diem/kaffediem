@@ -19,8 +19,13 @@
     </div>
   </div>
 
-  <div class="absolute bottom-4 left-0 h-24 w-24">
+  <div class="absolute bottom-4 left-0 flex">
     <a href="/">
-      <img src={QR} alt="QR code" />
+      <img class="h-24 w-24" src={QR} alt="QR code" />
     </a>
+    <div class="flex flex-col items-start justify-center ml-2 py-1">
+      <span class="text-sm text-gray-700">Skann eller besøk</span>
+      <a href="https://kaffediem.asvg.no" class="text-sm text-gray-700"> <span class="font-bold text-gray-700">kaffediem.asvg.no</span></a>
+      <span class="text-sm text-gray-700"> for å bestille</span>
+    </div>
   </div>
