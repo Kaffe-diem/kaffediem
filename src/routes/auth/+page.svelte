@@ -1,8 +1,8 @@
 <script lang="ts">
   import PocketBase from "pocketbase";
-  import { PUBLIC_PB_URL } from "$env/static/public";
+  import { PUBLIC_PB_HOST } from "$env/static/public";
 
-  const pb = new PocketBase(PUBLIC_PB_URL);
+  const pb = new PocketBase(PUBLIC_PB_HOST);
 
   async function login(form: HTMLFormElement) {
     try {
