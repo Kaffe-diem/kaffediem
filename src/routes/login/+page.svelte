@@ -12,18 +12,17 @@
 
       if (meta?.isNew) {
         const formData = new FormData();
+        formData.append("name", meta.name);
 
         const response = await fetch(meta.avatarUrl);
-
         if (response.ok) {
           const file = await response.blob();
           formData.append("avatar", file);
         }
 
-        formData.append("name", meta.name);
-
         await pb.collection("users").update(authData.record.id, formData);
       }
+
       form.token.value = pb.authStore.token;
       form.submit();
     } catch (err) {
@@ -31,3 +30,8 @@
     }
   }
 </script>
+
+<form method="post" on:submit|preventDefault={(e) => login(e.currentTarget)}>
+    <input name="token" type="hidden" />
+    <button class="hover:underline">Logg inn med Google</button>
+</form>

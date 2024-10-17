@@ -2,7 +2,7 @@
   const navItems = [
     { href: "/drinks", text: "Meny" },
     { href: "/display", text: "Visning" },
-    { href: "/auth", text: "Logg inn" }
+    { href: "/login", text: "Logg inn" }
   ];
 </script>
 

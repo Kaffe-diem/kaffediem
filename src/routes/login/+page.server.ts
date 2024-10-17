@@ -6,7 +6,7 @@ export const actions = {
     const form = await request.formData();
     const token = form.get("token");
     if (!token || typeof token !== "string") {
-      throw redirect(303, "/auth");
+      throw redirect(303, "/login");
     }
     cookies.set("pb_auth", JSON.stringify({ token: token }), { path: "/" });
     throw redirect(303, "/");
