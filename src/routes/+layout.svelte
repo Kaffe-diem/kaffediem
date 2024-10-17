@@ -3,7 +3,8 @@
 
   const navItems = [
     { href: "/drinks", text: "Meny" },
-    { href: "/display", text: "Visning" }
+    { href: "/display", text: "Visning" },
+    { href: "/status", text: "Min bestilling" }
   ];
 </script>
 
