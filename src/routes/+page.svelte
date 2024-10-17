@@ -26,16 +26,6 @@
 	}
 </script>
 
-<header class="flex items-center justify-between">
-	<h1 class="text-4xl">Kaffe Diem</h1>
-	<nav>
-		<ul class="flex items-center justify-between space-x-4">
-			<li>
-				<a href="/">Heim</a>
-			</li>
-			<li>
-				<button on:click={onSignIn}>Logg inn</button>
-			</li>
-		</ul>
-	</nav>
-</header>
+<main>
+	Hei
+</main>
