@@ -13,6 +13,10 @@
       sort: "-created"
     });
 
+    await pb.collection("drinks").subscribe('*', (data) => {
+      console.log(data);
+    })
+
     console.log(result);
 
     return result
