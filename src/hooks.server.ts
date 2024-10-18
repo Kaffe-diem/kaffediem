@@ -1,3 +1,4 @@
+import { protectedRoutes } from "$lib/constants";
 import { pb } from "$lib/stores/authStore";
 import { redirect, type Handle } from "@sveltejs/kit";
 
