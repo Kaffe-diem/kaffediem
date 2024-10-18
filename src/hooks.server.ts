@@ -1,46 +1,30 @@
+import { pb } from "$lib/stores/authStore";
 import { redirect, type Handle } from "@sveltejs/kit";
-import PocketBase from "pocketbase";
-import { building } from "$app/environment";
-import { PUBLIC_PB_HOST } from "$env/static/public";
 
-// Kjører på hver page navigation
 export const handle: Handle = async ({ event, resolve }) => {
-  // Reset verdier
-  event.locals.id = "";
-  event.locals.email = "";
-  event.locals.pb = new PocketBase(PUBLIC_PB_HOST);
+  console.log(event.url.pathname);
 
-  // Logge ut hvis man går til /login (slipper å skrive ekstra logikk for det)
-  const isAuth: boolean = event.url.pathname === "/login";
-  if (isAuth || building) {
-    event.cookies.set("pb_auth", "", { path: "/" });
-    return await resolve(event);
-  }
+  // Load auth data from the cookie
+  const cookie = event.request.headers.get("cookie") || "";
+  pb.authStore.loadFromCookie(cookie);
 
-  // Lese cookie og authorize pocketbase
-  const pb_auth = event.request.headers.get("cookie") ?? "";
-  event.locals.pb.authStore.loadFromCookie(pb_auth);
+  // List of all routes that require the user to be logged in
+  const protectedRoutes = ["/account"];
 
-  if (!event.locals.pb.authStore.isValid) {
-    // Session expired
-    throw redirect(303, "/login");
-  }
-  try {
-    const auth = await event.locals.pb
-      .collection("users")
-      .authRefresh<{ id: string; email: string }>();
-    event.locals.id = auth.record.id;
-    event.locals.email = auth.record.email;
-  } catch {
-    throw redirect(303, "/login");
-  }
+  console.log(pb.authStore.isValid);
 
-  if (!event.locals.id) {
+  // Redirect to login if the user is not properly logged in
+  if (protectedRoutes.includes(event.url.pathname) && !pb.authStore.isValid) {
     throw redirect(303, "/login");
   }
 
   const response = await resolve(event);
-  const cookie = event.locals.pb.authStore.exportToCookie({ sameSite: "lax" });
-  response.headers.append("set-cookie", cookie);
+
+  // Save auth state to cookie
+  response.headers.set(
+    "set-cookie",
+    pb.authStore.exportToCookie({ secure: true, httpOnly: false })
+  );
+
   return response;
 };

@@ -4,7 +4,14 @@
 
   const pb = new PocketBase(PUBLIC_PB_HOST);
 
-  async function login(form: HTMLFormElement) {
+  if (typeof document !== "undefined") {
+    pb.authStore.loadFromCookie(document.cookie);
+    pb.authStore.onChange(() => {
+      document.cookie = pb.authStore.exportToCookie({ httpOnly: false });
+    });
+  }
+
+  async function login() {
     try {
       const authData = await pb.collection("users").authWithOAuth2({ provider: "google" });
 
@@ -23,15 +30,17 @@
         await pb.collection("users").update(authData.record.id, formData);
       }
 
-      form.token.value = pb.authStore.token;
-      form.submit();
+      document.cookie = pb.authStore.exportToCookie({ httpOnly: false });
     } catch (err) {
       console.error(err);
     }
   }
+
+  function logout() {
+    pb.authStore.clear();
+    document.cookie = pb.authStore.exportToCookie({ httpOnly: false });
+  }
 </script>
 
-<form method="post" on:submit|preventDefault={(e) => login(e.currentTarget)}>
-    <input name="token" type="hidden" />
-    <button class="hover:underline">Logg inn med Google</button>
-</form>
+<button on:click={login}>Logg inn med Google</button>
+<button on:click={logout}>Logg ut</button>
