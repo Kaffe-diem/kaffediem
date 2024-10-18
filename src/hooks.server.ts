@@ -7,9 +7,6 @@ export const handle: Handle = async ({ event, resolve }) => {
   const cookie = event.request.headers.get("cookie") || "";
   pb.authStore.loadFromCookie(cookie);
 
-  // List of all routes that require the user to be logged in
-  const protectedRoutes = ["/account"];
-
   // Redirect to login if the user is not properly logged in
   if (protectedRoutes.includes(event.url.pathname) && !pb.authStore.isValid) {
     throw redirect(303, "/");
