@@ -1,1 +1,1 @@
-<span class="rounded bg-gray-200 p-2"><slot /></span>
+<button class="btn btn-lg text-3xl font-normal"><slot /></button>
