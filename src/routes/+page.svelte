@@ -1,18 +1,14 @@
 <script>
-  import { auth, pb } from "$lib/stores/authStore";
+  import { auth } from "$lib/stores/authStore";
   import { onMount } from "svelte";
 
   let isAuthenticated = false;
   let user = null;
 
-  onMount(() => {
-    const unsubscribe = auth.subscribe((value) => {
-      isAuthenticated = value.isAuthenticated;
-      user = value.user;
-    });
-
-    return unsubscribe;
-  });
+  onMount(auth.subscribe((value) => {
+    isAuthenticated = value.isAuthenticated;
+    user = value.user;
+  }));
 </script>
 
 {#if isAuthenticated}
