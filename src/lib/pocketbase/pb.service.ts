@@ -1,7 +1,18 @@
+import { writable } from 'svelte/store';
 import pocketbase from "pocketbase";
+
+// ref: https://github.com/pocketbase/js-sdk?tab=readme-ov-file#nodejs-via-npm
+import eventsource from 'eventsource';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(global as any).EventSource = eventsource;
+
 import * as pbt from "./pb.d";
 
+// should probablt be moved away from here. also, stores don't have a length?
+export const ordersStore = writable<pbt.OrdersResponse[]>([]);
+
 export const pb = new pocketbase(process.env.PUBLIC_PB_HOST) as pbt.TypedPocketBase;
+
 await pb.admins.authWithPassword(
   process.env.PUBLIC_PB_ADMIN_EMAIL!,
   process.env.PUBLIC_PB_ADMIN_PASSWORD!
@@ -13,7 +24,6 @@ export const OrderService = {
         (await OrderService._createOrderDrink()).id
     ];
 
-    console.log(orderDrinkIds)
     return pb.collection("orders").create({
       drinks: orderDrinkIds,
       // admin does not work, as its not stored in users collection.
@@ -32,5 +42,23 @@ export const OrderService = {
         extras: [pbt.OrderDrinkExtrasOptions.cream],
         flavor: [pbt.OrderDrinkFlavorOptions.irish]
     });
+  },
+  
+  listenForOrders: async () => {
+    const orders = await pb.collection("orders").getFullList();
+    ordersStore.set(orders)
+  
+    pb.collection("orders").subscribe("*", (e) => {
+      ordersStore.update(currentOrders => {
+        const orderIndex = currentOrders.findIndex((order: pbt.OrdersResponse) => order.id === e.record.id);
+        if (orderIndex !== -1) {
+          currentOrders[orderIndex] = e.record;
+        } else {
+          currentOrders.push(e.record);
+        }
+        return currentOrders;
+      });
+    });
+    return ordersStore;
   }
 }
