@@ -2,8 +2,6 @@ import { pb } from "$lib/stores/authStore";
 import { redirect, type Handle } from "@sveltejs/kit";
 
 export const handle: Handle = async ({ event, resolve }) => {
-  console.log(event.url.pathname);
-
   // Load auth data from the cookie
   const cookie = event.request.headers.get("cookie") || "";
   pb.authStore.loadFromCookie(cookie);
@@ -11,11 +9,9 @@ export const handle: Handle = async ({ event, resolve }) => {
   // List of all routes that require the user to be logged in
   const protectedRoutes = ["/account"];
 
-  console.log(pb.authStore.isValid);
-
   // Redirect to login if the user is not properly logged in
   if (protectedRoutes.includes(event.url.pathname) && !pb.authStore.isValid) {
-    throw redirect(303, "/login");
+    throw redirect(303, "/");
   }
 
   const response = await resolve(event);

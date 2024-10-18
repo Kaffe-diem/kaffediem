@@ -1,8 +1,9 @@
 <script>
+  import AuthButton from "$lib/AuthButton.svelte";
+
   const navItems = [
     { href: "/drinks", text: "Meny" },
     { href: "/display", text: "Visning" },
-    { href: "/login", text: "Logg inn" }
   ];
 </script>
 
@@ -17,6 +18,7 @@
           <a href={item.href} class="hover:underline">{item.text}</a>
         </li>
       {/each}
+      <li><AuthButton /></li>
     </ul>
   </nav>
 </header>
