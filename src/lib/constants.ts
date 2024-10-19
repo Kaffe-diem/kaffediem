@@ -1,1 +1,1 @@
-export const protectedRoutes = ["/account"];
+export const restrictedRoutes = ["/account"];

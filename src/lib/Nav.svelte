@@ -1,7 +1,7 @@
 <script lang="ts">
   import { auth } from "$lib/stores/authStore";
   import { onMount } from "svelte";
-  import { protectedRoutes } from "$lib/constants";
+  import { restrictedRoutes } from "$lib/constants";
   import AuthButton from "$lib/AuthButton.svelte";
 
   let isAuthenticated = false;
@@ -13,10 +13,12 @@
   class NavItem {
     href: string;
     text: string;
+    requiresAuth: boolean;
 
     constructor(href: string, text: string) {
       this.href = href;
       this.text = text;
+      this.requiresAuth = restrictedRoutes.includes(this.href);
     }
   }
 
@@ -34,7 +36,7 @@
   <nav>
     <ul class="flex items-center space-x-4">
       {#each navItems as item}
-        {#if !protectedRoutes.includes(item.href) || isAuthenticated}
+        {#if isAuthenticated || !item.requiresAuth}
         <li>
           <a href={item.href} class="hover:underline">{item.text}</a>
         </li>

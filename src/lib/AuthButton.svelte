@@ -9,13 +9,6 @@
     isAuthenticated = value.isAuthenticated;
   }));
 
-  if (typeof document !== "undefined") {
-    pb.authStore.loadFromCookie(document.cookie);
-    pb.authStore.onChange(() => {
-      document.cookie = pb.authStore.exportToCookie({ httpOnly: false });
-    });
-  }
-
   function goHome() {
     if (window.location.pathname === '/') {
       window.location.reload();
@@ -33,10 +26,10 @@
       const formData = new FormData();
       formData.append("name", meta.name);
 
-      const response = await fetch(meta.avatarUrl);
-      if (response.ok) {
-        const file = await response.blob();
-        formData.append("avatar", file);
+      const avatarResponse = await fetch(meta.avatarUrl);
+      if (avatarResponse.ok) {
+        const avatar = await avatarResponse.blob();
+        formData.append("avatar", avatar);
       }
 
       await pb.collection("users").update(authData.record.id, formData);
