@@ -6,17 +6,17 @@
   ];
 </script>
 
-<header class="flex items-center justify-between py-2">
-  <h1 class="text-4xl font-bold">
-    <a href="/">Kaffe Diem</a>
-  </h1>
-  <nav>
-    <ul class="flex items-center space-x-4">
+<div class="navbar bg-base-100">
+  <div class="flex-1">
+    <a href="/" class="btn btn-ghost text-xl">Kaffe Diem</a>
+  </div>
+  <div class="flex-none">
+    <ul class="menu menu-horizontal px-1">
       {#each navItems as item}
         <li>
-          <a href={item.href} class="hover:underline">{item.text}</a>
+          <a href={item.href}>{item.text}</a>
         </li>
       {/each}
     </ul>
-  </nav>
-</header>
+  </div>
+</div>
