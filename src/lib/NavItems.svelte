@@ -8,7 +8,7 @@
   {#each navItems as item}
     {#if isAuthenticated || !item.requiresAuth}
       <li>
-        <a href={item.href}>{item.text}</a>
+        <a href={item.href} tabindex="0">{item.text}</a>
       </li>
     {/if}
   {/each}
