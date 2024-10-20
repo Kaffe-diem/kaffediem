@@ -22,7 +22,7 @@
 </p>
 
 <div class="inline-block text-center m-2">
-  <Rating class="rating-lg" value=9 />
+  <Rating class="rating-lg" value=9 readonly />
   <span class="text-sm">Fra 1729 omtaler</span>
 </div>
 
