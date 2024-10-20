@@ -2,7 +2,6 @@
   import { auth } from "$lib/stores/authStore";
   import { onMount } from "svelte";
   import { restrictedRoutes } from "$lib/constants";
-  import AuthButton from "$lib/AuthButton.svelte";
   import MenuIcon from "$lib/assets/MenuIcon.svelte";
   import NavItems from "$lib/NavItems.svelte";
 

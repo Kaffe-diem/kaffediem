@@ -1,6 +1,7 @@
 <script>
   export let navItems;
   export let isAuthenticated;
+  import AuthButton from "$lib/AuthButton.svelte";
 </script>
 
 <ul class="menu {$$restProps.class || ''}">
@@ -11,4 +12,5 @@
       </li>
     {/if}
   {/each}
+  <li><AuthButton /></li>
 </ul>
