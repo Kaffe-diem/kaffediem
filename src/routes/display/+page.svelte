@@ -6,7 +6,7 @@
   $: orders = [new Order(123), new Order(456), new Order(789, State.Complete)];
 </script>
 
-  <div class="h-full grid grid-cols-1 grid-rows-[1fr_auto_1fr] gap-4 md:grid-cols-[1fr_auto_1fr] md:grid-cols-1">
+  <div class="h-full grid grid-cols-1 grid-rows-[1fr_auto_1fr] gap-4 md:grid-cols-[1fr_auto_1fr] md:grid-rows-1">
     <div class="flex h-full flex-col p-4">
       <h2 class="mb-3 text-4xl text-neutral font-bold md:mb-6 md:text-center md:text-4xl">Straks ferdig...</h2>
       <OrderList {orders} filter={State.Production} />
