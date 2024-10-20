@@ -3,6 +3,8 @@
   import { onMount } from "svelte";
   import { restrictedRoutes } from "$lib/constants";
   import AuthButton from "$lib/AuthButton.svelte";
+  import MenuIcon from "$lib/assets/MenuIcon.svelte";
+  import NavItems from "$lib/NavItems.svelte";
 
   let isAuthenticated = false;
 
@@ -33,16 +35,13 @@
   <div class="flex-1">
     <a href="/" class="btn btn-ghost text-xl">Kaffe Diem</a>
   </div>
-  <div class="flex-none">
-    <ul class="menu menu-horizontal px-1">
-      {#each navItems as item}
-        {#if isAuthenticated || !item.requiresAuth}
-        <li>
-          <a href={item.href}>{item.text}</a>
-        </li>
-        {/if}
-      {/each}
-      <li><AuthButton /></li>
-    </ul>
+  <div class="dropdown dropdown-end lg:hidden">
+    <div tabindex="0" role="button" class="btn btn-ghost">
+      <MenuIcon />
+    </div>
+    <NavItems {navItems} {isAuthenticated} class="menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow" />
+  </div>
+  <div class="hidden flex-none lg:flex">
+    <NavItems {navItems} {isAuthenticated} class="menu menu-horizontal px-1" />
   </div>
 </div>

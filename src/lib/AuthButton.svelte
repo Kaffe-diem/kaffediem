@@ -47,7 +47,7 @@
 </script>
 
 {#if isAuthenticated}
-  <button on:click={logout} class="hover:underline">Logg ut</button>
+  <button on:click={logout}>Logg ut</button>
 {:else}
-  <button on:click={login} class="hover:underline">Logg inn</button>
+  <button on:click={login}>Logg inn</button>
 {/if}

@@ -24,6 +24,7 @@ export default {
         }
       }
     ],
+    // Effectively makes the dark theme the same as the light theme - could implement dark mode in the future
     darkTheme: "kaffeDiem"
   },
 
