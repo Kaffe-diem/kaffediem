@@ -29,6 +29,7 @@
 <!-- Jump below the image -->
 <br class="clear-both" />
 
+<!-- Scroll horizontally -->
 <div class="flex overflow-x-auto">
   <Review rating=10>
     <span slot="title">Meningen med livet</span>

@@ -6,7 +6,7 @@
 <div class="flex-none card bg-base-200 w-full md:max-w-lg shadow m-2">
   <div class="card-body">
     <h2 class="card-title"><slot name="title">Title</slot></h2>
-    <Rating value={rating} />
+    <Rating value={rating} readonly=true />
     <p><slot name="content">Content</slot></p>
     <p class="mt-2 italic">- <slot name="author">Author</slot></p>
   </div>
