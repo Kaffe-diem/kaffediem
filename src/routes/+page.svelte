@@ -13,7 +13,7 @@
   }));
 </script>
 
-<img src={Logo} alt="Kaffe diem logo" class="w-full max-w-[400px] md:max-w-[280px] md:pr-5 md:float-left m-4 mx-auto" />
+<img src={Logo} alt="Kaffe diem logo" class="w-full max-w-[400px] md:max-w-[280px] md:mr-10 md:float-left m-4 mx-auto rounded-xl" />
 
 <p>
   Den beste kaffeen på amalie skram!
