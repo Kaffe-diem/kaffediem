@@ -20,6 +20,7 @@
     "@types/eslint": "^9.6.0",
     "@types/eventsource": "^1.1.15",
     "autoprefixer": "^10.4.20",
+    "daisyui": "^4.12.13",
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-svelte": "^2.36.0",

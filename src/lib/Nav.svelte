@@ -1,22 +1,46 @@
-<script>
+<script lang="ts">
+  import { auth } from "$lib/stores/authStore";
+  import { onMount } from "svelte";
+  import { restrictedRoutes } from "$lib/constants";
+  import MenuIcon from "$lib/assets/MenuIcon.svelte";
+  import NavItems from "$lib/NavItems.svelte";
+
+  let isAuthenticated = false;
+
+  onMount(auth.subscribe((value) => {
+    isAuthenticated = value.isAuthenticated;
+  }));
+
+  class NavItem {
+    href: string;
+    text: string;
+    requiresAuth: boolean;
+
+    constructor(href: string, text: string) {
+      this.href = href;
+      this.text = text;
+      this.requiresAuth = restrictedRoutes.includes(this.href);
+    }
+  }
+
   const navItems = [
-    { href: "/drinks", text: "Meny" },
-    { href: "/display", text: "Visning" },
-    { href: "/auth", text: "Logg inn" }
+    new NavItem("/drinks", "Meny"),
+    new NavItem("/display", "Visning"),
+    new NavItem("/account", "Min bruker"),
   ];
 </script>
 
-<header class="flex items-center justify-between py-2">
-  <h1 class="text-4xl font-bold">
-    <a href="/">Kaffe Diem</a>
-  </h1>
-  <nav>
-    <ul class="flex items-center space-x-4">
-      {#each navItems as item}
-        <li>
-          <a href={item.href} class="hover:underline">{item.text}</a>
-        </li>
-      {/each}
-    </ul>
-  </nav>
-</header>
+<div class="navbar bg-base-100">
+  <div class="flex-1">
+    <a href="/" class="btn btn-ghost text-xl">Kaffe Diem</a>
+  </div>
+  <div class="dropdown dropdown-end lg:hidden">
+    <div tabindex="0" role="button" class="btn btn-ghost">
+      <MenuIcon />
+    </div>
+    <NavItems {navItems} {isAuthenticated} class="dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow" />
+  </div>
+  <div class="hidden flex-none lg:flex">
+    <NavItems {navItems} {isAuthenticated} class="menu menu-horizontal px-1" />
+  </div>
+</div>
