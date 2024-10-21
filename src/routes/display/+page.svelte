@@ -21,5 +21,4 @@
       <OrderList {orders} filter={State.Complete} />
     </div>
   </div>
-
  
