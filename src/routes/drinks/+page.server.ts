@@ -6,8 +6,6 @@ export const load: PageServerLoad = async ({ locals }) => {
   // Fetch drinks from the PocketBase collection
   const drinks = await pb.collection('drinks').getFullList( { sort: '-created' });
 
-  console.log(drinks);
-
   return {
     drinks: drinks
   };

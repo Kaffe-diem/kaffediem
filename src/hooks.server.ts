@@ -6,13 +6,13 @@ export const handle: Handle = async ({ event, resolve }) => {
   const cookie = event.request.headers.get("cookie") || "";
   pb.authStore.loadFromCookie(cookie);
 
-  event.locals.pb = pb;
-
   const isAuthenticated = pb.authStore.isValid;
   const isRestricted = restrictedRoutes.includes(event.url.pathname);
   if (isRestricted && !isAuthenticated) {
     throw redirect(303, "/");
   }
+
+  event.locals.pb = pb;
 
   const response = await resolve(event);
 
