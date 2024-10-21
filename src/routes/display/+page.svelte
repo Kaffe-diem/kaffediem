@@ -1,7 +1,7 @@
 <script lang="ts">
   import OrderList from "$lib/OrderList.svelte";
   import { State, Order } from "$lib/types";
-  import QR from "$lib/assets/qr-code.svg";
+
 
   $: orders = [new Order(123), new Order(456), new Order(789, State.Complete)];
 </script>
@@ -22,13 +22,4 @@
     </div>
   </div>
 
-  <div class="absolute bottom-4 left-0 hidden md:flex">
-    <a href="/">
-      <img class="h-24 w-24" src={QR} alt="QR code"/>
-    </a>
-    <div class="flex flex-col items-start justify-center ml-2 py-1 text-sm text-neutral">
-      <span>Skann eller besøk</span>
-      <a href="https://kaffediem.asvg.no" class="font-bold text-accent">kaffediem.asvg.no</a>
-      <span>for å bestille</span>
-    </div>
-  </div>
+ 
