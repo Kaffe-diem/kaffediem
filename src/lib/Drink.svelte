@@ -1,5 +1,8 @@
 <script lang="ts">
-  export let favorite: any;
+  export let drink: any;
+  export let primaryButtonText: string = "Bestill igjen";
+  export let ghostButtonText: string = "Slett";
+  export let showGhostButton: boolean = true;
   import { pb } from "$lib/stores/authStore";
 </script>
 
@@ -7,20 +10,30 @@
   <figure>
     <img
       class=""
-      src={pb.files.getUrl(favorite.expand.drink, favorite.expand.drink.image)}
-      alt={favorite.expand.drink.name}
+      src={pb.files.getUrl(drink.expand.drink, drink.expand.drink.image)}
+      alt={drink.expand.drink.name}
     />
   </figure>
   <div class="card-body">
-    <h2 class="card-title">{favorite.expand.drink.name}</h2>
-    <p>Price: ${favorite.expand.drink.price}</p>
-    <p>Serving Size: {favorite.serving_size}</p>
-    <p>Extras: {favorite.extras}</p>
-    <p>Milk: {favorite.milk}</p>
-    <p>Flavor: {favorite.flavor}</p>
+    <h2 class="card-title">{drink.expand.drink.name}</h2>
+    <p>Price: ${drink.expand.drink.price}</p>
+    {#if drink.serving_size}
+      <p>Serving Size: {drink.serving_size}</p>
+    {/if}
+    {#if drink.extras}
+      <p>Extras: {drink.extras}</p>
+    {/if}
+    {#if drink.milk}
+      <p>Milk: {drink.milk}</p>
+    {/if}
+    {#if drink.flavor}
+      <p>Flavor: {drink.flavor}</p>
+    {/if}
     <div class="card-actions justify-end">
-      <button class="btn btn-primary">Bestill igjen</button>
-      <button class="btn btn-tertiary btn-ghost">Slett</button>
+      <button class="btn btn-primary">{primaryButtonText}</button>
+      {#if showGhostButton}
+        <button class="btn btn-tertiary btn-ghost">{ghostButtonText}</button>
+      {/if}
     </div>
   </div>
 </div>
