@@ -7,7 +7,7 @@
 
 <div class="rating rating-half block {$$restProps.class || ''}">
   {#each Array(10) as _, n}
-    <input type="radio" {name} class="mask mask-coffee {n % 2 == 0 ? 'mask-half-1' : 'mask-half-2'} bg-accent" checked={n == value - 1} disabled={readonly} />
+    <input type="radio" {name} class="mask mask-coffee {n % 2 == 0 ? 'mask-half-1' : 'mask-half-2'} bg-accent {readonly ? 'cursor-default' : ''}" checked={n == value - 1} disabled={readonly} />
   {/each}
 </div>
 
