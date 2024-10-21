@@ -13,9 +13,7 @@
   }));
 </script>
 
-<img src={Logo} alt="Kaffe diem logo" class="w-full max-w-[400px] md:max-w-[300px] md:pr-5 md:float-left m-4 mx-auto" />
-
-<h1 class="text-4xl">Kaffe diem</h1>
+<img src={Logo} alt="Kaffe diem logo" class="w-full max-w-[400px] md:max-w-[280px] md:pr-5 md:float-left m-4 mx-auto" />
 
 <p>
   Den beste kaffeen på amalie skram!
@@ -24,6 +22,15 @@
 <div class="inline-block text-center m-2">
   <Rating class="rating-lg" value=9 readonly />
   <span class="text-sm">Fra 1729 omtaler</span>
+</div>
+
+<div>
+  {#if isAuthenticated}
+    <a href="/drinks" class="btn">Trykk her for å bestille</a>
+  {:else}
+    <AuthButton class="btn m-2">Logg inn for å bestille</AuthButton>
+    <p class="text-xs">Ved å opprette en bruker samtykker du til våre <a href="/tos" class="link-primary">vilkår for bruk</a></p>
+  {/if}
 </div>
 
 <!-- Jump below the image -->
@@ -48,14 +55,3 @@
 <p>
   <a href="/drinks" class="link-primary">Se menyen vår</a>
 </p>
-
-<br />
-
-<div>
-  {#if isAuthenticated}
-    <a href="/drinks" class="btn">Trykk her for å bestille</a>
-  {:else}
-    <AuthButton class="btn m-2">Logg inn for å bestille</AuthButton>
-    <p class="text-xs">Ved å opprette en bruker samtykker du til våre <a href="/tos" class="link-primary">vilkår for bruk</a></p>
-  {/if}
-</div>
