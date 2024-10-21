@@ -12,7 +12,7 @@
     </a>
     <div class="flex flex-col items-start justify-center ml-2 mr-2 py-1 text-xl text-neutral">
       <span>Skann eller besøk</span>
-      <a href="https://kaffediem.asvg.no" class="font-bold text-accent text-sky-600">kaffediem.asvg.no</a>
+      <a href="https://kaffediem.asvg.no" class="font-bold text-accent">kaffediem.asvg.no</a>
       <span>for å bestille</span>
     </div>
   </div>
