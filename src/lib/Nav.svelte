@@ -26,6 +26,7 @@
   const navItems = [
     new NavItem("/drinks", "Meny"),
     new NavItem("/display", "Visning"),
+    new NavItem("/favorites", "Favoritter"),
     new NavItem("/account", "Min bruker"),
   ];
 </script>

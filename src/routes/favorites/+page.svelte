@@ -36,7 +36,7 @@
       {/each}
     </ul>
   </section>
-  
+
   <section>
     <h1 class="text-2xl font-bold text-sky-700 italic">Kald drikke</h1>
     <ul class="grid grid-cols-3 gap-16">
@@ -47,7 +47,7 @@
       {/each}
     </ul>
   </section>
-  
+
   <section>
     <h1 class="text-2xl font-bold text-orange-700 italic">Sesongens spesialer 🎃</h1>
     <ul class="grid grid-cols-3 gap-16">
@@ -58,5 +58,5 @@
       {/each}
     </ul>
   </section>
-  
+
 </div>
