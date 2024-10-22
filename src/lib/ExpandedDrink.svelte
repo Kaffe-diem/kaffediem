@@ -3,7 +3,9 @@
   import { pb } from "$lib/stores/authStore";
 </script>
 
-<div class="card bg-base-100 shadow-md transition-all duration-100 hover:scale-[101%] hover:shadow-lg ">
+<div
+  class="card bg-base-100 shadow-md transition-all duration-100 hover:scale-[101%] hover:shadow-lg"
+>
   <figure>
     <img
       class="h-16"
@@ -28,7 +30,7 @@
     {/if}
     <div class="card-actions justify-end">
       <button class="btn btn-primary">Bestill igjen</button>
-      <button class="btn btn-tertiary btn-ghost">Slett</button>
+      <button class="btn-tertiary btn btn-ghost">Slett</button>
     </div>
   </div>
 </div>
