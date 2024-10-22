@@ -17,7 +17,7 @@
     <input
       type="radio"
       {name}
-      class="mask-coffee mask {'mask-half-' + (2 - n % 2)} bg-accent {readonly
+      class="mask-coffee mask {'mask-half-' + (2 - (n % 2))} bg-accent {readonly
         ? 'cursor-default'
         : ''}"
       checked={n == value}
