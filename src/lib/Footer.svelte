@@ -5,7 +5,7 @@
 
 <footer class="footer mt-10 bg-base-200 p-10 text-base-content">
   <aside>
-    <img src={Logo} alt="logo" class="w-24 mb-2 rounded-xl" />
+    <img src={Logo} alt="logo" class="mb-2 w-24 rounded-xl" />
     <p>
       Copyright © {year} Kaffe diem
       <br />
