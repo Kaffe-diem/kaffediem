@@ -1,6 +1,6 @@
 <script>
   import "../app.css";
-  import { page } from '$app/stores';
+  import { page } from "$app/stores";
   import Nav from "$lib/Nav.svelte";
 </script>
 

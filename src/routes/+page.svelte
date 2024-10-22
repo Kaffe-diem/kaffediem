@@ -5,10 +5,12 @@
   let isAuthenticated = false;
   let user = null;
 
-  onMount(auth.subscribe((value) => {
-    isAuthenticated = value.isAuthenticated;
-    user = value.user;
-  }));
+  onMount(
+    auth.subscribe((value) => {
+      isAuthenticated = value.isAuthenticated;
+      user = value.user;
+    })
+  );
 </script>
 
 {#if isAuthenticated}
