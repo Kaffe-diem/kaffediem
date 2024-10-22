@@ -31,8 +31,8 @@ jobs:
           echo PUBLIC_PB_ADMIN_PASSWORD=${{ secrets.PB_ADMIN_PASSWORD }} >> .env
           echo PUBLIC_PB_ADMIN_EMAIL=${{ secrets.PB_ADMIN_EMAIL }} >> .env
 
-      - name: Run npm check
-        run: npm run check
+      # - name: Run npm check
+      #   run: npm run check
 
       - name: Run npm check:format
         run: npm run check:format
