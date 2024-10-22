@@ -3,7 +3,7 @@
   export let rating: number;
 </script>
 
-<div class="flex-none card bg-base-200 w-full md:max-w-lg shadow m-2">
+<div class="card m-2 w-full flex-none bg-base-200 shadow md:max-w-lg">
   <div class="card-body">
     <h2 class="card-title"><slot name="title">Title</slot></h2>
     <Rating value={rating} readonly />
