@@ -17,11 +17,11 @@
 
 <img
   src={Logo}
-  alt="Kaffe diem logo"
+  alt="logo"
   class="m-4 mx-auto w-full max-w-[400px] rounded-xl md:float-left md:mr-10 md:max-w-[280px]"
 />
 
-<p>Den beste kaffeen på amalie skram!</p>
+<p>Den beste kaffeen på amalie skram vgs!</p>
 
 <div class="m-2 inline-block text-center">
   <Rating class="rating-lg" value="9" readonly />
@@ -61,5 +61,5 @@
 <br />
 
 <p>
-  <a href="/drinks" class="link-primary">Se menyen vår</a>
+  <a href="/drinks" class="link-primary text-4xl">Se menyen vår</a>
 </p>
