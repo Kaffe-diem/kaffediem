@@ -13,6 +13,8 @@
 </script>
 
 <div class="rating rating-half block {$$restProps.class || ''}">
+  <!-- Required for tailwind to compile classes: -->
+  <!-- The following classes are used: mask-half-1 mask-half-2 -->
   {#each items as n}
     <input
       type="radio"
