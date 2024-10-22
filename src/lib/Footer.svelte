@@ -1,12 +1,11 @@
 <script>
-  // import Logo from "$lib/assets/logo.png";
+  import Logo from "$lib/assets/logo.png";
   const year = new Date().getFullYear();
 </script>
 
 <footer class="footer mt-10 bg-base-200 p-10 text-base-content">
   <aside>
-    <!-- <img src={Logo} alt="logo" /> -->
-    [Insert logo her]
+    <img src={Logo} alt="logo" class="w-24 mb-2 rounded-xl" />
     <p>
       Copyright © {year} Kaffe diem
       <br />
