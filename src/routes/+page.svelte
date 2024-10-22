@@ -1,10 +1,10 @@
 <script>
   import { auth } from "$lib/stores/authStore";
   import { onMount } from "svelte";
-  import Logo from "$lib/assets/logo.png";
-  import AuthButton from "$lib/AuthButton.svelte";
-  import Rating from "$lib/Rating.svelte";
-  import Review from "$lib/Review.svelte";
+  import Logo from "$assets/logo.png";
+  import AuthButton from "$components/AuthButton.svelte";
+  import Rating from "$components/Rating.svelte";
+  import Review from "$components/Review.svelte";
 
   let isAuthenticated = false;
 

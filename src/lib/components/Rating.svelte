@@ -31,6 +31,6 @@
 
 <style>
   .mask-coffee {
-    mask-image: url("$lib/assets/coffee.svg");
+    mask-image: url("$assets/coffee.svg");
   }
 </style>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import OrderItem from "$lib/OrderItem.svelte";
+  import OrderItem from "$components/OrderItem.svelte";
   import { State, Order } from "$lib/types";
 
   export let orders: Order[];
