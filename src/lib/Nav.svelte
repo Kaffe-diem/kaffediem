@@ -7,9 +7,11 @@
 
   let isAuthenticated = false;
 
-  onMount(auth.subscribe((value) => {
-    isAuthenticated = value.isAuthenticated;
-  }));
+  onMount(
+    auth.subscribe((value) => {
+      isAuthenticated = value.isAuthenticated;
+    })
+  );
 
   class NavItem {
     href: string;
@@ -26,7 +28,7 @@
   const navItems = [
     new NavItem("/drinks", "Meny"),
     new NavItem("/display", "Visning"),
-    new NavItem("/account", "Min bruker"),
+    new NavItem("/account", "Min bruker")
   ];
 </script>
 
@@ -38,7 +40,11 @@
     <div tabindex="0" role="button" class="btn btn-ghost">
       <MenuIcon />
     </div>
-    <NavItems {navItems} {isAuthenticated} class="dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow" />
+    <NavItems
+      {navItems}
+      {isAuthenticated}
+      class="dropdown-content z-[1] mt-3 w-52 rounded-box bg-base-100 p-2 shadow"
+    />
   </div>
   <div class="hidden flex-none lg:flex">
     <NavItems {navItems} {isAuthenticated} class="menu menu-horizontal px-1" />
