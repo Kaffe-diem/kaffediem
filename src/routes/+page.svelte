@@ -1,6 +1,7 @@
 <script lang="ts">
   import { pb } from "$lib/stores/authStore";
   import { onMount } from "svelte";
+  import Drink from "$lib/Drink.svelte";
   let groupedDrinks: Record<string, any[]>;
 
   onMount(async () => {
@@ -23,38 +24,39 @@
 </h1>
 {/if}
 
-<section>
-  <h1 class="text-2xl font-bold text-red-700 italic">Varme drikker</h1>
-  <ul class="grid grid-cols-3 gap-16">
-    {#each groupedDrinks?.hot || [] as drink}
-      <li class="drink-card">
-        <h2 class="drink-name">{drink.name}</h2>
-        <p class="drink-kind">{drink.kind}</p>
-      </li>
-    {/each}
-  </ul>
-</section>
+<div class="flex flex-col gap-16">
 
-<section>
-  <h1 class="text-2xl font-bold text-sky-700 italic">Kalde drikker</h1>
-  <ul class="grid grid-cols-3 gap-16">
-    {#each groupedDrinks?.cold || [] as drink}
-      <li class="drink-card">
-        <h2 class="drink-name">{drink.name}</h2>
-        <p class="drink-kind">{drink.kind}</p>
-      </li>
-    {/each}
-  </ul>
-</section>
-
-<section>
-  <h1 class="text-2xl font-bold text-orange-700 italic">Sesongens spesialer</h1>
-  <ul class="grid grid-cols-3 gap-16">
-    {#each groupedDrinks?.special || [] as drink}
-      <li class="drink-card">
-        <h2 class="drink-name">{drink.name}</h2>
-        <p class="drink-kind">{drink.kind}</p>
-      </li>
-    {/each}
-  </ul>
-</section>
+  <section>
+    <h1 class="text-2xl font-bold text-red-700 italic">Varme drikker</h1>
+    <ul class="grid grid-cols-3 gap-16">
+      {#each groupedDrinks?.hot || [] as drink}
+        <li class="drink-card">
+          <Drink {drink} />
+        </li>
+      {/each}
+    </ul>
+  </section>
+  
+  <section>
+    <h1 class="text-2xl font-bold text-sky-700 italic">Kalde drikker</h1>
+    <ul class="grid grid-cols-3 gap-16">
+      {#each groupedDrinks?.cold || [] as drink}
+        <li class="drink-card">
+          <Drink {drink} />
+        </li>
+      {/each}
+    </ul>
+  </section>
+  
+  <section>
+    <h1 class="text-2xl font-bold text-orange-700 italic">Sesongens spesialer 🎃</h1>
+    <ul class="grid grid-cols-3 gap-16">
+      {#each groupedDrinks?.special || [] as drink}
+        <li class="drink-card">
+          <Drink {drink} />
+        </li>
+      {/each}
+    </ul>
+  </section>
+  
+</div>

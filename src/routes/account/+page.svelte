@@ -2,7 +2,7 @@
     import { PUBLIC_PB_HOST } from "$env/static/public";
 import { pb } from "$lib/stores/authStore";
 import { onMount } from "svelte";
-import Drink from "$lib/Drink.svelte";
+import Drink from "$lib/ExpandedDrink.svelte";
 
 let favorites: any[] = [];
 
