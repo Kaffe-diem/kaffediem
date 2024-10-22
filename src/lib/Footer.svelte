@@ -10,7 +10,7 @@
     <p>
       Copyright © {year} Kaffe diem
       <br />
-      Den beste kaffeen på Amalie Skram
+      Den beste kaffeen på Amalie Skram vgs
     </p>
   </aside>
   <nav>
