@@ -1,3 +1,7 @@
+/*
+
+I have only commented this out for now, as it might be used.
+
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -10,3 +14,5 @@ export const load: PageServerLoad = async ({ locals }) => {
     drinks: drinks
   };
 };
+
+*/

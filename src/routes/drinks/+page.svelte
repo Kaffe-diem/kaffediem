@@ -2,14 +2,20 @@
   import { onMount } from 'svelte';
   import { pb } from "$lib/stores/authStore";
 
-  export let data: { drinks: any[] };
+  let drinks: any[] = [];
 
-  let drinks = data.drinks;
+  async function getDrinks(): { drinks: any[]}
+  {
+    return await pb.collection('drinks').getFullList( { sort: '-created' }) ;
+  }
 
-  onMount(() => {
-        
+  onMount(async () => {
+
+    const data = await getDrinks();
+    drinks = data;
+
     pb.collection('drinks').subscribe('*', (data) => {
-      console.log(data);  // Handle real-time updates here
+      drinks = data;
     });
   });
 </script>
