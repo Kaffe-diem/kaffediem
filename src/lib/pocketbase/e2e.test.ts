@@ -3,7 +3,6 @@ import { pb, OrderService } from "$lib/pocketbase/pb.service";
 import type { OrdersResponse } from "$lib/pocketbase/pb.d";
 import type { Writable } from "svelte/store";
 
-
 describe("Pocketbase", () => {
   test("should be authenticated", () => {
     expect(pb.authStore.model).toBeDefined();
@@ -44,7 +43,7 @@ describe("Pocketbase", () => {
 
     test("should be able to delete an order", async () => {
       const res = await pb.collection("orders").delete(keptOrderId as string);
-      await expect(res).toBeDefined()
+      await expect(res).toBeDefined();
       keptOrderId = null;
     });
   });
