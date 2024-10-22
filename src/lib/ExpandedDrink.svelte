@@ -6,13 +6,6 @@
 <div
   class="card bg-base-100 shadow-md transition-all duration-100 hover:scale-[101%] hover:shadow-lg"
 >
-  <figure>
-    <img
-      class="h-16"
-      src={pb.files.getUrl(drink.expand.drink, drink.expand.drink.image)}
-      alt={drink.expand.drink.name}
-    />
-  </figure>
   <div class="card-body">
     <h2 class="card-title">{drink.expand.drink.name}</h2>
     <p>Price: ${drink.expand.drink.price}</p>
