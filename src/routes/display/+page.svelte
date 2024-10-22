@@ -1,31 +1,26 @@
 <script lang="ts">
   import OrderList from "$lib/OrderList.svelte";
   import { State, Order } from "$lib/types";
-  import QR from "$lib/assets/qr-code.svg";
 
   $: orders = [new Order(123), new Order(456), new Order(789, State.Complete)];
 </script>
 
-  <div class="h-full grid grid-cols-1 gap-4 md:grid-cols-2">
-    <div class="flex h-full flex-col border-b-2 border-black p-4 md:border-b-0 md:border-r-2">
-      <h2 class="mb-3 text-3xl font-bold md:mb-6 md:text-center md:text-4xl">Straks ferdig...</h2>
-      <OrderList {orders} filter={State.Production} />
-    </div>
-    <div class="flex h-full flex-col p-4">
-      <h2 class="mb-3 text-3xl font-bold text-green-700 md:mb-6 md:text-center md:text-4xl">
-        Kom og hent!
-      </h2>
-      <OrderList {orders} filter={State.Complete} />
-    </div>
+<div
+  class="grid h-full grid-cols-1 grid-rows-[1fr_auto_1fr] gap-4 md:grid-cols-[1fr_auto_1fr] md:grid-rows-1"
+>
+  <div class="flex h-full flex-col p-4">
+    <h2 class="mb-3 text-4xl font-bold text-neutral md:mb-6 md:text-center md:text-4xl">
+      Straks ferdig...
+    </h2>
+    <OrderList {orders} filter={State.Production} />
   </div>
 
-  <div class="absolute bottom-4 left-0 hidden md:flex">
-    <a href="/">
-      <img class="h-24 w-24" src={QR} alt="QR code" />
-    </a>
-    <div class="flex flex-col items-start justify-center ml-2 py-1">
-      <span class="text-sm text-gray-700">Skann eller besøk</span>
-      <a href="https://kaffediem.asvg.no" class="text-sm text-gray-700"> <span class="font-bold text-gray-700">kaffediem.asvg.no</span></a>
-      <span class="text-sm text-gray-700"> for å bestille</span>
-    </div>
+  <div class="divider md:divider-horizontal"></div>
+
+  <div class="flex h-full flex-col p-4">
+    <h2 class="mb-3 text-4xl font-bold text-primary md:mb-6 md:text-center md:text-4xl">
+      Kom og hent!
+    </h2>
+    <OrderList {orders} filter={State.Complete} />
   </div>
+</div>
