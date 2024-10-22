@@ -5,15 +5,17 @@
 
   let isAuthenticated = false;
 
-  onMount(auth.subscribe((value) => {
-    isAuthenticated = value.isAuthenticated;
-  }));
+  onMount(
+    auth.subscribe((value) => {
+      isAuthenticated = value.isAuthenticated;
+    })
+  );
 
   function goHome() {
-    if (window.location.pathname === '/') {
+    if (window.location.pathname === "/") {
       window.location.reload();
     } else {
-      goto('/');
+      goto("/");
     }
   }
 
@@ -36,13 +38,13 @@
     }
 
     document.cookie = pb.authStore.exportToCookie({ httpOnly: false });
-    goHome()
+    goHome();
   }
 
   function logout() {
     pb.authStore.clear();
     document.cookie = pb.authStore.exportToCookie({ httpOnly: false });
-    goHome()
+    goHome();
   }
 </script>
 
