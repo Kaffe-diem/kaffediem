@@ -1,8 +1,8 @@
 <script>
   import "../app.css";
   import { page } from "$app/stores";
-  import Nav from "$lib/Nav.svelte";
-  import Footer from "$lib/Footer.svelte";
+  import Nav from "$components/Nav.svelte";
+  import Footer from "$components/Footer.svelte";
 </script>
 
 <div class="flex min-h-screen flex-col">

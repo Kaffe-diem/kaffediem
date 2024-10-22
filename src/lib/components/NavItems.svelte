@@ -1,7 +1,7 @@
 <script>
   export let navItems;
   export let isAuthenticated;
-  import AuthButton from "$lib/AuthButton.svelte";
+  import AuthButton from "$components/AuthButton.svelte";
 </script>
 
 <ul class="menu {$$restProps.class || ''}">
