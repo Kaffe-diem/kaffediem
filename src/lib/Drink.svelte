@@ -4,12 +4,13 @@
   const purchased_cup = pb.authStore.model?.purchased_cup;
 </script>
 
-<div
-  class="card bg-base-100 shadow-md transition-all duration-100 hover:scale-[101%] hover:shadow-lg"
+<form
+  class="card bg-base-100  shadow-md transition-all duration-100 hover:scale-[101%] hover:shadow-lg"
 >
   <div class="card-body">
     <h2 class="card-title">{drink.name}</h2>
-    <p>Pris ${drink.price}</p>
+    <!-- price does not make sense without a modifier, remove until such is implemented? -->
+    <p>{drink.price},-</p>
     <div class="form-control">
       <label class="label">
         <span class="label-text">Velg en størrelse</span>
@@ -39,4 +40,4 @@
       <button class="btn btn-primary">Bestill</button>
     </div>
   </div>
-</div>
+</form>
