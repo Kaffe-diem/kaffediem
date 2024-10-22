@@ -27,7 +27,7 @@
 <div class="flex flex-col gap-16">
 
   <section>
-    <h1 class="text-2xl font-bold text-red-700 italic">Varme drikker</h1>
+    <h1 class="text-2xl font-bold text-red-700 italic">Varme drikke</h1>
     <ul class="grid grid-cols-3 gap-16">
       {#each groupedDrinks?.hot || [] as drink}
         <li class="drink-card">
@@ -38,7 +38,7 @@
   </section>
   
   <section>
-    <h1 class="text-2xl font-bold text-sky-700 italic">Kalde drikker</h1>
+    <h1 class="text-2xl font-bold text-sky-700 italic">Kald drikke</h1>
     <ul class="grid grid-cols-3 gap-16">
       {#each groupedDrinks?.cold || [] as drink}
         <li class="drink-card">
