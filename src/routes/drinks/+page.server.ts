@@ -1,4 +1,4 @@
-import pb from "$lib/pocketbase";
+import upb from "$lib/pocketbase";
 
 export const load = async () => ({
   drinks: await pb.collection("drinks").getFullList({
