@@ -1,7 +1,7 @@
 import upb from "$lib/pocketbase";
 
 export const load = async () => ({
-  drinks: await pb.collection("drinks").getFullList({
+  drinks: await upb.collection("drinks").getFullList({
     sort: "-created"
   })
 });
