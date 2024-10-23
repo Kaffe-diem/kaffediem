@@ -19,10 +19,9 @@
 
 {#if screenMessage.title != ""}
   <div class="flex h-screen flex-col items-center justify-center">
-    <div class="text-7xl font-bold md:text-9xl">{screenMessage.title}</div>
+    <span class="text-7xl font-bold md:text-9xl p-2">{screenMessage.title}</span>
     {#if screenMessage.subtext != ""}
-      <div class="divider"></div>
-      <div class="text-4xl md:text-6xl">{screenMessage.subtext}</div>
+      <span class="text-4xl md:text-6xl p-2">{screenMessage.subtext}</span>
     {/if}
   </div>
 {:else}
