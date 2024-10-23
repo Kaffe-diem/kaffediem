@@ -24,7 +24,7 @@
 <div class="flex flex-col gap-16">
   <section>
     <h1 class="text-2xl font-bold italic text-red-700">Varm drikke</h1>
-    <ul class="grid grid-cols-3 gap-16">
+    <ul class="grid grid-cols-1 md:grid-cols-3 gap-16">
       {#each groupedDrinks?.hot || [] as drink}
         <li class="drink-card">
           <Drink {drink} />
