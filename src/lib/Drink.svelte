@@ -1,7 +1,7 @@
 <script lang="ts">
   export let drink: any;
   import { pb } from "$lib/stores/authStore";
-  const purchased_cup = pb.authStore.model?.purchased_cup;
+  const purchasedCup = pb.authStore.model?.purchased_cup;
 </script>
 
 <form
