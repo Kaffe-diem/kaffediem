@@ -1,16 +1,11 @@
 <script lang="ts">
-  import { pb } from "$lib/stores/authStore";
-  import { onMount } from "svelte";
   import Drink from "$lib/Drink.svelte";
+  import { pb } from "$lib/stores/authStore";
   let groupedDrinks: Record<string, any[]>;
 
-  onMount(async () => {
-    const drinks = await pb.collection("drinks").getFullList(100, {
-      sort: "-created"
-    });
-
-    groupedDrinks = Object.groupBy(drinks, ({ kind }) => kind);
-  });
+  /** @type {import('./$types').PageData} */
+  export let data = { drinks: [] };
+  groupedDrinks = Object.groupBy(data.drinks, ({ kind }) => kind);
 </script>
 
 {#if pb.authStore.isValid}
@@ -24,7 +19,7 @@
 <div class="flex flex-col gap-16">
   <section>
     <h1 class="text-2xl font-bold italic text-red-700">Varm drikke</h1>
-    <ul class="grid grid-cols-1 md:grid-cols-3 gap-16">
+    <ul class="grid grid-cols-1 gap-16 md:grid-cols-3">
       {#each groupedDrinks?.hot || [] as drink}
         <li class="drink-card">
           <Drink {drink} />

@@ -30,7 +30,7 @@
             name="size"
             class="radio-bordered radio"
             value="Egen kopp"
-            checked={purchased_cup}
+            checked={purchasedCup}
           />
           <span class="ml-2">Egen kopp</span>
         </label>
