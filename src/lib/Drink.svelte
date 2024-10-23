@@ -5,7 +5,7 @@
 </script>
 
 <form
-  class="card bg-base-100  shadow-md transition-all duration-100 hover:scale-[101%] hover:shadow-lg"
+  class="card bg-base-100 shadow-md transition-all duration-100 hover:scale-[101%] hover:shadow-lg"
 >
   <div class="card-body">
     <h2 class="card-title">{drink.name}</h2>
