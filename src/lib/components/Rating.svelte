@@ -2,7 +2,7 @@
   export let value: number = 0;
   export let readonly: boolean = false;
   // Name is only required when the component's value can change
-  export let name: string;
+  export let name: string = null;
 
   function inputChange(newValue: number) {
     value = newValue;
