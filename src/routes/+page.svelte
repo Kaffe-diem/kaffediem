@@ -21,7 +21,7 @@
   class="m-4 mx-auto w-full max-w-[400px] rounded-xl md:float-left md:mr-10 md:max-w-[280px]"
 />
 
-<p>Den beste kaffeen på amalie skram vgs!</p>
+<p>Den beste kaffeen på Amalie Skram VGS!</p>
 
 <div class="m-2 inline-block text-center">
   <Rating class="rating-lg" value="9" readonly />
