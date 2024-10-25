@@ -17,11 +17,11 @@
   });
 </script>
 
-{#if screenMessage.title != ""}
+{#if screenMessage.isVisible}
   <div class="flex h-screen flex-col items-center justify-center">
-    <span class="text-7xl font-bold md:text-9xl p-2">{screenMessage.title}</span>
+    <span class="p-2 text-7xl font-bold md:text-9xl">{screenMessage.title}</span>
     {#if screenMessage.subtext != ""}
-      <span class="text-4xl md:text-6xl p-2">{screenMessage.subtext}</span>
+      <span class="p-2 text-4xl md:text-6xl">{screenMessage.subtext}</span>
     {/if}
   </div>
 {:else}
