@@ -3,12 +3,8 @@
   import { pb } from "$lib/stores/authStore";
   import { onMount } from "svelte";
 
-  let screenMessage = {};
-
-  onMount(async () => {
-    const screenMessageRecord = await pb.collection("screen_message").getList(1, 1);
-    screenMessage = screenMessageRecord.items[0];
-  });
+  export let data: { screenMessageRecord };
+  let screenMessage = data.screenMessageRecord[0];
 
   onMount(() => {
     pb.collection("screen_message").subscribe("*", function (event) {
