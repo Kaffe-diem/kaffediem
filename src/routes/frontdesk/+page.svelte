@@ -1,36 +1,22 @@
 <script lang="ts">
-  import { pb } from "$lib/stores/authStore";
-  let groupedDrinks: Record<string, any[]>;
-
-  export let data = { drinks: [] };
-  groupedDrinks = Object.groupBy(data.drinks, ({ kind }) => kind);
+  export let data;
 </script>
 
-<div class="flex flex-col gap-16">
-  <section>
-    <h1 class="text-2xl font-bold italic text-red-700">Varm drikke</h1>
-    <ul class="grid grid-cols-1 gap-6 md:grid-cols-8">
-      {#each groupedDrinks?.hot || [] as drink}
-        <input type="radio" name="drink" aria-label={drink.name} class="btn" />
-      {/each}
-    </ul>
-  </section>
-
-  <section>
-    <h1 class="text-2xl font-bold italic text-sky-700">Kald drikke</h1>
-    <ul class="grid grid-cols-1 gap-6 md:grid-cols-8">
-      {#each groupedDrinks?.cold || [] as drink}
-        <input type="radio" name="drink" aria-label={drink.name} class="btn" />
-      {/each}
-    </ul>
-  </section>
-
-  <section>
-    <h1 class="text-2xl font-bold italic text-orange-700">Sesongens spesial 🎃</h1>
-    <ul class="grid grid-cols-1 gap-6 md:grid-cols-8">
-      {#each groupedDrinks?.special || [] as drink}
-        <input type="radio" name="drink" aria-label={drink.name} class="btn" />
-      {/each}
-    </ul>
-  </section>
+<div class="flex flex-col gap-8">
+  {#each data.categories as category}
+    <section>
+      <h1 class="text-2xl mb-4 font-bold italic text-primary">{category.label}</h1>
+      <ul class="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        {#each data.drinks[category.name] as drink}
+          <label>
+            <input type="radio" name="drink" class="hidden peer" />
+            <div class="w-full h-24 btn border-2 peer-checked:border-accent relative flex justify-center items-center flex-col">
+              <span class="font-bold">{drink.name}</span>
+              <span class="font-normal absolute bottom-2 right-2">{drink.price},-</span>
+            </div>
+          </label>
+        {/each}
+      </ul>
+    </section>
+  {/each}
 </div>
