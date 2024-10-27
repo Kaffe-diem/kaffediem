@@ -1,4 +1,5 @@
 export const restrictedRoutes = ["/account", "/status"];
+export const adminRoutes = ["/frontdesk"];
 export const hideNavbar = ["/display"];
 export const hideFooter = ["/display", "/frontdesk"];
 
