@@ -7,20 +7,17 @@
   import { hideNavbar, hideFooter } from "$lib/constants.ts";
 </script>
 
-<div class="flex min-h-screen flex-col">
-  <div class="flex-grow">
-    <!-- Display-kiosk-siden skal ikke ha noen navbar; den skal kun vise bestillinger -->
-    {#if hideNavbar.includes($page.url.pathname)}
-      <slot />
-    {:else}
-      <div class="app mx-auto w-11/12 md:w-9/12">
-        <Nav />
-        <main class="mt-16">
-          <slot />
-        </main>
-      </div>
-    {/if}
-  </div>
+<div class="grid min-h-screen grid-rows-[1fr_auto]">
+  {#if hideNavbar.includes($page.url.pathname)}
+    <slot />
+  {:else}
+    <div class="app mx-auto grid w-11/12 grid-rows-[auto_1fr] md:w-9/12">
+      <Nav />
+      <main class="mt-16">
+        <slot />
+      </main>
+    </div>
+  {/if}
 
   {#if !hideFooter.includes($page.url.pathname)}
     <Footer />
