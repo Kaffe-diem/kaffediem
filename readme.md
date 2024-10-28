@@ -35,16 +35,16 @@ Sider som må til for dette:
 
 ```bash
 PUBLIC_PB_HOST=https://kodekafe-pocketbase.fly.dev
-PB_USER=
-PB_PASS=
-```
-
-Testing av db i svelte:
-
-```bash
-# samme verdier som USER og PASS over
 PUBLIC_PB_ADMIN_EMAIL=
 PUBLIC_PB_ADMIN_PASSWORD=
+```
+
+## Pocketbase
+
+Installer docker for å kjøre pocketbase lokalt.
+
+```bash
+docker compose up
 ```
 
 ## Development
