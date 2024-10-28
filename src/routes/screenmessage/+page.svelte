@@ -1,30 +1,34 @@
 <script lang="ts">
   import { pb } from "$lib/stores/authStore";
-  import { onMount } from "svelte";
 
   export let data: { screenMessageRecord };
-  let screenMessage = data.screenMessageRecord[0];
+  const screenMessage = data.screenMessageRecord[0];
 
-  onMount(() => {
-    pb.collection("screen_message").subscribe("*", function (event) {
-      screenMessage = event.record;
+  let title = screenMessage.title;
+  let subtext = screenMessage.subtext;
+
+  async function updateScreenMessage() {
+    await pb.collection("screen_message").update("tygravi8rpcyaf6", {
+      title: title,
+      subtext: subtext,
+      isVisible: true
     });
-  });
+  }
 </script>
 
 <div class="flex">
   <input
     type="text"
     placeholder="Tittel"
-    value={screenMessage.title}
+    bind:value={title}
     class="input input-lg input-bordered w-full max-w-xs"
   />
 
   <input
     type="text"
     placeholder="Beskrivelse"
-    value={screenMessage.subtext}
+    bind:value={subtext}
     class="input input-lg input-bordered ml-4 w-full max-w-xs"
   />
 </div>
-<button class="btn mt-4 w-full max-w-xs">OK</button>
+<button class="btn mt-4 w-full max-w-xs" on:click={updateScreenMessage}>OK</button>
