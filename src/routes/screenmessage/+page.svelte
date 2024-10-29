@@ -16,19 +16,22 @@
   }
 </script>
 
-<div class="flex">
-  <input
-    type="text"
-    placeholder="Tittel"
-    bind:value={title}
-    class="input input-lg input-bordered w-full max-w-xs"
-  />
+<form>
+  <div class="flex">
+    <input
+      type="text"
+      placeholder="Tittel"
+      bind:value={title}
+      class="input input-lg input-bordered w-full max-w-xs"
+    />
 
-  <input
-    type="text"
-    placeholder="Beskrivelse"
-    bind:value={subtext}
-    class="input input-lg input-bordered ml-4 w-full max-w-xs"
-  />
-</div>
-<button class="btn mt-4 w-full max-w-xs" on:click={updateScreenMessage}>OK</button>
+    <input
+      type="text"
+      placeholder="Beskrivelse"
+      bind:value={subtext}
+      class="input input-lg input-bordered ml-4 w-full max-w-xs"
+    />
+  </div>
+
+  <button type="submit" class="btn mt-4 w-full max-w-xs" on:click={updateScreenMessage}>OK</button>
+</form>
