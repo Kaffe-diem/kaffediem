@@ -8,7 +8,7 @@
   let subtext = screenMessage.subtext;
 
   async function updateScreenMessage() {
-    await pb.collection("screen_message").update("tygravi8rpcyaf6", {
+    await pb.collection("screen_message").update(screenMessage.id, {
       title: title,
       subtext: subtext,
       isVisible: true
