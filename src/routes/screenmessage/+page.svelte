@@ -17,7 +17,7 @@
 </script>
 
 <form>
-  <div class="flex">
+  <ul class="flex">
     <input
       type="text"
       placeholder="Tittel"
@@ -31,7 +31,7 @@
       bind:value={subtext}
       class="input input-lg input-bordered ml-4 w-full max-w-xs"
     />
-  </div>
+  </ul>
 
   <button type="submit" class="btn mt-4 w-full max-w-xs" on:click={updateScreenMessage}>OK</button>
 </form>
