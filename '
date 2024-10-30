@@ -4,30 +4,27 @@
   // TODO: instead of having an Order-type, interface directly with the DB using a svelte store
   $: orders = [new Order(123), new Order(456), new Order(789, State.Complete)];
 
+  $: cart = [];
+
   export let data;
   // Is undefined before anything is checked.
   // Make sure to account for that when implementing logic based on it.
   let selectedDrink;
 
-  let cart = [];
-  $: totalPrice = cart.reduce((sum, item) => sum + item.price, 0);
   function addToCart() {
-    // Has to be re-assigned to trigger reactivity..
-    // https://svelte.dev/tutorial/svelte/deep-state
-    // ↑ does not seem to work here /shrug
-    cart = [...cart, selectedDrink];
-    // selectedDrink = undefined;
-  }
-
-  function removeFromCart(index) {
-    // Same as above :(
-    // cart.splice(index, 1);
-    // cart = [...cart];
-    cart = cart.slice(0, index).concat(cart.slice(index + 1));
+    cart.append(selectedDrink);
+    console.log(selectedDrink);
+    selectedDrink = undefined;
   }
 </script>
 
-<div class="grid h-full grid-cols-[3fr,auto,1.5fr,auto,1fr] grid-rows-[100%] gap-4">
+{#if selectedDrink}
+  <p class="mb-4">
+    Valgt drikke: {selectedDrink.name}
+  </p>
+{/if}
+
+<div class="grid h-full grid-cols-[3fr,auto,1fr,auto,1fr] grid-rows-[100%] gap-4">
   <div class="flex flex-col overflow-y-auto">
     {#each data.categories as category}
       <div class="mb-8">
@@ -57,42 +54,16 @@
 
   <div class="divider divider-horizontal"></div>
 
-  <div class="flex h-full flex-col justify-center gap-8">
-    <div class="h-1/2 overflow-y-auto">
-      <table class="table table-pin-rows table-auto list-none p-4 shadow-2xl">
-        <thead>
-          <tr>
-            <th class="w-full">Drikke</th>
-            <th class="whitespace-nowrap">Pris</th>
-          </tr>
-        </thead>
-        <tbody>
-          {#if cart.length > 0}
-            {#each cart as drink, index}
-              <tr class="hover select-none" on:click={() => removeFromCart(index)}>
-                <td>{drink.name}</td>
-                <td>{drink.price},-</td>
-              </tr>
-            {/each}
-          {:else}
-            <tr>
-              <td>Ingenting</td>
-              <td></td>
-            </tr>
-          {/if}
-        </tbody>
-        <tfoot>
-          <tr>
-            <th>Total</th>
-            <th><span class="text-bold text-lg text-primary">{totalPrice},-</span></th>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
+  <div class="flex h-full flex-col justify-evenly gap-8 py-36">
+    <ul class="h-lg list-none p-4 shadow-2xl">
+      {#each cart as drink}
+        <li>{drink.name}</li>
+      {/each}
+    </ul>
 
     <div class="flex flex-row justify-center gap-2">
       <button class="bold btn btn-lg text-xl">Ferdig</button>
-      <button class="bold btn btn-primary btn-lg text-3xl" on:click={addToCart}>+</button>
+      <button class="bold btn btn-accent btn-lg text-3xl" on:click={addToCart}>+</button>
     </div>
   </div>
 
