@@ -9,14 +9,8 @@ import eventsource from "eventsource";
 import * as pbt from "./pb.d";
 
 // should probablt be moved away from here. also, stores don't have a length?
-export const ordersStore = writable<pbt.OrdersResponse[]>([]);
-
-export const pb = new pocketbase(process.env.PUBLIC_PB_HOST) as pbt.TypedPocketBase;
-
-await pb.admins.authWithPassword(
-  process.env.PUBLIC_PB_ADMIN_EMAIL!,
-  process.env.PUBLIC_PB_ADMIN_PASSWORD!
-);
+export const ordersStore = writable([])
+export const pb = new pocketbase(process.env.PUBLIC_PB_HOST)
 
 export const OrderService = {
   createOrder: async () => {
@@ -43,9 +37,11 @@ export const OrderService = {
   },
 
   listenForOrders: async () => {
+    // Populate the initial store
     const orders = await pb.collection("orders").getFullList();
     ordersStore.set(orders);
 
+    // Listen for changes
     pb.collection("orders").subscribe("*", (e) => {
       ordersStore.update((currentOrders) => {
         const orderIndex = currentOrders.findIndex(
