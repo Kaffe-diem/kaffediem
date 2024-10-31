@@ -1,5 +1,5 @@
 <script>
-  import Logo from "$lib/assets/logo.png";
+  import Logo from "$assets/logo.png";
   const year = new Date().getFullYear();
 </script>
 
@@ -9,7 +9,7 @@
     <p>
       Copyright © {year} Kaffe diem
       <br />
-      Den beste kaffeen på Amalie Skram vgs
+      Den beste kaffeen på Amalie Skram VGS
     </p>
   </aside>
   <nav>

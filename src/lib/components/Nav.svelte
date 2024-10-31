@@ -2,8 +2,8 @@
   import { auth } from "$lib/stores/authStore";
   import { onMount } from "svelte";
   import { restrictedRoutes } from "$lib/constants";
-  import MenuIcon from "$lib/assets/MenuIcon.svelte";
-  import NavItems from "$lib/NavItems.svelte";
+  import MenuIcon from "$assets/MenuIcon.svelte";
+  import NavItems from "$components/NavItems.svelte";
 
   let isAuthenticated = false;
 
@@ -28,7 +28,8 @@
   const navItems = [
     new NavItem("/drinks", "Meny"),
     new NavItem("/display", "Visning"),
-    new NavItem("/account", "Min bruker")
+    new NavItem("/account", "Min bruker"),
+    new NavItem("/status", "Min bestilling")
   ];
 </script>
 

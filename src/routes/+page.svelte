@@ -1,10 +1,10 @@
 <script>
   import { auth } from "$lib/stores/authStore";
   import { onMount } from "svelte";
-  import Logo from "$lib/assets/logo.png";
-  import AuthButton from "$lib/AuthButton.svelte";
-  import Rating from "$lib/Rating.svelte";
-  import Review from "$lib/Review.svelte";
+  import Logo from "$assets/logo.png";
+  import AuthButton from "$components/AuthButton.svelte";
+  import Rating from "$components/Rating.svelte";
+  import Review from "$components/Review.svelte";
 
   let isAuthenticated = false;
 
@@ -21,7 +21,7 @@
   class="m-4 mx-auto w-full max-w-[400px] rounded-xl md:float-left md:mr-10 md:max-w-[280px]"
 />
 
-<p>Den beste kaffeen på amalie skram vgs!</p>
+<p>Den beste kaffeen på Amalie Skram VGS!</p>
 
 <div class="m-2 inline-block text-center">
   <Rating class="rating-lg" value="9" readonly />
