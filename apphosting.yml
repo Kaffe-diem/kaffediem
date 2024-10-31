@@ -1,0 +1,8 @@
+
+
+env:
+-   variable: PUBLIC_PB_HOST
+    value: https://kodekafe-pocketbase.fly.dev
+    availability:
+    -   BUILD
+    -   RUNTIME
