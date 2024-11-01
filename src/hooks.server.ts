@@ -1,4 +1,4 @@
-import { restrictedRoutes } from "$lib/constants";
+import { restrictedRoutes, adminRoutes } from "$lib/constants";
 import { pb } from "$lib/stores/authStore";
 import { redirect, type Handle } from "@sveltejs/kit";
 
@@ -9,6 +9,12 @@ export const handle: Handle = async ({ event, resolve }) => {
   const isAuthenticated = pb.authStore.isValid;
   const isRestricted = restrictedRoutes.includes(event.url.pathname);
   if (isRestricted && !isAuthenticated) {
+    throw redirect(303, "/");
+  }
+
+  const isAdmin = pb.authStore.model?.is_admin;
+  const requiresAdmin = adminRoutes.includes(event.url.pathname);
+  if (requiresAdmin && !isAdmin) {
     throw redirect(303, "/");
   }
 
