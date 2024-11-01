@@ -53,6 +53,9 @@
         </div>
       </div>
     {/each}
+
+    <input type="radio" name="selected" class="radio mr-2 mt-4" />
+    <span class="text-lg">Åpent!</span>
   </ul>
 
   <button type="submit" class="btn mt-4 w-full max-w-xs" on:click={updateScreenMessages}>OK</button>
