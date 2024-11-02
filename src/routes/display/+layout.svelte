@@ -19,7 +19,7 @@
   });
 </script>
 
-{#if message !== undefined}
+{#if message !== null}
   <div class="flex h-screen flex-col items-center justify-center">
     <span class="p-2 text-7xl font-bold md:text-9xl">{message.title}</span>
     <span class="p-2 text-4xl md:text-6xl">{message.subtext}</span>
