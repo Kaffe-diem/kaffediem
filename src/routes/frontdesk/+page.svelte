@@ -1,8 +1,22 @@
 <script lang="ts">
   import { State, Order } from "$lib/types";
-  import OrderList from "$components/OrderList.svelte";
+  import OrderList from "./OrderList.svelte";
   // TODO: instead of having an Order-type, interface directly with the DB using a svelte store
-  $: orders = [new Order(123), new Order(456), new Order(789, State.Complete)];
+  $: orders = [
+    new Order(123),
+    new Order(456, State.Complete),
+    new Order(789, State.Complete),
+    new Order(999, State.Complete),
+    new Order(999, State.Complete),
+    new Order(999, State.Complete),
+    new Order(999, State.Complete),
+    new Order(999, State.Complete),
+    new Order(999, State.Complete),
+    new Order(999, State.Complete),
+    new Order(999, State.Complete),
+    new Order(999, State.Complete),
+    new Order(999, State.Complete)
+  ];
 
   export let data;
   // Is undefined before anything is checked.
