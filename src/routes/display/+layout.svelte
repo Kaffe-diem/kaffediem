@@ -5,6 +5,18 @@
 
   export let data: { visibleScreenMessage };
   let message = data.visibleScreenMessage;
+
+  onMount(() => {
+    pb.collection("screen_message").subscribe(
+      "*",
+      (event) => {
+        message = event.record;
+      },
+      {
+        filter: "isVisible = true"
+      }
+    );
+  });
 </script>
 
 {#if message !== undefined}
