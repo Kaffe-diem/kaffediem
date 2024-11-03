@@ -14,7 +14,7 @@
     new NavItem("/kitchen", "Kjøkken"),
     new NavItem("/display", "Visning"),
     new NavItem("/screenmessage", "Endre skjerm melding"),
-    new NavItem("/edit-drinks", "Endre menyen")
+    new NavItem("/edit-menu", "Endre menyen")
   ];
 </script>
 
