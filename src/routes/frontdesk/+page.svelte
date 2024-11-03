@@ -112,5 +112,7 @@
 
   <div class="divider divider-horizontal"></div>
 
-  <OrderList {orders} filter={State.Complete} />
+  <div class="overflow-y-auto">
+    <OrderList {orders} filter={State.Complete} />
+  </div>
 </div>
