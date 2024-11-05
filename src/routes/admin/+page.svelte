@@ -10,11 +10,11 @@
   }
 
   const navItems = [
-    new NavItem("/frontdesk", "Bestillingsdisk"),
-    new NavItem("/kitchen", "Kjøkken"),
-    new NavItem("/display", "Visning"),
-    new NavItem("/screenmessage", "Endre skjerm melding"),
-    new NavItem("/edit-menu", "Endre menyen")
+    new NavItem("/admin/frontdesk", "Bestillingsdisk"),
+    // new NavItem("/admin/kitchen", "Kjøkken"),
+    new NavItem("/display", "Visning")
+    // new NavItem("/admin/screenmessage", "Endre skjerm melding"),
+    // new NavItem("/admin/menu", "Endre menyen")
   ];
 </script>
 

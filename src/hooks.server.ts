@@ -7,13 +7,13 @@ export const handle: Handle = async ({ event, resolve }) => {
   pb.authStore.loadFromCookie(cookie);
 
   const isAuthenticated = pb.authStore.isValid;
-  const isRestricted = restrictedRoutes.includes(event.url.pathname);
+  const isRestricted = restrictedRoutes.some((path) => event.url.pathname.includes(path));
   if (isRestricted && !isAuthenticated) {
     throw redirect(303, "/");
   }
 
   const isAdmin = pb.authStore.model?.is_admin;
-  const requiresAdmin = adminRoutes.includes(event.url.pathname);
+  const requiresAdmin = adminRoutes.some((path) => event.url.pathname.includes(path));
   if (requiresAdmin && !isAdmin) {
     throw redirect(303, "/");
   }

@@ -8,7 +8,7 @@
 </script>
 
 <div class="grid min-h-screen grid-rows-[1fr_auto]">
-  {#if hideNavbar.includes($page.url.pathname)}
+  {#if hideNavbar.some((path) => $page.url.pathname.includes(path))}
     <slot />
   {:else}
     <div class="app mx-auto grid w-11/12 grid-rows-[auto_1fr] md:w-9/12">
@@ -19,7 +19,7 @@
     </div>
   {/if}
 
-  {#if !hideFooter.includes($page.url.pathname)}
+  {#if !hideFooter.some((path) => $page.url.pathname.includes(path))}
     <Footer />
   {/if}
 </div>
