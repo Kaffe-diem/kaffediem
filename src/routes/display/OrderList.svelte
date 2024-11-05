@@ -1,5 +1,4 @@
 <script lang="ts">
-  import OrderItem from "$components/OrderItem.svelte";
   import { State, Order } from "$lib/types";
 
   export let orders: Order[];
@@ -9,7 +8,7 @@
 <div class="flex flex-wrap gap-2">
   {#each orders as order}
     {#if order.state == filter}
-      <OrderItem>{order.id}</OrderItem>
+      <button class="btn btn-lg bg-base-200 text-3xl font-normal text-neutral">{order.id}</button>
     {/if}
   {/each}
 </div>

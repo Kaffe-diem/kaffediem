@@ -25,3 +25,6 @@ src/pb.d.ts
 
 # Pocketbase
 /pocketbase-data
+
+.firebase
+.github
