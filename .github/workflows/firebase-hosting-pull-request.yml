@@ -11,6 +11,9 @@ jobs:
   build_and_preview:
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
+    env:
+      PUBLIC_PB_HOST: ${{ secrets.PUBLIC_PB_HOST }}
+      FIREBASE_CLI_EXPERIMENTS: webframeworks
     steps:
       - uses: actions/checkout@v4
       - run: npm ci && npm run build
@@ -19,6 +22,3 @@ jobs:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KAFFE_DIEM }}
           projectId: kaffe-diem
-        env:
-          PUBLIC_PB_HOST: ${{ secrets.PUBLIC_PB_HOST }}
-          FIREBASE_CLI_EXPERIMENTS: webframeworks
