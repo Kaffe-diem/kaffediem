@@ -32,9 +32,9 @@
   const navItems = [
     new NavItem("/drinks", "Meny"),
     new NavItem("/display", "Visning"),
-    new NavItem("/frontdesk", "Front desk"),
     new NavItem("/account", "Min bruker"),
-    new NavItem("/status", "Min bestilling")
+    new NavItem("/status", "Min bestilling"),
+    new NavItem("/admin", "Admin")
   ];
 </script>
 
