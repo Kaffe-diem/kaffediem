@@ -20,8 +20,8 @@ jobs:
         with:
           node-version: "22"
 
-      - name: get prettier prettier-plugin-svelte
-        run: npm i --save-dev prettier-plugin-svelte prettier
+      - name: get deps
+        run: npm ci prettier-plugin-svelte
 
-      - name: Check code style
+      - name: Lint
         run: npx prettier --check .
