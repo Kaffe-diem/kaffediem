@@ -1,6 +1,10 @@
 <script lang="ts">
-  export let drink: any;
   import { pb } from "$lib/stores/authStore";
+  interface Props {
+    drink: any;
+  }
+
+  let { drink }: Props = $props();
   const purchasedCup = pb.authStore.model?.purchased_cup;
 </script>
 

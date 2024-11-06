@@ -5,8 +5,8 @@
   import MenuIcon from "$assets/MenuIcon.svelte";
   import NavItems from "$components/NavItems.svelte";
 
-  let isAuthenticated = false;
-  let isAdmin = false;
+  let isAuthenticated = $state(false);
+  let isAdmin = $state(false);
 
   onMount(
     auth.subscribe((value) => {

@@ -8,11 +8,11 @@
   let order = new Order(999, State.Complete);
   let queuePosition = 10;
 
-  $: orderReceived = order.state == State.Received;
-  $: orderProduction = order.state > State.Received;
-  $: orderComplete = order.state > State.Production;
+  let orderReceived = $derived(order.state == State.Received);
+  let orderProduction = $derived(order.state > State.Received);
+  let orderComplete = $derived(order.state > State.Production);
 
-  $: orderColor = stateColors[order.state];
+  let orderColor = $derived(stateColors[order.state]);
   console.log(order.state);
   console.log(stateColors[order.state]);
   console.log(orderColor);

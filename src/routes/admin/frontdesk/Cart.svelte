@@ -1,11 +1,11 @@
 <script lang="ts">
-  export let selectedItem;
+  let { selectedItem } = $props();
 
   // FIXME when upgrade to svelte 5:
   // https://svelte.dev/tutorial/svelte/deep-state
   // let cart = $state([]);
-  let cart = [];
-  $: totalPrice = cart.reduce((sum, item) => sum + item.price, 0);
+  let cart = $state([]);
+  let totalPrice = $derived(cart.reduce((sum, item) => sum + item.price, 0));
   function addToCart() {
     // cart.append(selectedItem);
     cart = [...cart, selectedItem];
@@ -29,7 +29,7 @@
       <tbody>
         {#if cart.length > 0}
           {#each cart as drink, index}
-            <tr class="hover select-none" on:click={() => removeFromCart(index)}>
+            <tr class="hover select-none" onclick={() => removeFromCart(index)}>
               <td>{drink.name}</td>
               <td>{drink.price},-</td>
             </tr>
@@ -52,6 +52,6 @@
 
   <div class="flex flex-row justify-center gap-2">
     <button class="bold btn btn-lg text-xl">Ferdig</button>
-    <button class="bold btn btn-primary btn-lg text-3xl" on:click={addToCart}>+</button>
+    <button class="bold btn btn-primary btn-lg text-3xl" onclick={addToCart}>+</button>
   </div>
 </div>

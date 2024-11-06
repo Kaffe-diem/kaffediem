@@ -6,7 +6,7 @@
   import Rating from "$components/Rating.svelte";
   import Review from "$components/Review.svelte";
 
-  let isAuthenticated = false;
+  let isAuthenticated = $state(false);
 
   onMount(
     auth.subscribe((value) => {
@@ -47,14 +47,26 @@
 <!-- Scroll horizontally -->
 <div class="flex overflow-x-auto">
   <Review rating="10">
-    <span slot="title">Meningen med livet</span>
-    <span slot="content">Dette er den beste kaffeen jeg noen gang har smakt!</span>
-    <span slot="author">Navn Navnesen</span>
+    {#snippet title()}
+        <span >Meningen med livet</span>
+      {/snippet}
+    {#snippet content()}
+        <span >Dette er den beste kaffeen jeg noen gang har smakt!</span>
+      {/snippet}
+    {#snippet author()}
+        <span >Navn Navnesen</span>
+      {/snippet}
   </Review>
   <Review rating="1">
-    <span slot="title">Kjempedårlig</span>
-    <span slot="content">Har aldri smakt noe så dårlig.</span>
-    <span slot="author">Navn Navnesen</span>
+    {#snippet title()}
+        <span >Kjempedårlig</span>
+      {/snippet}
+    {#snippet content()}
+        <span >Har aldri smakt noe så dårlig.</span>
+      {/snippet}
+    {#snippet author()}
+        <span >Navn Navnesen</span>
+      {/snippet}
   </Review>
 </div>
 

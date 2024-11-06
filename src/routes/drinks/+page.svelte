@@ -1,10 +1,14 @@
 <script lang="ts">
   import Drink from "$lib/Drink.svelte";
   import { pb } from "$lib/stores/authStore";
-  let groupedDrinks: Record<string, any[]>;
+  let groupedDrinks: Record<string, any[]> = $state();
 
-  /** @type {import('./$types').PageData} */
-  export let data = { drinks: [] };
+  
+  interface Props {
+    data?: import('./$types').PageData;
+  }
+
+  let { data = { drinks: [] } }: Props = $props();
   groupedDrinks = Object.groupBy(data.drinks, ({ kind }) => kind);
 </script>
 

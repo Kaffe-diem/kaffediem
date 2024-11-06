@@ -5,7 +5,7 @@
   import Cart from "./Cart.svelte";
 
   // TODO: instead of having an Order-type, interface directly with the DB using a svelte store
-  $: orders = [
+  let orders = $derived([
     new Order(123),
     new Order(456, State.Complete),
     new Order(789, State.Complete),
@@ -19,12 +19,12 @@
     new Order(999, State.Complete),
     new Order(999, State.Complete),
     new Order(999, State.Complete)
-  ];
+  ]);
 
-  export let data;
+  let { data } = $props();
   // Is undefined before anything is checked.
   // Make sure to account for that when implementing logic based on it.
-  let selectedItem;
+  let selectedItem = $state();
 </script>
 
 <div class="grid h-full grid-cols-[3fr,auto,1.5fr,auto,1fr] grid-rows-[100%] gap-4">
