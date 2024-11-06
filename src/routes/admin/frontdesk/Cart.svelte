@@ -1,19 +1,14 @@
 <script lang="ts">
   let { selectedItem } = $props();
 
-  // FIXME when upgrade to svelte 5:
-  // https://svelte.dev/tutorial/svelte/deep-state
-  // let cart = $state([]);
   let cart = $state([]);
   let totalPrice = $derived(cart.reduce((sum, item) => sum + item.price, 0));
   function addToCart() {
-    // cart.append(selectedItem);
-    cart = [...cart, selectedItem];
+    cart.push(selectedItem);
   }
 
   function removeFromCart(index) {
-    // cart.splice(index, 1);
-    cart = cart.slice(0, index).concat(cart.slice(index + 1));
+    cart = cart.filter((_, i) => i !== index);
   }
 </script>
 
