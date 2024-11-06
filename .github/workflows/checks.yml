@@ -20,19 +20,8 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Install dependencies
-        run: npm ci
+      - name: get prettier prettier-plugin-svelte
+        run: npm i --save-dev prettier-plugin-svelte prettier
 
-      - name: Create env file
-        # Create .env based on secrets and variables defined in GitHub
-        run: |
-          touch .env
-          echo PUBLIC_PB_HOST=${{ vars.PB_HOST }} >> .env
-          echo PUBLIC_PB_ADMIN_PASSWORD=${{ secrets.PB_ADMIN_PASSWORD }} >> .env
-          echo PUBLIC_PB_ADMIN_EMAIL=${{ secrets.PB_ADMIN_EMAIL }} >> .env
-
-      # - name: Run npm check
-      #   run: npm run check
-
-      - name: Run npm check:format
-        run: npm run check:format
+      - name: Check code style
+        run: npx prettier --check .
