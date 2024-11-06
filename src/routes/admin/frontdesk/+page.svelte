@@ -25,7 +25,6 @@
   // Is undefined before anything is checked.
   // Make sure to account for that when implementing logic based on it.
   let selectedItem;
-
 </script>
 
 <div class="grid h-full grid-cols-[3fr,auto,1.5fr,auto,1fr] grid-rows-[100%] gap-4">

@@ -55,4 +55,3 @@
     <button class="bold btn btn-primary btn-lg text-3xl" on:click={addToCart}>+</button>
   </div>
 </div>
-
