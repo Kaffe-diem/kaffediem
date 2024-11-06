@@ -48,25 +48,25 @@
 <div class="flex overflow-x-auto">
   <Review rating="10">
     {#snippet title()}
-        <span >Meningen med livet</span>
-      {/snippet}
+      <span>Meningen med livet</span>
+    {/snippet}
     {#snippet content()}
-        <span >Dette er den beste kaffeen jeg noen gang har smakt!</span>
-      {/snippet}
+      <span>Dette er den beste kaffeen jeg noen gang har smakt!</span>
+    {/snippet}
     {#snippet author()}
-        <span >Navn Navnesen</span>
-      {/snippet}
+      <span>Navn Navnesen</span>
+    {/snippet}
   </Review>
   <Review rating="1">
     {#snippet title()}
-        <span >Kjempedårlig</span>
-      {/snippet}
+      <span>Kjempedårlig</span>
+    {/snippet}
     {#snippet content()}
-        <span >Har aldri smakt noe så dårlig.</span>
-      {/snippet}
+      <span>Har aldri smakt noe så dårlig.</span>
+    {/snippet}
     {#snippet author()}
-        <span >Navn Navnesen</span>
-      {/snippet}
+      <span>Navn Navnesen</span>
+    {/snippet}
   </Review>
 </div>
 

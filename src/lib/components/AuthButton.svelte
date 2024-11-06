@@ -3,8 +3,8 @@
   import { auth, pb } from "$lib/stores/authStore";
   import { goto } from "$app/navigation";
   interface Props {
-    children?: import('svelte').Snippet;
-    [key: string]: any
+    children?: import("svelte").Snippet;
+    [key: string]: any;
   }
 
   let { children, ...rest }: Props = $props();
@@ -55,7 +55,11 @@
 </script>
 
 {#if isAuthenticated}
-  <button onclick={logout} class={rest.class || ""}>{#if children}{@render children()}{:else}Logg ut{/if}</button>
+  <button onclick={logout} class={rest.class || ""}
+    >{#if children}{@render children()}{:else}Logg ut{/if}</button
+  >
 {:else}
-  <button onclick={login} class={rest.class || ""}>{#if children}{@render children()}{:else}Logg inn{/if}</button>
+  <button onclick={login} class={rest.class || ""}
+    >{#if children}{@render children()}{:else}Logg inn{/if}</button
+  >
 {/if}

@@ -3,9 +3,8 @@
   import { pb } from "$lib/stores/authStore";
   let groupedDrinks: Record<string, any[]> = $state();
 
-  
   interface Props {
-    data?: import('./$types').PageData;
+    data?: import("./$types").PageData;
   }
 
   let { data = { drinks: [] } }: Props = $props();

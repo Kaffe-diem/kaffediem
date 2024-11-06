@@ -5,7 +5,7 @@
 
   interface Props {
     data: { screenMessageRecord };
-    children?: import('svelte').Snippet;
+    children?: import("svelte").Snippet;
   }
 
   let { data, children }: Props = $props();

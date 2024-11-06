@@ -1,6 +1,4 @@
 <script lang="ts">
-  
-
   function inputChange(newValue: number) {
     value = newValue;
   }
@@ -11,7 +9,7 @@
     // Name is only required when the component's value can change
     name?: string;
     maxRating?: number;
-    [key: string]: any
+    [key: string]: any;
   }
 
   let {

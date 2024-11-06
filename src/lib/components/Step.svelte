@@ -1,7 +1,7 @@
 <script lang="ts">
   interface Props {
     state?: boolean;
-    children?: import('svelte').Snippet;
+    children?: import("svelte").Snippet;
   }
 
   let { state = false, children }: Props = $props();
