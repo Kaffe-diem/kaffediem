@@ -17,6 +17,7 @@ jobs:
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
+          PUBLIC_PB_HOST: ${{ secrets.PUBLIC_PB_HOST }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KAFFE_DIEM }}
           projectId: kaffe-diem
         env:
