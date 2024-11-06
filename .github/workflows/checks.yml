@@ -23,5 +23,5 @@ jobs:
       - name: get deps
         run: npm ci
 
-      - name: Lint
+      - name: Check formatting
         run: npx prettier --check .
