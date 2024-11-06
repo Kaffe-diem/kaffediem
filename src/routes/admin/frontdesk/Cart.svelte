@@ -43,7 +43,7 @@
       </tbody>
       <tfoot>
         <tr>
-          <th>Total</th>
+          <th>Total: <span class="text-neutral">{cart.length}</span></th>
           <th><span class="text-bold text-lg text-primary">{totalPrice},-</span></th>
         </tr>
       </tfoot>
