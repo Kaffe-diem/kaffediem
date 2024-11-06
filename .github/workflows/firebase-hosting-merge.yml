@@ -14,10 +14,10 @@ jobs:
       - run: npm ci && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          PUBLIC_PB_HOST: ${{ secrets.PUBLIC_PB_HOST }}
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KAFFE_DIEM }}
           channelId: live
           projectId: kaffe-diem
         env:
+          PUBLIC_PB_HOST: ${{ secrets.PUBLIC_PB_HOST }}
           FIREBASE_CLI_EXPERIMENTS: webframeworks
