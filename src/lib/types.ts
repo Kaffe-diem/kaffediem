@@ -34,4 +34,5 @@ class Order {
   }
 }
 
-export { State, Order };
+export { Order };
+export type { State };

@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { State, Order } from "$lib/types";
+  import type { State } from "$lib/types";
+  import { Order } from "$lib/types";
   import Step from "$components/Step.svelte";
   import { stateColors } from "$lib/constants";
 

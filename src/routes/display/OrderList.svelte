@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { State, Order } from "$lib/types";
+  import { Order } from "$lib/types";
+  import type { State } from "$lib/types";
 
   interface Props {
     orders: Order[];

@@ -1,5 +1,6 @@
 <script lang="ts">
   let { selectedItem } = $props();
+  import { orders } from "$lib/stores/orderStore";
 
   // FIXME when upgrade to svelte 5:
   // https://svelte.dev/tutorial/svelte/deep-state
@@ -51,7 +52,7 @@
   </div>
 
   <div class="flex flex-row justify-center gap-2">
-    <button class="bold btn btn-lg text-xl">Ferdig</button>
+    <button class="bold btn btn-lg text-xl" onclick={() => orders.add(cart)}>Ferdig</button>
     <button class="bold btn btn-primary btn-lg text-3xl" onclick={addToCart}>+</button>
   </div>
 </div>
