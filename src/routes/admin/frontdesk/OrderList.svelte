@@ -15,7 +15,7 @@
       {#if order.state === show}
         <li>
           <button class="btn mt-4 w-full text-xl font-normal md:btn-lg md:text-3xl">
-            {order.id}</button
+            {order.id.slice(0, 4)}</button
           >
         </li>
       {/if}
