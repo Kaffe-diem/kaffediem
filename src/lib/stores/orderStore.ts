@@ -63,11 +63,15 @@ const init = () => {
 
   return {
     subscribe,
-    add: (order: Order) => {
+    add: (_order: Order) => {
       // create 'received' order
       // think: this order will be received immediately by the subscription, so no need to update state
       // however, we can use the interim state to show a sent but not received order. depending on latency, we need to add it anyway.
-      pb.collection("orders").create(order);
+      pb.collection("orders").create({
+        customer: pb.authStore.model?.id,
+        drinks: ["csw4j2vfl41d6pq"],
+        state: "complete"
+      });
     }
   };
 };

@@ -52,7 +52,7 @@
   </div>
 
   <div class="flex flex-row justify-center gap-2">
-    <button class="bold btn btn-lg text-xl" onclick={() => orders.add(cart)}>Ferdig</button>
+    <button class="bold btn btn-lg text-xl" onclick={() => orders.add(cart[0])}>Ferdig</button>
     <button class="bold btn btn-primary btn-lg text-3xl" onclick={addToCart}>+</button>
   </div>
 </div>
