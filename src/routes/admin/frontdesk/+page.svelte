@@ -6,6 +6,7 @@
 
   let { data } = $props();
   let selectedItem = $state();
+  $inspect($orders);
 </script>
 
 <div class="grid h-full grid-cols-[3fr,auto,1.5fr,auto,1fr] grid-rows-[100%] gap-4">
@@ -17,5 +18,5 @@
 
   <div class="divider divider-horizontal"></div>
 
-  <OrderList orders={$orders} filter={true} />
+  <OrderList orders={$orders} show={"complete"} />
 </div>

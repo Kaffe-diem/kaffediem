@@ -1,22 +1,23 @@
 <script lang="ts">
+  import { State, Order } from "$lib/types";
   interface Props {
-    orders: any;
-    filter: boolean;
+    orders: Order[];
+    show: State;
   }
 
-  let { orders, filter }: Props = $props();
+  let { orders, show }: Props = $props();
 </script>
 
 <div class="overflow-y-auto">
   <ul class="flex-col">
     {#each orders as order}
-      <!-- {#if order.order_fulfilled == filter} -->
-      <li>
-        <button class="btn mt-4 w-full text-xl font-normal md:btn-lg md:text-3xl">
-          {order.id}</button
-        >
-      </li>
-      <!-- {/if} -->
+      {#if order.state === show}
+        <li>
+          <button class="btn mt-4 w-full text-xl font-normal md:btn-lg md:text-3xl">
+            {order.id}</button
+          >
+        </li>
+      {/if}
     {/each}
   </ul>
 </div>

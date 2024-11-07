@@ -5,12 +5,12 @@
 
   // let order = new Order(999, State.Received);
   // let order = new Order(999, State.Production);
-  let order = new Order(999, State.Complete);
+  // let order = new Order(999, State.Complete);
   let queuePosition = 10;
 
-  let orderReceived = $derived(order.state == State.Received);
-  let orderProduction = $derived(order.state > State.Received);
-  let orderComplete = $derived(order.state > State.Production);
+  // let orderReceived = $derived(order.state == State.Received);
+  // let orderProduction = $derived(order.state > State.Received);
+  // let orderComplete = $derived(order.state > State.Production);
 
   let orderColor = $derived(stateColors[order.state]);
   console.log(order.state);
