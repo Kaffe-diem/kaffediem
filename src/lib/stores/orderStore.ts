@@ -9,32 +9,35 @@ import eventsource from "eventsource";
 
 const pb = new pocketbase(PUBLIC_PB_HOST);
 
-export const orderStore = writable([]);
+export const orders = writable([]);
 
 const init = async () => {
-  const orders = await pb.collection("orders").getFullList();
-  orderStore.set(orders);
+  const initialOrders = await pb.collection("orders").getFullList();
+  orders.set(initialOrders);
 
   pb.collection("orders").subscribe("*", (e) => {
-    orderStore.update((state) => {
-      const updatedState = [...state];
-      const orderIndex = updatedState.findIndex((order) => order.id === e.record.id);
+    orders.update((state) => {
+      console.log({
+        message: "received event on orders subscription",
+        event: e,
+        currentState: state
+      });
 
-      if (e.action === "create") {
-        if (orderIndex === -1) {
-          updatedState.push(e.record);
-        }
-      } else if (e.action === "update") {
-        if (orderIndex !== -1) {
-          updatedState[orderIndex] = e.record;
-        }
-      } else if (e.action === "delete") {
-        if (orderIndex !== -1) {
-          updatedState.splice(orderIndex, 1);
-        }
+      const orderIndex = state.findIndex((order) => order.id === e.record.id);
+
+      switch (e.action) {
+        case "create":
+          state.push(e.record);
+          break;
+        case "update":
+          state[orderIndex] = e.record;
+          break;
+        case "delete":
+          state.splice(orderIndex, 1);
+          break;
       }
 
-      return updatedState;
+      return state;
     });
   });
 };

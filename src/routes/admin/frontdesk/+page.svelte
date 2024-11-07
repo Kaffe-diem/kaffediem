@@ -2,12 +2,10 @@
   import OrderList from "./OrderList.svelte";
   import ItemSelection from "./ItemSelection.svelte";
   import Cart from "./Cart.svelte";
-  import { orderStore } from "$lib/stores/orderStore";
+  import { orders } from "$lib/stores/orderStore";
 
   let { data } = $props();
-  let orders = $orderStore;
   let selectedItem = $state();
-  $inspect(orders);
 </script>
 
 <div class="grid h-full grid-cols-[3fr,auto,1.5fr,auto,1fr] grid-rows-[100%] gap-4">
@@ -19,5 +17,5 @@
 
   <div class="divider divider-horizontal"></div>
 
-  <OrderList {orders} filter={false} />
+  <OrderList orders={$orders} filter={true} />
 </div>
