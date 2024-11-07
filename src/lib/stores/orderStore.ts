@@ -10,8 +10,6 @@ import eventsource from "eventsource";
 
 const pb = new pocketbase(PUBLIC_PB_HOST);
 
-export const orders = writable<Order[]>([]);
-
 const mapToOrder = (data: unknown): Order => {
   return new Order({
     id: data.id,
@@ -27,11 +25,13 @@ const mapToOrder = (data: unknown): Order => {
 };
 
 const init = async () => {
+  const store = writable<Order[]>([]);
+
   const initialOrders = await pb.collection("orders").getFullList();
-  orders.set(initialOrders.map(mapToOrder));
+  store.set(initialOrders.map(mapToOrder));
 
   pb.collection("orders").subscribe("*", (e) => {
-    orders.update((state) => {
+    store.update((state) => {
       console.log({
         message: "received event on orders subscription",
         event: e,
@@ -57,6 +57,16 @@ const init = async () => {
       return state;
     });
   });
+
+  return {
+    subscribe: store.subscribe,
+    add: (order: Order) => {
+      // create 'received' order
+      // think: this order will be received immediately by the subscription, so no need to update state
+      // however, we can use the interim state to show a sent but not received order. depending on latency, we need to add it anyway.
+      pb.collection("orders").create(order);
+    }
+  };
 };
 
-init();
+export const orders = init();
