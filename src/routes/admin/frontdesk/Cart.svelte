@@ -3,13 +3,6 @@
 
   let cart = $state([]);
   let totalPrice = $derived(cart.reduce((sum, item) => sum + item.price, 0));
-  function addToCart() {
-    cart.push(selectedItem);
-  }
-
-  function removeFromCart(index) {
-    cart = cart.filter((_, i) => i !== index);
-  }
 </script>
 
 <div class="flex h-full flex-col justify-center gap-8">
@@ -24,7 +17,7 @@
       <tbody>
         {#if cart.length > 0}
           {#each cart as drink, index}
-            <tr class="hover select-none" onclick={() => removeFromCart(index)}>
+            <tr class="hover select-none" onclick={() => cart.splice(index, 1)}>
               <td>{drink.name}</td>
               <td>{drink.price},-</td>
             </tr>
@@ -47,6 +40,8 @@
 
   <div class="flex flex-row justify-center gap-2">
     <button class="bold btn btn-lg text-xl">Ferdig</button>
-    <button class="bold btn btn-primary btn-lg text-3xl" onclick={addToCart}>+</button>
+    <button class="bold btn btn-primary btn-lg text-3xl" onclick={() => cart.push(selectedItem)}
+      >+</button
+    >
   </div>
 </div>
