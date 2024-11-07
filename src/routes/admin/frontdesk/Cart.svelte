@@ -3,6 +3,7 @@
   import { orders } from "$lib/stores/orderStore";
 
   let cart = $state([]);
+  $inspect(cart);
   let totalPrice = $derived(cart.reduce((sum, item) => sum + item.price, 0));
 </script>
 
@@ -40,7 +41,13 @@
   </div>
 
   <div class="flex flex-row justify-center gap-2">
-    <button class="bold btn btn-lg text-xl" onclick={() => orders.add(cart[0])}>Ferdig</button>
+    <button
+      class="bold btn btn-lg text-xl"
+      onclick={() => {
+        orders.add(cart.map((item) => item.id));
+        cart = [];
+      }}>Ferdig</button
+    >
     <button class="bold btn btn-primary btn-lg text-3xl" onclick={() => cart.push(selectedItem)}
       >+</button
     >

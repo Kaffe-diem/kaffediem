@@ -1,4 +1,4 @@
-type State = "received" | "production" | "complete";
+type State = "received" | "production" | "completed" | "dispatched";
 
 class Order {
   id: string;

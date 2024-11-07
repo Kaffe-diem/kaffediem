@@ -63,15 +63,38 @@ const init = () => {
 
   return {
     subscribe,
-    add: (_order: Order) => {
-      // create 'received' order
-      // think: this order will be received immediately by the subscription, so no need to update state
-      // however, we can use the interim state to show a sent but not received order. depending on latency, we need to add it anyway.
-      pb.collection("orders").create({
+    add: async (order: string[]) => {
+      const drinkIds: string[] = await Promise.all(
+        // this mapping to create multiple order_drink with autocancellation disabled
+        // equals a terrible idea
+        // bulk / transactions coming in 0.23
+        // https://github.com/pocketbase/pocketbase/issues/5386
+        order.map(async (id: string) => {
+          const response = await pb.collection("order_drink").create(
+            {
+              drink: id,
+              serving_size: "big",
+              milk: "whole"
+              // extras:
+              // flavor:
+            },
+            {
+              $autoCancel: false
+            }
+          );
+          return response.id;
+        })
+      );
+
+      await pb.collection("orders").create({
         customer: pb.authStore.model?.id,
-        drinks: ["csw4j2vfl41d6pq"],
-        state: "complete"
+        drinks: drinkIds,
+        state: "received",
+        payment_fulfilled: false
       });
+    },
+    setState: (id: string, state: State) => {
+      pb.collection("orders").update(id, { state });
     }
   };
 };
