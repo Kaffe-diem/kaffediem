@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { State } from "$lib/types";
   interface Props {
-    // this is a custom store, I am not sure how to type it.
+    // this is a custom store Order[], I am not sure how to type it.
     orders: any;
     show: State;
   }
