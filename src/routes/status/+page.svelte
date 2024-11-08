@@ -2,7 +2,6 @@
   import type { State } from "$lib/types";
   import { Order } from "$lib/types";
   import Step from "$components/Step.svelte";
-  import { stateColors } from "$lib/constants";
 
   // let order = new Order(999, State.Received);
   // let order = new Order(999, State.Production);
@@ -13,10 +12,7 @@
   // let orderProduction = $derived(order.state > State.Received);
   // let orderComplete = $derived(order.state > State.Production);
 
-  let orderColor = $derived(stateColors[order.state]);
-  console.log(order.state);
-  console.log(stateColors[order.state]);
-  console.log(orderColor);
+  let orderColor = "red-500";
 </script>
 
 <div class="text-center font-bold text-neutral">
