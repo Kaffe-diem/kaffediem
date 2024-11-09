@@ -5,11 +5,11 @@
   let screenMessages = data.screenMessages;
   let activeMessage = data.activeMessage[0];
 
-  let open = !activeMessage.isVisible;
+  let messageVisible = activeMessage.isVisible;
   async function updateActiveMessage() {
     await pb.collection("activeMessage").update(activeMessage.id, {
       message: selectedMessage.id,
-      isVisible: !open
+      isVisible: messageVisible
     });
   }
 
@@ -40,7 +40,7 @@
               checked={message.id == selectedMessage.id}
               on:change={() => {
                 selectedMessage = message;
-                open = false;
+                messageVisible = true;
               }}
             />
 
@@ -70,8 +70,8 @@
       type="radio"
       name="selected"
       class="radio mr-2 mt-4"
-      checked={open}
-      on:change={() => (open = true)}
+      checked={!messageVisible}
+      on:change={() => (messageVisible = false)}
     />
     <span class="text-lg">Åpent!</span>
   </ul>
