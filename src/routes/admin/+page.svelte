@@ -13,7 +13,7 @@
     new AdminPage("/admin/frontdesk", "Bestillingsdisk"),
     // new NavItem("/admin/kitchen", "Kjøkken"),
     new AdminPage("/display", "Visning"),
-    new AdminPage("/admin/screenmessage", "Endre skjerm melding")
+    new AdminPage("/admin/message", "Endre skjerm melding")
     // new NavItem("/admin/menu", "Endre menyen")
   ];
 </script>

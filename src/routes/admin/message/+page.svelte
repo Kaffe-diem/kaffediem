@@ -2,23 +2,23 @@
   import { pb } from "$lib/stores/authStore";
 
   export let data;
-  let screenMessages = data.screenMessages;
+  let displayMessages = data.displayMessages;
   let activeMessage = data.activeMessage[0];
 
   let messageVisible = activeMessage.isVisible;
   async function updateActiveMessage() {
     await pb.collection("activeMessage").update(activeMessage.id, {
-      message: selectedScreenMessage.id,
+      message: selectedDisplayMessage.id,
       isVisible: messageVisible
     });
   }
 
-  let selectedScreenMessage = { id: activeMessage.message };
+  let selectedDisplayMessage = { id: activeMessage.message };
 
-  async function updateScreenMessages() {
+  async function updateDisplayMessages() {
     updateActiveMessage();
-    for (let screnMessage of screenMessages) {
-      await pb.collection("screenMessages").update(screnMessage.id, {
+    for (let screnMessage of displayMessages) {
+      await pb.collection("displayMessages").update(screnMessage.id, {
         title: screnMessage.title,
         subtext: screnMessage.subtext
       });
@@ -28,7 +28,7 @@
 
 <form>
   <ul class="list-none">
-    {#each screenMessages as screenMessage}
+    {#each displayMessages as displayMessage}
       <div class="flex">
         <div class="form-control">
           <label class="label cursor-pointer">
@@ -36,9 +36,9 @@
               type="radio"
               name="selected"
               class="radio mr-2 mt-4"
-              checked={screenMessage.id == selectedScreenMessage.id}
+              checked={displayMessage.id == selectedDisplayMessage.id}
               on:change={() => {
-                selectedScreenMessage = screenMessage;
+                selectedDisplayMessage = displayMessage;
                 messageVisible = true;
               }}
             />
@@ -47,7 +47,7 @@
               <input
                 type="text"
                 placeholder="Tittel"
-                bind:value={screenMessage.title}
+                bind:value={displayMessage.title}
                 class="input input-lg input-bordered w-full max-w-xs"
               />
             </li>
@@ -56,7 +56,7 @@
               <input
                 type="text"
                 placeholder="Beskrivelse"
-                bind:value={screenMessage.subtext}
+                bind:value={displayMessage.subtext}
                 class="input input-lg input-bordered ml-4 w-full max-w-xs"
               />
             </li>
@@ -75,7 +75,7 @@
     <span class="text-lg">Åpent!</span>
   </ul>
 
-  <button type="submit" class="btn mt-4 w-full max-w-xs" on:click={updateScreenMessages}
+  <button type="submit" class="btn mt-4 w-full max-w-xs" on:click={updateDisplayMessages}
     >Lagre</button
   >
 </form>
