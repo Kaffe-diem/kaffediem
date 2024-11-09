@@ -12,8 +12,8 @@
   const navItems = [
     new NavItem("/admin/frontdesk", "Bestillingsdisk"),
     // new NavItem("/admin/kitchen", "Kjøkken"),
-    new NavItem("/display", "Visning")
-    // new NavItem("/admin/screenmessage", "Endre skjerm melding"),
+    new NavItem("/display", "Visning"),
+    new NavItem("/admin/screenmessage", "Endre skjerm melding")
     // new NavItem("/admin/menu", "Endre menyen")
   ];
 </script>
