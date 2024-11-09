@@ -75,5 +75,5 @@
     <span class="text-lg">Åpent!</span>
   </ul>
 
-  <button type="submit" class="btn mt-4 w-full max-w-xs" on:click={updateScreenMessages}>OK</button>
+  <button type="submit" class="btn mt-4 w-full max-w-xs" on:click={updateScreenMessages}>Lagre</button>
 </form>
