@@ -8,19 +8,19 @@
   let messageVisible = activeMessage.isVisible;
   async function updateActiveMessage() {
     await pb.collection("activeMessage").update(activeMessage.id, {
-      message: selectedMessage.id,
+      message: selectedScreenMessage.id,
       isVisible: messageVisible
     });
   }
 
-  let selectedMessage = { id: activeMessage.message };
+  let selectedScreenMessage = { id: activeMessage.message };
 
   async function updateScreenMessages() {
     updateActiveMessage();
-    for (let message of screenMessages) {
-      await pb.collection("screenMessages").update(message.id, {
-        title: message.title,
-        subtext: message.subtext
+    for (let screnMessage of screenMessages) {
+      await pb.collection("screenMessages").update(screnMessage.id, {
+        title: screnMessage.title,
+        subtext: screnMessage.subtext
       });
     }
   }
@@ -28,7 +28,7 @@
 
 <form>
   <ul class="list-none">
-    {#each screenMessages as message}
+    {#each screenMessages as screenMessage}
       <div class="flex">
         <div class="form-control">
           <label class="label cursor-pointer">
@@ -36,9 +36,9 @@
               type="radio"
               name="selected"
               class="radio mr-2 mt-4"
-              checked={message.id == selectedMessage.id}
+              checked={screenMessage.id == selectedScreenMessage.id}
               on:change={() => {
-                selectedMessage = message;
+                selectedScreenMessage = screenMessage;
                 messageVisible = true;
               }}
             />
@@ -47,7 +47,7 @@
               <input
                 type="text"
                 placeholder="Tittel"
-                bind:value={message.title}
+                bind:value={screenMessage.title}
                 class="input input-lg input-bordered w-full max-w-xs"
               />
             </li>
@@ -56,7 +56,7 @@
               <input
                 type="text"
                 placeholder="Beskrivelse"
-                bind:value={message.subtext}
+                bind:value={screenMessage.subtext}
                 class="input input-lg input-bordered ml-4 w-full max-w-xs"
               />
             </li>
