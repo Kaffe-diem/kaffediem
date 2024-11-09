@@ -30,38 +30,40 @@
 <form>
   <ul class="list-none">
     {#each screenMessages as message}
-      <div class="form-control flex">
-        <label class="label cursor-pointer">
-          <input
-            type="radio"
-            name="selected"
-            class="radio mr-2 mt-4"
-            value={message}
-            checked={message.isVisible}
-            on:change={() => {
-              selectedMessage = message;
-              open = false;
-            }}
-          />
-
-          <li>
+      <div class="flex">
+        <div class="form-control">
+          <label class="label cursor-pointer">
             <input
-              type="text"
-              placeholder="Tittel"
-              bind:value={message.title}
-              class="input input-lg input-bordered w-full max-w-xs"
+              type="radio"
+              name="selected"
+              class="radio mr-2 mt-4"
+              value={message}
+              checked={message.isVisible}
+              on:change={() => {
+                selectedMessage = message;
+                open = false;
+              }}
             />
-          </li>
 
-          <li>
-            <input
-              type="text"
-              placeholder="Beskrivelse"
-              bind:value={message.subtext}
-              class="input input-lg input-bordered ml-4 w-full max-w-xs"
-            />
-          </li>
-        </label>
+            <li>
+              <input
+                type="text"
+                placeholder="Tittel"
+                bind:value={message.title}
+                class="input input-lg input-bordered w-full max-w-xs"
+              />
+            </li>
+
+            <li>
+              <input
+                type="text"
+                placeholder="Beskrivelse"
+                bind:value={message.subtext}
+                class="input input-lg input-bordered ml-4 w-full max-w-xs"
+              />
+            </li>
+          </label>
+        </div>
       </div>
     {/each}
 
