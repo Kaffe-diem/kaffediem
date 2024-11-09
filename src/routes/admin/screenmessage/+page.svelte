@@ -36,7 +36,6 @@
               type="radio"
               name="selected"
               class="radio mr-2 mt-4"
-              value={message}
               checked={message.id == selectedMessage.id}
               on:change={() => {
                 selectedMessage = message;
