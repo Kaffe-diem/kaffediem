@@ -8,6 +8,7 @@
   let open = !activeMessage.isVisible;
   async function updateActiveMessage() {
     await pb.collection("activeMessage").update(activeMessage.id, {
+      message: selectedMessage.id,
       isVisible: !open
     });
   }
