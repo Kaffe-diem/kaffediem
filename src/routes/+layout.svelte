@@ -3,22 +3,23 @@
   import { page } from "$app/stores";
   import Nav from "$components/Nav.svelte";
   import Footer from "$components/Footer.svelte";
+
+  import { hideNavbar, hideFooter } from "$lib/constants.ts";
 </script>
 
-<div class="flex min-h-screen flex-col">
-  <div class="flex-grow">
-    <!-- Display-kiosk-siden skal ikke ha noen navbar; den skal kun vise bestillinger -->
-    {#if $page.url.pathname.includes("display")}
-      <slot />
-    {:else}
-      <div class="app mx-auto w-11/12 md:w-9/12">
-        <Nav />
-        <main class="mt-16">
-          <slot />
-        </main>
-      </div>
-    {/if}
-  </div>
+<div class="grid min-h-screen grid-rows-[1fr_auto]">
+  {#if hideNavbar.some((path) => $page.url.pathname.includes(path))}
+    <slot />
+  {:else}
+    <div class="app mx-auto grid w-11/12 grid-rows-[auto_1fr] md:w-9/12">
+      <Nav />
+      <main class="mt-16">
+        <slot />
+      </main>
+    </div>
+  {/if}
 
-  <Footer />
+  {#if !hideFooter.some((path) => $page.url.pathname.includes(path))}
+    <Footer />
+  {/if}
 </div>

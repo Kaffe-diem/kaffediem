@@ -1,5 +1,5 @@
 <script lang="ts">
-  import OrderList from "$components/OrderList.svelte";
+  import OrderList from "./OrderList.svelte";
   import { State, Order } from "$lib/types";
 
   $: orders = [new Order(123), new Order(456), new Order(789, State.Complete)];

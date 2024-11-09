@@ -13,26 +13,15 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
 
-      - name: Install dependencies
+      - name: get deps
         run: npm ci
 
-      - name: Create env file
-        # Create .env based on secrets and variables defined in GitHub
-        run: |
-          touch .env
-          echo PUBLIC_PB_HOST=${{ vars.PB_HOST }} >> .env
-          echo PUBLIC_PB_ADMIN_PASSWORD=${{ secrets.PB_ADMIN_PASSWORD }} >> .env
-          echo PUBLIC_PB_ADMIN_EMAIL=${{ secrets.PB_ADMIN_EMAIL }} >> .env
-
-      # - name: Run npm check
-      #   run: npm run check
-
-      - name: Run npm check:format
+      - name: Check formatting
         run: npm run check:format

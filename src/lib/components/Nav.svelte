@@ -1,15 +1,18 @@
 <script lang="ts">
   import { auth } from "$lib/stores/authStore";
   import { onMount } from "svelte";
-  import { restrictedRoutes } from "$lib/constants";
+  import { restrictedRoutes, adminRoutes } from "$lib/constants";
   import MenuIcon from "$assets/MenuIcon.svelte";
   import NavItems from "$components/NavItems.svelte";
 
   let isAuthenticated = false;
+  let isAdmin = false;
 
   onMount(
     auth.subscribe((value) => {
       isAuthenticated = value.isAuthenticated;
+      // Will be undefined, false or true:
+      isAdmin = value.user?.is_admin;
     })
   );
 
@@ -22,6 +25,7 @@
       this.href = href;
       this.text = text;
       this.requiresAuth = restrictedRoutes.includes(this.href);
+      this.requiresAdmin = adminRoutes.includes(this.href);
     }
   }
 
@@ -29,7 +33,8 @@
     new NavItem("/drinks", "Meny"),
     new NavItem("/display", "Visning"),
     new NavItem("/account", "Min bruker"),
-    new NavItem("/status", "Min bestilling")
+    new NavItem("/status", "Min bestilling"),
+    new NavItem("/admin", "Admin")
   ];
 </script>
 
@@ -44,10 +49,11 @@
     <NavItems
       {navItems}
       {isAuthenticated}
+      {isAdmin}
       class="dropdown-content z-[1] mt-3 w-52 rounded-box bg-base-100 p-2 shadow"
     />
   </div>
   <div class="hidden flex-none lg:flex">
-    <NavItems {navItems} {isAuthenticated} class="menu menu-horizontal px-1" />
+    <NavItems {navItems} {isAuthenticated} {isAdmin} class="menu menu-horizontal px-1" />
   </div>
 </div>
