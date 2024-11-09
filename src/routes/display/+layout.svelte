@@ -3,26 +3,26 @@
   import { pb } from "$lib/stores/authStore";
   import { onMount } from "svelte";
 
-  export let data: { visibleScreenMessage };
-  let message = data.visibleScreenMessage;
+  export let data: { activeMessage };
+  let message = data.activeMessage[0];
 
   onMount(() => {
-    pb.collection("screen_message").subscribe(
-      "*",
+    pb.collection("activeMessage").subscribe(
+      message.id,
       (event) => {
         message = event.record;
       },
       {
-        filter: "isVisible = true"
+        expand: "message"
       }
     );
   });
 </script>
 
-{#if message !== null}
+{#if message.isVisible}
   <div class="flex h-screen flex-col items-center justify-center">
-    <span class="p-2 text-7xl font-bold md:text-9xl">{message.title}</span>
-    <span class="p-2 text-4xl md:text-6xl">{message.subtext}</span>
+    <span class="p-2 text-7xl font-bold md:text-9xl">{message.expand.message.title}</span>
+    <span class="p-2 text-4xl md:text-6xl">{message.expand.message.subtext}</span>
   </div>
 {:else}
   <main class="relative mx-auto h-screen w-11/12 py-4">
