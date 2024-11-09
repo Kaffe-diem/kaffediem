@@ -13,15 +13,14 @@
     });
   }
 
-  let selectedMessage;
+  let selectedMessage = { id: activeMessage.message };
 
   async function updateScreenMessages() {
     updateActiveMessage();
     for (let message of screenMessages) {
       await pb.collection("screenMessages").update(message.id, {
         title: message.title,
-        subtext: message.subtext,
-        isVisible: message.id == selectedMessage.id
+        subtext: message.subtext
       });
     }
   }
@@ -38,7 +37,7 @@
               name="selected"
               class="radio mr-2 mt-4"
               value={message}
-              checked={message.isVisible}
+              checked={message.id == selectedMessage.id}
               on:change={() => {
                 selectedMessage = message;
                 open = false;
@@ -77,5 +76,7 @@
     <span class="text-lg">Åpent!</span>
   </ul>
 
-  <button type="submit" class="btn mt-4 w-full max-w-xs" on:click={updateScreenMessages}>Lagre</button>
+  <button type="submit" class="btn mt-4 w-full max-w-xs" on:click={updateScreenMessages}
+    >Lagre</button
+  >
 </form>
