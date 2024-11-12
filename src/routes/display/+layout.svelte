@@ -4,24 +4,29 @@
   import { onMount } from "svelte";
 
   interface Props {
-    data: { screenMessageRecord };
-    children?: import("svelte").Snippet;
+    data: { activeMessage: String[] };
   }
 
   let { data, children }: Props = $props();
-  let screenMessage = $state(data.screenMessageRecord[0]);
+  let message = $state(data.activeMessage[0]);
 
   onMount(() => {
-    pb.collection("screen_message").subscribe("*", function (event) {
-      screenMessage = event.record;
-    });
+    pb.collection("activeMessage").subscribe(
+      message.id,
+      (event) => {
+        message = event.record;
+      },
+      {
+        expand: "message"
+      }
+    );
   });
 </script>
 
-{#if screenMessage.isVisible}
+{#if message.isVisible}
   <div class="flex h-screen flex-col items-center justify-center">
-    <span class="p-2 text-7xl font-bold md:text-9xl">{screenMessage.title}</span>
-    <span class="p-2 text-4xl md:text-6xl">{screenMessage.subtext}</span>
+    <span class="p-2 text-7xl font-bold md:text-9xl">{message.expand.message.title}</span>
+    <span class="p-2 text-4xl md:text-6xl">{message.expand.message.subtext}</span>
   </div>
 {:else}
   <main class="relative mx-auto h-screen w-11/12 py-4">
