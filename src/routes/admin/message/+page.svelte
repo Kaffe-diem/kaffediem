@@ -1,11 +1,11 @@
 <script lang="ts">
   import { pb } from "$lib/stores/authStore";
 
-  export let data;
-  let displayMessages = data.displayMessages;
+  let { data } = $props();
+  let displayMessages = $state(data.displayMessages);
   let activeMessage = data.activeMessage[0];
 
-  let messageVisible = activeMessage.isVisible;
+  let messageVisible = $state(activeMessage.isVisible);
   async function updateActiveMessage() {
     await pb.collection("activeMessage").update(activeMessage.id, {
       message: selectedDisplayMessage.id,
@@ -13,7 +13,7 @@
     });
   }
 
-  let selectedDisplayMessage = { id: activeMessage.message };
+  let selectedDisplayMessage = $state({ id: activeMessage.message });
 
   async function updateDisplayMessages() {
     updateActiveMessage();
@@ -37,7 +37,7 @@
               name="selected"
               class="radio mr-2 mt-4"
               checked={displayMessage.id == selectedDisplayMessage.id}
-              on:change={() => {
+              onchange={() => {
                 selectedDisplayMessage = displayMessage;
                 messageVisible = true;
               }}
@@ -70,12 +70,12 @@
       name="selected"
       class="radio mr-2 mt-4"
       checked={!messageVisible}
-      on:change={() => (messageVisible = false)}
+      onchange={() => (messageVisible = false)}
     />
     <span class="text-lg">Åpent!</span>
   </ul>
 
-  <button type="submit" class="btn mt-4 w-full max-w-xs" on:click={updateDisplayMessages}
+  <button type="submit" class="btn mt-4 w-full max-w-xs" onclick={updateDisplayMessages}
     >Lagre</button
   >
 </form>
