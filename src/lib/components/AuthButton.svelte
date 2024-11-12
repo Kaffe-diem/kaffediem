@@ -2,8 +2,14 @@
   import { onMount } from "svelte";
   import { auth, pb } from "$lib/stores/authStore";
   import { goto } from "$app/navigation";
+  interface Props {
+    children?: import("svelte").Snippet;
+    [key: string]: any;
+  }
 
-  let isAuthenticated = false;
+  let { children, ...rest }: Props = $props();
+
+  let isAuthenticated = $state(false);
 
   onMount(
     auth.subscribe((value) => {
@@ -49,7 +55,11 @@
 </script>
 
 {#if isAuthenticated}
-  <button on:click={logout} class={$$restProps.class || ""}><slot>Logg ut</slot></button>
+  <button onclick={logout} class={rest.class || ""}
+    >{#if children}{@render children()}{:else}Logg ut{/if}</button
+  >
 {:else}
-  <button on:click={login} class={$$restProps.class || ""}><slot>Logg inn</slot></button>
+  <button onclick={login} class={rest.class || ""}
+    >{#if children}{@render children()}{:else}Logg inn{/if}</button
+  >
 {/if}

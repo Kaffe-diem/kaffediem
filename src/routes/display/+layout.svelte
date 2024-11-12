@@ -3,8 +3,13 @@
   import { pb } from "$lib/stores/authStore";
   import { onMount } from "svelte";
 
-  export let data: { screenMessageRecord };
-  let screenMessage = data.screenMessageRecord[0];
+  interface Props {
+    data: { screenMessageRecord };
+    children?: import("svelte").Snippet;
+  }
+
+  let { data, children }: Props = $props();
+  let screenMessage = $state(data.screenMessageRecord[0]);
 
   onMount(() => {
     pb.collection("screen_message").subscribe("*", function (event) {
@@ -20,7 +25,7 @@
   </div>
 {:else}
   <main class="relative mx-auto h-screen w-11/12 py-4">
-    <slot />
+    {@render children?.()}
   </main>
 {/if}
 

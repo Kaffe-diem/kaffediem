@@ -1,11 +1,9 @@
 <script>
-  export let navItems;
-  export let isAuthenticated;
-  export let isAdmin;
   import AuthButton from "$components/AuthButton.svelte";
+  let { navItems, isAuthenticated, isAdmin, ...rest } = $props();
 </script>
 
-<ul class="menu {$$restProps.class || ''}">
+<ul class="menu {rest.class || ''}">
   {#each navItems as item}
     {#if (isAuthenticated || !item.requiresAuth) && (isAdmin || !item.requiresAdmin)}
       <li>

@@ -2,7 +2,7 @@
   import OrderList from "./OrderList.svelte";
   import { State, Order } from "$lib/types";
 
-  $: orders = [new Order(123), new Order(456), new Order(789, State.Complete)];
+  let orders = $derived([new Order(123), new Order(456), new Order(789, State.Complete)]);
 </script>
 
 <div
