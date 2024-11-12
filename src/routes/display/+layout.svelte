@@ -7,7 +7,7 @@
     data: { activeMessage: String[] };
   }
 
-  let { data }: Props = $props();
+  let { data, children }: Props = $props();
   let message = $state(data.activeMessage[0]);
 
   onMount(() => {
