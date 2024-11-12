@@ -1,6 +1,5 @@
 <script lang="ts">
-  export let categories;
-  export let selectedItem;
+  let { categories, selectedItem = $bindable() } = $props();
 </script>
 
 <div class="flex flex-col overflow-y-auto">

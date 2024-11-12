@@ -3,8 +3,8 @@
   import { onMount } from "svelte";
   import ExpandedDrink from "$lib/ExpandedDrink.svelte";
 
-  let favorites: any[];
-  let previous_orders_drinks: any[];
+  let favorites: any[] = $state();
+  let previous_orders_drinks: any[] = $state();
   onMount(async () => {
     const userId = pb.authStore.model?.id;
     if (userId) {

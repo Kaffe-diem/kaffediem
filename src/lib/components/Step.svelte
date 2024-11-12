@@ -1,8 +1,13 @@
 <script lang="ts">
-  export let state: boolean = false;
+  interface Props {
+    state?: boolean;
+    children?: import("svelte").Snippet;
+  }
+
+  let { state = false, children }: Props = $props();
 </script>
 
-<li class="step {state ? 'step-primary' : ''} p-2"><slot /></li>
+<li class="step {state ? 'step-primary' : ''} p-2">{@render children?.()}</li>
 
 <style>
   .step:after {

@@ -1,8 +1,12 @@
 <script lang="ts">
   import { State, Order } from "$lib/types";
 
-  export let orders: Order[];
-  export let filter: State;
+  interface Props {
+    orders: Order[];
+    filter: State;
+  }
+
+  let { orders, filter }: Props = $props();
 </script>
 
 <div class="overflow-y-auto">
