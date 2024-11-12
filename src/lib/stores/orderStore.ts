@@ -32,19 +32,19 @@ const init = () => {
     const initialOrders = await pb.collection("orders").getFullList();
     set(initialOrders.map(mapToOrder));
 
-    pb.collection("orders").subscribe("*", (e) => {
+    pb.collection("orders").subscribe("*", (event) => {
       update((state) => {
         console.log({
           message: "received event on orders subscription",
-          event: e,
+          event: event,
           currentState: state
         });
 
-        const orderIndex = state.findIndex((order) => order.id === e.record.id);
+        const orderIndex = state.findIndex((order) => order.id === event.record.id);
 
-        const order = mapToOrder(e.record);
+        const order = mapToOrder(event.record);
 
-        switch (e.action) {
+        switch (event.action) {
           case "create":
             state.push(order);
             break;
