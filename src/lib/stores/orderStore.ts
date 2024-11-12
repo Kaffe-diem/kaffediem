@@ -72,11 +72,7 @@ const init = () => {
         order.map(async (id: string) => {
           const response = await pb.collection("order_drink").create(
             {
-              drink: id,
-              serving_size: "big",
-              milk: "whole"
-              // extras:
-              // flavor:
+              drink: id
             },
             {
               $autoCancel: false
