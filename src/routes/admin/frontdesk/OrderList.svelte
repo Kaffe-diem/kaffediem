@@ -12,7 +12,7 @@
 <div class="overflow-y-auto">
   <ul class="flex-col">
     {#each $orders as order}
-      {#if order.state === show}
+      {#if show.includes(order.state)}
         <li>
           <!-- maybe on hover/click (if click, swipe to delete) we can show the contents? -->
           <button

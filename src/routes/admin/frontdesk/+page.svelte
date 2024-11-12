@@ -17,5 +17,5 @@
 
   <div class="divider divider-horizontal"></div>
 
-  <OrderList {orders} show={"completed"} />
+  <OrderList {orders} show={["completed"]} />
 </div>
