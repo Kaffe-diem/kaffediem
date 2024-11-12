@@ -1,5 +1,5 @@
 <script lang="ts">
-  class NavItem {
+  class AdminPage {
     href: string;
     text: string;
 
@@ -9,22 +9,22 @@
     }
   }
 
-  const navItems = [
-    new NavItem("/admin/frontdesk", "Bestillingsdisk"),
-    // new NavItem("/admin/kitchen", "Kjøkken"),
-    new NavItem("/display", "Visning")
-    // new NavItem("/admin/screenmessage", "Endre skjerm melding"),
-    // new NavItem("/admin/menu", "Endre menyen")
+  const adminPages = [
+    new AdminPage("/admin/frontdesk", "Bestillingsdisk"),
+    // new AdminPage("/admin/kitchen", "Kjøkken"),
+    new AdminPage("/display", "Visning"),
+    new AdminPage("/admin/message", "Endre skjerm melding")
+    // new AdminPage("/admin/menu", "Endre menyen")
   ];
 </script>
 
 <ul>
-  {#each navItems as item}
+  {#each adminPages as page}
     <li>
       <a
         class="btn relative m-4 flex h-24 w-full flex-col items-center justify-center text-3xl lg:text-5xl"
-        href={item.href}
-        >{item.text}
+        href={page.href}
+        >{page.text}
       </a>
     </li>
   {/each}
