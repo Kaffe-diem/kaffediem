@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { pb } from "$lib/stores/authStore";
+  import pb from "$lib/pocketbase";
   import { onMount } from "svelte";
   import ExpandedDrink from "$lib/ExpandedDrink.svelte";
 

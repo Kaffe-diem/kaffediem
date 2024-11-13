@@ -1,6 +1,5 @@
-import { PUBLIC_PB_HOST } from "$env/static/public";
+import pb from "$lib/pocketbase";
 import { writable } from "svelte/store";
-import pocketbase from "pocketbase";
 import { Order } from "$lib/types";
 import type { State } from "$lib/types";
 
@@ -9,7 +8,7 @@ import eventsource from "eventsource";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (global as any).EventSource = eventsource;
 
-const pb = new pocketbase(PUBLIC_PB_HOST);
+
 
 const mapToOrder = (data: unknown): Order => {
   return new Order({

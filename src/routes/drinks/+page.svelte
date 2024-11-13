@@ -1,6 +1,6 @@
 <script lang="ts">
   import Drink from "$lib/Drink.svelte";
-  import { pb } from "$lib/stores/authStore";
+  import pb from "$lib/pocketbase";
   let groupedDrinks: Record<string, any[]> = $state();
 
   interface Props {
