@@ -10,9 +10,9 @@ Etterspørseler fra ansatte:
   - Trykke på ordre -> bytte fra produksjon til ferdig til slette
   - Stor knapp for å legge til
   - Knapp for å skrive melding på display
-- [ ] Det nåværende systemet lar deg også sette spesifikke meldinger på skjermen (som "stengt" hvor ansatte kan skrive hva som helst)
+- [x] Det nåværende systemet lar deg også sette spesifikke meldinger på skjermen (som "stengt" hvor ansatte kan skrive hva som helst)
 - [ ] Måte for ansatte å legge til ting i menyen (nye valg, sesong valg osv)
-- [ ] QR-kode / lenke til denne her frontenden på skjermen
+- [x] QR-kode / lenke til denne her frontenden på skjermen
 - [ ] Vise bilder i menyen
 
 Andre ting:
