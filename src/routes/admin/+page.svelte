@@ -11,7 +11,7 @@
 
   const adminPages = [
     new AdminPage("/admin/frontdesk", "Bestillingsdisk"),
-    // new AdminPage("/admin/kitchen", "Kjøkken"),
+    new AdminPage("/admin/kitchen", "Kjøkken"),
     new AdminPage("/display", "Visning"),
     new AdminPage("/admin/message", "Endre skjerm melding")
     // new AdminPage("/admin/menu", "Endre menyen")
