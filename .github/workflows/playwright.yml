@@ -6,6 +6,8 @@ on:
     branches: [ main, master ]
 jobs:
   test:
+    env:
+      PB_ADMIN_BASIC: ${{ secrets.PB_ADMIN_BASIC }}
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
