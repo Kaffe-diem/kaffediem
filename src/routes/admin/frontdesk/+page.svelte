@@ -1,29 +1,10 @@
 <script lang="ts">
-  import { State, Order } from "$lib/types";
   import OrderList from "./OrderList.svelte";
   import ItemSelection from "./ItemSelection.svelte";
   import Cart from "./Cart.svelte";
-
-  // TODO: instead of having an Order-type, interface directly with the DB using a svelte store
-  let orders = $derived([
-    new Order(123),
-    new Order(456, State.Complete),
-    new Order(789, State.Complete),
-    new Order(999, State.Complete),
-    new Order(999, State.Complete),
-    new Order(999, State.Complete),
-    new Order(999, State.Complete),
-    new Order(999, State.Complete),
-    new Order(999, State.Complete),
-    new Order(999, State.Complete),
-    new Order(999, State.Complete),
-    new Order(999, State.Complete),
-    new Order(999, State.Complete)
-  ]);
+  import { orders } from "$lib/stores/orderStore";
 
   let { data } = $props();
-  // Is undefined before anything is checked.
-  // Make sure to account for that when implementing logic based on it.
   let selectedItem = $state();
 </script>
 
@@ -36,5 +17,5 @@
 
   <div class="divider divider-horizontal"></div>
 
-  <OrderList {orders} filter={State.Complete} />
+  <OrderList {orders} show={["completed"]} />
 </div>

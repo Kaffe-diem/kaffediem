@@ -1,76 +1,84 @@
-# Kaffe diem frontend i svelte
+# Kaffediem på Svelte 🧨
 
-## TODO
+Dette er kaffe-diem sitt system for å selge kaffe. Bygget med kjærlighet av elever fra Amalie Skram.
 
-Etterspørseler fra ansatte:
+Vent litt no; er ikke du en elev på Amalie Skram? [Bli med på Discord!](https://discord.gg/HC6UMSfrJN)
 
-- [ ] Finere UI (prøve å etterligne macdonalds osv)
-- [ ] Gjenlage det nåverende systemet på ipaden
-  - To kolonner, akkurat som display
-  - Trykke på ordre -> bytte fra produksjon til ferdig til slette
-  - Stor knapp for å legge til
-  - Knapp for å skrive melding på display
-- [x] Det nåværende systemet lar deg også sette spesifikke meldinger på skjermen (som "stengt" hvor ansatte kan skrive hva som helst)
-- [ ] Måte for ansatte å legge til ting i menyen (nye valg, sesong valg osv)
-- [x] QR-kode / lenke til denne her frontenden på skjermen
-- [ ] Vise bilder i menyen
+## Kjøre, lokalt
 
-Andre ting:
+Det er nyttig å enten ha Linux eller WSL. Noen bruker også Nix.
 
-- Må spørre VLFK for å få vipps konto (gjøres gjennom Mercedes og ledelsen)
-- Må spørre VLFK om å tillate google-innlogging gjennom oauth
-- Rundt 75% bruker kortbetalling og det er foretrukket, resten bruker vipps. Slik det virker nå må ansatte manuelt åpne vipps og sende en request
-- Bruke egen kopp må virke
+```bash
+echo "PUBLIC_PB_HOST=https://kodekafe-pocketbase.fly.dev" > .env
+npm i
+nvm use 20
+make
+```
 
-Sider som må til for dette:
+Bemerk at node versjon 20 brukes. Det er ikke nødvendig å installere denne med NVM, men det er praktisk.
 
-- Main side med info om kaffe diem, links til de andre sidene
-- Hoved display
-- Ipad display for å endre og legge til bestillinger (kun touchskjerm)
-- Endre på menyen for ansatte
-- Bestilling på telefon
-- Se status på telefon
+Man kan også kjøre Pocketbase lokalt via docker, dette er luddig om man skal endre på schema. Dette er via Docker, via make:
+
+```bash
+make db
+```
+
+## Din første PR 🚀
+
+Vi har code-review for merge til main og previews på alle nye PR.
 
 ## .env
 
-```bash
+Følgende miljøvariabler er påkrevd:
+
+```env
 PUBLIC_PB_HOST=https://kodekafe-pocketbase.fly.dev
-PUBLIC_PB_ADMIN_EMAIL=
-PUBLIC_PB_ADMIN_PASSWORD=
 ```
 
-## Pocketbase
+# Litt om arkitektur
 
-Installer docker for å kjøre pocketbase lokalt.
+![Diagram](docs/architecture.excalidraw.svg)
 
-```bash
-docker compose up
+Ordre er hovedtingen rundt programvaren. De har fire states, som representeres deres livsyklus. Vi kan se på dette som en [tilstandsmaskin](https://en.wikipedia.org/wiki/Finite-state_machine):
+
+```
+[Received] → [Production] → [Completed] → [Dispatched]
 ```
 
-## Development
+Tjenester kommuniserer ikke direkte med hverandre. De sender en melding til backend. Andre tjenester lytter til visse kanaler hos backend. Når det er en oppdatering de er interessert i får de den. Generelt sett vil ikke andre tjenester lytte direkte til backend, vi bruker isolorer mye av den logikken under `lib/stores`. I prinsipp er dette relativt enkel implementasjon av en [event-driven arkiktektur](https://en.wikipedia.org/wiki/Event-driven_architecture).
 
-1. Clone repoen
+For eksempel så vil den store skjermen med hvilke ordre som er på vei ikke ha noe logikk selv. Den henter alt `lib/orderStore`.
 
-2. Installer dependencies
+![display](docs/display.excalidraw.svg)
 
-```bash
-npm ci
-```
+Ymse gloser:
 
-3. Run dev serveren
+- [Pocketbase](https://pocketbase.io/). Vårt backend og persistens. Dette er en go-applikasjon som skriver til en SQLite database. Den har også en WebUI. Vi bruker en API-klient med typings.
+- [Svelte](https://svelte.dev/). Et frontendrammeverk.
+- [Sveltekit](https://svelte.dev/docs/kit/introduction). Ymse verktøy for Svelte, blant annet routing og muligheten for server-side kode.
+- [Firebase](https://firebase.google.com/). Det vi bruker til å kjøre sveltekit, altså frontendapplikasjonen.
+- [fly.io](https://fly.io). Det vi bruker til å kjøre Pocketbase, altså backendapplikasjonen.
+- Ivrig på å bidra. Deg—akkurat nå.
 
-```bash
-npm run dev
-npm run dev -- --host # for å åpne til nettverk
-```
+Vi har stores som er for det meste real-time subscriptions i mot Pocketbase. Disse lar resten av applikasjonen skrive til, gjennom et fast grensesnitt, og lytte til [Server Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events). Dette gjør at applikasjonen oppleves som realtime, samtidig lagres alle endringer som gjøres mot persistenslaget.
 
-## Deploy
+Resten av interaksjon for å hente og skrive data gjøres gjennom `$lib/pocketbase` som eksporterer en singleton pocketbase-klient rettet mot `PUBLIC_PB_HOST`. Dette er trygt fordi vi har autoriseringspolicy på Pocketbase.
 
-### Teste på lokal maskin
+## Red flags ⛳️
+
+Kodebasen beveger seg fort og vi gjør mange ting OK+ til "vi fikser det etterpå". Generelt sett kan du fokusere på `$lib/components`, `$lib/stores`, og `$lib/routes`.
+
+Designsystemet er ikke gjennomtenkt.
+
+# Teste prod build?
+
+[intern monolog: refaktorsier dette via https://github.com/Kaffe-diem/kaffediem/issues/50]
+
+## Teste på lokal maskin
 
 (Antar at dependencies allerede er installert)
 
-1. Build appen
+1. Bygg appen
 
 ```bash
 npm run build
@@ -82,7 +90,7 @@ npm run build
 node build
 ```
 
-### Hvis dependencies ikke er installert (for eksempel på rpi):
+## Hvis dependencies ikke er installert (for eksempel på rpi):
 
 1. Kopier `package.json` og `package-lock.json` til `build/`
 

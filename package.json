@@ -37,6 +37,10 @@
   },
   "type": "module",
   "dependencies": {
-    "pocketbase": "^0.21.5"
+    "@types/eventsource": "^1.1.15",
+    "@types/node": "^22.9.0",
+    "eventsource": "^2.0.2",
+    "pocketbase": "^0.21.5",
+    "vite-plugin-node-polyfills": "^0.22.0"
   }
 }

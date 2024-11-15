@@ -1,6 +1,6 @@
 <script lang="ts">
   interface Props {
-    state?: boolean;
+    state?: string;
     children?: import("svelte").Snippet;
   }
 
