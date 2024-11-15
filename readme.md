@@ -37,6 +37,20 @@ PUBLIC_PB_HOST=https://kodekafe-pocketbase.fly.dev
 
 # Litt om arkitektur
 
+![Diagram](docs/architecture.excalidraw.svg)
+
+Ordre er hovedtingen rundt programvaren. De har fire states, som representeres deres livsyklus. Vi kan se på dette som en [tilstandsmaskin](https://en.wikipedia.org/wiki/Finite-state_machine):
+
+```
+[Received] → [Production] → [Completed] → [Dispatched]
+```
+
+Tjenester kommuniserer ikke direkte med hverandre. De sender en melding til backend. Andre tjenester lytter til visse kanaler hos backend. Når det er en oppdatering de er interessert i får de den. Generelt sett vil ikke andre tjenester lytte direkte til backend, vi bruker isolorer mye av den logikken under `lib/stores`. I prinsipp er dette relativt enkel implementasjon av en [event-driven arkiktektur](https://en.wikipedia.org/wiki/Event-driven_architecture).
+
+For eksempel så vil den store skjermen med hvilke ordre som er på vei ikke ha noe logikk selv. Den henter alt `lib/orderStore`.
+
+![display](docs/display.excalidraw.svg)
+
 Ymse gloser:
 
 - [Pocketbase](https://pocketbase.io/). Vårt backend og persistens. Dette er en go-applikasjon som skriver til en SQLite database. Den har også en WebUI. Vi bruker en API-klient med typings.
