@@ -4,7 +4,7 @@ Dette er kaffe-diem sitt system for å selge kaffe. Bygget med kjærlighet av el
 
 Vent litt no; er ikke du en elev på Amalie Skram? [Bli med på Discord!](https://discord.gg/HC6UMSfrJN)
 
-## Kjøre, lokalt
+## Kjøre lokalt
 
 Det er nyttig å enten ha Linux eller WSL.
 
@@ -17,7 +17,7 @@ make
 
 Bemerk at node versjon 20 brukes. Det er ikke nødvendig å installere denne med NVM, men det er praktisk.
 
-Man kan også kjøre Pocketbase lokalt via docker, dette er luddig om man skal endre på schema. Dette er via Docker, via make:
+Man kan også kjøre Pocketbase lokalt via docker, dette er lurt om man skal endre på schema. Dette er via Docker, via make:
 
 ```bash
 make db
@@ -27,13 +27,17 @@ make db
 
 Vi har code-review for merge til main og previews på alle nye PR.
 
+Formater koden din før du commit-er:
+
+```bash
+npm run format
+```
+
 ### Hva kan jeg gjøre?
 
-Generelt sett kan du fokusere på `$lib/components`, `$lib/stores`, og `src/routes`.
-
-Se på åpne issues og åpne pull requests.
-
-Eller titt rundt i koden og let etter forbedringer.
+- Generelt sett kan du fokusere på `$lib/components`, `$lib/stores`, og `src/routes`.
+- Se på åpne issues og åpne pull requests.
+- Eller titt rundt i koden og let etter forbedringer.
 
 # Arkitektur
 
@@ -51,13 +55,14 @@ For eksempel vil den store skjermen med hvilke bestillinger som er på vei ikke 
 
 ![display](docs/display.excalidraw.svg)
 
-## Forskjellige gloser:
+## Gloser
 
-- [Pocketbase](https://pocketbase.io/). Vårt backend og persistens. Dette er en go-applikasjon som skriver til en SQLite database. Den har også en WebUI. Vi bruker en API-klient med typings.
+- [Pocketbase](https://pocketbase.io). Vårt backend og persistens. Dette er en go-applikasjon som skriver til en SQLite database. Den har også en WebUI. Vi bruker en API-klient med typings.
 - [Svelte](https://svelte.dev/). Et frontendrammeverk.
 - [Sveltekit](https://svelte.dev/docs/kit/introduction). Ymse verktøy for Svelte, blant annet routing og muligheten for server-side kode.
-- [Firebase](https://firebase.google.com/). Det vi bruker til å kjøre sveltekit, altså frontendapplikasjonen.
-- [fly.io](https://fly.io). Det vi bruker til å kjøre Pocketbase, altså backendapplikasjonen.
+- [Firebase](https://firebase.google.com). Det vi bruker til å kjøre SvelteKit, frontendapplikasjonen.
+- [fly.io](https://fly.io). Det vi bruker til å kjøre Pocketbase, backendapplikasjonen.
+- [Docker](https://www.docker.com). Lettvektscontainere som virker likt i alle miljø.
 - Ivrig på å bidra. Deg—akkurat nå.
 
 Vi har stores som er for det meste real-time subscriptions i mot Pocketbase. Disse lar resten av applikasjonen skrive til, gjennom et fast grensesnitt, og lytte til [Server Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events). Dette gjør at applikasjonen oppleves som realtime, samtidig lagres alle endringer som gjøres mot persistenslaget.
