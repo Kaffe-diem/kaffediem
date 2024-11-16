@@ -1,5 +1,5 @@
 <script lang="ts">
-  import OrderList from "./OrderList.svelte";
+  import OrderList from "../OrderList.svelte";
   import ItemSelection from "./ItemSelection.svelte";
   import Cart from "./Cart.svelte";
   import { orders } from "$lib/stores/orderStore";
@@ -17,5 +17,5 @@
 
   <div class="divider divider-horizontal"></div>
 
-  <OrderList {orders} show={["completed"]} />
+  <OrderList {orders} show={["completed"]} onclick={"dispatched"} />
 </div>

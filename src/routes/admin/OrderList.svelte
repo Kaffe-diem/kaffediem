@@ -3,11 +3,11 @@
   interface Props {
     // this is a custom store Order[], I am not sure how to type it.
     orders: any;
-    show: State;
-    state: string;
+    show: State[];
+    onclick: string;
   }
 
-  let { orders, show, state }: Props = $props();
+  let { orders, show, onclick }: Props = $props();
 </script>
 
 <div class="overflow-y-auto">
@@ -18,7 +18,7 @@
           <!-- maybe on hover/click (if click, swipe to delete) we can show the contents? -->
           <button
             class="btn mt-4 w-full text-xl font-normal md:btn-lg md:text-3xl"
-            onclick={() => orders.setState(order.id, state)}
+            onclick={() => orders.setState(order.id, onclick)}
           >
             {order.id.slice(0, 4)}
           </button>
