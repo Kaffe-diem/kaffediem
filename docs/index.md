@@ -1,12 +1,10 @@
-# Bestillingssystem for Kaffe Diem
+# Bestillingssystem for kaffe-diem
 
-Dette er et system for Kaffe Diem for å håndtere bestilling av kaffe.
-
-## Oversikt over sider
+Dette er et system for kaffe-diem for å håndtere bestilling av kaffe.
 
 ```bash
 / # Startside
-├── /account # Info om din bruker: bestillinger etc.
+├── /account # Info om din bruker: bestillinger osv.
 ├── /admin # Oversikt over ansattes mulige handlinger
 │   ├── /frontdesk # Ta imot bestillinger
 │   ├── /kitchen # Se aktive bestillinger
@@ -20,7 +18,7 @@ Dette er et system for Kaffe Diem for å håndtere bestilling av kaffe.
 
 - [x] Implementere
 
-Logoen til Kaffe Diem, og en kort beskrivelse av hva de er.
+Logoen til kaffe-diem og en kort beskrivelse av hva kaffe-diem er.
 
 ## /account
 
@@ -49,15 +47,16 @@ Bestillingsdisk. Her legger ansatte til nye bestillinger. Siden er delt inn i tr
   - Liste over produkter i bestillingen. Man kan trykke på et produkt i listen for å fjerne det.
   - Knapp for å legge til flere produkter, valgt i menyen.
   - Knapp for å fullføre bestilling: `"Ferdig"`.
+- Liste over ferdige bestillinger som skal gis ut til kundene.
 
 ### /admin/kitchen
 
 - [ ] Implementere
 
-En liste over mottatte ordre og ordre i produksjon.
+En liste over mottatte bestillinger og bestillinger i produksjon.
 
 ### /admin/message
 
 - [x] Implementere
 
-Endring av meldingen. Denne meldingen skal vises på `/display`, og blokkerer alt annet innhold. Siden har en liste over ulike valg for hva som skal vises som meldingen. Man kan velge med en radio knapp, og endre title / subtitle med input-bokser.
+Endring av meldingen. Denne meldingen skal vises på `/display`, og blokkerer alt annet innhold. Siden har en liste over ulike valg for hva som skal vises som meldingen. Man kan velge med en radio knapp, og endre tittel / beskrivelse med input-bokser.
