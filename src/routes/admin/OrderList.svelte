@@ -12,7 +12,7 @@
 
 <div class="overflow-y-auto">
   <ul class="flex-col">
-    {#each $orders as order}
+    {#each $orders as order, index}
       {#if show.includes(order.state)}
         <li>
           <!-- maybe on hover/click (if click, swipe to delete) we can show the contents? -->
@@ -20,7 +20,7 @@
             class="btn mt-4 w-full text-xl font-normal md:btn-lg md:text-3xl"
             onclick={() => orders.setState(order.id, onclick)}
           >
-            {order.id.slice(0, 4)}
+            {index + 100}
           </button>
         </li>
       {/if}
