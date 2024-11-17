@@ -8,8 +8,6 @@ import eventsource from "eventsource";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (global as any).EventSource = eventsource;
 
-
-
 const mapToOrder = (data: unknown): Order => {
   return new Order({
     id: data.id,
