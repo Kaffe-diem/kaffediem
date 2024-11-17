@@ -10,7 +10,7 @@ Tjenester kommuniserer ikke direkte med hverandre. De sender en melding til back
 
 For eksempel vil den store skjermen med hvilke bestillinger som er på vei ikke ha noe logikk selv. Den henter alt fra `$lib/orderStore`.
 
-![display](docs/display.excalidraw.svg)
+![display](./display.excalidraw.svg)
 
 ## Gloser
 
@@ -20,7 +20,6 @@ For eksempel vil den store skjermen med hvilke bestillinger som er på vei ikke 
 - [Firebase](https://firebase.google.com). Det vi bruker til å kjøre SvelteKit, frontendapplikasjonen.
 - [fly.io](https://fly.io). Det vi bruker til å kjøre Pocketbase, backendapplikasjonen.
 - [Docker](https://www.docker.com). Lettvektscontainere som virker likt i alle miljø.
-- Ivrig på å bidra. Deg—akkurat nå.
 
 Vi har stores som er for det meste real-time subscriptions i mot Pocketbase. Disse lar resten av applikasjonen skrive til, gjennom et fast grensesnitt, og lytte til [Server Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events). Dette gjør at applikasjonen oppleves som realtime, samtidig lagres alle endringer som gjøres mot persistenslaget.
 
