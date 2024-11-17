@@ -60,3 +60,26 @@ En liste over mottatte bestillinger og bestillinger i produksjon.
 - [x] Implementere
 
 Endring av meldingen. Denne meldingen skal vises på `/display`, og blokkerer alt annet innhold. Siden har en liste over ulike valg for hva som skal vises som meldingen. Man kan velge med en radio knapp, og endre tittel / beskrivelse med input-bokser.
+
+### /menu
+
+- [ ] Implementere
+
+Her kan kunder se menyen. Den skal vise det samme som venstre kolonne av `/admin/frontdesk`, i tillegg til bilder for hver ting på menyen. Man skal også kunne bestille herfra.
+
+### /status
+
+- [ ] Implementere
+
+Kunder kan se status på sin egen bestilling gjort fra `/menu`. Den går mellom ulike states:
+
+- Received
+- Production
+- Completed
+- Dispatched
+
+### /tos
+
+- [x] Implementere
+
+Vilkår for bruk. Vi må forklare hva vi kommer til å gjøre med dataen, hva vi tar vare på og alt om personvern.
