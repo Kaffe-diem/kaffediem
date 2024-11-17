@@ -20,6 +20,7 @@ test("test", async ({ page, browserName }) => {
 
   // log in
   await page.goto("/");
+  await page.waitForLoadState("networkidle");
   await page.getByRole("button", { name: "Logg inn", exact: true }).click({
     button: "right"
   });
