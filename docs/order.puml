@@ -1,0 +1,17 @@
+@startuml
+!pragma teoz true
+
+title Bestillingsprosess
+
+actor Customer as customer
+actor Frontdesk as frontdesk
+actor Kitchen as kitchen
+
+customer -> frontdesk : Give order
+frontdesk -> frontdesk : Create order
+frontdesk -> kitchen : Order to ""received""
+kitchen -> kitchen : Order to ""production""
+kitchen -> frontdesk : Order to ""completed""
+frontdesk -> customer : Order to ""dispatched""
+
+@enduml
