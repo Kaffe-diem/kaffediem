@@ -29,7 +29,7 @@ make db
 
 [intern monolog: refaktorsier dette via https://github.com/Kaffe-diem/kaffediem/issues/50]
 
-## Teste på lokal maskin
+### Teste på lokal maskin
 
 (Antar at dependencies allerede er installert)
 
@@ -45,7 +45,7 @@ npm run build
 node build
 ```
 
-## Hvis dependencies ikke er installert (for eksempel på rpi):
+### Hvis dependencies ikke er installert (for eksempel på rpi):
 
 1. Kopier `package.json` og `package-lock.json` til `build/`
 
