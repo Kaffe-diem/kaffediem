@@ -9,9 +9,9 @@ actor Kitchen as kitchen
 
 customer -> frontdesk : Give order
 frontdesk -> frontdesk : Create order
-frontdesk -> kitchen : Order to ""received""
-kitchen -> kitchen : Order to ""production""
-kitchen -> frontdesk : Order to ""completed""
-frontdesk -> customer : Order to ""dispatched""
+frontdesk -> kitchen : Order to """received"""
+kitchen -> kitchen : Order to """production"""
+kitchen -> frontdesk : Order to """completed"""
+frontdesk -> customer : Order to """dispatched"""
 
 @enduml
