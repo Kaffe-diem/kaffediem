@@ -4,6 +4,10 @@ Dette er kaffe-diem sitt system for å selge kaffe. Bygget med kjærlighet av el
 
 Vent litt no; er ikke du en elev på Amalie Skram? [Bli med på Discord!](https://discord.gg/HC6UMSfrJN)
 
+<br><br>
+
+Les mer om de interne delene av prosjektet i [dokumentasjonen](./docs/readme.md).
+
 ## Kjøre lokalt
 
 Det er nyttig å enten ha Linux eller WSL.
