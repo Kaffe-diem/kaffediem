@@ -8,8 +8,6 @@ Dette prosjektet har blitt utviklet på kodekafe. [Bli med på Discord!](https:/
 - [Forklaring av sider](./docs/routes.md)
 - [Arkitektur](./docs/architecture.md)
 
-Slik kan du kjøre appen lokalt når du jobber med endringer.
-
 ## Kjøre lokalt
 
 Det er nyttig å enten ha Linux eller WSL.
