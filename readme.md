@@ -2,9 +2,13 @@
 
 Dette er kaffe-diem sitt system for å selge kaffe. Bygget med kjærlighet av elever fra [Amalie Skram](https://www.amalieskram.vgs.no).
 
-Vent litt no; er ikke du en elev på Amalie Skram? [Bli med på Discord!](https://discord.gg/HC6UMSfrJN)
+Dette prosjektet har blitt utviklet på kodekafe. [Bli med på Discord!](https://discord.gg/HC6UMSfrJN)
 
-Les om de interne delene av prosjektet i [dokumentasjonen](./docs/readme.md).
+- [Kontribuering](./docs/contribution.md)
+- [Forklaring av sider](./docs/routes.md)
+- [Arkitektur](./docs/architecture.md)
+
+Slik kan du kjøre appen lokalt når du jobber med endringer.
 
 ## Kjøre lokalt
 
@@ -65,22 +69,3 @@ npm ci --omit dev
 ```bash
 node .
 ```
-
-## Din første PR 🚀
-
-Vi har code-review for merge til main og previews på alle nye pull requests.
-
-Formater koden din før du commit-er:
-
-```bash
-npm run format
-```
-
-Vi skriver kode og commits på engelsk med [camelCase](https://en.wikipedia.org/wiki/Camel_case). Diskusjoner i issues og pull requests kan være på enten norsk eller engelsk.
-Commits er på formen: `component: short description` med maks lengde 50 tegn, med en valgfri lengre beskrivelse.
-
-### Hva kan jeg gjøre?
-
-- Generelt sett kan du fokusere på `$lib/components`, `$lib/stores`, og `src/routes`.
-- Se på åpne issues og åpne pull requests.
-- Eller titt rundt i koden og let etter forbedringer.
