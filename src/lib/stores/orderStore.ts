@@ -29,7 +29,11 @@ const init = () => {
   const { subscribe, set, update } = writable<Order[]>([]);
 
   (async () => {
-    const initialOrders = await pb.collection("orders").getFullList();
+    const initialOrders = await pb.collection("orders").getFullList({
+      expand: "drinks, drinks.drink",
+      filter: "state != 'dispatched'"
+    });
+
     set(initialOrders.map(mapToOrder));
 
     pb.collection("orders").subscribe("*", (event) => {
@@ -37,7 +41,7 @@ const init = () => {
         console.log({
           message: "received event on orders subscription",
           event: event,
-          currentState: state
+          currentState: JSON.stringify(state, undefined, 2)
         });
 
         const orderIndex = state.findIndex((order) => order.id === event.record.id);
@@ -49,6 +53,10 @@ const init = () => {
             state.push(order);
             break;
           case "update":
+            pb.collection("order_drink").getFullList({
+              filter: event.record.drinks.map((id: string) => `id="${id}"`).join("||"),
+              expand: "drink"
+            });
             state[orderIndex] = order;
             break;
           case "delete":
