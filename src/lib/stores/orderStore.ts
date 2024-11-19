@@ -20,6 +20,7 @@ const mapToOrder = (data: unknown): Order => {
     created: data.created,
     customer: data.customer,
     drinks: data.drinks,
+    expand: data.expand,
     payment_fulfilled: data.payment_fulfilled,
     updated: data.updated
   });
