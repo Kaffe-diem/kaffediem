@@ -37,38 +37,40 @@ const init = () => {
     // @ts-expect-error Pocketbase typing not implemented yet
     set(initialOrders.map(mapToOrder));
 
-    pb.collection("orders").subscribe("*", (event) => {
-      update((state) => {
-        // console.log({
-        //   message: "received event on orders subscription",
-        //   event: event,
-        //   currentState: JSON.stringify(state, undefined, 2)
-        // });
+    pb.collection("orders").subscribe(
+      "*",
+      (event) => {
+        update((state) => {
+          // console.log({
+          //   message: "received event on orders subscription",
+          //   event: event,
+          //   currentState: JSON.stringify(state, undefined, 2)
+          // });
 
-        const orderIndex = state.findIndex((order) => order.id === event.record.id);
+          const orderIndex = state.findIndex((order) => order.id === event.record.id);
 
-        // @ts-expect-error Pocketbase typing not implemented yet
-        const order = mapToOrder(event.record);
+          // @ts-expect-error Pocketbase typing not implemented yet
+          const order = mapToOrder(event.record);
 
-        switch (event.action) {
-          case "create":
-            state.push(order);
-            break;
-          case "update":
-            pb.collection("order_drink").getFullList({
-              filter: event.record.drinks.map((id: string) => `id="${id}"`).join("||"),
-              expand: "drink"
-            });
-            state[orderIndex] = order;
-            break;
-          case "delete":
-            state.splice(orderIndex, 1);
-            break;
-        }
+          switch (event.action) {
+            case "create":
+              state.push(order);
+              break;
+            case "update":
+              state[orderIndex] = order;
+              break;
+            case "delete":
+              state.splice(orderIndex, 1);
+              break;
+          }
 
-        return state;
-      });
-    });
+          return state;
+        });
+      },
+      {
+        expand: "drinks, drinks.drink"
+      }
+    );
   })();
 
   return {
