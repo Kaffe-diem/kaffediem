@@ -1,40 +1,24 @@
 type State = "received" | "production" | "completed" | "dispatched";
 
-class Order {
-  id: string;
-  state: State;
-  collectionId: string;
-  collectionName: string;
-  created: Date;
-  customer: string;
-  drinks: Array<any>;
-  paymentFulfilled: boolean;
-  updated: Date;
+class Drink {
+  name: string;
 
-  constructor(data: {
-    id: string;
-    state: string;
-    collectionId: string;
-    collectionName: string;
-    created: string;
-    customer: string;
-    drinks: Array<any>;
-    expand: Array<any>;
-    payment_fulfilled: boolean;
-    updated: string;
-  }) {
-    this.id = data.id;
-    this.state = data.state;
-    this.collectionId = data.collectionId;
-    this.collectionName = data.collectionName;
-    this.created = new Date(data.created);
-    this.customer = data.customer;
-    this.drinks = data.drinks;
-    this.expand = data.expand;
-    this.paymentFulfilled = data.payment_fulfilled;
-    this.updated = new Date(data.updated);
+  constructor(data: { name: string }) {
+    this.name = data.name;
   }
 }
 
-export { Order };
+class Order {
+  id: string;
+  state: State;
+  drinks: Array<Drink>;
+
+  constructor(data: { id: string; state: State; drinks: Array<Drink> }) {
+    this.id = data.id;
+    this.state = data.state;
+    this.drinks = data.drinks;
+  }
+}
+
+export { Drink, Order };
 export type { State };

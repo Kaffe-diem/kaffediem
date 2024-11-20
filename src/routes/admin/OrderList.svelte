@@ -21,9 +21,9 @@
             onclick={() => orders.setState(order.id, onclick)}
           >
             {index + 100}
-            {#each order.expand.drinks as drink}
+            {#each order.drinks as drink}
               <span class="badge badge-primary">
-                {drink.expand.drink.name}
+                {drink.name}
               </span>
             {/each}
           </button>
