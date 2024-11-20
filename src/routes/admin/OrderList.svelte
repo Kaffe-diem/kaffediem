@@ -17,12 +17,6 @@
     {label}
   </h2>
   <table class="table table-sm table-auto">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Innhold</th>
-      </tr>
-    </thead>
     <tbody>
       {#each $orders as order, index}
         {#if show.includes(order.state)}
