@@ -19,6 +19,7 @@ class Order {
     created: string;
     customer: string;
     drinks: Array<any>;
+    expand: Array<any>;
     payment_fulfilled: boolean;
     updated: string;
   }) {
@@ -29,6 +30,7 @@ class Order {
     this.created = new Date(data.created);
     this.customer = data.customer;
     this.drinks = data.drinks;
+    this.expand = data.expand;
     this.paymentFulfilled = data.payment_fulfilled;
     this.updated = new Date(data.updated);
   }
