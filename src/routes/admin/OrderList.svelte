@@ -5,30 +5,40 @@
     orders: any;
     show: State[];
     onclick: string;
+    label: string;
   }
 
-  let { orders, show, onclick }: Props = $props();
+  let { orders, show, onclick, label }: Props = $props();
 </script>
 
-<div class="overflow-y-auto">
-  <ul class="flex-col">
-    {#each $orders as order, index}
-      {#if show.includes(order.state)}
-        <li>
-          <!-- maybe on hover/click (if click, swipe to delete) we can show the contents? -->
-          <button
-            class="btn mt-4 flex w-full space-x-2 text-xl font-normal md:btn-lg md:text-3xl"
-            onclick={() => orders.setState(order.id, onclick)}
-          >
-            {index + 100}
-            {#each order.drinks as drink}
-              <span class="badge badge-primary">
-                {drink.name}
-              </span>
-            {/each}
-          </button>
-        </li>
-      {/if}
-    {/each}
-  </ul>
+<div class="h-full w-full overflow-y-auto">
+  <h2
+    class="sticky top-0 z-50 bg-base-100 pb-2 text-center text-4xl font-bold text-neutral md:mb-6"
+  >
+    {label}
+  </h2>
+  <table class="table table-sm table-auto">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Innhold</th>
+      </tr>
+    </thead>
+    <tbody>
+      {#each $orders as order, index}
+        {#if show.includes(order.state)}
+          <tr class="hover" onclick={() => orders.setState(order.id, onclick)}>
+            <td>{index + 100}</td>
+            <td>
+              {#each order.drinks as drink}
+                <span class="badge badge-ghost m-1 whitespace-nowrap">
+                  {drink.name}
+                </span>
+              {/each}
+            </td>
+          </tr>
+        {/if}
+      {/each}
+    </tbody>
+  </table>
 </div>

@@ -8,14 +8,14 @@
   let selectedItem = $state();
 </script>
 
-<div class="grid h-full grid-cols-[3fr,auto,1.5fr,auto,1fr] grid-rows-[100%] gap-4">
+<div class="grid h-full grid-cols-[2fr,auto,1fr,auto,1fr] grid-rows-[100%] gap-2">
   <ItemSelection categories={data.categories} bind:selectedItem />
 
-  <div class="divider divider-horizontal"></div>
+  <div class="divider divider-horizontal m-1 p-1"></div>
 
   <Cart {selectedItem} />
 
-  <div class="divider divider-horizontal"></div>
+  <div class="divider divider-horizontal m-1 p-1"></div>
 
-  <OrderList {orders} show={["completed"]} onclick={"dispatched"} />
+  <OrderList {orders} show={["completed"]} onclick={"dispatched"} label="Ferdig" />
 </div>
