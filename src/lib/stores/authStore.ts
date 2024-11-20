@@ -1,10 +1,7 @@
 import { writable } from "svelte/store";
-import PocketBase from "pocketbase";
-import { PUBLIC_PB_HOST } from "$env/static/public";
+import pb from "$lib/pocketbase/";
 
-const pb = new PocketBase(PUBLIC_PB_HOST);
-
-export const auth = writable({
+const auth = writable({
   isAuthenticated: pb.authStore.isValid,
   user: pb.authStore.model
 });
@@ -20,4 +17,4 @@ if (typeof document !== "undefined") {
   pb.authStore.loadFromCookie(document.cookie);
 }
 
-export { pb };
+export default auth;

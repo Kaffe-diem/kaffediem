@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { auth, pb } from "$lib/stores/authStore";
+  import auth from "$lib/stores/authStore";
+  import pb from "$lib/pocketbase";
   import { goto } from "$app/navigation";
   interface Props {
     children?: import("svelte").Snippet;

@@ -1,5 +1,5 @@
 <script>
-  import { auth } from "$lib/stores/authStore";
+  import auth from "$lib/stores/authStore";
   import { onMount } from "svelte";
   import Logo from "$assets/logo.png";
   import AuthButton from "$components/AuthButton.svelte";

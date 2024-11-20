@@ -1,6 +1,6 @@
 <script lang="ts">
   import QR from "$lib/assets/qr-code.svg";
-  import { pb } from "$lib/stores/authStore";
+  import pb from "$lib/pocketbase";
   import { onMount } from "svelte";
 
   interface Props {

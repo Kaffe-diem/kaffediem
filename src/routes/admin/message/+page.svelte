@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { pb } from "$lib/stores/authStore";
+  import pb from "$lib/pocketbase";
 
   let { data } = $props();
   let displayMessages = $state(data.displayMessages);

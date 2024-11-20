@@ -1,76 +1,41 @@
-# Kaffe diem frontend i svelte
+# Kaffediem på Svelte 🧨
 
-## TODO
+Dette er kaffe-diem sitt system for å selge kaffe. Bygget med kjærlighet av elever fra [Amalie Skram](https://www.amalieskram.vgs.no).
 
-Etterspørseler fra ansatte:
+Dette prosjektet har blitt utviklet på kodekafe. [Bli med på Discord!](https://discord.gg/HC6UMSfrJN)
 
-- [ ] Finere UI (prøve å etterligne macdonalds osv)
-- [ ] Gjenlage det nåverende systemet på ipaden
-  - To kolonner, akkurat som display
-  - Trykke på ordre -> bytte fra produksjon til ferdig til slette
-  - Stor knapp for å legge til
-  - Knapp for å skrive melding på display
-- [ ] Det nåværende systemet lar deg også sette spesifikke meldinger på skjermen (som "stengt" hvor ansatte kan skrive hva som helst)
-- [ ] Måte for ansatte å legge til ting i menyen (nye valg, sesong valg osv)
-- [ ] QR-kode / lenke til denne her frontenden på skjermen
-- [ ] Vise bilder i menyen
+- [Kontribuering](./docs/contribution.md)
+- [Forklaring av sider](./docs/routes.md)
+- [Arkitektur](./docs/architecture.md)
 
-Andre ting:
+## Kjøre lokalt
 
-- Må spørre VLFK for å få vipps konto (gjøres gjennom Mercedes og ledelsen)
-- Må spørre VLFK om å tillate google-innlogging gjennom oauth
-- Rundt 75% bruker kortbetalling og det er foretrukket, resten bruker vipps. Slik det virker nå må ansatte manuelt åpne vipps og sende en request
-- Bruke egen kopp må virke
-
-Sider som må til for dette:
-
-- Main side med info om kaffe diem, links til de andre sidene
-- Hoved display
-- Ipad display for å endre og legge til bestillinger (kun touchskjerm)
-- Endre på menyen for ansatte
-- Bestilling på telefon
-- Se status på telefon
-
-## .env
+Det er nyttig å enten ha Linux eller WSL.
 
 ```bash
-PUBLIC_PB_HOST=https://kodekafe-pocketbase.fly.dev
-PUBLIC_PB_ADMIN_EMAIL=
-PUBLIC_PB_ADMIN_PASSWORD=
+echo "PUBLIC_PB_HOST=https://kodekafe-pocketbase.fly.dev" > .env
+npm i
+nvm use 20
+make
 ```
 
-## Pocketbase
+Bemerk at node versjon 20 brukes. Det er ikke nødvendig å installere denne med NVM, men det er praktisk.
 
-Installer docker for å kjøre pocketbase lokalt.
+Man kan også kjøre Pocketbase lokalt via docker, dette er lurt om man skal endre på schema. Dette er via Docker, via make:
 
 ```bash
-docker compose up
+make db
 ```
 
-## Development
+## Teste prod build?
 
-1. Clone repoen
-
-2. Installer dependencies
-
-```bash
-npm ci
-```
-
-3. Run dev serveren
-
-```bash
-npm run dev
-npm run dev -- --host # for å åpne til nettverk
-```
-
-## Deploy
+[intern monolog: refaktorsier dette via https://github.com/Kaffe-diem/kaffediem/issues/50]
 
 ### Teste på lokal maskin
 
 (Antar at dependencies allerede er installert)
 
-1. Build appen
+1. Bygg appen
 
 ```bash
 npm run build
