@@ -1,14 +1,13 @@
 <script lang="ts">
   import type { State } from "$lib/types";
+  import { orders } from "$lib/stores/orderStore";
   interface Props {
-    // this is a custom store Order[], I am not sure how to type it.
-    orders: any;
     show: State[];
     onclick: string;
     label: string;
   }
 
-  let { orders, show, onclick, label }: Props = $props();
+  let { show, onclick, label }: Props = $props();
 </script>
 
 <div class="h-full w-full overflow-y-auto">
