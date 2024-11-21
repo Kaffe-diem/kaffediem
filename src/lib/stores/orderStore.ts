@@ -29,9 +29,10 @@ const init = () => {
   const { subscribe, set, update } = writable<Order[]>([]);
 
   (async () => {
+    const today = new Date().toISOString().split("T")[0];
     const initialOrders = await pb.collection("orders").getFullList({
       expand: "drinks, drinks.drink",
-      filter: "state != 'dispatched'"
+      filter: `created >= "${today}"`
     });
 
     // @ts-expect-error Pocketbase typing not implemented yet
