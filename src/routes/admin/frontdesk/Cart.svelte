@@ -3,7 +3,6 @@
   import { orders } from "$lib/stores/orderStore";
 
   let cart = $state([]);
-  $inspect(cart);
   let totalPrice = $derived(cart.reduce((sum, item) => sum + item.price, 0));
 </script>
 
