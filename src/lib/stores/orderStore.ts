@@ -35,7 +35,7 @@ const subscribe = createPbStore<Order>(
 
 export default {
   subscribe,
-  add: async (order: string[]) => {
+  create: async (order: string[]) => {
     const drinkIds: string[] = await Promise.all(
       // FIXME: Use transactions
       // https://github.com/pocketbase/pocketbase/issues/5386
@@ -54,7 +54,7 @@ export default {
       payment_fulfilled: false
     });
   },
-  setState: (id: string, state: State) => {
+  updateState: (id: string, state: State) => {
     pb.collection("orders").update(id, { state });
   }
 };

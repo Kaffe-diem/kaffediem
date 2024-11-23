@@ -20,7 +20,7 @@
     <tbody>
       {#each $orders as order, index}
         {#if show.includes(order.state)}
-          <tr class="hover" onclick={() => orders.setState(order.id, onclick)}>
+          <tr class="hover" onclick={() => orders.updateState(order.id, onclick)}>
             <td>{index + 100}</td>
             <td>
               {#each order.drinks as drink}

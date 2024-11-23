@@ -43,7 +43,7 @@
     <button
       class="bold btn btn-lg text-xl"
       onclick={() => {
-        orders.add(cart.map((item) => item.id));
+        orders.create(cart.map((item) => item.id));
         cart = [];
       }}>Ferdig</button
     >
