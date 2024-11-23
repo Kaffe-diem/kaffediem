@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import auth from "$lib/stores/authStore";
+  import auth from "$stores/authStore";
   import pb from "$lib/pocketbase";
   import { goto } from "$app/navigation";
   interface Props {

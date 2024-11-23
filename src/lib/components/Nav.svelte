@@ -1,5 +1,5 @@
 <script lang="ts">
-  import auth from "$lib/stores/authStore";
+  import auth from "$stores/authStore";
   import { onMount } from "svelte";
   import { restrictedRoutes, adminRoutes } from "$lib/constants";
   import MenuIcon from "$assets/MenuIcon.svelte";

@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { State } from "$lib/types";
-  import orders from "$lib/stores/orderStore";
+  import orders from "$stores/orderStore";
   interface Props {
     show: State[];
     onclick: string;
