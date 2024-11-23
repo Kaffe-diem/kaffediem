@@ -1,6 +1,6 @@
 <script lang="ts">
   import OrderList from "./OrderList.svelte";
-  import { orders } from "$lib/stores/orderStore";
+  import orders from "$lib/stores/orderStore";
 </script>
 
 <div

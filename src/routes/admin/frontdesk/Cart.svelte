@@ -1,6 +1,6 @@
 <script lang="ts">
   let { selectedItem } = $props();
-  import { orders } from "$lib/stores/orderStore";
+  import orders from "$lib/stores/orderStore";
 
   let cart = $state([]);
   let totalPrice = $derived(cart.reduce((sum, item) => sum + item.price, 0));
