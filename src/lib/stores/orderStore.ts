@@ -1,4 +1,4 @@
-import createPbStore from "$lib/stores/pbStore";
+import createPbStore from "$stores/pbStore";
 import pb from "$lib/pocketbase";
 import { Drink, Order } from "$lib/types";
 import type { State } from "$lib/types";
@@ -40,9 +40,15 @@ export default {
       // FIXME: Use transactions
       // https://github.com/pocketbase/pocketbase/issues/5386
       order.map(async (id: string) => {
-        const response = await pb.collection("order_drink").create({
-          drink: id
-        });
+        const response = await pb.collection("order_drink").create(
+          {
+            drink: id
+          },
+          {
+            $autoCancel: false
+          }
+        );
+
         return response.id;
       })
     );
