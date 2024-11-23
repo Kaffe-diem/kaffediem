@@ -48,3 +48,33 @@ class ActiveMessage {
 }
 
 export { Message, ActiveMessage };
+
+class Item {
+  id: string;
+  name: string;
+  price: number;
+  category: string;
+
+  constructor(data: { id: string; name: string; price: number; category: string }) {
+    this.id = data.id;
+    this.name = data.name;
+    this.price = data.price;
+    this.category = data.category;
+  }
+}
+
+class Category {
+  id: string;
+  name: string;
+  sort_order: number;
+  items: Item[];
+
+  constructor(data: { id: string; name: string; sort_order: number; items: Item[] }) {
+    this.id = data.id;
+    this.name = data.name;
+    this.sort_order = data.sort_order;
+    this.items = data.items;
+  }
+}
+
+export { Item, Category };
