@@ -1,6 +1,6 @@
 type State = "received" | "production" | "completed" | "dispatched";
 
-class Drink {
+class OrderDrink {
   name: string;
 
   constructor(data: { name: string }) {
@@ -11,16 +11,16 @@ class Drink {
 class Order {
   id: string;
   state: State;
-  drinks: Array<Drink>;
+  drinks: Array<OrderDrink>;
 
-  constructor(data: { id: string; state: State; drinks: Array<Drink> }) {
+  constructor(data: { id: string; state: State; drinks: Array<OrderDrink> }) {
     this.id = data.id;
     this.state = data.state;
     this.drinks = data.drinks;
   }
 }
 
-export { Drink, Order };
+export { OrderDrink, Order };
 export type { State };
 
 class Message {

@@ -1,10 +1,10 @@
 import createPbStore from "$stores/pbStore";
 import pb from "$lib/pocketbase";
-import { Drink, Order } from "$lib/types";
+import { OrderDrink, Order } from "$lib/types";
 import type { State } from "$lib/types";
 
-const mapToDrink = (data: unknown): Drink => {
-  return new Drink({
+const mapToOrderDrink = (data: unknown): OrderDrink => {
+  return new OrderDrink({
     // @ts-expect-error Pocketbase typing not implemented yet
     name: data.expand.drink.name
   });
@@ -16,7 +16,7 @@ const mapToOrder = (data: { id: string; state: State; expand: unknown }): Order 
     id: data.id,
     state: data.state,
     // @ts-expect-error Pocketbase typing not implemented yet
-    drinks: data.expand.drinks.map(mapToDrink)
+    drinks: data.expand.drinks.map(mapToOrderDrink)
   });
 };
 
