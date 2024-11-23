@@ -22,3 +22,29 @@ class Order {
 
 export { Drink, Order };
 export type { State };
+
+class Message {
+  id: string;
+  title: string;
+  subtext: string;
+
+  constructor(data: { id: string; title: string; subtext: string }) {
+    this.id = data.id;
+    this.title = data.title;
+    this.subtext = data.subtext;
+  }
+}
+
+class ActiveMessage {
+  id: string;
+  message: Message;
+  visible: boolean;
+
+  constructor(data: { id: string; message: Message; visible: boolean }) {
+    this.id = data.id;
+    this.message = data.message;
+    this.visible = data.visible;
+  }
+}
+
+export { Message, ActiveMessage };

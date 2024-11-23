@@ -11,7 +11,7 @@ export default function createPbStore<T>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   mapFunction: (data: any) => T,
   fetchOptions: { [key: string]: string } = {},
-  subscribeOptions: { [key: string]: string } = {}
+  subscribeOptions: { [key: string]: string } = fetchOptions
 ) {
   const { subscribe, set, update } = writable<T[]>([]);
 
