@@ -30,17 +30,17 @@
   <div class="flex-1">
     <a href="/" class="btn btn-ghost text-xl">Kaffe Diem</a>
   </div>
-  <div class="dropdown dropdown-end lg:hidden">
-    <div tabindex="0" role="button" class="btn btn-ghost">
+  <details class="dropdown dropdown-end lg:hidden">
+    <summary tabindex="0" class="btn btn-ghost">
       <MenuIcon />
-    </div>
+    </summary>
     <NavItems
       {navItems}
       isAuthenticated={$auth.isAuthenticated}
       isAdmin={$auth.user?.isAdmin}
       class="dropdown-content z-[1] mt-3 w-52 rounded-box bg-base-100 p-2 shadow"
     />
-  </div>
+  </details>
   <div class="hidden flex-none lg:flex">
     <NavItems
       {navItems}
