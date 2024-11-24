@@ -1,7 +1,7 @@
 <script lang="ts">
   import { activeMessage } from "$stores/messageStore";
 
-  import QR from "$assets/qr-code.svg";
+  // import QR from "$assets/qr-code.svg";
 
   interface Props {
     children;
@@ -21,7 +21,7 @@
   </main>
 {/if}
 
-<div class="absolute bottom-0 left-0 hidden md:flex">
+<!-- <div class="absolute bottom-0 left-0 hidden md:flex">
   <a href="/">
     <img class="h-48 w-48" src={QR} alt="QR code" />
   </a>
@@ -30,4 +30,4 @@
     <a href="https://kaffediem.asvg.no" class="font-bold text-accent">kaffediem.asvg.no</a>
     <span>for å bestille</span>
   </div>
-</div>
+</div> -->
