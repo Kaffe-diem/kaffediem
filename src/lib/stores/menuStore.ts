@@ -21,7 +21,7 @@ const mapToCategory = (data: {
   new Category({
     id: data.id,
     name: data.name,
-    sort_order: data.sort_order,
+    sortOrder: data.sort_order,
     items: data.expand.drinks_via_category.map(mapToItem).map(mapToItem)
   });
 
@@ -33,13 +33,13 @@ export const categories = {
   update: async (category: Category) => {
     await pb.collection("categories").update(category.id, {
       name: category.name,
-      sort_order: category.sort_order
+      sort_order: category.sortOrder
     });
   },
   create: async (category: Category) => {
     await pb.collection("categories").create({
       name: category.name,
-      sort_order: category.sort_order
+      sort_order: category.sortOrder
     });
   },
   delete: async (id: string) => {

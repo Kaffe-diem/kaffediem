@@ -66,13 +66,13 @@ class Item {
 class Category {
   id: string;
   name: string;
-  sort_order: number;
+  sortOrder: number;
   items: Item[];
 
-  constructor(data: { id: string; name: string; sort_order: number; items: Item[] }) {
+  constructor(data: { id: string; name: string; sortOrder: number; items: Item[] }) {
     this.id = data.id;
     this.name = data.name;
-    this.sort_order = data.sort_order;
+    this.sortOrder = data.sortOrder;
     this.items = data.items;
   }
 }
