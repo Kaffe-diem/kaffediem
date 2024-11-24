@@ -26,6 +26,8 @@
   ];
 </script>
 
+{@debug $auth}
+
 <div class="navbar bg-base-100">
   <div class="flex-1">
     <a href="/" class="btn btn-ghost text-xl">Kaffe Diem</a>
@@ -37,7 +39,7 @@
     <NavItems
       {navItems}
       isAuthenticated={$auth.isAuthenticated}
-      isAdmin={$auth.user?.isAdmin}
+      isAdmin={$auth.user?.is_admin}
       class="dropdown-content z-[1] mt-3 w-52 rounded-box bg-base-100 p-2 shadow"
     />
   </details>
@@ -45,7 +47,7 @@
     <NavItems
       {navItems}
       isAuthenticated={$auth.isAuthenticated}
-      isAdmin={$auth.user?.isAdmin}
+      isAdmin={$auth.user?.is_admin}
       class="menu menu-horizontal px-1"
     />
   </div>
