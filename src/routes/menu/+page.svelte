@@ -1,6 +1,7 @@
 <script>
   import { categories } from "$stores/menuStore";
   import orders from "$stores/orderStore";
+  import auth from "$stores/authStore";
 </script>
 
 {#each $categories as category}
@@ -15,10 +16,12 @@
           <div class="card-body">
             <h2 class="card-title">{item.name}</h2>
             <div class="card-actions items-center justify-between">
-              <button class="btn btn-secondary" onclick={() => orders.create([item.id])}
-                >Kjøp</button
-              >
-              <span>{item.price},-</span>
+              {#if $auth.isAuthenticated}
+                <button class="btn btn-secondary" onclick={() => orders.create([item.id])}
+                  >Kjøp</button
+                >
+              {/if}
+              <span class="ml-auto">{item.price},-</span>
             </div>
           </div>
         </div>
