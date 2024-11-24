@@ -2,23 +2,25 @@ import createPbStore from "$stores/pbStore";
 import pb from "$lib/pocketbase";
 import { OrderDrink, Order } from "$lib/types";
 import type { State } from "$lib/types";
+import { mapToItem } from "$stores/menuStore";
 
-const mapToOrderDrink = (data: unknown): OrderDrink => {
-  return new OrderDrink({
+const mapToOrderDrink = (data: { id: string; expand: unknown }): OrderDrink =>
+  new OrderDrink({
+    id: data.id,
     // @ts-expect-error Pocketbase typing not implemented yet
-    name: data.expand.drink.name
+    name: data.expand.drink.name,
+    // @ts-expect-error Pocketbase typing not implemented yet
+    item: mapToItem(data.expand.drink)
   });
-};
 
 // Typing is not entirely correct. FIXME when implementing proper typing
-const mapToOrder = (data: { id: string; state: State; expand: unknown }): Order => {
-  return new Order({
+const mapToOrder = (data: { id: string; state: State; expand: unknown }): Order =>
+  new Order({
     id: data.id,
     state: data.state,
     // @ts-expect-error Pocketbase typing not implemented yet
     drinks: data.expand.drinks.map(mapToOrderDrink)
   });
-};
 
 const today = new Date().toISOString().split("T")[0];
 export default {
@@ -61,4 +63,11 @@ export default {
   updateState: (id: string, state: State) => {
     pb.collection("orders").update(id, { state });
   }
+};
+
+export const userOrders = {
+  subscribe: createPbStore<Order>("orders", mapToOrder, {
+    expand: "drinks, drinks.drink",
+    filter: `customer = '${pb.authStore.model?.id}'`
+  })
 };

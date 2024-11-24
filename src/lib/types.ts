@@ -1,10 +1,14 @@
 type State = "received" | "production" | "completed" | "dispatched";
 
 class OrderDrink {
+  id: string;
   name: string;
+  item: Item;
 
-  constructor(data: { name: string }) {
+  constructor(data: { id: string; name: string; item: Item }) {
+    this.id = data.id;
     this.name = data.name;
+    this.item = data.item;
   }
 }
 

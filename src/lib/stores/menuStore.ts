@@ -2,7 +2,7 @@ import createPbStore from "$stores/pbStore";
 import pb from "$lib/pocketbase";
 import { Item, Category } from "$lib/types";
 
-const mapToItem = (data: {
+export const mapToItem = (data: {
   id: string;
   name: string;
   price: number;
