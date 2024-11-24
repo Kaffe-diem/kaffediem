@@ -1,46 +1,38 @@
 <script lang="ts">
-  import pb from "$lib/pocketbase";
-  import { onMount } from "svelte";
-  import ExpandedDrink from "$lib/ExpandedDrink.svelte";
-
-  let favorites: any[] = $state();
-  let previous_orders_drinks: any[] = $state();
-  onMount(async () => {
-    const userId = pb.authStore.model?.id;
-    if (userId) {
-      const user = await pb.collection("users").getOne(userId, {
-        expand: "favorites,favorites.drink"
-      });
-      favorites = user.expand?.favorites || [];
-
-      const orders = await pb.collection("orders").getList(1, 10, {
-        filter: `customer = '${userId}'`,
-        expand: "drinks,drinks.drink"
-      });
-      previous_orders_drinks = orders.items.flatMap((order) => order.expand?.drinks || []);
-      console.log(previous_orders_drinks);
-    }
-  });
+  import { userOrders } from "$stores/orderStore";
+  import auth from "$stores/authStore";
 </script>
 
-<div class="items-between flex">
-  <section>
-    <h1 class="my-16 text-4xl font-bold italic text-teal-700">
-      {pb.authStore.model?.name.split(" ")[0].toUpperCase()} ELSKER
-    </h1>
-    <div class="grid grid-cols-3 gap-16">
-      {#each favorites || [] as drink}
-        <ExpandedDrink {drink} />
-      {/each}
-    </div>
-  </section>
+{#if $auth.isAuthenticated}
+  <h1 class="mb-4 flex items-center text-2xl">
+    Hei, {$auth.user.name}{#if $auth.user.is_admin}<span class="badge badge-primary badge-lg ml-2"
+        >Admin</span
+      >{/if}
+  </h1>
 
-  <section>
-    <h1 class="my-16 text-4xl font-bold italic text-teal-700">SISTE BESTILLINGER</h1>
-    <div class="grid grid-cols-3 gap-16">
-      {#each previous_orders_drinks ?? [] as drink}
-        <ExpandedDrink {drink} />
+  <h2 class="mb-4 text-xl">Tidligere bestillinger:</h2>
+
+  {#each $userOrders as order}
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      {#each order.drinks as item}
+        <div class="card card-compact bg-base-200">
+          <figure>
+            <img
+              class="h-48 w-full object-cover"
+              src={item.item.image}
+              alt={`Bilde av ${item.item.name}`}
+            />
+          </figure>
+          <div class="card-body">
+            <h2 class="card-title">{item.item.name}</h2>
+            <div class="card-actions items-center justify-between">
+              <span class="ml-auto">{item.item.price},-</span>
+            </div>
+          </div>
+        </div>
       {/each}
     </div>
-  </section>
-</div>
+  {/each}
+{:else}
+  <h1 class="text-2xl">Du er ikke logget inn!</h1>
+{/if}
