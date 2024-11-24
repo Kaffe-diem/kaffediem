@@ -27,8 +27,11 @@ export const messages = {
       subtext
     });
   },
-  update: async (id: string, title: string, subtext: string) => {
-    await pb.collection("displayMessages").update(id, { title, subtext });
+  update: async (message: Message) => {
+    await pb.collection("displayMessages").update(message.id, {
+      title: message.title,
+      subtext: message.subtext
+    });
   },
   delete: async (id: string) => {
     await pb.collection("displayMessages").delete(id);
@@ -77,7 +80,7 @@ export const activeMessage = {
   subscribe: createActiveMessageStore(),
   update: async (message: ActiveMessage) => {
     await pb.collection("activeMessage").update(message.id, {
-      message: message.message,
+      message: message.message.id,
       isVisible: message.visible
     });
   }
