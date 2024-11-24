@@ -1,20 +1,8 @@
 <script lang="ts">
   import auth from "$stores/authStore";
-  import { onMount } from "svelte";
   import { restrictedRoutes, adminRoutes } from "$lib/constants";
   import MenuIcon from "$assets/MenuIcon.svelte";
   import NavItems from "$components/NavItems.svelte";
-
-  let isAuthenticated = $state(false);
-  let isAdmin = $state(false);
-
-  onMount(
-    auth.subscribe((value) => {
-      isAuthenticated = value.isAuthenticated;
-      // Will be undefined, false or true:
-      isAdmin = value.user?.is_admin;
-    })
-  );
 
   class NavItem {
     href: string;
@@ -48,12 +36,17 @@
     </div>
     <NavItems
       {navItems}
-      {isAuthenticated}
-      {isAdmin}
+      isAuthenticated={$auth.isAuthenticated}
+      isAdmin={$auth.user?.isAdmin}
       class="dropdown-content z-[1] mt-3 w-52 rounded-box bg-base-100 p-2 shadow"
     />
   </div>
   <div class="hidden flex-none lg:flex">
-    <NavItems {navItems} {isAuthenticated} {isAdmin} class="menu menu-horizontal px-1" />
+    <NavItems
+      {navItems}
+      isAuthenticated={$auth.isAuthenticated}
+      isAdmin={$auth.user?.isAdmin}
+      class="menu menu-horizontal px-1"
+    />
   </div>
 </div>

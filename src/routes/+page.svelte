@@ -1,18 +1,9 @@
 <script>
   import auth from "$stores/authStore";
-  import { onMount } from "svelte";
   import Logo from "$assets/logo.png";
   import AuthButton from "$components/AuthButton.svelte";
   import Rating from "$components/Rating.svelte";
   import Review from "$components/Review.svelte";
-
-  let isAuthenticated = $state(false);
-
-  onMount(
-    auth.subscribe((value) => {
-      isAuthenticated = value.isAuthenticated;
-    })
-  );
 </script>
 
 <img
@@ -29,7 +20,7 @@
 </div>
 
 <div>
-  {#if isAuthenticated}
+  {#if $auth.isAuthenticated}
     <a href="/menu" class="btn">Trykk her for å bestille</a>
   {:else}
     <AuthButton class="btn m-2">Logg inn for å bestille</AuthButton>
