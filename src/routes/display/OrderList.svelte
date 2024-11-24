@@ -1,13 +1,12 @@
 <script lang="ts">
+  import orders from "$stores/orderStore";
   import type { State } from "$lib/types";
 
   interface Props {
-    // this is a custom store of Order[], I am not sure how to type it.
-    orders: any;
     show: State[];
   }
 
-  let { orders, show }: Props = $props();
+  let { show }: Props = $props();
 </script>
 
 <div class="flex flex-wrap gap-2">
