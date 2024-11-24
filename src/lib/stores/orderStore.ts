@@ -21,20 +21,18 @@ const mapToOrder = (data: { id: string; state: State; expand: unknown }): Order 
 };
 
 const today = new Date().toISOString().split("T")[0];
-const subscribe = createPbStore<Order>(
-  "orders",
-  mapToOrder,
-  {
-    expand: "drinks, drinks.drink",
-    filter: `created >= "${today}"`
-  },
-  {
-    expand: "drinks, drinks.drink"
-  }
-);
-
 export default {
-  subscribe,
+  subscribe: createPbStore<Order>(
+    "orders",
+    mapToOrder,
+    {
+      expand: "drinks, drinks.drink",
+      filter: `created >= "${today}"`
+    },
+    {
+      expand: "drinks, drinks.drink"
+    }
+  ),
   create: async (order: string[]) => {
     const drinkIds: string[] = await Promise.all(
       // FIXME: Use transactions
