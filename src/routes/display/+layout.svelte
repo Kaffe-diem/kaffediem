@@ -4,7 +4,7 @@
   import QR from "$assets/qr-code.svg";
 
   interface Props {
-    data: { activeMessage: string[] };
+    children;
   }
 
   let { children }: Props = $props();
