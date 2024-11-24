@@ -15,7 +15,7 @@
   {#each $userOrders as order}
     <div class="mb-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {#each order.drinks as item}
-        <div class="card card-compact bg-base-200">
+        <div class="card card-compact m-2 bg-base-200">
           <figure>
             <img
               class="h-48 w-full object-cover"
