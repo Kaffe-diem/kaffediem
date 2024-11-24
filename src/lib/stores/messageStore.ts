@@ -1,6 +1,7 @@
 import createPbStore from "$stores/pbStore";
 import pb from "$lib/pocketbase";
 import { Message, ActiveMessage } from "$lib/types";
+import { writable } from "svelte/store";
 
 const mapToMessage = (data: { id: string; title: string; subtext: string }): Message =>
   new Message({
@@ -34,10 +35,46 @@ export const messages = {
   }
 };
 
-export const activeMessages = {
-  subscribe: createPbStore<ActiveMessage>("activeMessage", mapToActiveMessage, {
-    expand: "message"
-  }),
+function createActiveMessageStore() {
+  // Initialize with dummy non-visible message
+  const { subscribe, set } = writable<ActiveMessage>(
+    new ActiveMessage({
+      id: "",
+      visible: false,
+      message: new Message({
+        id: "",
+        title: "",
+        subtext: ""
+      })
+    })
+  );
+
+  (async () => {
+    const initialData = await pb.collection("activeMessage").getFullList({
+      expand: "message"
+    });
+
+    // Only use the first record. Assumes that PB already has this record.
+    // @ts-expect-error Typing again
+    set(mapToActiveMessage(initialData[0]));
+
+    pb.collection("activeMessage").subscribe(
+      "*",
+      (event) => {
+        // @ts-expect-error Typing again
+        set(mapToActiveMessage(event.record));
+      },
+      {
+        expand: "message"
+      }
+    );
+  })();
+
+  return subscribe;
+}
+
+export const activeMessage = {
+  subscribe: createActiveMessageStore(),
   update: async (message: ActiveMessage) => {
     await pb.collection("activeMessage").update(message.id, {
       message: message.message,

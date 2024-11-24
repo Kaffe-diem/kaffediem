@@ -1,32 +1,19 @@
 <script lang="ts">
+  import { activeMessage } from "$stores/messageStore";
+
   import QR from "$lib/assets/qr-code.svg";
-  import pb from "$lib/pocketbase";
-  import { onMount } from "svelte";
 
   interface Props {
-    data: { activeMessage: String[] };
+    data: { activeMessage: string[] };
   }
 
-  let { data, children }: Props = $props();
-  let message = $state(data.activeMessage[0]);
-
-  onMount(() => {
-    pb.collection("activeMessage").subscribe(
-      message.id,
-      (event) => {
-        message = event.record;
-      },
-      {
-        expand: "message"
-      }
-    );
-  });
+  let { children }: Props = $props();
 </script>
 
-{#if message.isVisible}
+{#if $activeMessage.visible}
   <div class="flex h-screen flex-col items-center justify-center">
-    <span class="p-2 text-7xl font-bold md:text-9xl">{message.expand.message.title}</span>
-    <span class="p-2 text-4xl md:text-6xl">{message.expand.message.subtext}</span>
+    <span class="p-2 text-7xl font-bold md:text-9xl">{$activeMessage.message.title}</span>
+    <span class="p-2 text-4xl md:text-6xl">{$activeMessage.message.subtext}</span>
   </div>
 {:else}
   <main class="relative mx-auto h-screen w-11/12 py-4">
