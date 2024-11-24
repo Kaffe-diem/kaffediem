@@ -1,7 +1,7 @@
 <script lang="ts">
   import { activeMessage } from "$stores/messageStore";
 
-  import QR from "$lib/assets/qr-code.svg";
+  import QR from "$assets/qr-code.svg";
 
   interface Props {
     data: { activeMessage: string[] };
