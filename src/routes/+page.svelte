@@ -30,7 +30,7 @@
 
 <div>
   {#if isAuthenticated}
-    <a href="/drinks" class="btn">Trykk her for å bestille</a>
+    <a href="/menu" class="btn">Trykk her for å bestille</a>
   {:else}
     <AuthButton class="btn m-2">Logg inn for å bestille</AuthButton>
     <p class="text-xs">
@@ -73,5 +73,5 @@
 <br />
 
 <p>
-  <a href="/drinks" class="link-primary text-4xl">Se menyen vår</a>
+  <a href="/menu" class="link-primary text-4xl">Se menyen vår</a>
 </p>

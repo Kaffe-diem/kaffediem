@@ -2,14 +2,20 @@ import createPbStore from "$stores/pbStore";
 import pb from "$lib/pocketbase";
 import { Item, Category } from "$lib/types";
 
-const mapToItem = (data: { id: string; name: string; price: number; category: string }): Item =>
+const mapToItem = (data: {
+  id: string;
+  name: string;
+  price: number;
+  category: string;
+  image: string;
+}): Item =>
   new Item({
     id: data.id,
     name: data.name,
     price: data.price,
-    category: data.category
+    category: data.category,
+    image: pb.files.getUrl(data, data.image)
   });
-
 const mapToCategory = (data: {
   id: string;
   name: string;
@@ -22,7 +28,7 @@ const mapToCategory = (data: {
     id: data.id,
     name: data.name,
     sortOrder: data.sort_order,
-    items: data.expand.drinks_via_category.map(mapToItem).map(mapToItem)
+    items: data.expand.drinks_via_category.map(mapToItem)
   });
 
 export const categories = {

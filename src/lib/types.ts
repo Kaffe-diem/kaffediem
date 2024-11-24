@@ -54,12 +54,14 @@ class Item {
   name: string;
   price: number;
   category: string;
+  image: string;
 
-  constructor(data: { id: string; name: string; price: number; category: string }) {
+  constructor(data: { id: string; name: string; price: number; category: string; image: string }) {
     this.id = data.id;
     this.name = data.name;
     this.price = data.price;
     this.category = data.category;
+    this.image = data.image;
   }
 }
 
