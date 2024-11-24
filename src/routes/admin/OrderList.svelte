@@ -21,10 +21,10 @@
       {#each $orders as order, index}
         {#if show.includes(order.state)}
           <tr class="hover border-none" onclick={() => orders.updateState(order.id, onclick)}>
-            <td>{index + 100}</td>
+            <td class="text-lg">{index + 100}</td>
             <td>
               {#each order.drinks as drink}
-                <span class="badge badge-ghost m-1 whitespace-nowrap">
+                <span class="badge badge-ghost m-1 whitespace-nowrap p-3 text-lg">
                   {drink.name}
                 </span>
               {/each}
