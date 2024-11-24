@@ -3,6 +3,10 @@ import pb from "$lib/pocketbase";
 import { Message, ActiveMessage } from "$lib/types";
 import { writable } from "svelte/store";
 
+import eventsource from "eventsource";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(global as any).EventSource = eventsource;
+
 const mapToMessage = (data: { id: string; title: string; subtext: string }): Message =>
   new Message({
     id: data.id,
