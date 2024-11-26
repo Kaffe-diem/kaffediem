@@ -1,6 +1,7 @@
 <script lang="ts">
   import { userOrders } from "$stores/orderStore";
   import auth from "$stores/authStore";
+  import MenuItem from "$components/MenuItem.svelte";
 </script>
 
 {#if $auth.isAuthenticated}
@@ -15,21 +16,7 @@
   {#each $userOrders as order}
     <div class="mb-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {#each order.drinks as item}
-        <div class="card card-compact m-2 bg-base-200">
-          <figure>
-            <img
-              class="h-48 w-full object-cover"
-              src={item.item.image}
-              alt={`Bilde av ${item.item.name}`}
-            />
-          </figure>
-          <div class="card-body">
-            <h2 class="card-title">{item.item.name}</h2>
-            <div class="card-actions items-center justify-between">
-              <span class="ml-auto">{item.item.price},-</span>
-            </div>
-          </div>
-        </div>
+        <MenuItem {item} />
       {/each}
     </div>
   {/each}
