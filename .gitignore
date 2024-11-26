@@ -21,7 +21,7 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 # Schema
-src/pb.d.ts
+src/lib/pb-types.d.ts
 
 # Pocketbase
 /pocketbase-data
