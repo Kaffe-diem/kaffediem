@@ -18,7 +18,7 @@ Bemerk at node versjon 20 brukes. Det kan installeres med NVM:
 nvm use 20
 ```
 
-### Teste på lokal maskin (dependencies allerede installert, hvis ikke: `npm i`)
+### Teste på lokal maskin (dependencies allerede installert, hvis ikke: `npm ci`)
 
 1. .env
 
