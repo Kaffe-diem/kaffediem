@@ -1,24 +1,22 @@
 import createPbStore from "$stores/pbStore";
 import pb from "$lib/pocketbase";
 import { OrderDrink, Order } from "$lib/types";
+import type { ExpandedOrderRecord, ExpandedOrderDrinkRecord } from "$lib/types";
 import type { State } from "$lib/types";
 import { mapToItem } from "$stores/menuStore";
+import type { RecordIdString } from "$lib/pb-types";
 
-const mapToOrderDrink = (data: { id: string; expand: unknown }): OrderDrink =>
+const mapToOrderDrink = (data: ExpandedOrderDrinkRecord): OrderDrink =>
   new OrderDrink({
     id: data.id,
-    // @ts-expect-error Pocketbase typing not implemented yet
     name: data.expand.drink.name,
-    // @ts-expect-error Pocketbase typing not implemented yet
     item: mapToItem(data.expand.drink)
   });
 
-// Typing is not entirely correct. FIXME when implementing proper typing
-const mapToOrder = (data: { id: string; state: State; expand: unknown }): Order =>
+const mapToOrder = (data: ExpandedOrderRecord): Order =>
   new Order({
     id: data.id,
     state: data.state,
-    // @ts-expect-error Pocketbase typing not implemented yet
     drinks: data.expand.drinks.map(mapToOrderDrink)
   });
 
@@ -39,7 +37,7 @@ export default {
     const drinkIds: string[] = await Promise.all(
       // FIXME: Use transactions
       // https://github.com/pocketbase/pocketbase/issues/5386
-      order.map(async (id: string) => {
+      order.map(async (id: RecordIdString) => {
         const response = await pb.collection("order_drink").create(
           {
             drink: id
@@ -60,7 +58,7 @@ export default {
       payment_fulfilled: false
     });
   },
-  updateState: (id: string, state: State) => {
+  updateState: (id: RecordIdString, state: State) => {
     pb.collection("orders").update(id, { state });
   }
 };

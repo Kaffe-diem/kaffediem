@@ -1,3 +1,5 @@
+import type { RecordIdString, DrinksRecord } from "$lib/pb-types";
+
 type State = "received" | "production" | "completed" | "dispatched";
 
 class OrderDrink {
@@ -84,3 +86,18 @@ class Category {
 }
 
 export { Item, Category };
+
+export type ExpandedOrderRecord = {
+  id: RecordIdString;
+  state: State;
+  expand: { drinks: Array<DrinksRecord> };
+};
+
+export type ExpandedOrderDrinkRecord = {
+  id: RecordIdString;
+  expand: { drink: ExpandedDrinksRecord };
+};
+
+export type ExpandedDrinksRecord = DrinksRecord & {
+  id: RecordIdString;
+};
