@@ -24,8 +24,8 @@ nvm use 20
 
 ```
 PUBLIC_PB_HOST=https://kodekafe-pocketbase.fly.dev
-PUBLIC_PB_ADMIN_EMAIL=
-PUBLIC_PB_ADMIN_PASSWORD=
+PB_ADMIN_EMAIL=
+PB_ADMIN_PASSWORD=
 ```
 
 ```bash
