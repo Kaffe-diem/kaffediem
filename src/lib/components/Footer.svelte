@@ -20,4 +20,8 @@
     <h6 class="footer-title">Få hjelp</h6>
     <a href="mailto:kaffediem@asvg.no" class="link-hover link">Kontakt oss</a>
   </nav>
+  <nav>
+    <h6 class="footer-title">Annet</h6>
+    <a href="/display" class="link-hover link">Visning</a>
+  </nav>
 </footer>

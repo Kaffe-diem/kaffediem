@@ -19,7 +19,6 @@
 
   const navItems = [
     new NavItem("/menu", "Meny"),
-    new NavItem("/display", "Visning"),
     new NavItem("/account", "Min bruker"),
     new NavItem("/admin", "Admin")
   ];
