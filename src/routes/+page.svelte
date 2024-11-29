@@ -2,8 +2,8 @@
   import auth from "$stores/authStore";
   import Logo from "$assets/logo.png";
   import AuthButton from "$components/AuthButton.svelte";
-  import Rating from "$components/Rating.svelte";
   import Menu from "./Menu.svelte";
+  import { activeMessage } from "$stores/messageStore";
 </script>
 
 <img
@@ -12,11 +12,18 @@
   class="m-4 mx-auto w-full max-w-[400px] rounded-xl md:float-left md:mr-10 md:max-w-[280px]"
 />
 
-<p>Den beste kaffeen på Amalie Skram VGS!</p>
+<div class="text-2xl">
+  <p>Den beste kaffeen på Amalie Skram VGS!</p>
 
-<div class="m-2 inline-block text-center">
-  <Rating class="rating-lg" value={9} readonly />
-  <span class="text-sm">Fra 1729 omtaler</span>
+  <br />
+  <ul>
+    {#if $activeMessage.visible}
+      <li>{$activeMessage.message.title}</li>
+      <li>{$activeMessage.message.subtext}</li>
+    {:else}
+      <li>Vi er åpen!</li>
+    {/if}
+  </ul>
 </div>
 
 {#if !$auth.isAuthenticated}
