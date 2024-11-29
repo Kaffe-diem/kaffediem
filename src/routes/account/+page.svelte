@@ -16,7 +16,7 @@
   {#each $userOrders as order}
     <div class="mb-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {#each order.drinks as item}
-        <MenuItem item={item.item} buyButton={true} />
+        <MenuItem item={item.item} buyButton />
       {/each}
     </div>
   {/each}
