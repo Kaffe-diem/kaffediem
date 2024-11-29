@@ -1,10 +1,6 @@
 <script lang="ts">
   import { categories } from "$stores/menuStore";
-  interface Props {
-    cart: [];
-  }
-
-  let { cart }: Props = $props();
+  let { selectedItem = $bindable() } = $props();
 </script>
 
 <div class="flex flex-col overflow-y-auto">
@@ -19,10 +15,10 @@
               name="drink"
               class="peer hidden"
               value={item}
-              onclick={() => cart.push(item)}
+              bind:group={selectedItem}
             />
             <div
-              class="peer btn relative flex h-24 w-full flex-col items-center justify-center border-4"
+              class="btn relative flex h-24 w-full flex-col items-center justify-center border-4 peer-checked:border-accent"
             >
               <span class="font-bold">{item.name}</span>
               <span class="absolute bottom-2 right-2 font-normal">{item.price},-</span>
