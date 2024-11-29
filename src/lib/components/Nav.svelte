@@ -17,11 +17,7 @@
     }
   }
 
-  const navItems = [
-    new NavItem("/menu", "Meny"),
-    new NavItem("/account", "Min bruker"),
-    new NavItem("/admin", "Admin")
-  ];
+  const navItems = [new NavItem("/account", "Min bruker"), new NavItem("/admin", "Admin")];
 </script>
 
 <div class="drawer drawer-end z-[2]">
