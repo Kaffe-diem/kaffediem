@@ -2,6 +2,7 @@
   import { userOrders } from "$stores/orderStore";
   import auth from "$stores/authStore";
   import MenuItem from "$components/MenuItem.svelte";
+  import Status from "./Status.svelte";
 </script>
 
 {#if $auth.isAuthenticated}
@@ -10,6 +11,8 @@
         >Admin</span
       >{/if}
   </h1>
+
+  <Status />
 
   <h2 class="mb-4 text-xl">Tidligere bestillinger:</h2>
 

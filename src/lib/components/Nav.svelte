@@ -21,12 +21,11 @@
     new NavItem("/menu", "Meny"),
     new NavItem("/display", "Visning"),
     new NavItem("/account", "Min bruker"),
-    new NavItem("/status", "Min bestilling"),
     new NavItem("/admin", "Admin")
   ];
 </script>
 
-<div class="drawer drawer-end z-[1]">
+<div class="drawer drawer-end z-[2]">
   <input id="drawer" type="checkbox" class="drawer-toggle" />
   <div class="drawer-content flex flex-col">
     <div class="navbar w-full">
