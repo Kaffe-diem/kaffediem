@@ -1,6 +1,40 @@
 <script lang="ts">
   import { messages, activeMessage } from "$stores/messageStore";
   import { Message, ActiveMessage } from "$lib/types";
+  import { debounce } from "$lib/utils";
+
+  const handleActiveMessageChange = (message) => {
+    activeMessage.update(
+      new ActiveMessage({
+        ...$activeMessage,
+        visible: true,
+        message
+      })
+    );
+  };
+
+  const handleMessageTextChange = (e, message, field: "title" | "subtext") => {
+    messages.update(
+      new Message({
+        ...message,
+        [field]: e.target.value
+      })
+    );
+
+    const isActive = message.id === $activeMessage.message.id;
+    if (isActive) {
+      debounce(handleActiveMessageChange, 100)(message);
+    }
+  };
+
+  const handleVisibilityChange = () => {
+    activeMessage.update(
+      new ActiveMessage({
+        ...$activeMessage,
+        visible: false
+      })
+    );
+  };
 </script>
 
 <form>
@@ -14,40 +48,21 @@
             name="selected"
             checked={message.id == $activeMessage.message.id}
             value={message}
-            onchange={() =>
-              activeMessage.update(
-                new ActiveMessage({
-                  ...$activeMessage,
-                  visible: true,
-                  message
-                })
-              )}
+            onchange={() => handleActiveMessageChange(message)}
           />
           <input
             type="text"
             class="input input-lg input-bordered w-full"
             value={message.title}
             placeholder="Tittel"
-            onchange={(e) =>
-              messages.update(
-                new Message({
-                  ...message,
-                  title: e.target.value
-                })
-              )}
+            oninput={(e) => handleMessageTextChange(e, message, "title")}
           />
           <input
             type="text"
             class="input input-lg input-bordered w-full"
             value={message.subtext}
             placeholder="Beskrivelse"
-            onchange={(e) =>
-              messages.update(
-                new Message({
-                  ...message,
-                  subtext: e.target.value
-                })
-              )}
+            oninput={(e) => handleMessageTextChange(e, message, "subtext")}
           />
         </label>
       </li>
@@ -59,13 +74,7 @@
           class="radio mr-4"
           name="selected"
           checked={!$activeMessage.visible}
-          onchange={() =>
-            activeMessage.update(
-              new ActiveMessage({
-                ...$activeMessage,
-                visible: false
-              })
-            )}
+          onchange={handleVisibilityChange}
         />
         <span>Åpent!</span>
       </label>
