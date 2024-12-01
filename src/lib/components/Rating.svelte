@@ -6,8 +6,7 @@
   interface Props {
     value?: number;
     readonly?: boolean;
-    // Name is only required when the component's value can change
-    name?: string;
+    name?: string | null;
     maxRating?: number;
     [key: string]: any;
   }
@@ -15,7 +14,7 @@
   let {
     value = $bindable(0),
     readonly = false,
-    name = null,
+    name = null as string | null,
     maxRating = 10,
     ...rest
   }: Props = $props();
