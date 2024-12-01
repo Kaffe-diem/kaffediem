@@ -1,11 +1,12 @@
 <script lang="ts">
-  import OrderList from "../OrderList.svelte";
-  import ItemSelection from "./ItemSelection.svelte";
-  import Cart from "./Cart.svelte";
   import { activeMessage } from "$stores/messageStore";
   import { ActiveMessage } from "$lib/types";
 
-  let selectedItem = $state();
+  interface Props {
+    children;
+  }
+
+  let { children }: Props = $props();
 </script>
 
 {#if $activeMessage.visible}
@@ -29,15 +30,7 @@
     >
   </div>
 {:else}
-  <div class="grid h-full grid-cols-[2fr,auto,1fr,auto,1fr] grid-rows-[100%] gap-2">
-    <ItemSelection bind:selectedItem />
-
-    <div class="divider divider-horizontal m-1 p-1"></div>
-
-    <Cart {selectedItem} />
-
-    <div class="divider divider-horizontal m-1 p-1"></div>
-
-    <OrderList show={["completed"]} onclick={"dispatched"} label="Ferdig" />
-  </div>
+  <main class="relative mx-auto h-screen w-11/12 py-4">
+    {@render children?.()}
+  </main>
 {/if}
