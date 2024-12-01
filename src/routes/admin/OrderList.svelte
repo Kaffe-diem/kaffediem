@@ -1,10 +1,11 @@
 <script lang="ts">
-  import type { State } from "$lib/types";
+  import type { OrdersStateOptions, RecordIdString } from "$lib/pb.d";
   import orders from "$stores/orderStore";
+
   interface Props {
-    show: State[];
-    onclick: string;
-    label: string;
+    show: OrdersStateOptions[];
+    onclick: OrdersStateOptions;
+    label: RecordIdString;
   }
 
   let { show, onclick, label }: Props = $props();
@@ -19,13 +20,13 @@
   <table class="table table-sm table-auto">
     <tbody>
       {#each $orders as order, index}
-        {#if show.includes(order.state)}
-          <tr class="hover border-none" onclick={() => orders.updateState(order.id, onclick)}>
+        {#if show.includes(order?.state)}
+          <tr class="hover border-none" onclick={() => orders.updateState(order?.id, onclick)}>
             <td class="text-lg">{index + 100}</td>
             <td>
-              {#each order.drinks as drink}
+              {#each order.expand.drinks as orderDrink}
                 <span class="badge badge-ghost m-1 whitespace-nowrap p-3 text-lg">
-                  {drink.name}
+                  {orderDrink.expand.drink.name}
                 </span>
               {/each}
             </td>

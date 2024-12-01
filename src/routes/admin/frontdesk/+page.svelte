@@ -2,6 +2,7 @@
   import OrderList from "../OrderList.svelte";
   import ItemSelection from "./ItemSelection.svelte";
   import Cart from "./Cart.svelte";
+  import { OrdersStateOptions } from "$lib/pb.d";
 
   let selectedItem = $state();
 </script>
@@ -15,5 +16,9 @@
 
   <div class="divider divider-horizontal m-1 p-1"></div>
 
-  <OrderList show={["completed"]} onclick={"dispatched"} label="Ferdig" />
+  <OrderList
+    show={[OrdersStateOptions.completed]}
+    onclick={OrdersStateOptions.dispatched}
+    label="Ferdig"
+  />
 </div>
