@@ -53,14 +53,14 @@
             class="input input-lg input-bordered w-full"
             value={message.title}
             placeholder="Tittel"
-            oninput={(e) => handleMessageTextChange(e, message, "title")}
+            oninput={(event) => handleMessageTextChange(event, message, "title")}
           />
           <input
             type="text"
             class="input input-lg input-bordered w-full"
             value={message.subtext}
             placeholder="Beskrivelse"
-            oninput={(e) => handleMessageTextChange(e, message, "subtext")}
+            oninput={(event) => handleMessageTextChange(event, message, "subtext")}
           />
         </label>
       </li>
