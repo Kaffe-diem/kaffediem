@@ -1,6 +1,6 @@
 <script lang="ts">
   import OrderList from "./OrderList.svelte";
-  import { OrdersStateOptions } from "$lib/pb.d";
+  import { OrdersStateOptions } from "$lib/pocketbase";
   const { received, production, completed } = OrdersStateOptions;
 </script>
 

@@ -1,7 +1,5 @@
 import createPbStore from "$stores/pbStore";
-import pb from "$lib/pocketbase";
-import type { RecordIdString } from "$lib/pb.d";
-import { OrdersStateOptions, Collections } from "$lib/pb.d";
+import pb, { Collections, OrdersStateOptions, type RecordIdString } from "$lib/pocketbase";
 
 const today = new Date().toISOString().split("T")[0];
 

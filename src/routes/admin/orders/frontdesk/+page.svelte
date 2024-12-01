@@ -2,7 +2,7 @@
   import OrderList from "../OrderList.svelte";
   import ItemSelection from "./ItemSelection.svelte";
   import Cart from "./Cart.svelte";
-  import { OrdersStateOptions } from "$lib/pb.d";
+  import { OrdersStateOptions } from "$lib/pocketbase";
 
   let selectedItem = $state();
 </script>

@@ -1,12 +1,10 @@
 import createPbStore from "$stores/pbStore";
-import pb from "$lib/pocketbase";
-import {
+import pb, {
   Collections,
   type CategoriesResponse,
   type DrinksResponse,
-  type RecordIdString,
-  type DrinksViaCategory
-} from "$lib/pb.d";
+  type RecordIdString
+} from "$lib/pocketbase";
 
 type CategoryWithDrinks = CategoriesResponse<{
   drinks_via_category: DrinksViaCategory[];

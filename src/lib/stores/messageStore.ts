@@ -1,15 +1,14 @@
 import createPbStore from "$stores/pbStore";
-import pb from "$lib/pocketbase";
-import { writable } from "svelte/store";
-
-import eventsource from "eventsource";
-import {
+import pb, {
   Collections,
   type ActiveMessageRecord,
   type ActiveMessageResponse,
   type DisplayMessagesResponse,
   type RecordIdString
-} from "$lib/pb.d";
+} from "$lib/pocketbase";
+import { writable } from "svelte/store";
+
+import eventsource from "eventsource";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (global as any).EventSource = eventsource;
 

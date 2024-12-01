@@ -1,6 +1,6 @@
 <script lang="ts">
   import orders from "$stores/orderStore";
-  import { OrdersStateOptions } from "$lib/pb.d";
+  import { OrdersStateOptions } from "$lib/pocketbase";
 
   interface Props {
     show: OrdersStateOptions[];

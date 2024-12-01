@@ -1,7 +1,7 @@
 <script lang="ts">
   import { messages, activeMessage } from "$stores/messageStore";
   import { debounce } from "$lib/utils";
-  import type { DisplayMessagesResponse, ActiveMessageResponse } from "$lib/pb.d";
+  import type { DisplayMessagesResponse, ActiveMessageResponse } from "$lib/pocketbase";
 
   const handleActiveMessageChange = (message: DisplayMessagesResponse) => {
     activeMessage.update({

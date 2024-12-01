@@ -1,6 +1,5 @@
-import pb from "$lib/pocketbase";
+import pb, { Collections, type CollectionResponses } from "$lib/pocketbase";
 import { writable } from "svelte/store";
-import type { Collections, CollectionResponses } from "$lib/pb.d";
 
 // ref: https://github.com/pocketbase/js-sdk?tab=readme-ov-file#nodejs-via-npm
 import eventsource from "eventsource";

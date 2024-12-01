@@ -1,6 +1,6 @@
 <script lang="ts">
   import { activeMessage } from "$stores/messageStore";
-  import type { ActiveMessageResponse } from "$lib/pb.d";
+  import type { ActiveMessageResponse } from "$lib/pocketbase";
 
   interface Props {
     children;
