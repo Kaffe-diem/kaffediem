@@ -12,16 +12,18 @@ export default {
   subscribe: createPbStore(Collections.Orders, baseOptions),
 
   create: async (drinkIds: RecordIdString[]) => {
-    const orderDrinkIds = await Promise.all(
-      drinkIds.map(async (drinkId) => {
-        const response = await pb.collection(Collections.OrderDrink).create({ drink: drinkId });
-        return response.id;
-      })
-    );
+    const getOrderDrinkIds = async (): Promise<RecordIdString[]> => {
+      return await Promise.all(
+        drinkIds.map(async (drinkId) => {
+          const response = await pb.collection(Collections.OrderDrink).create({ drink: drinkId });
+          return response.id;
+        })
+      );
+    };
 
     await pb.collection(Collections.Orders).create({
       customer: pb.authStore.model?.id,
-      drinks: orderDrinkIds,
+      drinks: await getOrderDrinkIds(),
       state: OrdersStateOptions.received,
       payment_fulfilled: false
     });
