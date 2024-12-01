@@ -3,7 +3,7 @@
   import { restrictedRoutes, adminRoutes } from "$lib/constants";
   import MenuIcon from "$assets/MenuIcon.svelte";
   import NavItems from "$components/NavItems.svelte";
-  import type NavItem from "$lib/types";
+  import type { NavItem } from "$lib/types";
 
   const makeNavItem = (href: string, text: string): NavItem => {
     return {
