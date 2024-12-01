@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import auth from "$lib/stores/authStore";
+  import auth from "$stores/authStore";
   import pb from "$lib/pocketbase";
   import { goto } from "$app/navigation";
   interface Props {
@@ -9,14 +8,6 @@
   }
 
   let { children, ...rest }: Props = $props();
-
-  let isAuthenticated = $state(false);
-
-  onMount(
-    auth.subscribe((value) => {
-      isAuthenticated = value.isAuthenticated;
-    })
-  );
 
   function goHome() {
     if (window.location.pathname === "/") {
@@ -55,7 +46,7 @@
   }
 </script>
 
-{#if isAuthenticated}
+{#if $auth.isAuthenticated}
   <button onclick={logout} class={rest.class || ""}
     >{#if children}{@render children()}{:else}Logg ut{/if}</button
   >

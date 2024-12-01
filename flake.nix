@@ -25,7 +25,7 @@
               # Plantuml
               plantuml
               # JS
-              nodejs_22
+              nodejs_20
               nodePackages.npm
               nodePackages.typescript-language-server
               nodePackages.typescript

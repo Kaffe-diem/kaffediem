@@ -4,7 +4,7 @@
   import Nav from "$components/Nav.svelte";
   import Footer from "$components/Footer.svelte";
 
-  import { hideNavbar, hideFooter } from "$lib/constants.ts";
+  import { hideNavbar, hideFooter } from "$lib/constants";
   let { children } = $props();
 </script>
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   let { selectedItem } = $props();
-  import { orders } from "$lib/stores/orderStore";
+  import orders from "$stores/orderStore";
 
   let cart = $state([]);
   let totalPrice = $derived(cart.reduce((sum, item) => sum + item.price, 0));
@@ -43,7 +43,7 @@
     <button
       class="bold btn btn-lg text-xl"
       onclick={() => {
-        orders.add(cart.map((item) => item.id));
+        orders.create(cart.map((item) => item.id));
         cart = [];
       }}>Ferdig</button
     >

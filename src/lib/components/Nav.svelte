@@ -1,20 +1,8 @@
 <script lang="ts">
-  import auth from "$lib/stores/authStore";
-  import { onMount } from "svelte";
+  import auth from "$stores/authStore";
   import { restrictedRoutes, adminRoutes } from "$lib/constants";
   import MenuIcon from "$assets/MenuIcon.svelte";
   import NavItems from "$components/NavItems.svelte";
-
-  let isAuthenticated = $state(false);
-  let isAdmin = $state(false);
-
-  onMount(
-    auth.subscribe((value) => {
-      isAuthenticated = value.isAuthenticated;
-      // Will be undefined, false or true:
-      isAdmin = value.user?.is_admin;
-    })
-  );
 
   class NavItem {
     href: string;
@@ -29,31 +17,42 @@
     }
   }
 
-  const navItems = [
-    new NavItem("/drinks", "Meny"),
-    new NavItem("/display", "Visning"),
-    new NavItem("/account", "Min bruker"),
-    new NavItem("/status", "Min bestilling"),
-    new NavItem("/admin", "Admin")
-  ];
+  const navItems = [new NavItem("/account", "Min bruker"), new NavItem("/admin", "Admin")];
 </script>
 
-<div class="navbar bg-base-100">
-  <div class="flex-1">
-    <a href="/" class="btn btn-ghost text-xl">Kaffe Diem</a>
-  </div>
-  <div class="dropdown dropdown-end lg:hidden">
-    <div tabindex="0" role="button" class="btn btn-ghost">
-      <MenuIcon />
+<div class="drawer drawer-end z-[2]">
+  <input id="drawer" type="checkbox" class="drawer-toggle" />
+  <div class="drawer-content flex flex-col">
+    <div class="navbar w-full">
+      <div class="flex-1">
+        <a href="/" class="btn btn-ghost text-xl">Kaffe Diem</a>
+      </div>
+      <div class="flex-none lg:hidden">
+        <label for="drawer" aria-label="open sidebar" class="btn btn-square btn-ghost">
+          <MenuIcon />
+        </label>
+      </div>
+      <div class="hidden flex-none lg:block">
+        <ul class="menu menu-horizontal">
+          <NavItems
+            {navItems}
+            isAuthenticated={$auth.isAuthenticated}
+            isAdmin={$auth.user?.is_admin}
+            class="menu menu-horizontal px-1"
+          />
+        </ul>
+      </div>
     </div>
-    <NavItems
-      {navItems}
-      {isAuthenticated}
-      {isAdmin}
-      class="dropdown-content z-[1] mt-3 w-52 rounded-box bg-base-100 p-2 shadow"
-    />
   </div>
-  <div class="hidden flex-none lg:flex">
-    <NavItems {navItems} {isAuthenticated} {isAdmin} class="menu menu-horizontal px-1" />
+  <div class="drawer-side">
+    <label for="drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+    <ul class="menu min-h-full w-80 bg-base-100 p-4">
+      <NavItems
+        {navItems}
+        isAuthenticated={$auth.isAuthenticated}
+        isAdmin={$auth.user?.is_admin}
+        class="text-2xl"
+      />
+    </ul>
   </div>
 </div>

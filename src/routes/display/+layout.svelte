@@ -1,32 +1,19 @@
 <script lang="ts">
-  import QR from "$lib/assets/qr-code.svg";
-  import pb from "$lib/pocketbase";
-  import { onMount } from "svelte";
+  import { activeMessage } from "$stores/messageStore";
+
+  // import QR from "$assets/qr-code.svg";
 
   interface Props {
-    data: { activeMessage: String[] };
+    children;
   }
 
-  let { data, children }: Props = $props();
-  let message = $state(data.activeMessage[0]);
-
-  onMount(() => {
-    pb.collection("activeMessage").subscribe(
-      message.id,
-      (event) => {
-        message = event.record;
-      },
-      {
-        expand: "message"
-      }
-    );
-  });
+  let { children }: Props = $props();
 </script>
 
-{#if message.isVisible}
-  <div class="flex h-screen flex-col items-center justify-center">
-    <span class="p-2 text-7xl font-bold md:text-9xl">{message.expand.message.title}</span>
-    <span class="p-2 text-4xl md:text-6xl">{message.expand.message.subtext}</span>
+{#if $activeMessage.visible}
+  <div class="flex h-screen flex-col items-center justify-center text-center">
+    <span class="p-2 text-7xl font-bold md:text-9xl">{$activeMessage.message.title}</span>
+    <span class="p-2 text-4xl md:text-6xl">{$activeMessage.message.subtext}</span>
   </div>
 {:else}
   <main class="relative mx-auto h-screen w-11/12 py-4">
@@ -34,7 +21,7 @@
   </main>
 {/if}
 
-<div class="absolute bottom-0 left-0 hidden md:flex">
+<!-- <div class="absolute bottom-0 left-0 hidden md:flex">
   <a href="/">
     <img class="h-48 w-48" src={QR} alt="QR code" />
   </a>
@@ -43,4 +30,4 @@
     <a href="https://kaffediem.asvg.no" class="font-bold text-accent">kaffediem.asvg.no</a>
     <span>for å bestille</span>
   </div>
-</div>
+</div> -->

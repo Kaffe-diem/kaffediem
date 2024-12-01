@@ -1,81 +1,92 @@
 <script lang="ts">
-  import pb from "$lib/pocketbase";
+  import { messages, activeMessage } from "$stores/messageStore";
+  import { Message, ActiveMessage } from "$lib/types";
+  import { debounce } from "$lib/utils";
 
-  let { data } = $props();
-  let displayMessages = $state(data.displayMessages);
-  let activeMessage = data.activeMessage[0];
+  const handleActiveMessageChange = (message) => {
+    activeMessage.update(
+      new ActiveMessage({
+        ...$activeMessage,
+        visible: true,
+        message
+      })
+    );
+  };
 
-  let messageVisible = $state(activeMessage.isVisible);
-  async function updateActiveMessage() {
-    await pb.collection("activeMessage").update(activeMessage.id, {
-      message: selectedDisplayMessage.id,
-      isVisible: messageVisible
-    });
-  }
+  const handleMessageTextChange = (event, message, field: "title" | "subtext") => {
+    messages.update(
+      new Message({
+        ...message,
+        [field]: event.target.value
+      })
+    );
 
-  let selectedDisplayMessage = $state({ id: activeMessage.message });
-
-  async function updateDisplayMessages() {
-    updateActiveMessage();
-    for (let screnMessage of displayMessages) {
-      await pb.collection("displayMessages").update(screnMessage.id, {
-        title: screnMessage.title,
-        subtext: screnMessage.subtext
-      });
+    const isActive = message.id === $activeMessage.message.id;
+    if (isActive) {
+      debounce(handleActiveMessageChange, 100)(message);
     }
-  }
+  };
+
+  const handleVisibilityChange = () => {
+    activeMessage.update(
+      new ActiveMessage({
+        ...$activeMessage,
+        visible: false
+      })
+    );
+  };
 </script>
 
 <form>
   <ul class="list-none">
-    {#each displayMessages as displayMessage}
-      <div class="flex">
-        <div class="form-control">
-          <label class="label cursor-pointer">
-            <input
-              type="radio"
-              name="selected"
-              class="radio mr-2 mt-4"
-              checked={displayMessage.id == selectedDisplayMessage.id}
-              onchange={() => {
-                selectedDisplayMessage = displayMessage;
-                messageVisible = true;
-              }}
-            />
-
-            <li>
-              <input
-                type="text"
-                placeholder="Tittel"
-                bind:value={displayMessage.title}
-                class="input input-lg input-bordered w-full max-w-xs"
-              />
-            </li>
-
-            <li>
-              <input
-                type="text"
-                placeholder="Beskrivelse"
-                bind:value={displayMessage.subtext}
-                class="input input-lg input-bordered ml-4 w-full max-w-xs"
-              />
-            </li>
-          </label>
-        </div>
-      </div>
+    {#each $messages as message}
+      <li class="my-4">
+        <label class="form-control grid grid-cols-[auto_1fr_1fr_auto] place-items-center gap-4">
+          <input
+            type="radio"
+            class="radio"
+            name="selected"
+            checked={message.id == $activeMessage.message.id}
+            value={message}
+            onchange={() => handleActiveMessageChange(message)}
+          />
+          <input
+            type="text"
+            class="input input-lg input-bordered w-full"
+            value={message.title}
+            placeholder="Tittel"
+            oninput={(event) => handleMessageTextChange(event, message, "title")}
+          />
+          <input
+            type="text"
+            class="input input-lg input-bordered w-full"
+            value={message.subtext}
+            placeholder="Beskrivelse"
+            oninput={(event) => handleMessageTextChange(event, message, "subtext")}
+          />
+          <button
+            class="btn btn-secondary btn-lg"
+            onclick={() => {
+              if (window.confirm(`Er du sikker på at du vil slette "${message.title}"?`)) {
+                messages.delete(message.id);
+              }
+            }}>-</button
+          >
+        </label>
+      </li>
     {/each}
-
-    <input
-      type="radio"
-      name="selected"
-      class="radio mr-2 mt-4"
-      checked={!messageVisible}
-      onchange={() => (messageVisible = false)}
-    />
-    <span class="text-lg">Åpent!</span>
+    <li class="my-4">
+      <label class="flex items-center">
+        <input
+          type="radio"
+          class="radio mr-4"
+          name="selected"
+          checked={!$activeMessage.visible}
+          onchange={handleVisibilityChange}
+        />
+        <span>Åpent!</span>
+      </label>
+    </li>
+    <button class="btn btn-lg" onclick={() => messages.create("", "")}>Legg til melding</button>
   </ul>
-
-  <button type="submit" class="btn mt-4 w-full max-w-xs" onclick={updateDisplayMessages}
-    >Lagre</button
-  >
 </form>

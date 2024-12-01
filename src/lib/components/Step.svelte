@@ -1,10 +1,10 @@
 <script lang="ts">
   interface Props {
-    state?: string;
+    state: boolean;
     children?: import("svelte").Snippet;
   }
 
-  let { state = false, children }: Props = $props();
+  let { state, children }: Props = $props();
 </script>
 
 <li class="step {state ? 'step-primary' : ''} p-2">{@render children?.()}</li>
