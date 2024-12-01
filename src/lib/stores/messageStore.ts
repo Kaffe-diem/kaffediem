@@ -19,7 +19,14 @@ const mapToMessage = (data: { id: string; title: string; subtext: string }): Mes
 const mapToActiveMessage = (data: { id: string; expand: any; isVisible: boolean }): ActiveMessage =>
   new ActiveMessage({
     id: data.id,
-    message: mapToMessage(data.expand.message),
+    message:
+      data.expand !== undefined
+        ? mapToMessage(data.expand.message)
+        : new Message({
+            id: "",
+            title: "",
+            subtext: ""
+          }),
     visible: data.isVisible
   });
 

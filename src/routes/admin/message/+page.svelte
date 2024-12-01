@@ -41,7 +41,7 @@
   <ul class="list-none">
     {#each $messages as message}
       <li class="my-4">
-        <label class="form-control grid grid-cols-[auto_1fr_1fr] place-items-center gap-4">
+        <label class="form-control grid grid-cols-[auto_1fr_1fr_auto] place-items-center gap-4">
           <input
             type="radio"
             class="radio"
@@ -64,6 +64,14 @@
             placeholder="Beskrivelse"
             oninput={(event) => handleMessageTextChange(event, message, "subtext")}
           />
+          <button
+            class="btn btn-secondary btn-lg"
+            onclick={() => {
+              if (window.confirm(`Er du sikker på at du vil slette ${message.title}?`)) {
+                messages.delete(message.id);
+              }
+            }}>-</button
+          >
         </label>
       </li>
     {/each}
@@ -79,5 +87,6 @@
         <span>Åpent!</span>
       </label>
     </li>
+    <button class="btn btn-lg" onclick={() => messages.create("", "")}>Legg til melding</button>
   </ul>
 </form>
