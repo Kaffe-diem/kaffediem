@@ -15,7 +15,7 @@ export default function createPbStore<T extends Collections>(
 
   (async () => {
     const initialData = await pb.collection(collection).getFullList(fetchOptions);
-    set(initialData);
+    set(initialData as CollectionResponses[T][]);
 
     pb.collection(collection).subscribe(
       "*",
