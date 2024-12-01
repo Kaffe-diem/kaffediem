@@ -67,7 +67,7 @@
           <button
             class="btn btn-secondary btn-lg"
             onclick={() => {
-              if (window.confirm(`Er du sikker på at du vil slette ${message.title}?`)) {
+              if (window.confirm(`Er du sikker på at du vil slette "${message.title}"?`)) {
                 messages.delete(message.id);
               }
             }}>-</button
