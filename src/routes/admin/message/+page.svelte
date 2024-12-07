@@ -1,39 +1,37 @@
 <script lang="ts">
   import { messages, activeMessage } from "$stores/messageStore";
-  import { Message, ActiveMessage } from "$lib/types";
   import { debounce } from "$lib/utils";
+  import type { DisplayMessagesResponse, ActiveMessageResponse } from "$lib/pocketbase";
 
-  const handleActiveMessageChange = (message) => {
-    activeMessage.update(
-      new ActiveMessage({
-        ...$activeMessage,
-        visible: true,
-        message
-      })
-    );
+  const handleActiveMessageChange = (message: DisplayMessagesResponse) => {
+    activeMessage.update({
+      ...$activeMessage,
+      isVisible: true,
+      message: message.id
+    } as ActiveMessageResponse);
   };
 
-  const handleMessageTextChange = (event, message, field: "title" | "subtext") => {
-    messages.update(
-      new Message({
-        ...message,
-        [field]: event.target.value
-      })
-    );
+  const handleMessageTextChange = (
+    e: Event,
+    message: DisplayMessagesResponse,
+    field: "title" | "subtext"
+  ) => {
+    messages.update({
+      ...message,
+      [field]: (e.target as HTMLInputElement).value
+    } as DisplayMessagesResponse);
 
-    const isActive = message.id === $activeMessage.message.id;
+    const isActive = message.id === $activeMessage?.message;
     if (isActive) {
       debounce(handleActiveMessageChange, 100)(message);
     }
   };
 
   const handleVisibilityChange = () => {
-    activeMessage.update(
-      new ActiveMessage({
-        ...$activeMessage,
-        visible: false
-      })
-    );
+    activeMessage.update({
+      ...$activeMessage,
+      isVisible: false
+    } as ActiveMessageResponse);
   };
 </script>
 
@@ -46,8 +44,8 @@
             type="radio"
             class="radio"
             name="selected"
-            checked={message.id == $activeMessage.message.id}
-            value={message}
+            checked={message.id == $activeMessage?.message?.id}
+            value={message.id}
             onchange={() => handleActiveMessageChange(message)}
           />
           <input
@@ -81,7 +79,7 @@
           type="radio"
           class="radio mr-4"
           name="selected"
-          checked={!$activeMessage.visible}
+          checked={!$activeMessage.isVisible}
           onchange={handleVisibilityChange}
         />
         <span>Åpent!</span>
