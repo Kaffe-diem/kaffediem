@@ -29,13 +29,15 @@ export const messages = {
   }
 };
 
+type T = ActiveMessageResponse<DisplayMessagesResponse>;
+
 export const activeMessage = {
   subscribe: createPbStore(Collections.ActiveMessage, {
     expand: "message"
   }),
-  update: async (current: ActiveMessageResponse) => {
-    await pb.collection(Collections.ActiveMessage).update(current.id, {
-      message: current?.expand.message.id,
+  update: async (current: T) => {
+    await pb.collection(Collections.ActiveMessage).update<T>(current.id, {
+      message: current.expand?.id,
       isVisible: current.isVisible
     });
   }

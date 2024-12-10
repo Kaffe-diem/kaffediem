@@ -1,14 +1,16 @@
 <script lang="ts">
   import { messages, activeMessage } from "$stores/messageStore";
   import { debounce } from "$lib/utils";
-  import type { DisplayMessagesResponse, ActiveMessageResponse } from "$lib/pocketbase";
+  import type { DisplayMessagesResponse } from "$lib/pocketbase";
 
   const handleActiveMessageChange = (message: DisplayMessagesResponse) => {
     activeMessage.update({
-      ...$activeMessage,
+      message: message.id,
       isVisible: true,
-      message: message.id
-    } as ActiveMessageResponse);
+      expand: {
+        message: message
+      }
+    });
   };
 
   const handleMessageTextChange = (
@@ -21,17 +23,19 @@
       [field]: (e.target as HTMLInputElement).value
     } as DisplayMessagesResponse);
 
-    const isActive = message.id === $activeMessage?.message;
+    const isActive = message.id === $activeMessage?.expand.message.id;
     if (isActive) {
       debounce(handleActiveMessageChange, 100)(message);
     }
   };
 
   const handleVisibilityChange = () => {
-    activeMessage.update({
-      ...$activeMessage,
-      isVisible: false
-    } as ActiveMessageResponse);
+    activeMessage.update(
+      new ActiveMessage({
+        ...$activeMessage,
+        visible: false
+      })
+    );
   };
 </script>
 
@@ -44,16 +48,10 @@
             type="radio"
             class="radio"
             name="selected"
-            checked={message.id == $activeMessage?.message?.id}
-            value={message.id}
-            onchange={() => handleActiveMessageChange(message)}
+            checked={message.id == $activeMessage?.expand.message.id}
           />
-          <input
-            type="text"
-            class="input input-lg input-bordered w-full"
-            value={message.title}
-            placeholder="Tittel"
-            oninput={(event) => handleMessageTextChange(event, message, "title")}
+          type="text" class="input input-lg input-bordered w-full" value={message.title}
+          placeholder="Tittel" oninput={(event) => handleMessageTextChange(event, message, "title")}
           />
           <input
             type="text"

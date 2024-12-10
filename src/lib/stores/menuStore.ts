@@ -1,14 +1,5 @@
 import createPbStore from "$stores/pbStore";
-import pb, {
-  Collections,
-  type CategoriesResponse,
-  type DrinksResponse,
-  type RecordIdString
-} from "$lib/pocketbase";
-
-type CategoryWithDrinks = CategoriesResponse<{
-  drinks_via_category: DrinksViaCategory[];
-}>;
+import pb, { Collections, type DrinksResponse, type RecordIdString } from "$lib/pocketbase";
 
 export const categories = {
   subscribe: createPbStore(Collections.Categories, {
@@ -16,14 +7,14 @@ export const categories = {
     expand: "drinks_via_category"
   }),
 
-  update: async (category: CategoryWithDrinks) => {
+  update: async (category) => {
     await pb.collection(Collections.Categories).update(category.id, {
       name: category.name,
       sort_order: category.sort_order
     });
   },
 
-  create: async (category: Omit<CategoryWithDrinks, "expand">) => {
+  create: async (category, "expand") => {
     await pb.collection(Collections.Categories).create({
       name: category.name,
       sort_order: category.sort_order
