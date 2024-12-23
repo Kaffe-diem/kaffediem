@@ -23,5 +23,16 @@ jobs:
       - name: get deps
         run: npm ci
 
+      - name: Create env file
+        # Create .env based on secrets and variables defined in GitHub
+        run: |
+          touch .env
+          echo PUBLIC_PB_HOST=${{ vars.PB_HOST }} >> .env
+          echo PB_ADMIN_PASSWORD=${{ secrets.PB_ADMIN_PASSWORD }} >> .env
+          echo PB_ADMIN_EMAIL=${{ secrets.PB_ADMIN_EMAIL }} >> .env
+
+      - name: Run pocketbase-typegen
+        run: npx --yes pocketbase-typegen@1.2.1 --url $(PUBLIC_PB_HOST) --email $(PB_ADMIN_EMAIL) --password $(PB_ADMIN_PASSWORD) --out ./src/lib/pocketbase/index.d.ts
+
       - name: Lint and check formatting
         run: npm run lint
