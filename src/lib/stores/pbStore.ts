@@ -1,4 +1,4 @@
-import pb, { Collections, type CollectionResponses } from "$lib/pocketbase";
+import pb, { Collections } from "$lib/pocketbase";
 import { writable } from "svelte/store";
 
 // ref: https://github.com/pocketbase/js-sdk?tab=readme-ov-file#nodejs-via-npm
@@ -6,29 +6,33 @@ import eventsource from "eventsource";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (global as any).EventSource = eventsource;
 
-export default function createPbStore<T extends Collections>(
-  collection: T,
-  fetchOptions: Record<string, string> = {},
-  subscribeOptions: Record<string, string> = fetchOptions
+export default function createPbStore<Collection extends Collections, RecordClass>(
+  collection: Collection,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  recordClass: new (data: any) => RecordClass,
+  fetchOptions: { [key: string]: string } = {},
+  subscribeOptions: { [key: string]: string } = fetchOptions
 ) {
-  const { subscribe, set, update } = writable<CollectionResponses[T][]>([]);
+  const { subscribe, set, update } = writable<RecordClass[]>([]);
 
   (async () => {
     const initialData = await pb.collection(collection).getFullList(fetchOptions);
-    set(initialData as CollectionResponses[T][]);
+    set(initialData.map((record) => new recordClass(record)));
 
     pb.collection(collection).subscribe(
       "*",
-      (event: { record: CollectionResponses[T]; action: string }) => {
+      (event) => {
         update((state) => {
+          // @ts-expect-error All targets of record maps should have an id.
           const itemIndex = state.findIndex((item) => item.id == event.record.id);
+          const item = new recordClass(event.record);
 
           switch (event.action) {
             case "create":
-              state.push(event.record);
+              state.push(item);
               break;
             case "update":
-              if (itemIndex !== -1) state[itemIndex] = event.record;
+              if (itemIndex !== -1) state[itemIndex] = item;
               break;
             case "delete":
               if (itemIndex !== -1) state.splice(itemIndex, 1);

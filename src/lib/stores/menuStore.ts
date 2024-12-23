@@ -1,35 +1,36 @@
 import createPbStore from "$stores/pbStore";
-import pb, { Collections, type DrinksResponse, type RecordIdString } from "$lib/pocketbase";
+import pb, { Collections, type RecordIdString } from "$lib/pocketbase";
+import { Item, Category } from "$lib/types";
 
 export const categories = {
-  subscribe: createPbStore(Collections.Categories, {
+  subscribe: createPbStore(Collections.Categories, Category, {
     sort: "sort_order",
     expand: "drinks_via_category"
   }),
 
-  update: async (category) => {
+  update: async (category: Category) => {
     await pb.collection(Collections.Categories).update(category.id, {
       name: category.name,
-      sort_order: category.sort_order
+      sort_order: category.sortOrder
     });
   },
 
-  create: async (category, "expand") => {
+  create: async (category: Category) => {
     await pb.collection(Collections.Categories).create({
       name: category.name,
-      sort_order: category.sort_order
+      sort_order: category.sortOrder
     });
   },
 
-  delete: async (id: string) => {
+  delete: async (id: RecordIdString) => {
     await pb.collection(Collections.Categories).delete(id);
   }
 };
 
 export const items = {
-  subscribe: createPbStore(Collections.Drinks),
+  subscribe: createPbStore(Collections.Drinks, Item),
 
-  update: async (item: DrinksResponse) => {
+  update: async (item: Item) => {
     await pb.collection(Collections.Drinks).update(item.id, {
       name: item.name,
       price: item.price,
@@ -37,7 +38,7 @@ export const items = {
     });
   },
 
-  create: async (item: DrinksResponse) => {
+  create: async (item: Item) => {
     await pb.collection(Collections.Drinks).create({
       name: item.name,
       price: item.price,
@@ -45,7 +46,7 @@ export const items = {
     });
   },
 
-  delete: async (id: RecordIdString) => {
-    await pb.collection(Collections.Drinks).delete(id);
+  delete: async (itemId: RecordIdString) => {
+    await pb.collection(Collections.Drinks).delete(itemId);
   }
 };

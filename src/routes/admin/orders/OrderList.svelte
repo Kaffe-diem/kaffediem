@@ -24,9 +24,9 @@
           <tr class="hover border-none" onclick={() => orders.updateState(order?.id, onclick)}>
             <td class="text-lg">{index + 100}</td>
             <td>
-              {#each order.expand.drinks as orderDrink}
+              {#each order.items as orderItem}
                 <span class="badge badge-ghost m-1 whitespace-nowrap p-3 text-lg">
-                  {orderDrink.expand.drink.name}
+                  {orderItem.item.name}
                 </span>
               {/each}
             </td>

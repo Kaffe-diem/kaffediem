@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { DrinksResponse } from "$lib/pocketbase";
+  import { Item } from "$lib/types";
   let { selectedItem } = $props();
   import orders from "$stores/orderStore";
 
-  let cart = $state<DrinksResponse[]>([]);
+  let cart = $state<Item[]>([]);
   let totalPrice = $derived(cart.reduce((sum, item) => sum + item.price, 0));
 </script>
 
@@ -18,10 +18,10 @@
       </thead>
       <tbody>
         {#if cart.length > 0}
-          {#each cart as drink, index}
+          {#each cart as item, index}
             <tr class="hover select-none" onclick={() => cart.splice(index, 1)}>
-              <td>{drink.name}</td>
-              <td>{drink.price},-</td>
+              <td>{item.name}</td>
+              <td>{item.price},-</td>
             </tr>
           {/each}
         {:else}
@@ -48,8 +48,9 @@
         cart = [];
       }}>Ferdig</button
     >
-    <button class="bold btn btn-primary btn-lg text-3xl" onclick={() => cart.push(selectedItem)}
-      >+</button
+    <button
+      class="bold btn btn-primary btn-lg text-3xl"
+      onclick={() => cart.push(selectedItem as Item)}>+</button
     >
   </div>
 </div>

@@ -1,20 +1,10 @@
 <script lang="ts">
   import auth from "$stores/authStore";
-  import { restrictedRoutes, adminRoutes } from "$lib/constants";
   import MenuIcon from "$assets/MenuIcon.svelte";
   import NavItems from "$components/NavItems.svelte";
-  import type { NavItem } from "$lib/types";
+  import { NavItem } from "$lib/types";
 
-  const makeNavItem = (href: string, text: string): NavItem => {
-    return {
-      href,
-      text,
-      requiresAuth: restrictedRoutes.includes(href),
-      requiresAdmin: adminRoutes.includes(href)
-    };
-  };
-
-  const navItems = [makeNavItem("/account", "Min bruker"), makeNavItem("/admin", "Admin")];
+  const navItems = [new NavItem("/account", "Min bruker"), new NavItem("/admin", "Admin")];
 </script>
 
 <div class="drawer drawer-end z-[2]">

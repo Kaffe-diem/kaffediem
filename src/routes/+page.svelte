@@ -17,7 +17,7 @@
 
   <br />
   <ul>
-    {#if $activeMessage?.isVisible}
+    {#if $activeMessage.visible}
       <li class="font-bold">{$activeMessage.message.title}</li>
       <li>{$activeMessage.message.subtext}</li>
     {:else}

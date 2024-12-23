@@ -1,5 +1,6 @@
 import createPbStore from "$stores/pbStore";
-import pb, { Collections, OrdersStateOptions, type RecordIdString } from "$lib/pocketbase";
+import pb, { Collections, type RecordIdString } from "$lib/pocketbase";
+import { State, Order } from "$lib/types";
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -9,13 +10,13 @@ const baseOptions = {
 };
 
 export default {
-  subscribe: createPbStore(Collections.Orders, baseOptions),
+  subscribe: createPbStore(Collections.Orders, Order, baseOptions),
 
-  create: async (drinkIds: RecordIdString[]) => {
-    const getOrderDrinkIds = async (): Promise<RecordIdString[]> => {
+  create: async (itemIds: RecordIdString[]) => {
+    const getOrderItemIds = async (): Promise<RecordIdString[]> => {
       return await Promise.all(
-        drinkIds.map(async (drinkId) => {
-          const response = await pb.collection(Collections.OrderDrink).create({ drink: drinkId });
+        itemIds.map(async (itemId) => {
+          const response = await pb.collection(Collections.OrderDrink).create({ drink: itemId });
           return response.id;
         })
       );
@@ -23,18 +24,18 @@ export default {
 
     await pb.collection(Collections.Orders).create({
       customer: pb.authStore.model?.id,
-      drinks: await getOrderDrinkIds(),
-      state: OrdersStateOptions.received,
+      drinks: await getOrderItemIds(),
+      state: State.received,
       payment_fulfilled: false
     });
   },
 
-  updateState: (id: RecordIdString, state: OrdersStateOptions) => {
-    pb.collection(Collections.Orders).update(id, { state });
+  updateState: (orderId: RecordIdString, state: State) => {
+    pb.collection(Collections.Orders).update(orderId, { state });
   }
 };
 export const userOrders = {
-  subscribe: createPbStore(Collections.Orders, {
+  subscribe: createPbStore(Collections.Orders, Order, {
     ...baseOptions,
     filter: `customer = '${pb.authStore.model?.id}'`
   })
