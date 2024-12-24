@@ -10,7 +10,10 @@ jobs:
   checks:
     name: Run Checks
     runs-on: ubuntu-latest
-
+    env:
+      PUBLIC_PB_HOST: ${{ vars.PB_HOST }}
+      PB_ADMIN_PASSWORD: ${{ secrets.PB_ADMIN_PASSWORD }}
+      PB_ADMIN_EMAIL: ${{ secrets.PB_ADMIN_EMAIL }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,11 +25,6 @@ jobs:
 
       - name: get deps
         run: npm ci
-
-      - env:
-          PUBLIC_PB_HOST: ${{ vars.PB_HOST }}
-          PB_ADMIN_PASSWORD: ${{ secrets.PB_ADMIN_PASSWORD }}
-          PB_ADMIN_EMAIL: ${{ secrets.PB_ADMIN_EMAIL }}
 
       - name: Run pocketbase-typegen
         run: make pb_types
