@@ -18,5 +18,5 @@
 </main>
 
 <div class="absolute bottom-0 right-0 m-8 hidden md:flex">
-  <a onclick={redirectToPrevious} class="btn btn-secondary">Tilbake</a>
+  <button onclick={redirectToPrevious} class="btn btn-secondary">Tilbake</button>
 </div>
