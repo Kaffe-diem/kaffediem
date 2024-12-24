@@ -32,7 +32,7 @@ jobs:
           echo PB_ADMIN_EMAIL=${{ secrets.PB_ADMIN_EMAIL }} >> .env
 
       - name: Run pocketbase-typegen
-        run: npx --yes pocketbase-typegen@1.2.1 --url $(PUBLIC_PB_HOST) --email $(PB_ADMIN_EMAIL) --password $(PB_ADMIN_PASSWORD) --out ./src/lib/pocketbase/index.d.ts
+        run: npx --yes pocketbase-typegen@1.2.1 --url $({ vars.PUBLIC_PB_HOST }) --email $({ secrets.PB_ADMIN_EMAIL }) --password $({ secrets.PB_ADMIN_PASSWORD }) --out ./src/lib/pocketbase/index.d.ts
 
       - name: Lint and check formatting
         run: npm run lint
