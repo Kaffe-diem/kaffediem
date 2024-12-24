@@ -1,9 +1,9 @@
 default: dev
 
-dev: sync_schema
+dev: pb_types
 	@npm run dev
 
-build:
+build: pb_types
 	@npm run build
 
 db:
