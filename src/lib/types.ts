@@ -1,4 +1,4 @@
-import { type RecordIdString, OrdersStateOptions } from "$lib/pocketbase";
+import pb, { type RecordIdString, OrdersStateOptions, type DrinksResponse } from "$lib/pocketbase";
 import { restrictedRoutes, adminRoutes } from "$lib/constants";
 
 export class NavItem {
@@ -36,6 +36,18 @@ export class Order extends Record {
     this.state = data.state;
     this.items = data.drinks;
   }
+
+  static fromPb(data: {
+    id: RecordIdString;
+    state: State;
+    expand: { drinks: { id: RecordIdString; expand: { drink: DrinksResponse } }[] };
+  }): Order {
+    return new Order({
+      id: data.id,
+      state: data.state,
+      drinks: data.expand.drinks.map(OrderItem.fromPb)
+    });
+  }
 }
 
 export class OrderItem extends Record {
@@ -46,6 +58,14 @@ export class OrderItem extends Record {
     super(data);
     this.name = data.name;
     this.item = data.item;
+  }
+
+  static fromPb(data: { id: RecordIdString; expand: { drink: DrinksResponse } }): OrderItem {
+    return new OrderItem({
+      ...data,
+      name: data.expand.drink.name,
+      item: Item.fromPb(data.expand.drink)
+    });
   }
 }
 
@@ -68,6 +88,19 @@ export class Item extends Record {
     this.category = data.category;
     this.image = data.image;
   }
+
+  static fromPb(data: {
+    id: RecordIdString;
+    name: string;
+    price: number;
+    category: string;
+    image: string;
+  }): Item {
+    return new Item({
+      ...data,
+      image: pb.files.getURL(data, data.image)
+    });
+  }
 }
 
 export class Category extends Record {
@@ -81,6 +114,19 @@ export class Category extends Record {
     this.sortOrder = data.sortOrder;
     this.items = data.items;
   }
+
+  static fromPb(data: {
+    id: RecordIdString;
+    name: string;
+    sort_order: number;
+    expand: { drinks_via_category: DrinksResponse[] };
+  }): Category {
+    return new Category({
+      ...data,
+      sortOrder: data.sort_order,
+      items: data.expand.drinks_via_category.map(Item.fromPb)
+    });
+  }
 }
 
 // messages
@@ -93,6 +139,10 @@ export class Message extends Record {
     this.title = data.title;
     this.subtext = data.subtext;
   }
+
+  static fromPb(data: { id: RecordIdString; title: string; subtext: string }): Message {
+    return new Message(data);
+  }
 }
 
 export class ActiveMessage extends Record {
@@ -103,5 +153,24 @@ export class ActiveMessage extends Record {
     super(data);
     this.message = data.message;
     this.visible = data.visible;
+  }
+
+  static fromPb(data: {
+    id: RecordIdString;
+    expand: { message: Message };
+    isVisible: boolean;
+  }): ActiveMessage {
+    return new ActiveMessage({
+      id: data.id,
+      message:
+        data.expand !== undefined
+          ? Message.fromPb(data.expand.message)
+          : new Message({
+              id: "",
+              title: "",
+              subtext: ""
+            }),
+      visible: data.isVisible
+    });
   }
 }

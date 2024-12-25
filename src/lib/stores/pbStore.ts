@@ -9,7 +9,7 @@ import eventsource from "eventsource";
 export default function createPbStore<Collection extends Collections, RecordClass>(
   collection: Collection,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  recordClass: new (data: any) => RecordClass,
+  recordClass: { fromPb(data: any): RecordClass },
   fetchOptions: { [key: string]: string } = {},
   subscribeOptions: { [key: string]: string } = fetchOptions
 ) {
@@ -17,7 +17,7 @@ export default function createPbStore<Collection extends Collections, RecordClas
 
   (async () => {
     const initialData = await pb.collection(collection).getFullList(fetchOptions);
-    set(initialData.map((record) => new recordClass(record)));
+    set(initialData.map(recordClass.fromPb));
 
     pb.collection(collection).subscribe(
       "*",
@@ -25,7 +25,7 @@ export default function createPbStore<Collection extends Collections, RecordClas
         update((state) => {
           // @ts-expect-error All targets of record maps should have an id.
           const itemIndex = state.findIndex((item) => item.id == event.record.id);
-          const item = new recordClass(event.record);
+          const item = recordClass.fromPb(event.record);
 
           switch (event.action) {
             case "create":
