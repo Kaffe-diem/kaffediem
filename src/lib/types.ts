@@ -97,7 +97,7 @@ export class Item extends Record {
   }) {
     return new Item({
       ...data,
-      image: pb.files.getURL(data, data.image)
+      image: pb.files.getUrl(data, data.image)
     });
   }
 }
