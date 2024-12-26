@@ -31,10 +31,10 @@ export class Order extends Record {
   state: State;
   items: Array<OrderItem>;
 
-  constructor(data: { id: RecordIdString; state: State; drinks: Array<OrderItem> }) {
+  constructor(data: { id: RecordIdString; state: State; items: Array<OrderItem> }) {
     super(data);
     this.state = data.state;
-    this.items = data.drinks;
+    this.items = data.items;
   }
 
   static fromPb(data: {
@@ -45,7 +45,7 @@ export class Order extends Record {
     return new Order({
       id: data.id,
       state: data.state,
-      drinks: data.expand.drinks.map(OrderItem.fromPb)
+      items: data.expand.drinks.map(OrderItem.fromPb)
     });
   }
 }
