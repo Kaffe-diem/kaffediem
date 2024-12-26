@@ -1,4 +1,12 @@
-import pb, { type RecordIdString, OrdersStateOptions, type DrinksResponse } from "$lib/pocketbase";
+import pb, {
+  type RecordIdString,
+  OrdersStateOptions,
+  type DrinksResponse,
+  type ActiveMessageResponse,
+  type OrdersResponse,
+  type OrderDrinkResponse,
+  type CategoriesResponse
+} from "$lib/pocketbase";
 import { restrictedRoutes, adminRoutes } from "$lib/constants";
 
 export class NavItem {
@@ -21,47 +29,52 @@ export { OrdersStateOptions as State };
 export class Record {
   id: RecordIdString;
 
-  constructor(data: { id: RecordIdString }) {
+  constructor(data: Record) {
     this.id = data.id;
   }
 }
 
 // orders
+type ExpandedOrderRecord = OrdersResponse & {
+  expand: { drinks: ExpandedOrderDrinkRecord[] };
+};
+
 export class Order extends Record {
   state: State;
   items: Array<OrderItem>;
 
-  constructor(data: { id: RecordIdString; state: State; items: Array<OrderItem> }) {
+  constructor(data: Order) {
     super(data);
     this.state = data.state;
     this.items = data.items;
   }
 
-  static fromPb(data: {
-    id: RecordIdString;
-    state: State;
-    expand: { drinks: { id: RecordIdString; expand: { drink: DrinksResponse } }[] };
-  }) {
+  static fromPb(data: ExpandedOrderRecord) {
     return new Order({
-      ...data,
+      id: data.id,
+      state: data.state,
       items: data.expand.drinks.map(OrderItem.fromPb)
     });
   }
 }
 
+type ExpandedOrderDrinkRecord = OrderDrinkResponse & {
+  expand: { drink: DrinksResponse };
+};
+
 export class OrderItem extends Record {
   name: string;
   item: Item;
 
-  constructor(data: { id: RecordIdString; name: string; item: Item }) {
+  constructor(data: OrderItem) {
     super(data);
     this.name = data.name;
     this.item = data.item;
   }
 
-  static fromPb(data: { id: RecordIdString; expand: { drink: DrinksResponse } }) {
+  static fromPb(data: ExpandedOrderDrinkRecord) {
     return new OrderItem({
-      ...data,
+      id: data.id,
       name: data.expand.drink.name,
       item: Item.fromPb(data.expand.drink)
     });
@@ -74,13 +87,7 @@ export class Item extends Record {
   category: string;
   image: string;
 
-  constructor(data: {
-    id: RecordIdString;
-    name: string;
-    price: number;
-    category: string;
-    image: string;
-  }) {
+  constructor(data: Item) {
     super(data);
     this.name = data.name;
     this.price = data.price;
@@ -88,40 +95,37 @@ export class Item extends Record {
     this.image = data.image;
   }
 
-  static fromPb(data: {
-    id: RecordIdString;
-    name: string;
-    price: number;
-    category: string;
-    image: string;
-  }) {
+  static fromPb(data: DrinksResponse) {
     return new Item({
-      ...data,
+      id: data.id,
+      name: data.name,
+      price: data.price,
+      category: data.category,
       image: pb.files.getUrl(data, data.image)
     });
   }
 }
+
+type ExpandedCategoryRecord = CategoriesResponse & {
+  expand: { drinks_via_category: DrinksResponse[] };
+};
 
 export class Category extends Record {
   name: string;
   sortOrder: number;
   items: Item[];
 
-  constructor(data: { id: RecordIdString; name: string; sortOrder: number; items: Item[] }) {
+  constructor(data: Category) {
     super(data);
     this.name = data.name;
     this.sortOrder = data.sortOrder;
     this.items = data.items;
   }
 
-  static fromPb(data: {
-    id: RecordIdString;
-    name: string;
-    sort_order: number;
-    expand: { drinks_via_category: DrinksResponse[] };
-  }) {
+  static fromPb(data: ExpandedCategoryRecord) {
     return new Category({
-      ...data,
+      id: data.id,
+      name: data.name,
       sortOrder: data.sort_order,
       items: data.expand.drinks_via_category.map(Item.fromPb)
     });
@@ -133,37 +137,42 @@ export class Message extends Record {
   title: string;
   subtext: string;
 
-  constructor(data: { id: RecordIdString; title: string; subtext: string }) {
+  constructor(data: Message) {
     super(data);
     this.title = data.title;
     this.subtext = data.subtext;
   }
 
-  static fromPb(data: { id: RecordIdString; title: string; subtext: string }) {
+  static fromPb(data: Message) {
     return new Message(data);
   }
 }
+
+type ExpandedActiveMessageRecord = ActiveMessageResponse & {
+  expand: { message: Message };
+};
 
 export class ActiveMessage extends Record {
   message: Message;
   visible: boolean;
 
-  constructor(data: { id: RecordIdString; message: Message; visible: boolean }) {
+  constructor(data: ActiveMessage) {
     super(data);
     this.message = data.message;
     this.visible = data.visible;
   }
 
-  static fromPb(data: { id: RecordIdString; expand: { message: Message }; isVisible: boolean }) {
+  static fromPb(data: ExpandedActiveMessageRecord) {
     return new ActiveMessage({
-      ...data,
-      message: data.expand?.message
-        ? Message.fromPb(data.expand.message)
-        : new Message({
-            id: "",
-            title: "",
-            subtext: ""
-          }),
+      id: data.id,
+      message:
+        data.expand !== undefined
+          ? Message.fromPb(data.expand.message)
+          : new Message({
+              id: "",
+              title: "",
+              subtext: ""
+            }),
       visible: data.isVisible
     });
   }
