@@ -67,7 +67,14 @@ function createActiveMessageStore() {
         set(
           new ActiveMessage({
             id: event.record.id,
-            message: (event.record.expand as { message: Message }).message,
+            message:
+              event.record.expand !== undefined
+                ? (event.record.expand as { message: Message }).message
+                : new Message({
+                    id: "",
+                    title: "",
+                    subtext: ""
+                  }),
             visible: event.record.isVisible
           })
         );
