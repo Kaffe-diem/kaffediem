@@ -41,7 +41,7 @@ export class Order extends Record {
     id: RecordIdString;
     state: State;
     expand: { drinks: { id: RecordIdString; expand: { drink: DrinksResponse } }[] };
-  }): Order {
+  }) {
     return new Order({
       id: data.id,
       state: data.state,
@@ -60,7 +60,7 @@ export class OrderItem extends Record {
     this.item = data.item;
   }
 
-  static fromPb(data: { id: RecordIdString; expand: { drink: DrinksResponse } }): OrderItem {
+  static fromPb(data: { id: RecordIdString; expand: { drink: DrinksResponse } }) {
     return new OrderItem({
       ...data,
       name: data.expand.drink.name,
@@ -95,7 +95,7 @@ export class Item extends Record {
     price: number;
     category: string;
     image: string;
-  }): Item {
+  }) {
     return new Item({
       ...data,
       image: pb.files.getURL(data, data.image)
@@ -120,7 +120,7 @@ export class Category extends Record {
     name: string;
     sort_order: number;
     expand: { drinks_via_category: DrinksResponse[] };
-  }): Category {
+  }) {
     return new Category({
       ...data,
       sortOrder: data.sort_order,
@@ -140,7 +140,7 @@ export class Message extends Record {
     this.subtext = data.subtext;
   }
 
-  static fromPb(data: { id: RecordIdString; title: string; subtext: string }): Message {
+  static fromPb(data: { id: RecordIdString; title: string; subtext: string }) {
     return new Message(data);
   }
 }
@@ -155,11 +155,7 @@ export class ActiveMessage extends Record {
     this.visible = data.visible;
   }
 
-  static fromPb(data: {
-    id: RecordIdString;
-    expand: { message: Message };
-    isVisible: boolean;
-  }): ActiveMessage {
+  static fromPb(data: { id: RecordIdString; expand: { message: Message }; isVisible: boolean }) {
     return new ActiveMessage({
       id: data.id,
       message:
