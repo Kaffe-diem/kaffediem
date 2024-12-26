@@ -43,8 +43,7 @@ export class Order extends Record {
     expand: { drinks: { id: RecordIdString; expand: { drink: DrinksResponse } }[] };
   }) {
     return new Order({
-      id: data.id,
-      state: data.state,
+      ...data,
       items: data.expand.drinks.map(OrderItem.fromPb)
     });
   }
@@ -157,15 +156,14 @@ export class ActiveMessage extends Record {
 
   static fromPb(data: { id: RecordIdString; expand: { message: Message }; isVisible: boolean }) {
     return new ActiveMessage({
-      id: data.id,
-      message:
-        data.expand !== undefined
-          ? Message.fromPb(data.expand.message)
-          : new Message({
-              id: "",
-              title: "",
-              subtext: ""
-            }),
+      ...data,
+      message: data.expand?.message
+        ? Message.fromPb(data.expand.message)
+        : new Message({
+            id: "",
+            title: "",
+            subtext: ""
+          }),
       visible: data.isVisible
     });
   }
