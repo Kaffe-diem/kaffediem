@@ -1,6 +1,6 @@
 import createPbStore from "$stores/pbStore";
 import pb, { Collections, type RecordIdString } from "$lib/pocketbase";
-import { Message, ActiveMessage } from "$lib/types";
+import { Message, ActiveMessage, type ExpandedActiveMessageRecord } from "$lib/types";
 import { writable } from "svelte/store";
 
 import eventsource from "eventsource";
@@ -40,48 +40,24 @@ function createActiveMessageStore() {
     })
   );
 
+  const baseOptions = {
+    expand: "message"
+  };
+
   (async () => {
     // Only use the first record. Assumes that PB already has this and only this record.
-    const initialData = await pb.collection(Collections.ActiveMessage).getFirstListItem("", {
-      expand: "message"
-    });
+    const initialData: ExpandedActiveMessageRecord = await pb
+      .collection(Collections.ActiveMessage)
+      .getFirstListItem("", baseOptions);
 
-    set(
-      new ActiveMessage({
-        id: initialData.id,
-        message:
-          initialData.expand !== undefined
-            ? new Message((initialData.expand as { message: Message }).message)
-            : new Message({
-                id: "",
-                title: "",
-                subtext: ""
-              }),
-        visible: initialData.isVisible
-      })
-    );
+    set(ActiveMessage.fromPb(initialData));
 
     pb.collection(Collections.ActiveMessage).subscribe(
       "*",
-      (event) => {
-        set(
-          new ActiveMessage({
-            id: event.record.id,
-            message:
-              event.record.expand !== undefined
-                ? (event.record.expand as { message: Message }).message
-                : new Message({
-                    id: "",
-                    title: "",
-                    subtext: ""
-                  }),
-            visible: event.record.isVisible
-          })
-        );
+      (event: { record: ExpandedActiveMessageRecord }) => {
+        set(ActiveMessage.fromPb(event.record));
       },
-      {
-        expand: "message"
-      }
+      baseOptions
     );
   })();
 

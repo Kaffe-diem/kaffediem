@@ -148,7 +148,7 @@ export class Message extends Record {
   }
 }
 
-type ExpandedActiveMessageRecord = ActiveMessageResponse & {
+export type ExpandedActiveMessageRecord = ActiveMessageResponse & {
   expand: { message: Message };
 };
 
