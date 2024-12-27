@@ -16,10 +16,7 @@ export const messages = {
     });
   },
   update: async (message: Message) => {
-    await pb.collection(Collections.DisplayMessages).update(message.id, {
-      title: message.title,
-      subtext: message.subtext
-    });
+    await pb.collection(Collections.DisplayMessages).update(message.id, message.toPb());
   },
   delete: async (messageId: RecordIdString) => {
     await pb.collection(Collections.DisplayMessages).delete(messageId);
@@ -36,8 +33,8 @@ function createActiveMessageStore() {
         id: "",
         title: "",
         subtext: ""
-      })
-    })
+      } as Message)
+    } as ActiveMessage)
   );
 
   const baseOptions = {
@@ -67,9 +64,6 @@ function createActiveMessageStore() {
 export const activeMessage = {
   subscribe: createActiveMessageStore(),
   update: async (activeMessage: ActiveMessage) => {
-    await pb.collection(Collections.ActiveMessage).update(activeMessage.id, {
-      message: activeMessage.message.id,
-      isVisible: activeMessage.visible
-    });
+    await pb.collection(Collections.ActiveMessage).update(activeMessage.id, activeMessage.toPb());
   }
 };

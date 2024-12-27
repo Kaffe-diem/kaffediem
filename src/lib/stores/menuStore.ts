@@ -9,17 +9,11 @@ export const categories = {
   }),
 
   update: async (category: Category) => {
-    await pb.collection(Collections.Categories).update(category.id, {
-      name: category.name,
-      sort_order: category.sortOrder
-    });
+    await pb.collection(Collections.Categories).update(category.id, category.toPb());
   },
 
   create: async (category: Category) => {
-    await pb.collection(Collections.Categories).create({
-      name: category.name,
-      sort_order: category.sortOrder
-    });
+    await pb.collection(Collections.Categories).create(category.toPb());
   },
 
   delete: async (id: RecordIdString) => {
@@ -31,19 +25,11 @@ export const items = {
   subscribe: createPbStore(Collections.Drinks, Item),
 
   update: async (item: Item) => {
-    await pb.collection(Collections.Drinks).update(item.id, {
-      name: item.name,
-      price: item.price,
-      category: item.category
-    });
+    await pb.collection(Collections.Drinks).update(item.id, item.toPb());
   },
 
   create: async (item: Item) => {
-    await pb.collection(Collections.Drinks).create({
-      name: item.name,
-      price: item.price,
-      category: item.category
-    });
+    await pb.collection(Collections.Drinks).create(item.toPb());
   },
 
   delete: async (itemId: RecordIdString) => {

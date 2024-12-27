@@ -49,12 +49,12 @@ export class Order extends Record {
     this.items = data.items;
   }
 
-  static fromPb(data: ExpandedOrderRecord) {
+  static fromPb(data: ExpandedOrderRecord): Order {
     return new Order({
       id: data.id,
       state: data.state,
       items: data.expand.drinks.map(OrderItem.fromPb)
-    });
+    } as Order);
   }
 }
 
@@ -72,12 +72,12 @@ export class OrderItem extends Record {
     this.item = data.item;
   }
 
-  static fromPb(data: ExpandedOrderDrinkRecord) {
+  static fromPb(data: ExpandedOrderDrinkRecord): OrderItem {
     return new OrderItem({
       id: data.id,
       name: data.expand.drink.name,
       item: Item.fromPb(data.expand.drink)
-    });
+    } as OrderItem);
   }
 }
 
@@ -95,14 +95,18 @@ export class Item extends Record {
     this.image = data.image;
   }
 
-  static fromPb(data: DrinksResponse) {
+  toPb() {
+    return this;
+  }
+
+  static fromPb(data: DrinksResponse): Item {
     return new Item({
       id: data.id,
       name: data.name,
       price: data.price,
       category: data.category,
       image: pb.files.getUrl(data, data.image)
-    });
+    } as Item);
   }
 }
 
@@ -122,13 +126,17 @@ export class Category extends Record {
     this.items = data.items;
   }
 
-  static fromPb(data: ExpandedCategoryRecord) {
+  toPb() {
+    return { name: this.name, sort_order: this.sortOrder };
+  }
+
+  static fromPb(data: ExpandedCategoryRecord): Category {
     return new Category({
       id: data.id,
       name: data.name,
       sortOrder: data.sort_order,
       items: data.expand.drinks_via_category.map(Item.fromPb)
-    });
+    } as Category);
   }
 }
 
@@ -143,7 +151,11 @@ export class Message extends Record {
     this.subtext = data.subtext;
   }
 
-  static fromPb(data: Message) {
+  toPb() {
+    return this;
+  }
+
+  static fromPb(data: Message): Message {
     return new Message(data);
   }
 }
@@ -162,7 +174,11 @@ export class ActiveMessage extends Record {
     this.visible = data.visible;
   }
 
-  static fromPb(data: ExpandedActiveMessageRecord) {
+  toPb() {
+    return { message: this.message.id, isVisible: this.visible };
+  }
+
+  static fromPb(data: ExpandedActiveMessageRecord): ActiveMessage {
     return new ActiveMessage({
       id: data.id,
       message:
@@ -172,8 +188,8 @@ export class ActiveMessage extends Record {
               id: "",
               title: "",
               subtext: ""
-            }),
+            } as Message),
       visible: data.isVisible
-    });
+    } as ActiveMessage);
   }
 }

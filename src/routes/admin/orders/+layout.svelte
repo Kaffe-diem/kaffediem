@@ -21,7 +21,7 @@
           new ActiveMessage({
             ...$activeMessage,
             visible: false
-          })
+          } as ActiveMessage)
         )}>Åpne</button
     >
     <a

@@ -9,7 +9,7 @@
         ...$activeMessage,
         visible: true,
         message
-      })
+      } as ActiveMessage)
     );
   };
 
@@ -18,7 +18,7 @@
       new Message({
         ...message,
         [field]: (event.target as HTMLInputElement).value
-      })
+      } as Message)
     );
 
     const isActive = message.id === $activeMessage.message.id;
@@ -32,7 +32,7 @@
       new ActiveMessage({
         ...$activeMessage,
         visible: false
-      })
+      } as ActiveMessage)
     );
   };
 </script>
