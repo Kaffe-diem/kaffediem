@@ -1,11 +1,11 @@
 <script lang="ts">
   import { messages, activeMessage } from "$stores/messageStore";
-  import { Message, ActiveMessage } from "$lib/types";
+  import { makeMessage, makeActiveMessage, type Message } from "$lib/types";
   import { debounce } from "$lib/utils";
 
   const handleActiveMessageChange = (message: Message) => {
     activeMessage.update(
-      new ActiveMessage({
+      makeActiveMessage({
         ...$activeMessage,
         visible: true,
         message
@@ -15,7 +15,7 @@
 
   const handleMessageTextChange = (event: Event, message: Message, field: "title" | "subtext") => {
     messages.update(
-      new Message({
+      makeMessage({
         ...message,
         [field]: (event.target as HTMLInputElement).value
       })
@@ -29,7 +29,7 @@
 
   const handleVisibilityChange = () => {
     activeMessage.update(
-      new ActiveMessage({
+      makeActiveMessage({
         ...$activeMessage,
         visible: false
       })

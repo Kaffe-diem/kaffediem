@@ -1,6 +1,6 @@
 import createPbStore from "$stores/pbStore";
 import pb, { Collections, type RecordIdString } from "$lib/pocketbase";
-import { State, Order } from "$lib/types";
+import { State, makeOrder } from "$lib/types";
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -10,7 +10,7 @@ const baseOptions = {
 };
 
 export default {
-  subscribe: createPbStore(Collections.Orders, Order, baseOptions),
+  subscribe: createPbStore(Collections.Orders, makeOrder, baseOptions),
 
   create: async (itemIds: RecordIdString[]) => {
     const getOrderItemIds = async (): Promise<RecordIdString[]> => {
@@ -35,7 +35,7 @@ export default {
   }
 };
 export const userOrders = {
-  subscribe: createPbStore(Collections.Orders, Order, {
+  subscribe: createPbStore(Collections.Orders, makeOrder, {
     ...baseOptions,
     filter: `customer = '${pb.authStore.model?.id}'`
   })

@@ -1,38 +1,33 @@
 import createPbStore from "$stores/pbStore";
-import pb, { Collections, type RecordIdString } from "$lib/pocketbase";
-import { Message, ActiveMessage, type ExpandedActiveMessageRecord } from "$lib/types";
+import pb, { Collections, type DisplayMessagesResponse } from "$lib/pocketbase";
+import {
+  type ActiveMessage,
+  type ExpandedActiveMessageRecord,
+  makeMessage,
+  makeActiveMessage
+} from "$lib/types";
 import { writable } from "svelte/store";
+import type { BaseModel } from "pocketbase";
 
 import eventsource from "eventsource";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (global as any).EventSource = eventsource;
 
-export const messages = {
-  subscribe: createPbStore(Collections.DisplayMessages, Message),
-  create: async (title: string, subtext: string) => {
-    await pb.collection(Collections.DisplayMessages).create({
-      title,
-      subtext
-    });
-  },
-  update: async (message: Message) => {
-    await pb.collection(Collections.DisplayMessages).update(message.id, {
-      title: message.title,
-      subtext: message.subtext
-    });
-  },
-  delete: async (messageId: RecordIdString) => {
-    await pb.collection(Collections.DisplayMessages).delete(messageId);
-  }
-};
+export const messages = createPbStore(Collections.DisplayMessages, (data: BaseModel) =>
+  makeMessage({
+    id: data.id,
+    title: (data as DisplayMessagesResponse).title || "",
+    subtext: (data as DisplayMessagesResponse).subtext || ""
+  })
+);
 
 function createActiveMessageStore() {
   // Initialize with dummy non-visible message
   const { subscribe, set } = writable<ActiveMessage>(
-    new ActiveMessage({
+    makeActiveMessage({
       id: "",
       visible: false,
-      message: new Message({
+      message: makeMessage({
         id: "",
         title: "",
         subtext: ""
@@ -50,12 +45,24 @@ function createActiveMessageStore() {
       .collection(Collections.ActiveMessage)
       .getFirstListItem("", baseOptions);
 
-    set(ActiveMessage.fromPb(initialData));
+    set(
+      makeActiveMessage({
+        id: initialData.id,
+        message: makeMessage(initialData.expand.message),
+        visible: initialData.isVisible
+      })
+    );
 
     pb.collection(Collections.ActiveMessage).subscribe(
       "*",
       (event: { record: ExpandedActiveMessageRecord }) => {
-        set(ActiveMessage.fromPb(event.record));
+        set(
+          makeActiveMessage({
+            id: event.record.id,
+            message: makeMessage(event.record.expand.message),
+            visible: event.record.isVisible
+          })
+        );
       },
       baseOptions
     );

@@ -1,31 +1,33 @@
 import pb, { Collections } from "$lib/pocketbase";
 import { writable } from "svelte/store";
+import type { BaseSystemFields } from "$lib/pocketbase";
+import type { RecordModel } from "pocketbase";
 
 // ref: https://github.com/pocketbase/js-sdk?tab=readme-ov-file#nodejs-via-npm
 import eventsource from "eventsource";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (global as any).EventSource = eventsource;
 
-export default function createPbStore<Collection extends Collections, RecordClass>(
+type MakeFunction<T> = (data: BaseSystemFields<unknown>) => T;
+
+export default function createPbStore<Collection extends Collections, T extends { id: string }>(
   collection: Collection,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  recordClass: { fromPb(data: any): RecordClass },
+  makeRecord: MakeFunction<T>,
   fetchOptions: { [key: string]: string } = {},
   subscribeOptions: { [key: string]: string } = fetchOptions
 ) {
-  const { subscribe, set, update } = writable<RecordClass[]>([]);
+  const { subscribe, set, update } = writable<T[]>([]);
 
   (async () => {
     const initialData = await pb.collection(collection).getFullList(fetchOptions);
-    set(initialData.map(recordClass.fromPb));
+    set(initialData.map((record: RecordModel) => makeRecord(record as BaseSystemFields<unknown>)));
 
     pb.collection(collection).subscribe(
       "*",
       (event) => {
         update((state) => {
-          // @ts-expect-error All targets of record maps should have an id.
-          const itemIndex = state.findIndex((item) => item.id == event.record.id);
-          const item = recordClass.fromPb(event.record);
+          const itemIndex = state.findIndex((item) => item.id === event.record.id);
+          const item = makeRecord(event.record as BaseSystemFields<unknown>);
 
           switch (event.action) {
             case "create":

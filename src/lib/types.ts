@@ -1,179 +1,131 @@
-import pb, {
+import {
   type RecordIdString,
   OrdersStateOptions,
   type DrinksResponse,
   type ActiveMessageResponse,
-  type OrdersResponse,
   type OrderDrinkResponse,
-  type CategoriesResponse
+  type OrdersResponse,
+  type BaseSystemFields
 } from "$lib/pocketbase";
 import { restrictedRoutes, adminRoutes } from "$lib/constants";
 
-export class NavItem {
-  href: string;
-  text: string;
-  requiresAuth: boolean;
-  requiresAdmin: boolean;
-
-  constructor(href: string, text: string) {
-    this.href = href;
-    this.text = text;
-    this.requiresAuth = restrictedRoutes.includes(href);
-    this.requiresAdmin = adminRoutes.includes(href);
-  }
+export function makeNavItem(href: string, text: string) {
+  return {
+    href,
+    text,
+    requiresAuth: restrictedRoutes.includes(href),
+    requiresAdmin: adminRoutes.includes(href)
+  };
 }
+
+export type NavItem = ReturnType<typeof makeNavItem>;
 
 type State = OrdersStateOptions;
 export { OrdersStateOptions as State };
 
-export class Record {
+export function makeRecord(data: { id: RecordIdString }) {
+  return {
+    id: data.id
+  };
+}
+
+export function makeOrderItem(data: { id: RecordIdString; name: string; item: Item }) {
+  return {
+    ...makeRecord(data),
+    name: data.name,
+    item: data.item
+  };
+}
+
+export function makeItem(data: {
   id: RecordIdString;
-
-  constructor(data: Record) {
-    this.id = data.id;
-  }
-}
-
-// orders
-type ExpandedOrderRecord = OrdersResponse & {
-  expand: { drinks: ExpandedOrderDrinkRecord[] };
-};
-
-export class Order extends Record {
-  state: State;
-  items: Array<OrderItem>;
-
-  constructor(data: Order) {
-    super(data);
-    this.state = data.state;
-    this.items = data.items;
-  }
-
-  static fromPb(data: ExpandedOrderRecord) {
-    return new Order({
-      id: data.id,
-      state: data.state,
-      items: data.expand.drinks.map(OrderItem.fromPb)
-    });
-  }
-}
-
-type ExpandedOrderDrinkRecord = OrderDrinkResponse & {
-  expand: { drink: DrinksResponse };
-};
-
-export class OrderItem extends Record {
-  name: string;
-  item: Item;
-
-  constructor(data: OrderItem) {
-    super(data);
-    this.name = data.name;
-    this.item = data.item;
-  }
-
-  static fromPb(data: ExpandedOrderDrinkRecord) {
-    return new OrderItem({
-      id: data.id,
-      name: data.expand.drink.name,
-      item: Item.fromPb(data.expand.drink)
-    });
-  }
-}
-
-export class Item extends Record {
   name: string;
   price: number;
   category: string;
   image: string;
-
-  constructor(data: Item) {
-    super(data);
-    this.name = data.name;
-    this.price = data.price;
-    this.category = data.category;
-    this.image = data.image;
-  }
-
-  static fromPb(data: DrinksResponse) {
-    return new Item({
-      id: data.id,
-      name: data.name,
-      price: data.price,
-      category: data.category,
-      image: pb.files.getUrl(data, data.image)
-    });
-  }
+}) {
+  return {
+    ...makeRecord(data),
+    name: data.name,
+    price: data.price,
+    category: data.category,
+    image: data.image
+  };
 }
 
-type ExpandedCategoryRecord = CategoriesResponse & {
-  expand: { drinks_via_category: DrinksResponse[] };
-};
-
-export class Category extends Record {
+export function makeCategory(data: {
+  id: RecordIdString;
   name: string;
   sortOrder: number;
   items: Item[];
-
-  constructor(data: Category) {
-    super(data);
-    this.name = data.name;
-    this.sortOrder = data.sortOrder;
-    this.items = data.items;
-  }
-
-  static fromPb(data: ExpandedCategoryRecord) {
-    return new Category({
-      id: data.id,
-      name: data.name,
-      sortOrder: data.sort_order,
-      items: data.expand.drinks_via_category.map(Item.fromPb)
-    });
-  }
+}) {
+  return {
+    ...makeRecord(data),
+    name: data.name,
+    sortOrder: data.sortOrder,
+    items: data.items
+  };
 }
 
 // messages
-export class Message extends Record {
-  title: string;
-  subtext: string;
+export type Message = ReturnType<typeof makeMessage>;
 
-  constructor(data: Message) {
-    super(data);
-    this.title = data.title;
-    this.subtext = data.subtext;
-  }
-
-  static fromPb(data: Message) {
-    return new Message(data);
-  }
+export function makeMessage(data: { id: RecordIdString; title: string; subtext: string }) {
+  return {
+    ...makeRecord(data),
+    title: data.title,
+    subtext: data.subtext
+  };
 }
 
 export type ExpandedActiveMessageRecord = ActiveMessageResponse & {
   expand: { message: Message };
 };
 
-export class ActiveMessage extends Record {
+export function makeActiveMessage(data: {
+  id: RecordIdString;
   message: Message;
   visible: boolean;
+}) {
+  return {
+    ...makeRecord(data),
+    message: data.message,
+    visible: data.visible
+  };
+}
 
-  constructor(data: ActiveMessage) {
-    super(data);
-    this.message = data.message;
-    this.visible = data.visible;
-  }
+export type ActiveMessage = ReturnType<typeof makeActiveMessage>;
 
-  static fromPb(data: ExpandedActiveMessageRecord) {
-    return new ActiveMessage({
-      id: data.id,
-      message:
-        data.expand !== undefined
-          ? Message.fromPb(data.expand.message)
-          : new Message({
-              id: "",
-              title: "",
-              subtext: ""
-            }),
-      visible: data.isVisible
-    });
-  }
+export type Record = ReturnType<typeof makeRecord>;
+export type OrderItem = ReturnType<typeof makeOrderItem>;
+export type Item = ReturnType<typeof makeItem>;
+export type Category = ReturnType<typeof makeCategory>;
+
+export type Order = {
+  id: RecordIdString;
+  state: State;
+  items: Array<OrderItem>;
+};
+
+export function makeOrder(data: BaseSystemFields<unknown>): Order {
+  const expandedData = data as OrdersResponse & {
+    expand?: { drinks: Array<OrderDrinkResponse & { expand?: { drink: DrinksResponse } }> };
+  };
+
+  return {
+    id: expandedData.id,
+    state: expandedData.state,
+    items:
+      expandedData.expand?.drinks?.map((drink) => ({
+        id: drink.id,
+        name: drink.expand?.drink?.name || "",
+        item: {
+          id: drink.expand?.drink?.id || "",
+          name: drink.expand?.drink?.name || "",
+          price: drink.expand?.drink?.price || 0,
+          category: drink.expand?.drink?.category || "",
+          image: drink.expand?.drink?.image || ""
+        }
+      })) || []
+  };
 }

@@ -2,9 +2,9 @@
   import auth from "$stores/authStore";
   import MenuIcon from "$assets/MenuIcon.svelte";
   import NavItems from "$components/NavItems.svelte";
-  import { NavItem } from "$lib/types";
+  import { makeNavItem } from "$lib/types";
 
-  const navItems = [new NavItem("/account", "Min bruker"), new NavItem("/admin", "Admin")];
+  const navItems = [makeNavItem("/account", "Min bruker"), makeNavItem("/admin", "Admin")];
 </script>
 
 <div class="drawer drawer-end z-[2]">
