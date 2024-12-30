@@ -8,6 +8,7 @@ import pb, {
   type CategoriesResponse
 } from "$lib/pocketbase";
 import { restrictedRoutes, adminRoutes } from "$lib/constants";
+import type { AuthModel } from "pocketbase";
 
 export class NavItem {
   href: string;
@@ -44,11 +45,11 @@ export class User extends Record {
     this.isAdmin = data.isAdmin;
   }
 
-  static fromPb(): User {
+  static fromPb(data: AuthModel): User {
     return new User({
-      id: pb.authStore.model?.id,
-      name: pb.authStore.model?.name,
-      isAdmin: pb.authStore.model?.is_admin
+      id: data?.id,
+      name: data?.name,
+      isAdmin: data?.is_admin
     });
   }
 }

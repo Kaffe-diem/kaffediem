@@ -4,13 +4,13 @@ import { User } from "$lib/types";
 
 const auth = writable({
   isAuthenticated: pb.authStore.isValid,
-  user: User.fromPb()
+  user: User.fromPb(pb.authStore.model)
 });
 
 pb.authStore.onChange(() => {
   auth.set({
     isAuthenticated: pb.authStore.isValid,
-    user: User.fromPb()
+    user: User.fromPb(pb.authStore.model)
   });
 });
 
