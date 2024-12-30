@@ -7,7 +7,7 @@
 
 {#if $auth.isAuthenticated}
   <h1 class="mb-4 flex items-center text-2xl">
-    Hei, {$auth.user!.name}{#if $auth.user!.is_admin}<span class="badge badge-primary badge-lg ml-2"
+    Hei, {$auth.user.name}{#if $auth.user.isAdmin}<span class="badge badge-primary badge-lg ml-2"
         >Admin</span
       >{/if}
   </h1>

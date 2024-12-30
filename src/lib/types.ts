@@ -34,6 +34,25 @@ export class Record {
   }
 }
 
+export class User extends Record {
+  name: string;
+  isAdmin: boolean;
+
+  constructor(data: User) {
+    super(data);
+    this.name = data.name;
+    this.isAdmin = data.isAdmin;
+  }
+
+  static fromPb(): User {
+    return new User({
+      id: pb.authStore.model?.id,
+      name: pb.authStore.model?.name,
+      isAdmin: pb.authStore.model?.is_admin
+    });
+  }
+}
+
 // orders
 type ExpandedOrderRecord = OrdersResponse & {
   expand: { drinks: ExpandedOrderDrinkRecord[] };

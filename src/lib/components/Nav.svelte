@@ -24,7 +24,7 @@
           <NavItems
             {navItems}
             isAuthenticated={$auth.isAuthenticated}
-            isAdmin={$auth.user?.is_admin}
+            isAdmin={$auth.user.isAdmin}
             class="menu menu-horizontal px-1"
           />
         </ul>
@@ -37,7 +37,7 @@
       <NavItems
         {navItems}
         isAuthenticated={$auth.isAuthenticated}
-        isAdmin={$auth.user?.is_admin}
+        isAdmin={$auth.user.isAdmin}
         class="text-2xl"
       />
     </ul>

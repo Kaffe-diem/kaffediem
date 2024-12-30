@@ -1,6 +1,6 @@
 import createPbStore from "$stores/pbStore";
 import pb, { Collections, type RecordIdString } from "$lib/pocketbase";
-import { State, Order } from "$lib/types";
+import { State, Order, User } from "$lib/types";
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -23,7 +23,7 @@ export default {
     };
 
     await pb.collection(Collections.Orders).create({
-      customer: pb.authStore.model?.id,
+      customer: User.fromPb().id,
       drinks: await getOrderItemIds(),
       state: State.received,
       payment_fulfilled: false
@@ -37,6 +37,6 @@ export default {
 export const userOrders = {
   subscribe: createPbStore(Collections.Orders, Order, {
     ...baseOptions,
-    filter: `customer = '${pb.authStore.model?.id}'`
+    filter: `customer = '${User.fromPb().id}'`
   })
 };
