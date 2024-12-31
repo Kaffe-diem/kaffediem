@@ -9,10 +9,10 @@
     class?: string;
   }
 
-  let { navItems, isAuthenticated, isAdmin, ...rest }: Props = $props();
+  let { navItems, isAuthenticated, isAdmin, class: className = "" }: Props = $props();
 </script>
 
-<ul class="menu {rest.class || ''}">
+<ul class="menu {className}">
   {#each navItems as item}
     {#if (isAuthenticated || !item.requiresAuth) && (isAdmin || !item.requiresAdmin)}
       <li>
