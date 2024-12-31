@@ -4,8 +4,7 @@
   import { goto } from "$app/navigation";
   interface Props {
     children?: import("svelte").Snippet;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [key: string]: any;
+    class?: string;
   }
 
   let { children, ...rest }: Props = $props();
