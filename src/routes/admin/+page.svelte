@@ -1,10 +1,20 @@
 <script lang="ts">
+  class AdminPage {
+    href: string;
+    text: string;
+
+    constructor(href: string, text: string) {
+      this.href = href;
+      this.text = text;
+    }
+  }
+
   const adminPages = [
-    { href: "/admin/orders/frontdesk", text: "Bestillingsdisk" },
-    { href: "/admin/orders/kitchen", text: "Kjøkken" },
-    { href: "/display", text: "Visning" },
-    { href: "/admin/message", text: "Endre skjermmelding" }
-    // { href: "/admin/menu", text: "Endre menyen" }
+    new AdminPage("/admin/orders/frontdesk", "Bestillingsdisk"),
+    new AdminPage("/admin/orders/kitchen", "Kjøkken"),
+    new AdminPage("/display", "Visning"),
+    new AdminPage("/admin/message", "Endre skjermmelding")
+    // new AdminPage("/admin/menu", "Endre menyen")
   ];
 </script>
 
