@@ -27,6 +27,13 @@ export class NavItem {
 type State = OrdersStateOptions;
 export { OrdersStateOptions as State };
 
+export interface RecordBase {
+  id: RecordIdString;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  toPb(): any;
+  // fromPb(data: any): RecordClass; // can't have static methods in interface https://github.com/microsoft/TypeScript/issues/13462
+}
+
 export class Record {
   id: RecordIdString;
 
@@ -55,11 +62,11 @@ export class User extends Record {
 }
 
 // orders
-type ExpandedOrderRecord = OrdersResponse & {
+export type ExpandedOrderRecord = OrdersResponse & {
   expand: { drinks: ExpandedOrderDrinkRecord[] };
 };
 
-export class Order extends Record {
+export class Order extends Record implements RecordBase {
   state: State;
   items: Array<OrderItem>;
 
@@ -67,6 +74,11 @@ export class Order extends Record {
     super(data);
     this.state = data.state;
     this.items = data.items;
+  }
+
+  // FIXME: implement correctly
+  toPb() {
+    return this;
   }
 
   static fromPb(data: ExpandedOrderRecord): Order {
@@ -78,11 +90,11 @@ export class Order extends Record {
   }
 }
 
-type ExpandedOrderDrinkRecord = OrderDrinkResponse & {
+export type ExpandedOrderDrinkRecord = OrderDrinkResponse & {
   expand: { drink: DrinksResponse };
 };
 
-export class OrderItem extends Record {
+export class OrderItem extends Record implements RecordBase {
   name: string;
   item: Item;
 
@@ -90,6 +102,10 @@ export class OrderItem extends Record {
     super(data);
     this.name = data.name;
     this.item = data.item;
+  }
+
+  toPb() {
+    return this;
   }
 
   static fromPb(data: ExpandedOrderDrinkRecord): OrderItem {
@@ -101,7 +117,7 @@ export class OrderItem extends Record {
   }
 }
 
-export class Item extends Record {
+export class Item extends Record implements RecordBase {
   name: string;
   price: number;
   category: string;
@@ -130,11 +146,11 @@ export class Item extends Record {
   }
 }
 
-type ExpandedCategoryRecord = CategoriesResponse & {
+export type ExpandedCategoryRecord = CategoriesResponse & {
   expand: { drinks_via_category: DrinksResponse[] };
 };
 
-export class Category extends Record {
+export class Category extends Record implements RecordBase {
   name: string;
   sortOrder: number;
   items: Item[];
@@ -161,7 +177,7 @@ export class Category extends Record {
 }
 
 // messages
-export class Message extends Record {
+export class Message extends Record implements RecordBase {
   title: string;
   subtext: string;
 
@@ -184,7 +200,7 @@ export type ExpandedActiveMessageRecord = ActiveMessageResponse & {
   expand: { message: Message };
 };
 
-export class ActiveMessage extends Record {
+export class ActiveMessage extends Record implements RecordBase {
   message: Message;
   visible: boolean;
 

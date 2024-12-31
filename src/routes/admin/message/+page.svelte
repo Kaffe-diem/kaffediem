@@ -87,6 +87,10 @@
         <span>Åpent!</span>
       </label>
     </li>
-    <button class="btn btn-lg" onclick={() => messages.create("", "")}>Legg til melding</button>
+    <button
+      class="btn btn-lg"
+      onclick={() => messages.create(new Message({ title: "", subtext: "" } as Message))}
+      >Legg til melding</button
+    >
   </ul>
 </form>

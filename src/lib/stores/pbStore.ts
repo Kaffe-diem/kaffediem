@@ -1,12 +1,16 @@
-import pb, { Collections } from "$lib/pocketbase";
+import pb, { Collections, type RecordIdString } from "$lib/pocketbase";
 import { writable } from "svelte/store";
+import { type RecordBase } from "$lib/types";
 
 // ref: https://github.com/pocketbase/js-sdk?tab=readme-ov-file#nodejs-via-npm
 import eventsource from "eventsource";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (global as any).EventSource = eventsource;
 
-export default function createPbStore<Collection extends Collections, RecordClass>(
+export default function createPbStore<
+  Collection extends Collections,
+  RecordClass extends RecordBase
+>(
   collection: Collection,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   recordClass: { fromPb(data: any): RecordClass },
@@ -23,7 +27,6 @@ export default function createPbStore<Collection extends Collections, RecordClas
       "*",
       (event) => {
         update((state) => {
-          // @ts-expect-error All targets of record maps should have an id.
           const itemIndex = state.findIndex((item) => item.id == event.record.id);
           const item = recordClass.fromPb(event.record);
 
@@ -46,5 +49,16 @@ export default function createPbStore<Collection extends Collections, RecordClas
     );
   })();
 
-  return subscribe;
+  return {
+    subscribe,
+    update: async (record: RecordClass) => {
+      await pb.collection(collection).update(record.id, record.toPb());
+    },
+    create: async (record: RecordClass) => {
+      await pb.collection(collection).create(record.toPb());
+    },
+    delete: async (id: RecordIdString) => {
+      await pb.collection(collection).delete(id);
+    }
+  };
 }
