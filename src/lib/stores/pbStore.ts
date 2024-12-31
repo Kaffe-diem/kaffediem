@@ -7,10 +7,7 @@ import eventsource from "eventsource";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (global as any).EventSource = eventsource;
 
-export default function createPbStore<
-  Collection extends Collections,
-  RecordClass extends RecordBase
->(
+export function createPbStore<Collection extends Collections, RecordClass extends RecordBase>(
   collection: Collection,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   recordClass: { fromPb(data: any): RecordClass },
@@ -49,8 +46,21 @@ export default function createPbStore<
     );
   })();
 
+  return subscribe;
+}
+
+export function createGenericPbStore<
+  Collection extends Collections,
+  RecordClass extends RecordBase
+>(
+  collection: Collection,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  recordClass: { fromPb(data: any): RecordClass },
+  fetchOptions: { [key: string]: string } = {},
+  subscribeOptions: { [key: string]: string } = fetchOptions
+) {
   return {
-    subscribe,
+    subscribe: createPbStore(collection, recordClass, fetchOptions, subscribeOptions),
     update: async (record: RecordClass) => {
       await pb.collection(collection).update(record.id, record.toPb());
     },

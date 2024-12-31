@@ -1,8 +1,8 @@
-import createPbStore from "$stores/pbStore";
+import { createGenericPbStore, createPbStore } from "$stores/pbStore";
 import pb, { Collections, type RecordIdString } from "$lib/pocketbase";
-import { State, Order, type ExpandedOrderRecord } from "$lib/types";
+import { State, Order } from "$lib/types";
 import auth from "$stores/authStore";
-import { get, writable } from "svelte/store";
+import { get } from "svelte/store";
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -11,47 +11,8 @@ const baseOptions = {
   filter: `created >= "${today}"`
 };
 
-// FIXME: implement orderStore correctly instead of copying pbStore and removing returns
-function createOrderStore() {
-  const { subscribe, set, update } = writable<Order[]>([]);
-
-  (async () => {
-    const initialData: ExpandedOrderRecord[] = await pb
-      .collection(Collections.Orders)
-      .getFullList(baseOptions);
-    set(initialData.map((order) => Order.fromPb(order)));
-
-    pb.collection(Collections.Orders).subscribe(
-      "*",
-      (event: { record: ExpandedOrderRecord; action: string }) => {
-        update((state) => {
-          const itemIndex = state.findIndex((item) => item.id == event.record.id);
-          const item = Order.fromPb(event.record);
-
-          switch (event.action) {
-            case "create":
-              state.push(item);
-              break;
-            case "update":
-              if (itemIndex !== -1) state[itemIndex] = item;
-              break;
-            case "delete":
-              if (itemIndex !== -1) state.splice(itemIndex, 1);
-              break;
-          }
-
-          return state;
-        });
-      },
-      baseOptions
-    );
-  })();
-
-  return subscribe;
-}
-
 export default {
-  subscribe: createOrderStore(),
+  subscribe: createPbStore(Collections.Orders, Order, baseOptions),
 
   create: async (userId: RecordIdString, itemIds: RecordIdString[]) => {
     const getOrderItemIds = async (): Promise<RecordIdString[]> => {
@@ -76,7 +37,7 @@ export default {
   }
 };
 
-export const userOrders = createPbStore(Collections.Orders, Order, {
+export const userOrders = createGenericPbStore(Collections.Orders, Order, {
   ...baseOptions,
   filter: `customer = '${get(auth).user.id}'`
 });

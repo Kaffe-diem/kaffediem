@@ -1,4 +1,4 @@
-import createPbStore from "$stores/pbStore";
+import { createGenericPbStore } from "$stores/pbStore";
 import pb, { Collections } from "$lib/pocketbase";
 import { Message, ActiveMessage, type ExpandedActiveMessageRecord } from "$lib/types";
 import { writable } from "svelte/store";
@@ -7,7 +7,7 @@ import eventsource from "eventsource";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (global as any).EventSource = eventsource;
 
-export const messages = createPbStore(Collections.DisplayMessages, Message);
+export const messages = createGenericPbStore(Collections.DisplayMessages, Message);
 
 function createActiveMessageStore() {
   // Initialize with dummy non-visible message
