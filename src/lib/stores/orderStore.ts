@@ -14,7 +14,7 @@ const baseOptions = {
 export default {
   subscribe: createPbStore(Collections.Orders, Order, baseOptions),
 
-  create: async (itemIds: RecordIdString[]) => {
+  create: async (userId: RecordIdString, itemIds: RecordIdString[]) => {
     const getOrderItemIds = async (): Promise<RecordIdString[]> => {
       return await Promise.all(
         itemIds.map(async (itemId) => {
@@ -25,7 +25,7 @@ export default {
     };
 
     await pb.collection(Collections.Orders).create({
-      customer: get(auth).user.id,
+      customer: userId,
       drinks: await getOrderItemIds(),
       state: State.received,
       payment_fulfilled: false

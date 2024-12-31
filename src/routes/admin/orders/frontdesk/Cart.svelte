@@ -2,6 +2,7 @@
   import { Item } from "$lib/types";
   let { selectedItem } = $props();
   import orders from "$stores/orderStore";
+  import auth from "$stores/authStore";
 
   let cart = $state<Item[]>([]);
   let totalPrice = $derived(cart.reduce((sum, item) => sum + item.price, 0));
@@ -44,7 +45,10 @@
     <button
       class="bold btn btn-lg text-xl"
       onclick={() => {
-        orders.create(cart.map((item) => item.id));
+        orders.create(
+          $auth.user.id,
+          cart.map((item) => item.id)
+        );
         cart = [];
       }}>Ferdig</button
     >
