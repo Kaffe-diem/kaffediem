@@ -7,7 +7,7 @@
     class?: string;
   }
 
-  let { children, ...rest }: Props = $props();
+  let { children, class: className = "" }: Props = $props();
 
   function goHome() {
     if (window.location.pathname === "/") {
@@ -47,11 +47,11 @@
 </script>
 
 {#if $auth.isAuthenticated}
-  <button onclick={logout} class={rest.class || ""}
+  <button onclick={logout} class={className}
     >{#if children}{@render children()}{:else}Logg ut{/if}</button
   >
 {:else}
-  <button onclick={login} class={rest.class || ""}
+  <button onclick={login} class={className}
     >{#if children}{@render children()}{:else}Logg inn{/if}</button
   >
 {/if}
