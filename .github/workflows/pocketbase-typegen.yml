@@ -55,7 +55,7 @@ jobs:
       - name: Commit and push changes
         run: |
           git checkout -b "$branch"
-          git add src/lib/pocketbase/index.d.ts
+          git add --force src/lib/pocketbase/index.d.ts
           git commit -m "chore: update pocketbase types"
           git push origin "$branch"
           echo "::set-output name=branch::$branch"
