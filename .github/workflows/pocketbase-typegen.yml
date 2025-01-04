@@ -1,0 +1,72 @@
+name: Generate pocketbase types
+
+# PR opened, closed or updated
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  typegen:
+    name: Generate pocketbase types
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate types
+        env:
+          PUBLIC_PB_HOST: ${{ vars.PB_HOST }}
+          PB_ADMIN_PASSWORD: ${{ secrets.PB_ADMIN_PASSWORD }}
+          PB_ADMIN_EMAIL: ${{ secrets.PB_ADMIN_EMAIL }}
+        run: make pb_types
+
+      - name: Check for changes
+        # https://github.com/orgs/community/discussions/25280
+        run: |
+          if git diff --quiet; then
+            echo "::set-output name=commit_changes::true"
+          else
+            echo "::set-output name=commit_changes::false"
+          fi
+
+  pr:
+    name: Create pull request
+    needs: [typegen]
+    if: needs.typegen.outputs.commit_changes == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Set branch name
+        run: |
+          echo "branch=typegen-$(date -Iminutes)" >> $GITHUB_ENV
+
+      - name: Commit and push changes
+        run: |
+          git checkout -b "$branch"
+          git add --force src/lib/pocketbase/index.d.ts
+          git commit -m "chore: update pocketbase types"
+          git push origin "$branch"
+          echo "::set-output name=branch::$branch"
+
+      - name: Create pull request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --base main \
+            --head "$branch" \
+            --title "Update pocketbase types" \
+            --label "automated update"
