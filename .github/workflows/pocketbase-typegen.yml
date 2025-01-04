@@ -51,7 +51,7 @@ jobs:
   pr:
     name: Create pull request
     needs: [typegen]
-    if: needs.typegen.outputs.commit_changes
+    if: needs.typegen.outputs.commit_changes == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
