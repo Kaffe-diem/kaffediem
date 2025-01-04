@@ -10,6 +10,8 @@ jobs:
   typegen:
     name: Generate pocketbase types
     runs-on: ubuntu-latest
+    outputs:
+      commit_changes: ${{ steps.check_changes.outputs.commit_changes }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -30,6 +32,7 @@ jobs:
         run: make pb_types
 
       - name: Check for changes
+        id: check_changes
         # https://github.com/orgs/community/discussions/25280
         run: |
           if git diff --quiet; then
