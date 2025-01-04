@@ -45,7 +45,7 @@ jobs:
   pr:
     name: Create pull request
     needs: [typegen]
-    if: needs.typegen.outputs.commit_changes == 'true'
+    if: needs.typegen.outputs.commit_changes
     runs-on: ubuntu-latest
     steps:
       - name: Configure git
