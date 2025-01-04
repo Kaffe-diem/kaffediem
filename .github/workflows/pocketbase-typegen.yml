@@ -32,6 +32,12 @@ jobs:
           PB_ADMIN_EMAIL: ${{ secrets.PB_ADMIN_EMAIL }}
         run: make pb_types
 
+      - name: Upload generated types
+        uses: actions/upload-artifact@v3
+        with:
+          name: generated-types
+          path: src/lib/pocketbase/index.d.ts
+
       - name: Check for changes
         id: check_changes
         run: |
@@ -48,6 +54,15 @@ jobs:
     if: needs.typegen.outputs.commit_changes
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download generated types
+        uses: actions/download-artifact@v3
+        with:
+          name: generated-types
+          path: src/lib/pocketbase/
+
       - name: Configure git
         run: |
           git config user.name "github-actions[bot]"
