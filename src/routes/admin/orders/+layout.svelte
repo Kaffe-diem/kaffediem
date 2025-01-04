@@ -1,9 +1,10 @@
 <script lang="ts">
   import { activeMessage } from "$stores/messageStore";
   import { ActiveMessage } from "$lib/types";
+  import { type Snippet } from "svelte";
 
   interface Props {
-    children;
+    children: Snippet;
   }
 
   let { children }: Props = $props();
@@ -20,7 +21,7 @@
           new ActiveMessage({
             ...$activeMessage,
             visible: false
-          })
+          } as ActiveMessage)
         )}>Åpne</button
     >
     <a

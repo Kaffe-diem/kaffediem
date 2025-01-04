@@ -1,32 +1,31 @@
-import pb from "$lib/pocketbase";
+import pb, { Collections, type RecordIdString } from "$lib/pocketbase";
 import { writable } from "svelte/store";
+import { type RecordBase } from "$lib/types";
 
 // ref: https://github.com/pocketbase/js-sdk?tab=readme-ov-file#nodejs-via-npm
 import eventsource from "eventsource";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (global as any).EventSource = eventsource;
 
-export default function createPbStore<T>(
-  collection: string,
+export function createPbStore<Collection extends Collections, RecordClass extends RecordBase>(
+  collection: Collection,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  mapFunction: (data: any) => T,
+  recordClass: { fromPb(data: any): RecordClass },
   fetchOptions: { [key: string]: string } = {},
   subscribeOptions: { [key: string]: string } = fetchOptions
 ) {
-  const { subscribe, set, update } = writable<T[]>([]);
+  const { subscribe, set, update } = writable<RecordClass[]>([]);
 
   (async () => {
     const initialData = await pb.collection(collection).getFullList(fetchOptions);
-
-    set(initialData.map(mapFunction));
+    set(initialData.map(recordClass.fromPb));
 
     pb.collection(collection).subscribe(
       "*",
       (event) => {
         update((state) => {
-          // @ts-expect-error All targets of record maps should have an id.
           const itemIndex = state.findIndex((item) => item.id == event.record.id);
-          const item = mapFunction(event.record);
+          const item = recordClass.fromPb(event.record);
 
           switch (event.action) {
             case "create":
@@ -48,4 +47,28 @@ export default function createPbStore<T>(
   })();
 
   return subscribe;
+}
+
+export function createGenericPbStore<
+  Collection extends Collections,
+  RecordClass extends RecordBase
+>(
+  collection: Collection,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  recordClass: { fromPb(data: any): RecordClass },
+  fetchOptions: { [key: string]: string } = {},
+  subscribeOptions: { [key: string]: string } = fetchOptions
+) {
+  return {
+    subscribe: createPbStore(collection, recordClass, fetchOptions, subscribeOptions),
+    update: async (record: RecordClass) => {
+      await pb.collection(collection).update(record.id, record.toPb());
+    },
+    create: async (record: RecordClass) => {
+      await pb.collection(collection).create(record.toPb());
+    },
+    delete: async (id: RecordIdString) => {
+      await pb.collection(collection).delete(id);
+    }
+  };
 }

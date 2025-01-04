@@ -10,7 +10,10 @@ jobs:
   checks:
     name: Run Checks
     runs-on: ubuntu-latest
-
+    env:
+      PUBLIC_PB_HOST: ${{ vars.PB_HOST }}
+      PB_ADMIN_PASSWORD: ${{ secrets.PB_ADMIN_PASSWORD }}
+      PB_ADMIN_EMAIL: ${{ secrets.PB_ADMIN_EMAIL }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -18,10 +21,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "20"
 
       - name: get deps
         run: npm ci
 
-      - name: Check formatting
-        run: npm run check:format
+      - name: Run pocketbase-typegen
+        run: make pb_types
+
+      - name: Lint and check formatting
+        run: npm run lint

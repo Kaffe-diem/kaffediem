@@ -3,22 +3,22 @@
   import { Message, ActiveMessage } from "$lib/types";
   import { debounce } from "$lib/utils";
 
-  const handleActiveMessageChange = (message) => {
+  const handleActiveMessageChange = (message: Message) => {
     activeMessage.update(
       new ActiveMessage({
         ...$activeMessage,
         visible: true,
         message
-      })
+      } as ActiveMessage)
     );
   };
 
-  const handleMessageTextChange = (event, message, field: "title" | "subtext") => {
+  const handleMessageTextChange = (event: Event, message: Message, field: "title" | "subtext") => {
     messages.update(
       new Message({
         ...message,
-        [field]: event.target.value
-      })
+        [field]: (event.target as HTMLInputElement).value
+      } as Message)
     );
 
     const isActive = message.id === $activeMessage.message.id;
@@ -32,7 +32,7 @@
       new ActiveMessage({
         ...$activeMessage,
         visible: false
-      })
+      } as ActiveMessage)
     );
   };
 </script>
@@ -87,6 +87,10 @@
         <span>Åpent!</span>
       </label>
     </li>
-    <button class="btn btn-lg" onclick={() => messages.create("", "")}>Legg til melding</button>
+    <button
+      class="btn btn-lg"
+      onclick={() => messages.create(new Message({ title: "", subtext: "" } as Message))}
+      >Legg til melding</button
+    >
   </ul>
 </form>

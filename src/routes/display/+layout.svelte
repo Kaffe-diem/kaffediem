@@ -1,16 +1,17 @@
 <script lang="ts">
   import { activeMessage } from "$stores/messageStore";
+  import { type Snippet } from "svelte";
 
   // import QR from "$assets/qr-code.svg";
 
   interface Props {
-    children;
+    children: Snippet;
   }
 
   let { children }: Props = $props();
 </script>
 
-{#if $activeMessage.visible}
+{#if $activeMessage?.visible}
   <div class="flex h-screen flex-col items-center justify-center text-center">
     <span class="p-2 text-7xl font-bold md:text-9xl">{$activeMessage.message.title}</span>
     <span class="p-2 text-4xl md:text-6xl">{$activeMessage.message.subtext}</span>
