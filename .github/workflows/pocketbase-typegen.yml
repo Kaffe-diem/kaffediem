@@ -70,7 +70,7 @@ jobs:
 
       - name: Set branch name
         run: |
-          echo "branch=typegen-$(date -Iminutes)" >> $GITHUB_ENV
+          echo "branch=typegen-$(date +%s)" >> $GITHUB_ENV
 
       - name: Commit and push changes
         run: |
