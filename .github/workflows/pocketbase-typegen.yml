@@ -10,6 +10,9 @@ jobs:
   typegen:
     name: Generate pocketbase types
     runs-on: ubuntu-latest
+    outputs:
+      # https://github.com/orgs/community/discussions/25280
+      commit_changes: ${{ steps.check_changes.outputs.commit_changes }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -30,9 +33,10 @@ jobs:
         run: make pb_types
 
       - name: Check for changes
-        # https://github.com/orgs/community/discussions/25280
+        id: check_changes
         run: |
-          if git diff --quiet; then
+          # https://stackoverflow.com/a/62213712
+          if [ $(git status --porcelain | wc -l ) -gt 0 ]; then
             echo 'commit_changes=true' >> $GITHUB_OUTPUT
           else
             echo 'commit_changes=false' >> $GITHUB_OUTPUT
