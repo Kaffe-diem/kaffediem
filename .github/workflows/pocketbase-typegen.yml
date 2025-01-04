@@ -33,9 +33,9 @@ jobs:
         # https://github.com/orgs/community/discussions/25280
         run: |
           if git diff --quiet; then
-            echo "::set-output name=commit_changes::true"
+            echo 'true' >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=commit_changes::false"
+            echo 'false' >> $GITHUB_OUTPUT
           fi
 
   pr:
