@@ -87,4 +87,4 @@ jobs:
             --head "$branch" \
             --title "Update pocketbase types" \
             --body "Updated at $(date -Iminutes)" \
-            --label "automated update"
+            --label "typegen"
