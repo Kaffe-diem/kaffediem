@@ -83,4 +83,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr create --base "main" --head "$branch" --title "Update pocketbase types" --label "automated update"
+          gh pr create --base "main" \
+            --head "$branch" \
+            --title "Update pocketbase types" \
+            --body "Updated at $(date -Iminutes)" \
+            --label "typegen"
