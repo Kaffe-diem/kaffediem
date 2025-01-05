@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { Item } from "$lib/types";
   let { selectedItem } = $props();
   import orders from "$stores/orderStore";
+  import auth from "$stores/authStore";
 
-  let cart = $state([]);
+  let cart = $state<Item[]>([]);
   let totalPrice = $derived(cart.reduce((sum, item) => sum + item.price, 0));
 </script>
 
@@ -17,10 +19,10 @@
       </thead>
       <tbody>
         {#if cart.length > 0}
-          {#each cart as drink, index}
+          {#each cart as item, index}
             <tr class="hover select-none" onclick={() => cart.splice(index, 1)}>
-              <td>{drink.name}</td>
-              <td>{drink.price},-</td>
+              <td>{item.name}</td>
+              <td>{item.price},-</td>
             </tr>
           {/each}
         {:else}
@@ -43,12 +45,16 @@
     <button
       class="bold btn btn-lg text-xl"
       onclick={() => {
-        orders.create(cart.map((item) => item.id));
+        orders.create(
+          $auth.user.id,
+          cart.map((item) => item.id)
+        );
         cart = [];
       }}>Ferdig</button
     >
-    <button class="bold btn btn-primary btn-lg text-3xl" onclick={() => cart.push(selectedItem)}
-      >+</button
+    <button
+      class="bold btn btn-primary btn-lg text-3xl"
+      onclick={() => cart.push(selectedItem as Item)}>+</button
     >
   </div>
 </div>

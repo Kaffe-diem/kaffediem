@@ -1,21 +1,8 @@
 <script lang="ts">
   import auth from "$stores/authStore";
-  import { restrictedRoutes, adminRoutes } from "$lib/constants";
   import MenuIcon from "$assets/MenuIcon.svelte";
   import NavItems from "$components/NavItems.svelte";
-
-  class NavItem {
-    href: string;
-    text: string;
-    requiresAuth: boolean;
-
-    constructor(href: string, text: string) {
-      this.href = href;
-      this.text = text;
-      this.requiresAuth = restrictedRoutes.includes(this.href);
-      this.requiresAdmin = adminRoutes.includes(this.href);
-    }
-  }
+  import { NavItem } from "$lib/types";
 
   const navItems = [new NavItem("/account", "Min bruker"), new NavItem("/admin", "Admin")];
 </script>
@@ -37,7 +24,7 @@
           <NavItems
             {navItems}
             isAuthenticated={$auth.isAuthenticated}
-            isAdmin={$auth.user?.is_admin}
+            isAdmin={$auth.user.isAdmin}
             class="menu menu-horizontal px-1"
           />
         </ul>
@@ -50,7 +37,7 @@
       <NavItems
         {navItems}
         isAuthenticated={$auth.isAuthenticated}
-        isAdmin={$auth.user?.is_admin}
+        isAdmin={$auth.user.isAdmin}
         class="text-2xl"
       />
     </ul>

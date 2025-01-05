@@ -1,11 +1,14 @@
 default: dev
 
-dev: sync_schema
+dev: pb_types
 	@npm run dev
 
-build:
+build: pb_types
 	@npm run build
 
-sync_schema:
+db:
+	@docker compose up
+
+pb_types:
 	@echo Reading schema from $(PUBLIC_PB_HOST)
-	@npx pocketbase-typegen --url $(PUBLIC_PB_HOST) --email $(PUBLIC_PB_ADMIN_EMAIL) --password $(PUBLIC_PB_ADMIN_PASSWORD) --out ./src/pb.d.ts
+	@npx --yes pocketbase-typegen@1.2.1 --url $(PUBLIC_PB_HOST) --email $(PB_ADMIN_EMAIL) --password $(PB_ADMIN_PASSWORD) --out ./src/lib/pocketbase/index.d.ts

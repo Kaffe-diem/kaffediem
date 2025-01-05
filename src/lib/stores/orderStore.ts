@@ -1,73 +1,43 @@
-import createPbStore from "$stores/pbStore";
-import pb from "$lib/pocketbase";
-import { OrderDrink, Order } from "$lib/types";
-import type { State } from "$lib/types";
-import { mapToItem } from "$stores/menuStore";
-
-const mapToOrderDrink = (data: { id: string; expand: unknown }): OrderDrink =>
-  new OrderDrink({
-    id: data.id,
-    // @ts-expect-error Pocketbase typing not implemented yet
-    name: data.expand.drink.name,
-    // @ts-expect-error Pocketbase typing not implemented yet
-    item: mapToItem(data.expand.drink)
-  });
-
-// Typing is not entirely correct. FIXME when implementing proper typing
-const mapToOrder = (data: { id: string; state: State; expand: unknown }): Order =>
-  new Order({
-    id: data.id,
-    state: data.state,
-    // @ts-expect-error Pocketbase typing not implemented yet
-    drinks: data.expand.drinks.map(mapToOrderDrink)
-  });
+import { createGenericPbStore, createPbStore } from "$stores/pbStore";
+import pb, { Collections, type RecordIdString } from "$lib/pocketbase";
+import { State, Order } from "$lib/types";
+import auth from "$stores/authStore";
+import { get } from "svelte/store";
 
 const today = new Date().toISOString().split("T")[0];
+
+const baseOptions = {
+  expand: "drinks,drinks.drink",
+  filter: `created >= "${today}"`
+};
+
 export default {
-  subscribe: createPbStore<Order>(
-    "orders",
-    mapToOrder,
-    {
-      expand: "drinks, drinks.drink",
-      filter: `created >= "${today}"`
-    },
-    {
-      expand: "drinks, drinks.drink"
-    }
-  ),
-  create: async (order: string[]) => {
-    const drinkIds: string[] = await Promise.all(
-      // FIXME: Use transactions
-      // https://github.com/pocketbase/pocketbase/issues/5386
-      order.map(async (id: string) => {
-        const response = await pb.collection("order_drink").create(
-          {
-            drink: id
-          },
-          {
-            $autoCancel: false
-          }
-        );
+  subscribe: createPbStore(Collections.Orders, Order, baseOptions),
 
-        return response.id;
-      })
-    );
+  create: async (userId: RecordIdString, itemIds: RecordIdString[]) => {
+    const getOrderItemIds = async (): Promise<RecordIdString[]> => {
+      return await Promise.all(
+        itemIds.map(async (itemId) => {
+          const response = await pb.collection(Collections.OrderDrink).create({ drink: itemId });
+          return response.id;
+        })
+      );
+    };
 
-    await pb.collection("orders").create({
-      customer: pb.authStore.model?.id,
-      drinks: drinkIds,
-      state: "received",
+    await pb.collection(Collections.Orders).create({
+      customer: userId,
+      drinks: await getOrderItemIds(),
+      state: State.received,
       payment_fulfilled: false
     });
   },
-  updateState: (id: string, state: State) => {
-    pb.collection("orders").update(id, { state });
+
+  updateState: (orderId: RecordIdString, state: State) => {
+    pb.collection(Collections.Orders).update(orderId, { state });
   }
 };
 
-export const userOrders = {
-  subscribe: createPbStore<Order>("orders", mapToOrder, {
-    expand: "drinks, drinks.drink",
-    filter: `customer = '${pb.authStore.model?.id}'`
-  })
-};
+export const userOrders = createGenericPbStore(Collections.Orders, Order, {
+  ...baseOptions,
+  filter: `customer = '${get(auth).user.id}'`
+});

@@ -3,22 +3,22 @@
   import { Message, ActiveMessage } from "$lib/types";
   import { debounce } from "$lib/utils";
 
-  const handleActiveMessageChange = (message) => {
+  const handleActiveMessageChange = (message: Message) => {
     activeMessage.update(
       new ActiveMessage({
         ...$activeMessage,
         visible: true,
         message
-      })
+      } as ActiveMessage)
     );
   };
 
-  const handleMessageTextChange = (e, message, field: "title" | "subtext") => {
+  const handleMessageTextChange = (event: Event, message: Message, field: "title" | "subtext") => {
     messages.update(
       new Message({
         ...message,
-        [field]: e.target.value
-      })
+        [field]: (event.target as HTMLInputElement).value
+      } as Message)
     );
 
     // const isActive = message.id === $activeMessage.message.id;
@@ -32,7 +32,7 @@
       new ActiveMessage({
         ...$activeMessage,
         visible: false
-      })
+      } as ActiveMessage)
     );
   };
 </script>
@@ -41,7 +41,7 @@
   <ul class="list-none">
     {#each $messages as message}
       <li class="my-4">
-        <label class="form-control grid grid-cols-[auto_1fr_1fr] place-items-center gap-4">
+        <label class="form-control grid grid-cols-[auto_1fr_1fr_auto] place-items-center gap-4">
           <input
             type="radio"
             class="radio"
@@ -55,15 +55,23 @@
             class="input input-lg input-bordered w-full"
             value={message.title}
             placeholder="Tittel"
-            oninput={(e) => handleMessageTextChange(e, message, "title")}
+            oninput={(event) => handleMessageTextChange(event, message, "title")}
           />
           <input
             type="text"
             class="input input-lg input-bordered w-full"
             value={message.subtext}
             placeholder="Beskrivelse"
-            oninput={(e) => handleMessageTextChange(e, message, "subtext")}
+            oninput={(event) => handleMessageTextChange(event, message, "subtext")}
           />
+          <button
+            class="btn btn-secondary btn-lg"
+            onclick={() => {
+              if (window.confirm(`Er du sikker på at du vil slette "${message.title}"?`)) {
+                messages.delete(message.id);
+              }
+            }}>-</button
+          >
         </label>
       </li>
     {/each}
@@ -79,5 +87,10 @@
         <span>Åpent!</span>
       </label>
     </li>
+    <button
+      class="btn btn-lg"
+      onclick={() => messages.create(new Message({ title: "", subtext: "" } as Message))}
+      >Legg til melding</button
+    >
   </ul>
 </form>

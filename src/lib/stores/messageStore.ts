@@ -1,5 +1,5 @@
-import createPbStore from "$stores/pbStore";
-import pb from "$lib/pocketbase";
+import { createGenericPbStore } from "$stores/pbStore";
+import pb, { Collections, type DisplayMessagesResponse } from "$lib/pocketbase";
 import { Message, ActiveMessage } from "$lib/types";
 import { writable } from "svelte/store";
 
@@ -7,44 +7,7 @@ import eventsource from "eventsource";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (global as any).EventSource = eventsource;
 
-const mapToMessage = (data: { id: string; title: string; subtext: string }): Message =>
-  new Message({
-    id: data.id,
-    title: data.title,
-    subtext: data.subtext
-  });
-
-// FIXME: again, pocketbase typing
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mapToActiveMessage = (data: {
-  id: string;
-  message: any;
-  isVisible: boolean;
-}): ActiveMessage =>
-  new ActiveMessage({
-    id: data.id,
-    message: mapToMessage(data.message),
-    visible: data.isVisible
-  });
-
-export const messages = {
-  subscribe: createPbStore<Message>("displayMessages", mapToMessage),
-  create: async (title: string, subtext: string) => {
-    await pb.collection("displayMessages").create({
-      title,
-      subtext
-    });
-  },
-  update: async (message: Message) => {
-    await pb.collection("displayMessages").update(message.id, {
-      title: message.title,
-      subtext: message.subtext
-    });
-  },
-  delete: async (id: string) => {
-    await pb.collection("displayMessages").delete(id);
-  }
-};
+export const messages = createGenericPbStore(Collections.DisplayMessages, Message);
 
 function createActiveMessageStore() {
   // Initialize with dummy non-visible message
@@ -56,44 +19,46 @@ function createActiveMessageStore() {
         id: "",
         title: "",
         subtext: ""
-      })
-    })
+      } as Message)
+    } as ActiveMessage)
   );
 
   (async () => {
-    const initialActiveMessages = await pb.collection("activeMessage").getFullList();
-    // Only use the first record. Assumes that PB already has this record.
-    const initialActiveMessage = initialActiveMessages[0];
-    const initialMessages = await pb.collection("displayMessages").getFullList();
-    const initialMessage = initialMessages.filter((m) => m.id == initialActiveMessage.message)[0];
+    // Only use the first record. Assumes that PB already has this and only this record.
+    const initialActiveMessage = await pb
+      .collection(Collections.ActiveMessage)
+      .getFirstListItem("");
 
-    // @ts-expect-error Typing again
-    const initialData = mapToActiveMessage({
-      ...initialActiveMessage,
-      message: initialMessage
-    });
+    const initialMessages: DisplayMessagesResponse[] = await pb
+      .collection(Collections.DisplayMessages)
+      .getFullList();
+    const initialMessage: DisplayMessagesResponse =
+      initialMessages.filter((message) => message.id == initialActiveMessage.message)[0] ||
+      ({ id: "", title: "", subtext: "" } as DisplayMessagesResponse);
 
+    const initialData = ActiveMessage.fromPb(initialActiveMessage, initialMessage);
     set(initialData);
 
-    pb.collection("activeMessage").subscribe("*", (event) => {
+    pb.collection(Collections.ActiveMessage).subscribe("*", (event: { record: ActiveMessage }) => {
       update((state) => {
-        // @ts-expect-error Typing again
-        return mapToActiveMessage({
+        return new ActiveMessage({
           ...event.record,
           message: state.message
-        });
+        } as ActiveMessage);
       });
     });
 
-    pb.collection("displayMessages").subscribe("*", (event) => {
-      update((state) => {
-        if (event.record.id == state.message.id) {
-          // @ts-expect-error Typing again
-          state.message = mapToMessage(event.record);
-        }
-        return state;
-      });
-    });
+    pb.collection(Collections.DisplayMessages).subscribe(
+      "*",
+      (event: { record: DisplayMessagesResponse }) => {
+        update((state) => {
+          if (event.record.id == state.message.id) {
+            state.message = Message.fromPb(event.record);
+          }
+          return state;
+        });
+      }
+    );
   })();
 
   return subscribe;
@@ -101,10 +66,7 @@ function createActiveMessageStore() {
 
 export const activeMessage = {
   subscribe: createActiveMessageStore(),
-  update: async (message: ActiveMessage) => {
-    await pb.collection("activeMessage").update(message.id, {
-      message: message.message.id,
-      isVisible: message.visible
-    });
+  update: async (activeMessage: ActiveMessage) => {
+    await pb.collection(Collections.ActiveMessage).update(activeMessage.id, activeMessage.toPb());
   }
 };
