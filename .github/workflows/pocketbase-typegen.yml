@@ -44,6 +44,8 @@ jobs:
           echo "branch=typegen-$(date +%s)" >> $GITHUB_ENV
 
       - name: Commit and push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ $(git status --porcelain | wc -l ) -gt 0 ]; then
             # If there is a diff: https://stackoverflow.com/a/62213712
