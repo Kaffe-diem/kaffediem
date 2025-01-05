@@ -11,8 +11,6 @@ jobs:
     name: Generate pocketbase types
     runs-on: ubuntu-latest
     outputs:
-      # https://github.com/orgs/community/discussions/25280
-      commit_changes: ${{ steps.check_changes.outputs.commit_changes }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -38,31 +36,6 @@ jobs:
           name: generated-types
           path: src/lib/pocketbase/index.d.ts
 
-      - name: Check for changes
-        id: check_changes
-        run: |
-          # https://stackoverflow.com/a/62213712
-          if [ $(git status --porcelain | wc -l ) -gt 0 ]; then
-            echo 'commit_changes=true' >> $GITHUB_OUTPUT
-          else
-            echo 'commit_changes=false' >> $GITHUB_OUTPUT
-          fi
-
-  pr:
-    name: Create pull request
-    needs: [typegen]
-    if: needs.typegen.outputs.commit_changes == true
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Download generated types
-        uses: actions/download-artifact@v4
-        with:
-          name: generated-types
-          path: src/lib/pocketbase/
-
       - name: Configure git
         run: |
           git config user.name "github-actions[bot]"
@@ -74,17 +47,16 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          git checkout -b "$branch"
-          git add --force src/lib/pocketbase/index.d.ts
-          git commit -m "chore: update pocketbase types"
-          git push origin "$branch"
+          if [ $(git status --porcelain | wc -l ) -gt 0 ]; then
+            # If there is a diff: https://stackoverflow.com/a/62213712
+            git checkout -b "$branch"
+            git add --force src/lib/pocketbase/index.d.ts
+            git commit -m "chore: update pocketbase types"
+            git push origin "$branch"
 
-      - name: Create pull request
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh pr create --base "main" \
-            --head "$branch" \
-            --title "Update pocketbase types" \
-            --body "Updated at $(date -Iminutes)" \
-            --label "typegen"
+            gh pr create --base "main" \
+              --head "$branch" \
+              --title "Update pocketbase types" \
+              --body "Updated at $(date -Iminutes)" \
+              --label "typegen"
+          fi
