@@ -1,6 +1,5 @@
 name: Generate pocketbase types
 
-# PR opened, closed or updated
 on:
   push:
     branches:
@@ -10,7 +9,6 @@ jobs:
   typegen:
     name: Generate pocketbase types
     runs-on: ubuntu-latest
-    outputs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
