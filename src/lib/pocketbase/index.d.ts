@@ -12,6 +12,7 @@ export enum Collections {
 	Drinks = "drinks",
 	OrderDrink = "order_drink",
 	Orders = "orders",
+	Test123 = "test123",
 	Users = "users",
 }
 
@@ -109,6 +110,10 @@ export type OrdersRecord = {
 	state?: OrdersStateOptions
 }
 
+export type Test123Record = {
+	field1?: string
+}
+
 export type UsersRecord = {
 	avatar?: string
 	favorites?: RecordIdString[]
@@ -124,6 +129,7 @@ export type DisplayMessagesResponse<Texpand = unknown> = Required<DisplayMessage
 export type DrinksResponse<Texpand = unknown> = Required<DrinksRecord> & BaseSystemFields<Texpand>
 export type OrderDrinkResponse<Texpand = unknown> = Required<OrderDrinkRecord> & BaseSystemFields<Texpand>
 export type OrdersResponse<Texpand = unknown> = Required<OrdersRecord> & BaseSystemFields<Texpand>
+export type Test123Response<Texpand = unknown> = Required<Test123Record> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
@@ -135,6 +141,7 @@ export type CollectionRecords = {
 	drinks: DrinksRecord
 	order_drink: OrderDrinkRecord
 	orders: OrdersRecord
+	test123: Test123Record
 	users: UsersRecord
 }
 
@@ -145,6 +152,7 @@ export type CollectionResponses = {
 	drinks: DrinksResponse
 	order_drink: OrderDrinkResponse
 	orders: OrdersResponse
+	test123: Test123Response
 	users: UsersResponse
 }
 
@@ -158,5 +166,6 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: 'drinks'): RecordService<DrinksResponse>
 	collection(idOrName: 'order_drink'): RecordService<OrderDrinkResponse>
 	collection(idOrName: 'orders'): RecordService<OrdersResponse>
+	collection(idOrName: 'test123'): RecordService<Test123Response>
 	collection(idOrName: 'users'): RecordService<UsersResponse>
 }
