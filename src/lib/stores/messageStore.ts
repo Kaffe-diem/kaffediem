@@ -1,5 +1,9 @@
 import { createGenericPbStore } from "$stores/pbStore";
-import pb, { Collections, type DisplayMessagesResponse } from "$lib/pocketbase";
+import pb, {
+  Collections,
+  type ActiveMessageResponse,
+  type DisplayMessagesResponse
+} from "$lib/pocketbase";
 import { Message, ActiveMessage } from "$lib/types";
 import { writable } from "svelte/store";
 
@@ -36,29 +40,23 @@ function createActiveMessageStore() {
       initialMessages.filter((message) => message.id == initialActiveMessage.message)[0] ||
       ({ id: "", title: "", subtext: "" } as DisplayMessagesResponse);
 
-    const initialData = ActiveMessage.fromPb(initialActiveMessage, initialMessage);
+    const initialData = ActiveMessage.fromPb(initialActiveMessage, Message.fromPb(initialMessage));
     set(initialData);
 
-    pb.collection(Collections.ActiveMessage).subscribe("*", (event: { record: ActiveMessage }) => {
+    pb.collection(Collections.ActiveMessage).subscribe("*", (event) => {
       update((state) => {
-        return new ActiveMessage({
-          ...event.record,
-          message: state.message
-        } as ActiveMessage);
+        return ActiveMessage.fromPb(event.record, state.message);
       });
     });
 
-    pb.collection(Collections.DisplayMessages).subscribe(
-      "*",
-      (event: { record: DisplayMessagesResponse }) => {
-        update((state) => {
-          if (event.record.id == state.message.id) {
-            state.message = Message.fromPb(event.record);
-          }
-          return state;
-        });
-      }
-    );
+    pb.collection(Collections.DisplayMessages).subscribe("*", (event) => {
+      update((state) => {
+        if (event.record.id == state.message.id) {
+          state.message = Message.fromPb(event.record);
+        }
+        return state;
+      });
+    });
   })();
 
   return subscribe;

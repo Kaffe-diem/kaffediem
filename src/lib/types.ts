@@ -215,13 +215,10 @@ export class ActiveMessage extends Record implements RecordBase {
     return { message: this.message.id, isVisible: this.visible };
   }
 
-  static fromPb(
-    activeMessage: ActiveMessageResponse,
-    message: DisplayMessagesResponse
-  ): ActiveMessage {
+  static fromPb(activeMessage: ActiveMessageResponse, message: Message): ActiveMessage {
     return new ActiveMessage({
       id: activeMessage.id,
-      message: Message.fromPb(message),
+      message: message,
       visible: activeMessage.isVisible
     } as ActiveMessage);
   }
