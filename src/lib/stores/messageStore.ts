@@ -1,9 +1,5 @@
 import { createGenericPbStore } from "$stores/pbStore";
-import pb, {
-  Collections,
-  type ActiveMessageResponse,
-  type DisplayMessagesResponse
-} from "$lib/pocketbase";
+import pb, { Collections, type DisplayMessagesResponse } from "$lib/pocketbase";
 import { Message, ActiveMessage } from "$lib/types";
 import { writable } from "svelte/store";
 
