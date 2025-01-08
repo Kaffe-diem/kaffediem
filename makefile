@@ -1,3 +1,5 @@
+include .env
+
 default: dev
 
 dev: pb_types
