@@ -60,7 +60,7 @@
           <input
             type="text"
             class="input input-lg input-bordered w-full"
-            value={message.subtext}
+            value={message.subtitle}
             placeholder="Beskrivelse"
             oninput={(event) => handleMessageTextChange(event, message, "subtext")}
           />
@@ -89,7 +89,7 @@
     </li>
     <button
       class="btn btn-lg"
-      onclick={() => messages.create(new Message({ title: "", subtext: "" } as Message))}
+      onclick={() => messages.create(new Message({ title: "", subtitle: "" } as Message))}
       >Legg til melding</button
     >
   </ul>

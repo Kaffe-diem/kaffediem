@@ -19,7 +19,7 @@
   <ul>
     {#if $activeMessage.visible}
       <li class="font-bold">{$activeMessage.message.title}</li>
-      <li>{$activeMessage.message.subtext}</li>
+      <li>{$activeMessage.message.subtitle}</li>
     {:else}
       <li>Vi er åpen!</li>
     {/if}

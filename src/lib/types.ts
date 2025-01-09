@@ -179,8 +179,8 @@ export class Category extends Record implements RecordBase {
 
 // messages
 export class Message extends Record implements RecordBase {
-  title?: string;
-  subtitle?: string;
+  title: string;
+  subtitle: string;
 
   constructor(data: Message) {
     super(data);
