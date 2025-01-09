@@ -13,7 +13,7 @@
     );
   };
 
-  const handleMessageTextChange = (event: Event, message: Message, field: "title" | "subtext") => {
+  const handleMessageTextChange = (event: Event, message: Message, field: "title" | "subtitle") => {
     messages.update(
       new Message({
         ...message,
@@ -62,7 +62,7 @@
             class="input input-lg input-bordered w-full"
             value={message.subtitle}
             placeholder="Beskrivelse"
-            oninput={(event) => handleMessageTextChange(event, message, "subtext")}
+            oninput={(event) => handleMessageTextChange(event, message, "subtitle")}
           />
           <button
             class="btn btn-secondary btn-lg"
