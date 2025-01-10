@@ -12,7 +12,7 @@
           <label>
             <input
               type="radio"
-              name="drink"
+              name="item"
               class="peer hidden"
               value={item}
               bind:group={selectedItem}

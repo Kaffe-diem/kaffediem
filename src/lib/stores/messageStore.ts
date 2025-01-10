@@ -7,7 +7,7 @@ import eventsource from "eventsource";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (global as any).EventSource = eventsource;
 
-export const messages = createGenericPbStore(Collections.DisplayMessages, Message);
+export const messages = createGenericPbStore(Collections.Message, Message);
 
 function createActiveMessageStore() {
   // Initialize with dummy non-visible message
@@ -18,7 +18,7 @@ function createActiveMessageStore() {
       message: new Message({
         id: "",
         title: "",
-        subtext: ""
+        subtitle: ""
       } as Message)
     } as ActiveMessage)
   );
@@ -30,12 +30,12 @@ function createActiveMessageStore() {
   (async () => {
     // Only use the first record. Assumes that PB already has this and only this record.
     const initialData: ExpandedActiveMessageRecord = await pb
-      .collection(Collections.ActiveMessage)
+      .collection(Collections.Status)
       .getFirstListItem("", baseOptions);
 
     set(ActiveMessage.fromPb(initialData));
 
-    pb.collection(Collections.ActiveMessage).subscribe(
+    pb.collection(Collections.Status).subscribe(
       "*",
       (event: { record: ExpandedActiveMessageRecord }) => {
         set(ActiveMessage.fromPb(event.record));
@@ -50,6 +50,6 @@ function createActiveMessageStore() {
 export const activeMessage = {
   subscribe: createActiveMessageStore(),
   update: async (activeMessage: ActiveMessage) => {
-    await pb.collection(Collections.ActiveMessage).update(activeMessage.id, activeMessage.toPb());
+    await pb.collection(Collections.Status).update(activeMessage.id, activeMessage.toPb());
   }
 };

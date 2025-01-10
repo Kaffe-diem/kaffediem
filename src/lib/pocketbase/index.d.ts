@@ -11,13 +11,13 @@ export enum Collections {
 	Mfas = "_mfas",
 	Otps = "_otps",
 	Superusers = "_superusers",
-	ActiveMessage = "activeMessage",
-	Categories = "categories",
-	DisplayMessages = "displayMessages",
-	Drinks = "drinks",
-	OrderDrink = "order_drink",
-	Orders = "orders",
-	Users = "users",
+	Category = "category",
+	Item = "item",
+	Message = "message",
+	Order = "order",
+	OrderItem = "order_item",
+	Status = "status",
+	User = "user",
 }
 
 // Alias types for improved usability
@@ -91,15 +91,7 @@ export type SuperusersRecord = {
 	verified?: boolean
 }
 
-export type ActiveMessageRecord = {
-	created?: IsoDateString
-	id: string
-	isVisible?: boolean
-	message?: RecordIdString
-	updated?: IsoDateString
-}
-
-export type CategoriesRecord = {
+export type CategoryRecord = {
 	created?: IsoDateString
 	id: string
 	name: string
@@ -107,89 +99,63 @@ export type CategoriesRecord = {
 	updated?: IsoDateString
 }
 
-export type DisplayMessagesRecord = {
-	created?: IsoDateString
-	id: string
-	subtext?: string
-	title?: string
-	updated?: IsoDateString
-}
-
-export type DrinksRecord = {
+export type ItemRecord = {
 	category: RecordIdString
 	created?: IsoDateString
 	id: string
 	image: string
 	name: string
-	price: number
+	price_nok: number
 	updated?: IsoDateString
 }
 
-export enum OrderDrinkServingSizeOptions {
-	"small" = "small",
-	"big" = "big",
-	"custom" = "custom",
-}
-
-export enum OrderDrinkMilkOptions {
-	"oat" = "oat",
-	"soy" = "soy",
-	"whole" = "whole",
-	"low-fat" = "low-fat",
-	"lactose-free" = "lactose-free",
-}
-
-export enum OrderDrinkExtrasOptions {
-	"sirup" = "sirup",
-	"espresso" = "espresso",
-	"cream" = "cream",
-}
-
-export enum OrderDrinkFlavorOptions {
-	"vanilla" = "vanilla",
-	"salt-caramel" = "salt-caramel",
-	"pumpkin-spice" = "pumpkin-spice",
-	"irish" = "irish",
-	"spicy" = "spicy",
-}
-export type OrderDrinkRecord = {
+export type MessageRecord = {
 	created?: IsoDateString
-	drink: RecordIdString
-	extras?: OrderDrinkExtrasOptions[]
-	flavor?: OrderDrinkFlavorOptions[]
 	id: string
-	milk?: OrderDrinkMilkOptions
-	serving_size?: OrderDrinkServingSizeOptions
+	subtitle?: string
+	title?: string
 	updated?: IsoDateString
 }
 
-export enum OrdersStateOptions {
+export enum OrderStateOptions {
 	"received" = "received",
 	"production" = "production",
 	"completed" = "completed",
 	"dispatched" = "dispatched",
 }
-export type OrdersRecord = {
+export type OrderRecord = {
 	created?: IsoDateString
 	customer?: RecordIdString
-	drinks: RecordIdString[]
 	id: string
-	payment_fulfilled?: boolean
-	state?: OrdersStateOptions
+	items: RecordIdString[]
+	state?: OrderStateOptions
 	updated?: IsoDateString
 }
 
-export type UsersRecord = {
+export type OrderItemRecord = {
+	created?: IsoDateString
+	id: string
+	item: RecordIdString
+	updated?: IsoDateString
+}
+
+export type StatusRecord = {
+	created?: IsoDateString
+	id: string
+	message?: RecordIdString
+	online?: boolean
+	updated?: IsoDateString
+}
+
+export type UserRecord = {
 	avatar?: string
 	created?: IsoDateString
 	email?: string
 	emailVisibility?: boolean
-	favorites?: RecordIdString[]
 	id: string
 	is_admin?: boolean
 	name?: string
 	password: string
-	purchased_cup?: boolean
 	tokenKey: string
 	updated?: IsoDateString
 	username: string
@@ -202,13 +168,13 @@ export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRec
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
-export type ActiveMessageResponse<Texpand = unknown> = Required<ActiveMessageRecord> & BaseSystemFields<Texpand>
-export type CategoriesResponse<Texpand = unknown> = Required<CategoriesRecord> & BaseSystemFields<Texpand>
-export type DisplayMessagesResponse<Texpand = unknown> = Required<DisplayMessagesRecord> & BaseSystemFields<Texpand>
-export type DrinksResponse<Texpand = unknown> = Required<DrinksRecord> & BaseSystemFields<Texpand>
-export type OrderDrinkResponse<Texpand = unknown> = Required<OrderDrinkRecord> & BaseSystemFields<Texpand>
-export type OrdersResponse<Texpand = unknown> = Required<OrdersRecord> & BaseSystemFields<Texpand>
-export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
+export type CategoryResponse<Texpand = unknown> = Required<CategoryRecord> & BaseSystemFields<Texpand>
+export type ItemResponse<Texpand = unknown> = Required<ItemRecord> & BaseSystemFields<Texpand>
+export type MessageResponse<Texpand = unknown> = Required<MessageRecord> & BaseSystemFields<Texpand>
+export type OrderResponse<Texpand = unknown> = Required<OrderRecord> & BaseSystemFields<Texpand>
+export type OrderItemResponse<Texpand = unknown> = Required<OrderItemRecord> & BaseSystemFields<Texpand>
+export type StatusResponse<Texpand = unknown> = Required<StatusRecord> & BaseSystemFields<Texpand>
+export type UserResponse<Texpand = unknown> = Required<UserRecord> & AuthSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
 
@@ -218,13 +184,13 @@ export type CollectionRecords = {
 	_mfas: MfasRecord
 	_otps: OtpsRecord
 	_superusers: SuperusersRecord
-	activeMessage: ActiveMessageRecord
-	categories: CategoriesRecord
-	displayMessages: DisplayMessagesRecord
-	drinks: DrinksRecord
-	order_drink: OrderDrinkRecord
-	orders: OrdersRecord
-	users: UsersRecord
+	category: CategoryRecord
+	item: ItemRecord
+	message: MessageRecord
+	order: OrderRecord
+	order_item: OrderItemRecord
+	status: StatusRecord
+	user: UserRecord
 }
 
 export type CollectionResponses = {
@@ -233,13 +199,13 @@ export type CollectionResponses = {
 	_mfas: MfasResponse
 	_otps: OtpsResponse
 	_superusers: SuperusersResponse
-	activeMessage: ActiveMessageResponse
-	categories: CategoriesResponse
-	displayMessages: DisplayMessagesResponse
-	drinks: DrinksResponse
-	order_drink: OrderDrinkResponse
-	orders: OrdersResponse
-	users: UsersResponse
+	category: CategoryResponse
+	item: ItemResponse
+	message: MessageResponse
+	order: OrderResponse
+	order_item: OrderItemResponse
+	status: StatusResponse
+	user: UserResponse
 }
 
 // Type for usage with type asserted PocketBase instance
@@ -251,11 +217,11 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: '_mfas'): RecordService<MfasResponse>
 	collection(idOrName: '_otps'): RecordService<OtpsResponse>
 	collection(idOrName: '_superusers'): RecordService<SuperusersResponse>
-	collection(idOrName: 'activeMessage'): RecordService<ActiveMessageResponse>
-	collection(idOrName: 'categories'): RecordService<CategoriesResponse>
-	collection(idOrName: 'displayMessages'): RecordService<DisplayMessagesResponse>
-	collection(idOrName: 'drinks'): RecordService<DrinksResponse>
-	collection(idOrName: 'order_drink'): RecordService<OrderDrinkResponse>
-	collection(idOrName: 'orders'): RecordService<OrdersResponse>
-	collection(idOrName: 'users'): RecordService<UsersResponse>
+	collection(idOrName: 'category'): RecordService<CategoryResponse>
+	collection(idOrName: 'item'): RecordService<ItemResponse>
+	collection(idOrName: 'message'): RecordService<MessageResponse>
+	collection(idOrName: 'order'): RecordService<OrderResponse>
+	collection(idOrName: 'order_item'): RecordService<OrderItemResponse>
+	collection(idOrName: 'status'): RecordService<StatusResponse>
+	collection(idOrName: 'user'): RecordService<UserResponse>
 }

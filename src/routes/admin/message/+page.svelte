@@ -13,7 +13,7 @@
     );
   };
 
-  const handleMessageTextChange = (event: Event, message: Message, field: "title" | "subtext") => {
+  const handleMessageTextChange = (event: Event, message: Message, field: "title" | "subtitle") => {
     messages.update(
       new Message({
         ...message,
@@ -60,9 +60,9 @@
           <input
             type="text"
             class="input input-lg input-bordered w-full"
-            value={message.subtext}
+            value={message.subtitle}
             placeholder="Beskrivelse"
-            oninput={(event) => handleMessageTextChange(event, message, "subtext")}
+            oninput={(event) => handleMessageTextChange(event, message, "subtitle")}
           />
           <button
             class="btn btn-secondary btn-lg"
@@ -89,7 +89,7 @@
     </li>
     <button
       class="btn btn-lg"
-      onclick={() => messages.create(new Message({ title: "", subtext: "" } as Message))}
+      onclick={() => messages.create(new Message({ title: "", subtitle: "" } as Message))}
       >Legg til melding</button
     >
   </ul>

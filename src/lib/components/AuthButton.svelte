@@ -18,7 +18,7 @@
   }
 
   async function login() {
-    const authData = await pb.collection("users").authWithOAuth2({ provider: "google" });
+    const authData = await pb.collection("user").authWithOAuth2({ provider: "google" });
 
     const meta = authData.meta;
 
@@ -32,7 +32,7 @@
         formData.append("avatar", avatar);
       }
 
-      await pb.collection("users").update(authData.record.id, formData);
+      await pb.collection("user").update(authData.record.id, formData);
     }
 
     document.cookie = pb.authStore.exportToCookie({ httpOnly: false });
