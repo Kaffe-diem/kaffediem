@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Item } from "$lib/types";
   let { selectedItem } = $props();
-  import orders from "$stores/orderStore";
+  import order from "$stores/orderStore";
   import auth from "$stores/authStore";
 
   let cart = $state<Item[]>([]);
@@ -45,7 +45,7 @@
     <button
       class="bold btn btn-lg text-xl"
       onclick={() => {
-        orders.create(
+        order.create(
           $auth.user.id,
           cart.map((item) => item.id)
         );
