@@ -1,6 +1,6 @@
 import { createGenericPbStore } from "$stores/pbStore";
-import pb, { Collections } from "$lib/pocketbase";
-import { Message, ActiveMessage, type ExpandedActiveMessageRecord } from "$lib/types";
+import pb, { Collections, type MessageResponse } from "$lib/pocketbase";
+import { Message, ActiveMessage } from "$lib/types";
 import { writable } from "svelte/store";
 
 import eventsource from "eventsource";
@@ -10,38 +10,47 @@ import eventsource from "eventsource";
 export const messages = createGenericPbStore(Collections.Message, Message);
 
 function createActiveMessageStore() {
-  // Initialize with dummy non-visible message
-  const { subscribe, set } = writable<ActiveMessage>(
-    new ActiveMessage({
-      id: "",
-      visible: false,
-      message: new Message({
-        id: "",
-        title: "",
-        subtitle: ""
-      } as Message)
-    } as ActiveMessage)
-  );
-
-  const baseOptions = {
-    expand: "message"
-  };
+  const { subscribe, set, update } = writable<ActiveMessage>(ActiveMessage.baseValue);
 
   (async () => {
     // Only use the first record. Assumes that PB already has this and only this record.
-    const initialData: ExpandedActiveMessageRecord = await pb
-      .collection(Collections.Status)
-      .getFirstListItem("", baseOptions);
+    const initialActiveMessage = await pb.collection(Collections.Status).getFirstListItem("");
+    const initialMessages: MessageResponse[] = await pb
+      .collection(Collections.Message)
+      .getFullList();
 
-    set(ActiveMessage.fromPb(initialData));
-
-    pb.collection(Collections.Status).subscribe(
-      "*",
-      (event: { record: ExpandedActiveMessageRecord }) => {
-        set(ActiveMessage.fromPb(event.record));
-      },
-      baseOptions
+    const initialData = ActiveMessage.fromPb(
+      initialActiveMessage,
+      initialMessages.map(Message.fromPb)
     );
+    set(initialData);
+
+    pb.collection(Collections.Status).subscribe("*", async (event) => {
+      update((state) => {
+        return ActiveMessage.fromPb(event.record, state.messages);
+      });
+    });
+
+    pb.collection(Collections.Message).subscribe("*", (event) => {
+      update((state) => {
+        const itemIndex = state.messages.findIndex((item) => item.id == event.record.id);
+        const item = Message.fromPb(event.record);
+
+        switch (event.action) {
+          case "create":
+            state.messages.push(item);
+            break;
+          case "update":
+            if (itemIndex !== -1) state.messages[itemIndex] = item;
+            break;
+          case "delete":
+            if (itemIndex !== -1) state.messages.splice(itemIndex, 1);
+            break;
+        }
+
+        return state;
+      });
+    });
   })();
 
   return subscribe;

@@ -1,7 +1,6 @@
 <script lang="ts">
   import { messages, activeMessage } from "$stores/messageStore";
   import { Message, ActiveMessage } from "$lib/types";
-  import { debounce } from "$lib/utils";
 
   const handleActiveMessageChange = (message: Message) => {
     activeMessage.update(
@@ -20,11 +19,6 @@
         [field]: (event.target as HTMLInputElement).value
       } as Message)
     );
-
-    const isActive = message.id === $activeMessage.message.id;
-    if (isActive) {
-      debounce(handleActiveMessageChange, 100)(message);
-    }
   };
 
   const handleVisibilityChange = () => {
