@@ -10,7 +10,6 @@ import eventsource from "eventsource";
 export const messages = createGenericPbStore(Collections.Message, Message);
 
 function createActiveMessageStore() {
-  // Initialize with dummy non-visible message
   const { subscribe, set, update } = writable<ActiveMessage>(ActiveMessage.baseValue);
 
   (async () => {
