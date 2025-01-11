@@ -11,14 +11,7 @@ export const messages = createGenericPbStore(Collections.Message, Message);
 
 function createActiveMessageStore() {
   // Initialize with dummy non-visible message
-  const { subscribe, set, update } = writable<ActiveMessage>(
-    new ActiveMessage({
-      id: "",
-      visible: false,
-      message: Message.baseValue,
-      messages: [Message.baseValue]
-    } as ActiveMessage)
-  );
+  const { subscribe, set, update } = writable<ActiveMessage>(ActiveMessage.baseValue);
 
   (async () => {
     // Only use the first record. Assumes that PB already has this and only this record.
@@ -31,7 +24,6 @@ function createActiveMessageStore() {
       initialActiveMessage,
       initialMessages.map(Message.fromPb)
     );
-    console.log(initialData);
     set(initialData);
 
     pb.collection(Collections.Status).subscribe("*", async (event) => {

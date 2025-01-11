@@ -212,6 +212,13 @@ export class ActiveMessage extends Record implements RecordBase {
   messages: Message[];
   visible: boolean;
 
+  static baseValue = {
+    id: "",
+    visible: false,
+    message: Message.baseValue,
+    messages: [Message.baseValue]
+  } as ActiveMessage;
+
   constructor(data: ActiveMessage) {
     super(data);
     this.messages = data.messages;
