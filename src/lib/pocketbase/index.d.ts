@@ -6,13 +6,18 @@ import type PocketBase from 'pocketbase'
 import type { RecordService } from 'pocketbase'
 
 export enum Collections {
-	ActiveMessage = "activeMessage",
-	Categories = "categories",
-	DisplayMessages = "displayMessages",
-	Drinks = "drinks",
-	OrderDrink = "order_drink",
-	Orders = "orders",
-	Users = "users",
+	Authorigins = "_authOrigins",
+	Externalauths = "_externalAuths",
+	Mfas = "_mfas",
+	Otps = "_otps",
+	Superusers = "_superusers",
+	Category = "category",
+	Item = "item",
+	Message = "message",
+	Order = "order",
+	OrderItem = "order_item",
+	Status = "status",
+	User = "user",
 }
 
 // Alias types for improved usability
@@ -23,8 +28,6 @@ export type HTMLString = string
 // System fields
 export type BaseSystemFields<T = never> = {
 	id: RecordIdString
-	created: IsoDateString
-	updated: IsoDateString
 	collectionId: string
 	collectionName: Collections
 	expand?: T
@@ -39,124 +42,186 @@ export type AuthSystemFields<T = never> = {
 
 // Record types for each collection
 
-export type ActiveMessageRecord = {
-	isVisible?: boolean
-	message?: RecordIdString
+export type AuthoriginsRecord = {
+	collectionRef: string
+	created?: IsoDateString
+	fingerprint: string
+	id: string
+	recordRef: string
+	updated?: IsoDateString
 }
 
-export type CategoriesRecord = {
+export type ExternalauthsRecord = {
+	collectionRef: string
+	created?: IsoDateString
+	id: string
+	provider: string
+	providerId: string
+	recordRef: string
+	updated?: IsoDateString
+}
+
+export type MfasRecord = {
+	collectionRef: string
+	created?: IsoDateString
+	id: string
+	method: string
+	recordRef: string
+	updated?: IsoDateString
+}
+
+export type OtpsRecord = {
+	collectionRef: string
+	created?: IsoDateString
+	id: string
+	password: string
+	recordRef: string
+	sentTo?: string
+	updated?: IsoDateString
+}
+
+export type SuperusersRecord = {
+	created?: IsoDateString
+	email: string
+	emailVisibility?: boolean
+	id: string
+	password: string
+	tokenKey: string
+	updated?: IsoDateString
+	verified?: boolean
+}
+
+export type CategoryRecord = {
+	created?: IsoDateString
+	id: string
 	name: string
 	sort_order: number
+	updated?: IsoDateString
 }
 
-export type DisplayMessagesRecord = {
-	subtext?: string
-	title?: string
-}
-
-export type DrinksRecord = {
+export type ItemRecord = {
 	category: RecordIdString
+	created?: IsoDateString
+	id: string
 	image: string
 	name: string
-	price: number
+	price_nok: number
+	updated?: IsoDateString
 }
 
-export enum OrderDrinkServingSizeOptions {
-	"small" = "small",
-	"big" = "big",
-	"custom" = "custom",
+export type MessageRecord = {
+	created?: IsoDateString
+	id: string
+	subtitle?: string
+	title?: string
+	updated?: IsoDateString
 }
 
-export enum OrderDrinkMilkOptions {
-	"oat" = "oat",
-	"soy" = "soy",
-	"whole" = "whole",
-	"low-fat" = "low-fat",
-	"lactose-free" = "lactose-free",
-}
-
-export enum OrderDrinkExtrasOptions {
-	"sirup" = "sirup",
-	"espresso" = "espresso",
-	"cream" = "cream",
-}
-
-export enum OrderDrinkFlavorOptions {
-	"vanilla" = "vanilla",
-	"salt-caramel" = "salt-caramel",
-	"pumpkin-spice" = "pumpkin-spice",
-	"irish" = "irish",
-	"spicy" = "spicy",
-}
-export type OrderDrinkRecord = {
-	drink: RecordIdString
-	extras?: OrderDrinkExtrasOptions[]
-	flavor?: OrderDrinkFlavorOptions[]
-	milk?: OrderDrinkMilkOptions
-	serving_size?: OrderDrinkServingSizeOptions
-}
-
-export enum OrdersStateOptions {
+export enum OrderStateOptions {
 	"received" = "received",
 	"production" = "production",
 	"completed" = "completed",
 	"dispatched" = "dispatched",
 }
-export type OrdersRecord = {
+export type OrderRecord = {
+	created?: IsoDateString
 	customer?: RecordIdString
-	drinks: RecordIdString[]
-	payment_fulfilled?: boolean
-	state?: OrdersStateOptions
+	id: string
+	items: RecordIdString[]
+	state?: OrderStateOptions
+	updated?: IsoDateString
 }
 
-export type UsersRecord = {
+export type OrderItemRecord = {
+	created?: IsoDateString
+	id: string
+	item: RecordIdString
+	updated?: IsoDateString
+}
+
+export type StatusRecord = {
+	created?: IsoDateString
+	id: string
+	message?: RecordIdString
+	online?: boolean
+	updated?: IsoDateString
+}
+
+export type UserRecord = {
 	avatar?: string
-	favorites?: RecordIdString[]
+	created?: IsoDateString
+	email?: string
+	emailVisibility?: boolean
+	id: string
 	is_admin?: boolean
 	name?: string
-	purchased_cup?: boolean
+	password: string
+	tokenKey: string
+	updated?: IsoDateString
+	username: string
+	verified?: boolean
 }
 
 // Response types include system fields and match responses from the PocketBase API
-export type ActiveMessageResponse<Texpand = unknown> = Required<ActiveMessageRecord> & BaseSystemFields<Texpand>
-export type CategoriesResponse<Texpand = unknown> = Required<CategoriesRecord> & BaseSystemFields<Texpand>
-export type DisplayMessagesResponse<Texpand = unknown> = Required<DisplayMessagesRecord> & BaseSystemFields<Texpand>
-export type DrinksResponse<Texpand = unknown> = Required<DrinksRecord> & BaseSystemFields<Texpand>
-export type OrderDrinkResponse<Texpand = unknown> = Required<OrderDrinkRecord> & BaseSystemFields<Texpand>
-export type OrdersResponse<Texpand = unknown> = Required<OrdersRecord> & BaseSystemFields<Texpand>
-export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
+export type AuthoriginsResponse<Texpand = unknown> = Required<AuthoriginsRecord> & BaseSystemFields<Texpand>
+export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRecord> & BaseSystemFields<Texpand>
+export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
+export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
+export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
+export type CategoryResponse<Texpand = unknown> = Required<CategoryRecord> & BaseSystemFields<Texpand>
+export type ItemResponse<Texpand = unknown> = Required<ItemRecord> & BaseSystemFields<Texpand>
+export type MessageResponse<Texpand = unknown> = Required<MessageRecord> & BaseSystemFields<Texpand>
+export type OrderResponse<Texpand = unknown> = Required<OrderRecord> & BaseSystemFields<Texpand>
+export type OrderItemResponse<Texpand = unknown> = Required<OrderItemRecord> & BaseSystemFields<Texpand>
+export type StatusResponse<Texpand = unknown> = Required<StatusRecord> & BaseSystemFields<Texpand>
+export type UserResponse<Texpand = unknown> = Required<UserRecord> & AuthSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
 
 export type CollectionRecords = {
-	activeMessage: ActiveMessageRecord
-	categories: CategoriesRecord
-	displayMessages: DisplayMessagesRecord
-	drinks: DrinksRecord
-	order_drink: OrderDrinkRecord
-	orders: OrdersRecord
-	users: UsersRecord
+	_authOrigins: AuthoriginsRecord
+	_externalAuths: ExternalauthsRecord
+	_mfas: MfasRecord
+	_otps: OtpsRecord
+	_superusers: SuperusersRecord
+	category: CategoryRecord
+	item: ItemRecord
+	message: MessageRecord
+	order: OrderRecord
+	order_item: OrderItemRecord
+	status: StatusRecord
+	user: UserRecord
 }
 
 export type CollectionResponses = {
-	activeMessage: ActiveMessageResponse
-	categories: CategoriesResponse
-	displayMessages: DisplayMessagesResponse
-	drinks: DrinksResponse
-	order_drink: OrderDrinkResponse
-	orders: OrdersResponse
-	users: UsersResponse
+	_authOrigins: AuthoriginsResponse
+	_externalAuths: ExternalauthsResponse
+	_mfas: MfasResponse
+	_otps: OtpsResponse
+	_superusers: SuperusersResponse
+	category: CategoryResponse
+	item: ItemResponse
+	message: MessageResponse
+	order: OrderResponse
+	order_item: OrderItemResponse
+	status: StatusResponse
+	user: UserResponse
 }
 
 // Type for usage with type asserted PocketBase instance
 // https://github.com/pocketbase/js-sdk#specify-typescript-definitions
 
 export type TypedPocketBase = PocketBase & {
-	collection(idOrName: 'activeMessage'): RecordService<ActiveMessageResponse>
-	collection(idOrName: 'categories'): RecordService<CategoriesResponse>
-	collection(idOrName: 'displayMessages'): RecordService<DisplayMessagesResponse>
-	collection(idOrName: 'drinks'): RecordService<DrinksResponse>
-	collection(idOrName: 'order_drink'): RecordService<OrderDrinkResponse>
-	collection(idOrName: 'orders'): RecordService<OrdersResponse>
-	collection(idOrName: 'users'): RecordService<UsersResponse>
+	collection(idOrName: '_authOrigins'): RecordService<AuthoriginsResponse>
+	collection(idOrName: '_externalAuths'): RecordService<ExternalauthsResponse>
+	collection(idOrName: '_mfas'): RecordService<MfasResponse>
+	collection(idOrName: '_otps'): RecordService<OtpsResponse>
+	collection(idOrName: '_superusers'): RecordService<SuperusersResponse>
+	collection(idOrName: 'category'): RecordService<CategoryResponse>
+	collection(idOrName: 'item'): RecordService<ItemResponse>
+	collection(idOrName: 'message'): RecordService<MessageResponse>
+	collection(idOrName: 'order'): RecordService<OrderResponse>
+	collection(idOrName: 'order_item'): RecordService<OrderItemResponse>
+	collection(idOrName: 'status'): RecordService<StatusResponse>
+	collection(idOrName: 'user'): RecordService<UserResponse>
 }

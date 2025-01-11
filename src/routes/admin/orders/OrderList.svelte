@@ -1,10 +1,10 @@
 <script lang="ts">
-  import type { OrdersStateOptions, RecordIdString } from "$lib/pocketbase";
+  import type { OrderStateOptions as OrderStateOptions, RecordIdString } from "$lib/pocketbase";
   import orders from "$stores/orderStore";
 
   interface Props {
-    show: OrdersStateOptions[];
-    onclick: OrdersStateOptions;
+    show: OrderStateOptions[];
+    onclick: OrderStateOptions;
     label: RecordIdString;
   }
 

@@ -1,12 +1,12 @@
 import pb, {
   type RecordIdString,
-  OrdersStateOptions,
-  type DrinksResponse,
-  type ActiveMessageResponse,
-  type OrdersResponse,
-  type OrderDrinkResponse,
-  type CategoriesResponse,
-  type DisplayMessagesResponse
+  OrderStateOptions,
+  type ItemResponse,
+  type MessageResponse,
+  type OrderResponse,
+  type OrderItemResponse,
+  type CategoryResponse,
+  type StatusResponse
 } from "$lib/pocketbase";
 import { restrictedRoutes, adminRoutes } from "$lib/constants";
 import type { AuthModel } from "pocketbase";
@@ -25,8 +25,8 @@ export class NavItem {
   }
 }
 
-type State = OrdersStateOptions;
-export { OrdersStateOptions as State };
+type State = OrderStateOptions;
+export { OrderStateOptions as State };
 
 export interface RecordBase {
   id: RecordIdString;
@@ -63,8 +63,8 @@ export class User extends Record {
 }
 
 // orders
-export type ExpandedOrderRecord = OrdersResponse & {
-  expand: { drinks: ExpandedOrderDrinkRecord[] };
+export type ExpandedOrderRecord = OrderResponse & {
+  expand: { items: ExpandedOrderItemRecord[] };
 };
 
 export class Order extends Record implements RecordBase {
@@ -86,13 +86,13 @@ export class Order extends Record implements RecordBase {
     return new Order({
       id: data.id,
       state: data.state,
-      items: data.expand.drinks.map(OrderItem.fromPb)
+      items: data.expand.items.map(OrderItem.fromPb)
     } as Order);
   }
 }
 
-export type ExpandedOrderDrinkRecord = OrderDrinkResponse & {
-  expand: { drink: DrinksResponse };
+export type ExpandedOrderItemRecord = OrderItemResponse & {
+  expand: { item: ItemResponse };
 };
 
 export class OrderItem extends Record implements RecordBase {
@@ -109,11 +109,11 @@ export class OrderItem extends Record implements RecordBase {
     return this;
   }
 
-  static fromPb(data: ExpandedOrderDrinkRecord): OrderItem {
+  static fromPb(data: ExpandedOrderItemRecord): OrderItem {
     return new OrderItem({
       id: data.id,
-      name: data.expand.drink.name,
-      item: Item.fromPb(data.expand.drink)
+      name: data.expand.item.name,
+      item: Item.fromPb(data.expand.item)
     } as OrderItem);
   }
 }
@@ -136,19 +136,19 @@ export class Item extends Record implements RecordBase {
     return this;
   }
 
-  static fromPb(data: DrinksResponse): Item {
+  static fromPb(data: ItemResponse): Item {
     return new Item({
       id: data.id,
       name: data.name,
-      price: data.price,
+      price: data.price_nok,
       category: data.category,
       image: pb.files.getUrl(data, data.image)
     } as Item);
   }
 }
 
-export type ExpandedCategoryRecord = CategoriesResponse & {
-  expand: { drinks_via_category: DrinksResponse[] };
+export type ExpandedCategoryRecord = CategoryResponse & {
+  expand: { item_via_category: ItemResponse[] };
 };
 
 export class Category extends Record implements RecordBase {
@@ -172,7 +172,7 @@ export class Category extends Record implements RecordBase {
       id: data.id,
       name: data.name,
       sortOrder: data.sort_order,
-      items: data.expand.drinks_via_category.map(Item.fromPb)
+      items: data.expand.item_via_category.map(Item.fromPb)
     } as Category);
   }
 }
@@ -180,26 +180,30 @@ export class Category extends Record implements RecordBase {
 // messages
 export class Message extends Record implements RecordBase {
   title: string;
-  subtext: string;
+  subtitle: string;
 
   constructor(data: Message) {
     super(data);
     this.title = data.title;
-    this.subtext = data.subtext;
+    this.subtitle = data.subtitle;
   }
 
   toPb() {
-    return this;
+    return { title: this.title, subtitle: this.subtitle };
   }
 
-  static fromPb(data: DisplayMessagesResponse): Message {
+  static fromPb(data: MessageResponse): Message {
     return new Message({
       id: data.id,
       title: data.title,
-      subtext: data.subtext
+      subtitle: data.subtitle
     } as Message);
   }
 }
+
+export type ExpandedActiveMessageRecord = StatusResponse & {
+  expand: { message: MessageResponse };
+};
 
 export class ActiveMessage extends Record implements RecordBase {
   message: Message;
@@ -212,14 +216,14 @@ export class ActiveMessage extends Record implements RecordBase {
   }
 
   toPb() {
-    return { message: this.message.id, isVisible: this.visible };
+    return { message: this.message.id, online: this.visible };
   }
 
-  static fromPb(activeMessage: ActiveMessageResponse, message: Message): ActiveMessage {
+  static fromPb(activeMessage: StatusResponse, message: Message): ActiveMessage {
     return new ActiveMessage({
       id: activeMessage.id,
       message: message,
-      visible: activeMessage.isVisible
+      visible: activeMessage.online
     } as ActiveMessage);
   }
 }
