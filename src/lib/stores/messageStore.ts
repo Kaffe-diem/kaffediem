@@ -37,9 +37,10 @@ function createActiveMessageStore() {
     const initialData = ActiveMessage.fromPb(initialActiveMessage, Message.fromPb(initialMessage));
     set(initialData);
 
-    pb.collection(Collections.Status).subscribe("*", (event) => {
-      update((state) => {
-        return ActiveMessage.fromPb(event.record, state.message);
+    pb.collection(Collections.Status).subscribe("*", async (event) => {
+      const message = await pb.collection(Collections.Message).getOne(event.record.message);
+      update(() => {
+        return ActiveMessage.fromPb(event.record, Message.fromPb(message));
       });
     });
 
