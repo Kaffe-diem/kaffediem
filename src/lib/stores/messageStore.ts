@@ -15,11 +15,8 @@ function createActiveMessageStore() {
     new ActiveMessage({
       id: "",
       visible: false,
-      message: new Message({
-        id: "",
-        title: "",
-        subtitle: ""
-      } as Message)
+      message: Message.baseValue,
+      messages: [Message.baseValue]
     } as ActiveMessage)
   );
 
@@ -30,25 +27,36 @@ function createActiveMessageStore() {
       .collection(Collections.Message)
       .getFullList();
 
-    const initialMessage: MessageResponse =
-      initialMessages.filter((message) => message.id == initialActiveMessage.message)[0] ||
-      ({ id: "", title: "", subtitle: "" } as MessageResponse);
-
-    const initialData = ActiveMessage.fromPb(initialActiveMessage, Message.fromPb(initialMessage));
+    const initialData = ActiveMessage.fromPb(
+      initialActiveMessage,
+      initialMessages.map(Message.fromPb)
+    );
+    console.log(initialData);
     set(initialData);
 
     pb.collection(Collections.Status).subscribe("*", async (event) => {
-      const message = await pb.collection(Collections.Message).getOne(event.record.message);
-      update(() => {
-        return ActiveMessage.fromPb(event.record, Message.fromPb(message));
+      update((state) => {
+        return ActiveMessage.fromPb(event.record, state.messages);
       });
     });
 
     pb.collection(Collections.Message).subscribe("*", (event) => {
       update((state) => {
-        if (event.record.id == state.message.id) {
-          state.message = Message.fromPb(event.record);
+        const itemIndex = state.messages.findIndex((item) => item.id == event.record.id);
+        const item = Message.fromPb(event.record);
+
+        switch (event.action) {
+          case "create":
+            state.messages.push(item);
+            break;
+          case "update":
+            if (itemIndex !== -1) state.messages[itemIndex] = item;
+            break;
+          case "delete":
+            if (itemIndex !== -1) state.messages.splice(itemIndex, 1);
+            break;
         }
+
         return state;
       });
     });
