@@ -208,9 +208,9 @@ export type ExpandedActiveMessageRecord = StatusResponse & {
 };
 
 export class ActiveMessage extends Record implements RecordBase {
-  message: Message;
-  messages: Message[];
-  visible: boolean;
+  message!: Message;
+  messages!: Message[];
+  visible!: boolean;
 
   static baseValue = {
     id: "",
@@ -219,23 +219,16 @@ export class ActiveMessage extends Record implements RecordBase {
     messages: [Message.baseValue]
   } as ActiveMessage;
 
-  constructor(data: ActiveMessage) {
-    super(data);
-    this.messages = data.messages;
-    this.message = data.message;
-    this.visible = data.visible;
-  }
-
   toPb() {
     return { message: this.message.id, online: this.visible };
   }
 
   static fromPb(activeMessage: StatusResponse, messages: Message[]): ActiveMessage {
-    return new ActiveMessage({
+    return {
       id: activeMessage.id,
       message: messages.filter((m) => m.id == activeMessage.message)[0] || Message.baseValue,
       messages: messages,
       visible: activeMessage.online
-    } as ActiveMessage);
+    } as ActiveMessage;
   }
 }

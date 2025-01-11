@@ -17,12 +17,10 @@
       class="btn relative m-4 flex h-24 w-1/2 flex-col items-center justify-center text-3xl lg:text-5xl
 "
       onclick={() =>
-        activeMessage.update(
-          new ActiveMessage({
-            ...$activeMessage,
-            visible: false
-          } as ActiveMessage)
-        )}>Åpne</button
+        activeMessage.update({
+          ...$activeMessage,
+          visible: false
+        } as ActiveMessage)}>Åpne</button
     >
     <a
       href="/admin/message"

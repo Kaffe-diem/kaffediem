@@ -3,13 +3,11 @@
   import { Message, ActiveMessage } from "$lib/types";
 
   const handleActiveMessageChange = (message: Message) => {
-    activeMessage.update(
-      new ActiveMessage({
-        ...$activeMessage,
-        visible: true,
-        message
-      } as ActiveMessage)
-    );
+    activeMessage.update({
+      ...$activeMessage,
+      visible: true,
+      message
+    } as ActiveMessage);
   };
 
   const handleMessageTextChange = (event: Event, message: Message, field: "title" | "subtitle") => {
@@ -22,12 +20,10 @@
   };
 
   const handleVisibilityChange = () => {
-    activeMessage.update(
-      new ActiveMessage({
-        ...$activeMessage,
-        visible: false
-      } as ActiveMessage)
-    );
+    activeMessage.update({
+      ...$activeMessage,
+      visible: false
+    } as ActiveMessage);
   };
 </script>
 
