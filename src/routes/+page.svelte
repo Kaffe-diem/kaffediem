@@ -3,7 +3,7 @@
   import Logo from "$assets/logo.png";
   import AuthButton from "$components/AuthButton.svelte";
   import Menu from "./Menu.svelte";
-  import { activeMessage } from "$stores/messageStore";
+  import { status } from "$stores/messageStore";
 </script>
 
 <img
@@ -17,9 +17,9 @@
 
   <br />
   <ul>
-    {#if $activeMessage.visible}
-      <li class="font-bold">{$activeMessage.message.title}</li>
-      <li>{$activeMessage.message.subtitle}</li>
+    {#if $status.online}
+      <li class="font-bold">{$status.message.title}</li>
+      <li>{$status.message.subtitle}</li>
     {:else}
       <li>Vi er åpen!</li>
     {/if}

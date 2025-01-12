@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { messages, activeMessage } from "$stores/messageStore";
-  import { Message, ActiveMessage } from "$lib/types";
+  import { messages, status } from "$stores/messageStore";
+  import { Message, Status } from "$lib/types";
 
-  const handleActiveMessageChange = (message: Message) => {
-    activeMessage.update(
-      new ActiveMessage({
-        ...$activeMessage,
-        visible: true,
+  const handleStatusChange = (message: Message) => {
+    status.update(
+      new Status({
+        ...$status,
+        online: true,
         message
-      } as ActiveMessage)
+      } as Status)
     );
   };
 
@@ -22,11 +22,11 @@
   };
 
   const handleVisibilityChange = () => {
-    activeMessage.update(
-      new ActiveMessage({
-        ...$activeMessage,
-        visible: false
-      } as ActiveMessage)
+    status.update(
+      new Status({
+        ...$status,
+        online: false
+      } as Status)
     );
   };
 </script>
@@ -40,9 +40,9 @@
             type="radio"
             class="radio"
             name="selected"
-            checked={message.id == $activeMessage.message.id}
+            checked={message.id == $status.message.id}
             value={message}
-            onchange={() => handleActiveMessageChange(message)}
+            onchange={() => handleStatusChange(message)}
           />
           <input
             type="text"
@@ -75,7 +75,7 @@
           type="radio"
           class="radio mr-4"
           name="selected"
-          checked={!$activeMessage.visible}
+          checked={!$status.online}
           onchange={handleVisibilityChange}
         />
         <span>Åpent!</span>

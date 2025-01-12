@@ -203,39 +203,35 @@ export class Message extends Record implements RecordBase {
   }
 }
 
-export type ExpandedActiveMessageRecord = StatusResponse & {
-  expand: { message: MessageResponse };
-};
-
-export class ActiveMessage extends Record implements RecordBase {
+export class Status extends Record implements RecordBase {
   message: Message;
   messages: Message[];
-  visible: boolean;
+  online: boolean;
 
   static baseValue = {
     id: "",
-    visible: false,
+    online: false,
     message: Message.baseValue,
     messages: [Message.baseValue]
-  } as ActiveMessage;
+  } as Status;
 
-  constructor(data: ActiveMessage) {
+  constructor(data: Status) {
     super(data);
     this.messages = data.messages;
     this.message = data.message;
-    this.visible = data.visible;
+    this.online = data.online;
   }
 
   toPb() {
-    return { message: this.message.id, online: this.visible };
+    return { message: this.message.id, online: this.online };
   }
 
-  static fromPb(activeMessage: StatusResponse, messages: Message[]): ActiveMessage {
-    return new ActiveMessage({
-      id: activeMessage.id,
-      message: messages.filter((m) => m.id == activeMessage.message)[0] || Message.baseValue,
+  static fromPb(status: StatusResponse, messages: Message[]): Status {
+    return new Status({
+      id: status.id,
+      message: messages.filter((m) => m.id == status.message)[0] || Message.baseValue,
       messages: messages,
-      visible: activeMessage.online
-    } as ActiveMessage);
+      online: status.online
+    } as Status);
   }
 }

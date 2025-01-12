@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { activeMessage } from "$stores/messageStore";
+  import { status } from "$stores/messageStore";
   import { type Snippet } from "svelte";
 
   // import QR from "$assets/qr-code.svg";
@@ -11,10 +11,10 @@
   let { children }: Props = $props();
 </script>
 
-{#if $activeMessage?.visible}
+{#if $status?.online}
   <div class="flex h-screen flex-col items-center justify-center text-center">
-    <span class="p-2 text-7xl font-bold md:text-9xl">{$activeMessage.message.title}</span>
-    <span class="p-2 text-4xl md:text-6xl">{$activeMessage.message.subtitle}</span>
+    <span class="p-2 text-7xl font-bold md:text-9xl">{$status.message.title}</span>
+    <span class="p-2 text-4xl md:text-6xl">{$status.message.subtitle}</span>
   </div>
 {:else}
   <main class="relative mx-auto h-screen w-11/12 py-4">
