@@ -1,0 +1,18 @@
+name: Forbedring
+description: Forslag til ny funksjonalitet eller forbedrelse
+title: ""
+labels: ["enhancement"]
+body:
+  - type: checkboxes
+    attributes:
+      label:
+      description:
+      options:
+        - label: Jeg har sett etter lignende issues
+          required: true
+  - type: textarea
+    attributes:
+      label: Beskriv forslaget
+      description: Gjerne gi forslag til hvordan det kan implementeres
+    validations:
+      required: true
