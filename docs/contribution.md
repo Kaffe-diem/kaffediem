@@ -7,7 +7,8 @@ Vi har code-review for merge til main og previews på alle nye pull requests.
 Formater koden din og fiks feilmeldinger og advarsler før du commit-er:
 
 ```bash
-npm run lint
+make format
+make lint
 ```
 
 ### Retningslinjer
