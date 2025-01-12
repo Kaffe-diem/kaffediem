@@ -1,0 +1,23 @@
+name: Bug
+description: Noe virker ikke slik det skal
+title: ""
+labels: ["bug"]
+body:
+  - type: checkboxes
+    attributes:
+      label:
+      description:
+      options:
+        - label: Jeg har sett etter lignende issues
+          required: true
+  - type: textarea
+    attributes:
+      label: Beskriv problemet
+      description: Hvordan reproduseres feilen?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Relevante logs
+      description: Lim inn logs fra konsollen
+      render: shell
