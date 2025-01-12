@@ -28,10 +28,6 @@ PB_ADMIN_EMAIL=
 PB_ADMIN_PASSWORD=
 ```
 
-```bash
-export $(xargs <.env)
-```
-
 2. Bygg og kjør appen
 
 ```bash

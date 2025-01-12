@@ -3,14 +3,22 @@
 default: dev
 
 dev: pb_types
-	@npm run dev
+	npx vite dev
 
 build: pb_types
-	@npm run build
+	npx vite build
 
 db:
-	@docker compose up
+	docker compose up
 
 pb_types:
-	@echo Reading schema from $(PUBLIC_PB_HOST)
-	@npx --yes pocketbase-typegen@1.3.0 --url $(PUBLIC_PB_HOST) --email $(PB_ADMIN_EMAIL) --password $(PB_ADMIN_PASSWORD) --out ./src/lib/pocketbase/index.d.ts
+	npx pocketbase-typegen --url $(PUBLIC_PB_HOST) --email $(PB_ADMIN_EMAIL) --password $(PB_ADMIN_PASSWORD) --out ./src/lib/pocketbase/index.d.ts
+
+format:
+	npx prettier --write .
+
+lint:
+	npx prettier --check . 
+	npx svelte-kit sync 
+	npx svelte-check --tsconfig ./tsconfig.json
+	npx eslint src
