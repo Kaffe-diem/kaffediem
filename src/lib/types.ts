@@ -142,7 +142,7 @@ export class Item extends Record implements RecordBase {
       name: data.name,
       price: data.price_nok,
       category: data.category,
-      image: pb.files.getUrl(data, data.image)
+      image: pb.files.getURL(data, data.image)
     } as Item);
   }
 }
