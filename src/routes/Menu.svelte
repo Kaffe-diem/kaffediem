@@ -1,6 +1,6 @@
 <script>
   import { categories } from "$stores/menuStore";
-  import { status } from "$stores/messageStore";
+  import { status } from "$stores/statusStore";
   import MenuItem from "$components/MenuItem.svelte";
 </script>
 

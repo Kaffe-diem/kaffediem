@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { messages, status } from "$stores/messageStore";
+  import { messages, status } from "$stores/statusStore";
   import { Message, Status } from "$lib/types";
 
   const handleStatusChange = (message: Message) => {

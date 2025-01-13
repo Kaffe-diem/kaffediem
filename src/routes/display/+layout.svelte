@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { status } from "$stores/messageStore";
+  import { status } from "$stores/statusStore";
   import { type Snippet } from "svelte";
 
   // import QR from "$assets/qr-code.svg";

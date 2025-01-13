@@ -3,7 +3,7 @@
   import Logo from "$assets/logo.png";
   import AuthButton from "$components/AuthButton.svelte";
   import Menu from "./Menu.svelte";
-  import { status } from "$stores/messageStore";
+  import { status } from "$stores/statusStore";
 </script>
 
 <img

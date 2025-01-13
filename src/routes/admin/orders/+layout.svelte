@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { status } from "$stores/messageStore";
+  import { status } from "$stores/statusStore";
   import { Status } from "$lib/types";
   import { type Snippet } from "svelte";
 
