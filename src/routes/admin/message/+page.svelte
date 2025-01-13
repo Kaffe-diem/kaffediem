@@ -3,31 +3,23 @@
   import { Message, Status } from "$lib/types";
 
   const handleStatusChange = (message: Message) => {
-    status.update(
-      new Status({
-        ...$status,
-        online: true,
-        message
-      } as Status)
+    status.update(new Status($status.id, message, $status.messages, true));
+  };
+
+  const handleTitleChange = (event: Event, message: Message) => {
+    messages.update(
+      new Message(message.id, (event.target as HTMLInputElement).value, message.subtitle)
     );
   };
 
-  const handleMessageTextChange = (event: Event, message: Message, field: "title" | "subtitle") => {
+  const handleSubtitleChange = (event: Event, message: Message) => {
     messages.update(
-      new Message({
-        ...message,
-        [field]: (event.target as HTMLInputElement).value
-      } as Message)
+      new Message(message.id, message.title, (event.target as HTMLInputElement).value)
     );
   };
 
   const handleVisibilityChange = () => {
-    status.update(
-      new Status({
-        ...$status,
-        online: false
-      } as Status)
-    );
+    status.update(new Status($status.id, $status.message, $status.messages, false));
   };
 </script>
 
@@ -49,14 +41,14 @@
             class="input input-lg input-bordered w-full"
             value={message.title}
             placeholder="Tittel"
-            oninput={(event) => handleMessageTextChange(event, message, "title")}
+            oninput={(event) => handleTitleChange(event, message)}
           />
           <input
             type="text"
             class="input input-lg input-bordered w-full"
             value={message.subtitle}
             placeholder="Beskrivelse"
-            oninput={(event) => handleMessageTextChange(event, message, "subtitle")}
+            oninput={(event) => handleSubtitleChange(event, message)}
           />
           <button
             class="btn btn-secondary btn-lg"
@@ -81,9 +73,7 @@
         <span>Åpent!</span>
       </label>
     </li>
-    <button
-      class="btn btn-lg"
-      onclick={() => messages.create(new Message({ title: "", subtitle: "" } as Message))}
+    <button class="btn btn-lg" onclick={() => messages.create(Message.baseValue)}
       >Legg til melding</button
     >
   </ul>

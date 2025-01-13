@@ -17,12 +17,8 @@
       class="btn relative m-4 flex h-24 w-1/2 flex-col items-center justify-center text-3xl lg:text-5xl
 "
       onclick={() =>
-        status.update(
-          new Status({
-            ...$status,
-            online: false
-          } as Status)
-        )}>Åpne</button
+        status.update(new Status($status.id, $status.message, $status.messages, false))}
+      >Åpne</button
     >
     <a
       href="/admin/message"
