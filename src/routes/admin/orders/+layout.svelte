@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { activeMessage } from "$stores/messageStore";
-  import { ActiveMessage } from "$lib/types";
+  import { status } from "$stores/statusStore";
+  import { Status } from "$lib/types";
   import { type Snippet } from "svelte";
 
   interface Props {
@@ -10,18 +10,18 @@
   let { children }: Props = $props();
 </script>
 
-{#if $activeMessage.visible}
+{#if $status.online}
   <div class="flex h-full w-full flex-col items-center justify-center">
     <span class="p-2 text-center text-3xl font-bold md:text-6xl">Det er stengt</span>
     <button
       class="btn relative m-4 flex h-24 w-1/2 flex-col items-center justify-center text-3xl lg:text-5xl
 "
       onclick={() =>
-        activeMessage.update(
-          new ActiveMessage({
-            ...$activeMessage,
-            visible: false
-          } as ActiveMessage)
+        status.update(
+          new Status({
+            ...$status,
+            online: false
+          } as Status)
         )}>Åpne</button
     >
     <a

@@ -1,6 +1,6 @@
 import { createGenericPbStore } from "$stores/pbStore";
 import pb, { Collections, type MessageResponse } from "$lib/pocketbase";
-import { Message, ActiveMessage } from "$lib/types";
+import { Message, Status } from "$lib/types";
 import { writable } from "svelte/store";
 
 import eventsource from "eventsource";
@@ -9,8 +9,8 @@ import eventsource from "eventsource";
 
 export const messages = createGenericPbStore(Collections.Message, Message);
 
-function createActiveMessageStore() {
-  const { subscribe, set, update } = writable<ActiveMessage>(ActiveMessage.baseValue);
+function createStatusStore() {
+  const { subscribe, set, update } = writable(Status.baseValue);
 
   (async () => {
     // Only use the first record. Assumes that PB already has this and only this record.
@@ -19,15 +19,12 @@ function createActiveMessageStore() {
       .collection(Collections.Message)
       .getFullList();
 
-    const initialData = ActiveMessage.fromPb(
-      initialActiveMessage,
-      initialMessages.map(Message.fromPb)
-    );
+    const initialData = Status.fromPb(initialActiveMessage, initialMessages.map(Message.fromPb));
     set(initialData);
 
     pb.collection(Collections.Status).subscribe("*", async (event) => {
       update((state) => {
-        return ActiveMessage.fromPb(event.record, state.messages);
+        return Status.fromPb(event.record, state.messages);
       });
     });
 
@@ -56,9 +53,9 @@ function createActiveMessageStore() {
   return subscribe;
 }
 
-export const activeMessage = {
-  subscribe: createActiveMessageStore(),
-  update: async (activeMessage: ActiveMessage) => {
-    await pb.collection(Collections.Status).update(activeMessage.id, activeMessage.toPb());
+export const status = {
+  subscribe: createStatusStore(),
+  update: async (status: Status) => {
+    await pb.collection(Collections.Status).update(status.id, status.toPb());
   }
 };
