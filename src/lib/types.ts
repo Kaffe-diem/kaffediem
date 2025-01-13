@@ -61,7 +61,7 @@ export class Order implements RecordBase {
 
   // FIXME: implement correctly
   toPb() {
-    return this;
+    return { state: this.state, items: this.items };
   }
 
   static fromPb(data: ExpandedOrderRecord): Order {
@@ -81,7 +81,7 @@ export class OrderItem implements RecordBase {
   ) {}
 
   toPb() {
-    return this;
+    return { name: this.name, item: this.item };
   }
 
   static fromPb(data: ExpandedOrderItemRecord): OrderItem {
@@ -99,7 +99,7 @@ export class Item implements RecordBase {
   ) {}
 
   toPb() {
-    return this;
+    return { name: this.name, price_nok: this.price, category: this.category, image: this.image };
   }
 
   static fromPb(data: ItemResponse): Item {
