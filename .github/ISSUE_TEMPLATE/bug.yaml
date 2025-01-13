@@ -1,14 +1,13 @@
 name: Bug
 description: Noe virker ikke slik det skal
-title: ""
 labels: ["bug"]
 body:
   - type: checkboxes
     attributes:
-      label:
+      label: "Jeg har:"
       description:
       options:
-        - label: Jeg har sett etter lignende issues
+        - label: Sett etter lignende issues
           required: true
   - type: textarea
     attributes:
@@ -16,6 +15,15 @@ body:
       description: Hvordan reproduseres feilen?
     validations:
       required: true
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: På hvilke nettlesere skjer problemet?
+      multiple: true
+      options:
+        - Firefox
+        - Chromium
+        - Safari
   - type: textarea
     attributes:
       label: Relevante logs
