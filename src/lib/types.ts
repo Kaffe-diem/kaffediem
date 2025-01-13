@@ -147,7 +147,7 @@ export class Message implements RecordBase {
     public readonly subtitle: string
   ) {}
 
-  static baseValue = { id: "", title: "", subtitle: "" } as Message;
+  static baseValue = new Message("", "", "");
 
   toPb() {
     return { title: this.title, subtitle: this.subtitle };
@@ -166,12 +166,7 @@ export class Status implements RecordBase {
     public readonly online: boolean
   ) {}
 
-  static baseValue = {
-    id: "",
-    online: false,
-    message: Message.baseValue,
-    messages: [Message.baseValue]
-  } as Status;
+  static baseValue = new Status("", Message.baseValue, [Message.baseValue], false);
 
   toPb() {
     return { message: this.message.id, online: this.online };
