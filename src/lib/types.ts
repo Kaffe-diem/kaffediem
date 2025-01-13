@@ -35,30 +35,15 @@ export interface RecordBase {
   // fromPb(data: any): RecordClass; // can't have static methods in interface https://github.com/microsoft/TypeScript/issues/13462
 }
 
-export class Record {
-  id: RecordIdString;
-
-  constructor(data: Record) {
-    this.id = data.id;
-  }
-}
-
-export class User extends Record {
-  name: string;
-  isAdmin: boolean;
-
-  constructor(data: User) {
-    super(data);
-    this.name = data.name;
-    this.isAdmin = data.isAdmin;
-  }
+export class User {
+  constructor(
+    public readonly id: RecordIdString,
+    public readonly name: string,
+    public readonly isAdmin: boolean
+  ) {}
 
   static fromPb(data: AuthModel): User {
-    return new User({
-      id: data?.id,
-      name: data?.name,
-      isAdmin: data?.is_admin
-    });
+    return new User(data?.id, data?.name, data?.is_admin);
   }
 }
 
@@ -67,15 +52,12 @@ export type ExpandedOrderRecord = OrderResponse & {
   expand: { items: ExpandedOrderItemRecord[] };
 };
 
-export class Order extends Record implements RecordBase {
-  state: State;
-  items: Array<OrderItem>;
-
-  constructor(data: Order) {
-    super(data);
-    this.state = data.state;
-    this.items = data.items;
-  }
+export class Order implements RecordBase {
+  constructor(
+    public readonly id: RecordIdString,
+    public readonly state: State,
+    public readonly items: Array<OrderItem>
+  ) {}
 
   // FIXME: implement correctly
   toPb() {
@@ -83,11 +65,7 @@ export class Order extends Record implements RecordBase {
   }
 
   static fromPb(data: ExpandedOrderRecord): Order {
-    return new Order({
-      id: data.id,
-      state: data.state,
-      items: data.expand.items.map(OrderItem.fromPb)
-    } as Order);
+    return new Order(data.id, data.state, data.expand.items.map(OrderItem.fromPb));
   }
 }
 
@@ -95,55 +73,43 @@ export type ExpandedOrderItemRecord = OrderItemResponse & {
   expand: { item: ItemResponse };
 };
 
-export class OrderItem extends Record implements RecordBase {
-  name: string;
-  item: Item;
-
-  constructor(data: OrderItem) {
-    super(data);
-    this.name = data.name;
-    this.item = data.item;
-  }
+export class OrderItem implements RecordBase {
+  constructor(
+    public readonly id: RecordIdString,
+    public readonly name: string,
+    public readonly item: Item
+  ) {}
 
   toPb() {
     return this;
   }
 
   static fromPb(data: ExpandedOrderItemRecord): OrderItem {
-    return new OrderItem({
-      id: data.id,
-      name: data.expand.item.name,
-      item: Item.fromPb(data.expand.item)
-    } as OrderItem);
+    return new OrderItem(data.id, data.expand.item.name, Item.fromPb(data.expand.item));
   }
 }
 
-export class Item extends Record implements RecordBase {
-  name: string;
-  price: number;
-  category: string;
-  image: string;
-
-  constructor(data: Item) {
-    super(data);
-    this.name = data.name;
-    this.price = data.price;
-    this.category = data.category;
-    this.image = data.image;
-  }
+export class Item implements RecordBase {
+  constructor(
+    public readonly id: RecordIdString,
+    public readonly name: string,
+    public readonly price: number,
+    public readonly category: string,
+    public readonly image: string
+  ) {}
 
   toPb() {
     return this;
   }
 
   static fromPb(data: ItemResponse): Item {
-    return new Item({
-      id: data.id,
-      name: data.name,
-      price: data.price_nok,
-      category: data.category,
-      image: pb.files.getUrl(data, data.image)
-    } as Item);
+    return new Item(
+      data.id,
+      data.name,
+      data.price_nok,
+      data.category,
+      pb.files.getUrl(data, data.image)
+    );
   }
 }
 
@@ -151,62 +117,54 @@ export type ExpandedCategoryRecord = CategoryResponse & {
   expand: { item_via_category: ItemResponse[] };
 };
 
-export class Category extends Record implements RecordBase {
-  name: string;
-  sortOrder: number;
-  items: Item[];
-
-  constructor(data: Category) {
-    super(data);
-    this.name = data.name;
-    this.sortOrder = data.sortOrder;
-    this.items = data.items;
-  }
+export class Category implements RecordBase {
+  constructor(
+    public readonly id: RecordIdString,
+    public readonly name: string,
+    public readonly sortOrder: number,
+    public readonly items: Item[]
+  ) {}
 
   toPb() {
     return { name: this.name, sort_order: this.sortOrder };
   }
 
   static fromPb(data: ExpandedCategoryRecord): Category {
-    return new Category({
-      id: data.id,
-      name: data.name,
-      sortOrder: data.sort_order,
-      items: data.expand.item_via_category.map(Item.fromPb)
-    } as Category);
+    return new Category(
+      data.id,
+      data.name,
+      data.sort_order,
+      data.expand.item_via_category.map(Item.fromPb)
+    );
   }
 }
 
 // messages
-export class Message extends Record implements RecordBase {
-  title: string;
-  subtitle: string;
+export class Message implements RecordBase {
+  constructor(
+    public readonly id: RecordIdString,
+    public readonly title: string,
+    public readonly subtitle: string
+  ) {}
 
   static baseValue = { id: "", title: "", subtitle: "" } as Message;
-
-  constructor(data: Message) {
-    super(data);
-    this.title = data.title;
-    this.subtitle = data.subtitle;
-  }
 
   toPb() {
     return { title: this.title, subtitle: this.subtitle };
   }
 
   static fromPb(data: MessageResponse): Message {
-    return new Message({
-      id: data.id,
-      title: data.title,
-      subtitle: data.subtitle
-    } as Message);
+    return new Message(data.id, data.title, data.subtitle);
   }
 }
 
-export class Status extends Record implements RecordBase {
-  message: Message;
-  messages: Message[];
-  online: boolean;
+export class Status implements RecordBase {
+  constructor(
+    public readonly id: RecordIdString,
+    public readonly message: Message,
+    public readonly messages: Message[],
+    public readonly online: boolean
+  ) {}
 
   static baseValue = {
     id: "",
@@ -215,23 +173,16 @@ export class Status extends Record implements RecordBase {
     messages: [Message.baseValue]
   } as Status;
 
-  constructor(data: Status) {
-    super(data);
-    this.messages = data.messages;
-    this.message = data.message;
-    this.online = data.online;
-  }
-
   toPb() {
     return { message: this.message.id, online: this.online };
   }
 
   static fromPb(status: StatusResponse, messages: Message[]): Status {
-    return new Status({
-      id: status.id,
-      message: messages.filter((m) => m.id == status.message)[0] || Message.baseValue,
-      messages: messages,
-      online: status.online
-    } as Status);
+    return new Status(
+      status.id,
+      messages.filter((m) => m.id == status.message)[0] || Message.baseValue,
+      messages,
+      status.online
+    );
   }
 }
