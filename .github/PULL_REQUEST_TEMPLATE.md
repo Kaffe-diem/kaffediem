@@ -3,8 +3,8 @@
 ## Jeg har:
 
 - [ ] Sjekket andre issues og pull requests
-- [ ] Formatert koden med `npm run format`
-- [ ] Fikset linting errors fra `npm run lint`
+- [ ] Formatert koden med `make format`
+- [ ] Fikset linting errors fra `make lint`
 - [ ] Testet koden med `make`
 - [ ] Dokumentert endringene i `/docs`
 - [ ] Fulgt [retningslinjene for kontribuering](../docs/contribution.md)
