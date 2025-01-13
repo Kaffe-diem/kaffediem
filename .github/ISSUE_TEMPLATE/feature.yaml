@@ -1,14 +1,13 @@
 name: Forbedring
 description: Forslag til ny funksjonalitet eller forbedrelse
-title: ""
 labels: ["enhancement"]
 body:
   - type: checkboxes
     attributes:
-      label:
+      label: "Jeg har:"
       description:
       options:
-        - label: Jeg har sett etter lignende issues
+        - label: Sett etter lignende issues
           required: true
   - type: textarea
     attributes:
