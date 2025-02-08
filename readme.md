@@ -18,7 +18,7 @@ Bemerk at node versjon 20 brukes. Det kan installeres med NVM:
 nvm use 20
 ```
 
-### Teste på lokal maskin (dependencies allerede installert, hvis ikke: `npm ci`)
+### Teste på lokal maskin (dependencies allerede installert, hvis ikke: `make dependencies`)
 
 1. .env
 
@@ -42,17 +42,17 @@ make db
 
 ### Hvis dependencies ikke er installert (for eksempel på rpi):
 
-1. Kopier `package.json` og `package-lock.json` til `build/`
+1. Kopier `package.json` og `bun.lock` til `build/`
 
 ```bash
-cp {package.json,package-lock.json} build/
+cp {package.json,bun.lock} build/
 cd build
 ```
 
 2. Installer dependencies
 
 ```bash
-npm ci --omit dev
+bun install --production
 ```
 
 3. Kjør serveren:

@@ -2,23 +2,26 @@
 
 default: dev
 
-dev: pb_types
-	npx vite dev
+dev: pb_types dependencies
+	bun run vite dev
 
-build: pb_types
-	npx vite build
+build: pb_types dependencies
+	bun run vite build
 
-db:
+db: dependencies
 	docker compose up
 
-pb_types:
-	@npx pocketbase-typegen --url $(PUBLIC_PB_HOST) --email $(PB_ADMIN_EMAIL) --password $(PB_ADMIN_PASSWORD) --out ./src/lib/pocketbase/index.d.ts
+pb_types: dependencies
+	@bun run pocketbase-typegen --url $(PUBLIC_PB_HOST) --email $(PB_ADMIN_EMAIL) --password $(PB_ADMIN_PASSWORD) --out ./src/lib/pocketbase/index.d.ts
 
-format:
-	npx prettier --write .
+format: dependencies
+	bun run prettier --write .
 
-lint:
-	npx prettier --check . 
-	npx svelte-kit sync 
-	npx svelte-check --tsconfig ./tsconfig.json
-	npx eslint src
+lint: dependencies
+	bun run prettier --check .
+	bun run svelte-kit sync
+	bun run svelte-check --tsconfig ./tsconfig.json
+	bun run eslint src
+
+dependencies:
+	bun install

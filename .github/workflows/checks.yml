@@ -23,9 +23,6 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Get dependencies
-        run: npm ci
-
       - name: Run pocketbase-typegen
         run: make pb_types
 

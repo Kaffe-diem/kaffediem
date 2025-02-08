@@ -25,8 +25,8 @@
               # Plantuml
               plantuml
               # JS
-              nodejs_20
-              nodePackages.npm
+              (nodejs_20.override { enableNpm = false; })
+              bun
               nodePackages.typescript-language-server
               nodePackages.typescript
               emmet-ls
