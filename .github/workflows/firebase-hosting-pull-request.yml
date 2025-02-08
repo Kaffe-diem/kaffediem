@@ -18,6 +18,7 @@ jobs:
       FIREBASE_CLI_EXPERIMENTS: webframeworks
     steps:
       - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
       - run: make build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
