@@ -8,7 +8,7 @@ dev: pb_types dependencies
 build: pb_types dependencies
 	bun run vite build
 
-db: dependencies
+db:
 	docker compose up
 
 pb_types: dependencies
