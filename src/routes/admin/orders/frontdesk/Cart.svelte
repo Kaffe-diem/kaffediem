@@ -9,6 +9,40 @@
 </script>
 
 <div class="flex h-full flex-col justify-center gap-8">
+  <ul>
+    <label><input type="checkbox" class="toggle" /> Bursdag</label>
+    <label><input type="checkbox" class="toggle" /> Klippekort</label>
+
+    <fieldset>
+      <legend>Melk</legend>
+      <label><input type="radio" class="radio" name="milk" /> Havre</label>
+      <label><input type="radio" class="radio" name="milk" /> Soya</label>
+      <label><input type="radio" class="radio" name="milk" /> Hel</label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Smaker</legend>
+      <label><input type="radio" class="radio" name="flavor" /> Vanilje</label>
+      <label><input type="radio" class="radio" name="flavor" /> Salt karamell</label>
+      <label><input type="radio" class="radio" name="flavor" /> Pumpkin spice</label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Extra</legend>
+      <label><input type="radio" class="radio" name="extra" /> Sirup</label>
+      <label><input type="radio" class="radio" name="extra" /> Krem</label>
+      <label><input type="radio" class="radio" name="extra" /> Espresso</label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Kopp</legend>
+      <label><input type="radio" class="radio" name="size" /> Liten</label>
+      <label><input type="radio" class="radio" name="size" /> Middels</label>
+      <label><input type="radio" class="radio" name="size" /> Stor</label>
+      <label><input type="radio" class="radio" name="size" /> Egen</label>
+    </fieldset>
+  </ul>
+
   <div class="h-1/2 overflow-y-auto">
     <table class="table table-pin-rows table-auto list-none p-4 shadow-2xl">
       <thead>
