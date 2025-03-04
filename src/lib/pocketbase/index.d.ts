@@ -12,9 +12,13 @@ export enum Collections {
 	Otps = "_otps",
 	Superusers = "_superusers",
 	Category = "category",
+	CustomizationKey = "customization_key",
+	CustomizationValue = "customization_value",
 	Item = "item",
+	ItemCustomization = "item_customization",
 	Message = "message",
 	Order = "order",
+	OrderCorrection = "order_correction",
 	OrderItem = "order_item",
 	Status = "status",
 	User = "user",
@@ -99,6 +103,23 @@ export type CategoryRecord = {
 	updated?: IsoDateString
 }
 
+export type CustomizationKeyRecord = {
+	created?: IsoDateString
+	id: string
+	label_color?: string
+	name?: string
+	updated?: IsoDateString
+}
+
+export type CustomizationValueRecord = {
+	belongs_to?: RecordIdString
+	created?: IsoDateString
+	id: string
+	name?: string
+	price_increment_nok?: number
+	updated?: IsoDateString
+}
+
 export type ItemRecord = {
 	category: RecordIdString
 	created?: IsoDateString
@@ -107,6 +128,14 @@ export type ItemRecord = {
 	name: string
 	price_nok: number
 	updated?: IsoDateString
+}
+
+export type ItemCustomizationRecord = {
+	created?: IsoDateString
+	id: string
+	key?: RecordIdString
+	updated?: IsoDateString
+	value?: RecordIdString[]
 }
 
 export type MessageRecord = {
@@ -126,14 +155,25 @@ export enum OrderStateOptions {
 export type OrderRecord = {
 	created?: IsoDateString
 	customer?: RecordIdString
+	field?: RecordIdString
 	id: string
 	items: RecordIdString[]
 	state?: OrderStateOptions
 	updated?: IsoDateString
 }
 
+export type OrderCorrectionRecord = {
+	created?: IsoDateString
+	description?: string
+	id: string
+	name?: string
+	system_tag?: string
+	updated?: IsoDateString
+}
+
 export type OrderItemRecord = {
 	created?: IsoDateString
+	customization?: RecordIdString[]
 	id: string
 	item: RecordIdString
 	updated?: IsoDateString
@@ -169,9 +209,13 @@ export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemF
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
 export type CategoryResponse<Texpand = unknown> = Required<CategoryRecord> & BaseSystemFields<Texpand>
+export type CustomizationKeyResponse<Texpand = unknown> = Required<CustomizationKeyRecord> & BaseSystemFields<Texpand>
+export type CustomizationValueResponse<Texpand = unknown> = Required<CustomizationValueRecord> & BaseSystemFields<Texpand>
 export type ItemResponse<Texpand = unknown> = Required<ItemRecord> & BaseSystemFields<Texpand>
+export type ItemCustomizationResponse<Texpand = unknown> = Required<ItemCustomizationRecord> & BaseSystemFields<Texpand>
 export type MessageResponse<Texpand = unknown> = Required<MessageRecord> & BaseSystemFields<Texpand>
 export type OrderResponse<Texpand = unknown> = Required<OrderRecord> & BaseSystemFields<Texpand>
+export type OrderCorrectionResponse<Texpand = unknown> = Required<OrderCorrectionRecord> & BaseSystemFields<Texpand>
 export type OrderItemResponse<Texpand = unknown> = Required<OrderItemRecord> & BaseSystemFields<Texpand>
 export type StatusResponse<Texpand = unknown> = Required<StatusRecord> & BaseSystemFields<Texpand>
 export type UserResponse<Texpand = unknown> = Required<UserRecord> & AuthSystemFields<Texpand>
@@ -185,9 +229,13 @@ export type CollectionRecords = {
 	_otps: OtpsRecord
 	_superusers: SuperusersRecord
 	category: CategoryRecord
+	customization_key: CustomizationKeyRecord
+	customization_value: CustomizationValueRecord
 	item: ItemRecord
+	item_customization: ItemCustomizationRecord
 	message: MessageRecord
 	order: OrderRecord
+	order_correction: OrderCorrectionRecord
 	order_item: OrderItemRecord
 	status: StatusRecord
 	user: UserRecord
@@ -200,9 +248,13 @@ export type CollectionResponses = {
 	_otps: OtpsResponse
 	_superusers: SuperusersResponse
 	category: CategoryResponse
+	customization_key: CustomizationKeyResponse
+	customization_value: CustomizationValueResponse
 	item: ItemResponse
+	item_customization: ItemCustomizationResponse
 	message: MessageResponse
 	order: OrderResponse
+	order_correction: OrderCorrectionResponse
 	order_item: OrderItemResponse
 	status: StatusResponse
 	user: UserResponse
@@ -218,9 +270,13 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: '_otps'): RecordService<OtpsResponse>
 	collection(idOrName: '_superusers'): RecordService<SuperusersResponse>
 	collection(idOrName: 'category'): RecordService<CategoryResponse>
+	collection(idOrName: 'customization_key'): RecordService<CustomizationKeyResponse>
+	collection(idOrName: 'customization_value'): RecordService<CustomizationValueResponse>
 	collection(idOrName: 'item'): RecordService<ItemResponse>
+	collection(idOrName: 'item_customization'): RecordService<ItemCustomizationResponse>
 	collection(idOrName: 'message'): RecordService<MessageResponse>
 	collection(idOrName: 'order'): RecordService<OrderResponse>
+	collection(idOrName: 'order_correction'): RecordService<OrderCorrectionResponse>
 	collection(idOrName: 'order_item'): RecordService<OrderItemResponse>
 	collection(idOrName: 'status'): RecordService<StatusResponse>
 	collection(idOrName: 'user'): RecordService<UserResponse>

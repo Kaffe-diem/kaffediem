@@ -6,7 +6,10 @@ import pb, {
   type OrderResponse,
   type OrderItemResponse,
   type CategoryResponse,
-  type StatusResponse
+  type StatusResponse,
+  type CustomizationKeyResponse,
+  type CustomizationValueResponse,
+  type ItemCustomizationResponse
 } from "$lib/pocketbase";
 import { restrictedRoutes, adminRoutes } from "$lib/constants";
 import type { AuthModel } from "pocketbase";
@@ -178,6 +181,82 @@ export class Status implements RecordBase {
       messages.filter((m) => m.id == status.message)[0] || Message.baseValue,
       messages,
       status.online
+    );
+  }
+}
+
+// Customization types
+export class CustomizationKey implements RecordBase {
+  constructor(
+    public readonly id: RecordIdString,
+    public readonly name: string,
+    public readonly labelColor?: string
+  ) {}
+
+  toPb() {
+    return { name: this.name, label_color: this.labelColor };
+  }
+
+  static fromPb(data: CustomizationKeyResponse): CustomizationKey {
+    return new CustomizationKey(data.id, data.name || "", data.label_color);
+  }
+}
+
+export class CustomizationValue implements RecordBase {
+  constructor(
+    public readonly id: RecordIdString,
+    public readonly name: string,
+    public readonly shortname?: string,
+    public readonly priceIncrementNok?: number,
+    public readonly belongsTo?: RecordIdString
+  ) {}
+
+  toPb() {
+    return { 
+      name: this.name, 
+      shortname: this.shortname,
+      price_increment_nok: this.priceIncrementNok,
+      belongs_to: this.belongsTo
+    };
+  }
+
+  static fromPb(data: CustomizationValueResponse): CustomizationValue {
+    return new CustomizationValue(
+      data.id,
+      data.name,
+      data.shortname,
+      data.price_increment_nok,
+      data.belongs_to
+    );
+  }
+}
+
+export type ExpandedItemCustomizationRecord = ItemCustomizationResponse & {
+  expand: { 
+    key?: CustomizationKeyResponse,
+    value?: CustomizationValueResponse[]
+  };
+};
+
+export class ItemCustomization implements RecordBase {
+  constructor(
+    public readonly id: RecordIdString,
+    public readonly key?: CustomizationKey,
+    public readonly values?: CustomizationValue[]
+  ) {}
+
+  toPb() {
+    return { 
+      key: this.key?.id,
+      value: this.values?.map(v => v.id)
+    };
+  }
+
+  static fromPb(data: ExpandedItemCustomizationRecord): ItemCustomization {
+    return new ItemCustomization(
+      data.id,
+      data.expand.key ? CustomizationKey.fromPb(data.expand.key) : undefined,
+      data.expand.value ? data.expand.value.map(CustomizationValue.fromPb) : undefined
     );
   }
 }
