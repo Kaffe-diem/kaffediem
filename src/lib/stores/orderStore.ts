@@ -7,8 +7,6 @@ import { get } from "svelte/store";
 const today = new Date().toISOString().split("T")[0];
 
 const baseOptions = {
-  //   Table `item`
-  // + col `item` which references `order_item`
   expand: "items,items.item",
   filter: `created >= "${today}"`
 };

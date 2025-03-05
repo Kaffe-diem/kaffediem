@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { $props } from "svelte";
   import type { OrderStateOptions, RecordIdString } from "$lib/pocketbase";
   import orders from "$stores/orderStore";
   import { customizationKeys } from "$lib/stores/menuStore";
@@ -11,9 +10,10 @@
     label: string;
   }>();
 
-  // Helper function to get customization key by id
+
   function getKeyById(keyId: string): CustomizationKey | undefined {
     const keys = $customizationKeys as CustomizationKey[];
+    
     return keys.find((key: CustomizationKey) => key.id === keyId);
   }
 </script>
@@ -37,9 +37,9 @@
                     {orderItem.item.name}
                   </span>
                   
-                  {#if orderItem.item.customizations && orderItem.item.customizations.length > 0}
+                  {#if orderItem.customizations && orderItem.customizations.length > 0}
                     <div class="flex flex-wrap gap-1 mt-1 ml-2">
-                      {#each orderItem.item.customizations as customization}
+                      {#each orderItem.customizations as customization}
                         {#if customization.name}
                           <span 
                             class="badge badge-sm" 
