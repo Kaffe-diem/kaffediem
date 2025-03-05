@@ -233,7 +233,6 @@ export class CustomizationValue implements RecordBase {
   constructor(
     public readonly id: RecordIdString,
     public readonly name: string,
-    public readonly shortname?: string,
     public readonly priceIncrementNok?: number,
     public readonly belongsTo?: RecordIdString
   ) {}
@@ -241,20 +240,13 @@ export class CustomizationValue implements RecordBase {
   toPb() {
     return {
       name: this.name,
-      shortname: this.shortname,
       price_increment_nok: this.priceIncrementNok,
       belongs_to: this.belongsTo
     };
   }
 
   static fromPb(data: CustomizationValueResponse): CustomizationValue {
-    return new CustomizationValue(
-      data.id,
-      data.name,
-      undefined, // shortname is not in the response type
-      data.price_increment_nok,
-      data.belongs_to
-    );
+    return new CustomizationValue(data.id, data.name, data.price_increment_nok, data.belongs_to);
   }
 }
 

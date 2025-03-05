@@ -19,7 +19,9 @@
     <h2 class="card-title">{item.name}</h2>
     <div class="card-actions items-center justify-between">
       {#if $auth.isAuthenticated && buyButton}
-        <button class="btn btn-secondary" onclick={() => orders.create($auth.user.id, [item.id])}
+        <button
+          class="btn btn-secondary"
+          onclick={() => orders.create($auth.user.id, [{ itemId: item.id, customizations: [] }])}
           >Kjøp</button
         >
       {/if}

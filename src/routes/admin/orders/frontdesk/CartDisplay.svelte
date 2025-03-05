@@ -1,7 +1,8 @@
 <script lang="ts">
   import { cart, totalPrice, removeFromCart } from "$stores/cartStore";
-  import type { CustomizationValue } from "$lib/types";
   import { customizationKeys } from "$stores/menuStore";
+  import type { CustomizationValue } from "$lib/types";
+  import type { CartItem } from "$stores/cartStore";
 
   const colors = $derived(
     Object.fromEntries($customizationKeys.map((key) => [key.id, key.labelColor]))
@@ -40,7 +41,7 @@
   </span>
 {/snippet}
 
-{#snippet CartItem({ item, index }: { item: any; index: number })}
+{#snippet CartItem({ item, index }: { item: CartItem; index: number })}
   <tr class="hover select-none" onclick={() => removeFromCart(index)}>
     <td>
       <div>

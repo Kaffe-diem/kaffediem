@@ -1,6 +1,7 @@
 <script lang="ts">
   import { categories } from "$stores/menuStore";
-  import type { MenuItem } from "$lib/types";
+  import type { Item } from "$lib/types";
+  import type { Category } from "$lib/types";
 
   let { selectedItem = $bindable() } = $props();
 </script>
@@ -11,7 +12,7 @@
   {/each}
 </div>
 
-{#snippet CategorySection({ category }: { category: any })}
+{#snippet CategorySection({ category }: { category: Category })}
   <div class="mb-8">
     <h1 class="mb-4 text-2xl font-bold text-primary">{category.name}</h1>
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -22,7 +23,7 @@
   </div>
 {/snippet}
 
-{#snippet ItemCard({ item }: { item: MenuItem })}
+{#snippet ItemCard({ item }: { item: Item })}
   <label>
     <input type="radio" name="item" class="peer hidden" value={item} bind:group={selectedItem} />
     <div

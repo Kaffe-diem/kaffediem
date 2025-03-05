@@ -8,7 +8,7 @@
 
   export const getSelectedCustomizationsForItem = (): CustomizationValue[] =>
     Object.entries($selectedCustomizations)
-      .map(([_keyId, valueId]) => $customizationValues.find((v) => v.id === valueId))
+      .map(([, valueId]) => $customizationValues.find((v) => v.id === valueId))
       .filter(Boolean) as CustomizationValue[];
 </script>
 
@@ -34,7 +34,7 @@
   </div>
 {/snippet}
 
-{#snippet CustomizationOption({ key, value }: { key: any; value: CustomizationValue })}
+{#snippet CustomizationOption({ key, value }: { key: CustomizationKey; value: CustomizationValue })}
   <div>
     <button
       class="btn relative flex w-full items-center justify-between border-2 px-3 py-2
