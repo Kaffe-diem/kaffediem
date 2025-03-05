@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { OrderStateOptions, RecordIdString } from "$lib/pocketbase";
+  import type { OrderStateOptions } from "$lib/pocketbase";
   import orders from "$stores/orderStore";
   import { customizationKeys } from "$lib/stores/menuStore";
-  import type { CustomizationKey, Order } from "$lib/types";
+  import type { CustomizationKey, CustomizationValue, Order, OrderItem } from "$lib/types";
 
   const { show, onclick, label } = $props<{
     show: OrderStateOptions[];
@@ -14,10 +14,6 @@
     const keys = $customizationKeys as CustomizationKey[];
     
     return keys.find((key: CustomizationKey) => key.id === keyId);
-  }
-  
-  function handleOrderClick(orderId: RecordIdString) {
-    orders.updateState(orderId, onclick);
   }
 </script>
 
@@ -40,8 +36,7 @@
         {#if order && show.includes(order.state)}
           {@render OrderRow({ 
             order, 
-            orderNumber: index + 100, 
-            onOrderClick: handleOrderClick 
+            orderNumber: index + 100 
           })}
         {/if}
       {/each}
@@ -49,13 +44,13 @@
   </table>
 </div>
 
-{#snippet OrderRow({ order, orderNumber, onOrderClick })}
+{#snippet OrderRow({ order, orderNumber }: { order: Order, orderNumber: number })}
   <tr 
-    class="bg-base-300 rounded cursor-pointer transition-colors mb-4 block" 
-    onclick={() => onOrderClick(order.id)}
+    class="bg-base-200 rounded cursor-pointer transition-colors mb-4 block shadow-md" 
+    onclick={() => orders.updateState(order.id, onclick)}
     role="button"
     tabindex="0"
-    onkeydown={(e) => e.key === 'Enter' && onOrderClick(order.id)}
+    onkeydown={(e) => e.key === 'Enter' && orders.updateState(order.id, onclick)}
     aria-label={`Order ${orderNumber} with ${order.items.length} items`}
   >
     <td class="text-lg font-semibold">{orderNumber}</td>
@@ -69,8 +64,8 @@
   </tr>
 {/snippet}
 
-{#snippet OrderItem({ orderItem })}
-  <li class="rounded bg-base-100 p-3 shadow-sm">
+{#snippet OrderItem({ orderItem }: { orderItem: OrderItem })}
+  <li class="rounded bg-base-300 p-3 shadow">
     <div class="flex flex-col">
       <span class="text-lg font-medium mb-1">
         {orderItem.item.name}
@@ -89,7 +84,7 @@
   </li>
 {/snippet}
 
-{#snippet CustomizationBadge({ customization })}
+{#snippet CustomizationBadge({ customization }: { customization: CustomizationValue })}
   {@const keyId = customization.belongsTo || ''}
   {@const key = getKeyById(keyId)}
   {@const keyColor = key?.labelColor}

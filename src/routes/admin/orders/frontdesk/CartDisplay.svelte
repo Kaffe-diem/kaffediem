@@ -1,13 +1,11 @@
 <script lang="ts">
-  import { cart, totalPrice, removeFromCart, clearCart } from "$stores/cartStore";
-  import type { CustomizationKey } from "$lib/types";
+  import { cart, totalPrice, removeFromCart } from "$stores/cartStore";
+  import type { CustomizationValue } from "$lib/types";
   import { customizationKeys } from "$stores/menuStore";
   
-  function getKeyById(keyId: string): CustomizationKey | undefined {
-    return $customizationKeys.find(key => key.id === keyId);
-  }
-  
-
+  const colors = $derived(
+    Object.fromEntries($customizationKeys.map(key => [key.id, key.labelColor]))
+  );
 </script>
 
 <div class="overflow-y-auto">
@@ -21,45 +19,64 @@
     <tbody>
       {#if $cart.length > 0}
         {#each $cart as item, index}
-          <tr class="hover select-none" onclick={() => removeFromCart(index)}>
-            <td>
-              <div>
-                <div>{item.name}</div>
-                {#if item.customizations && item.customizations.length > 0}
-                  <div class="flex flex-wrap gap-1 mt-1">
-                    {#each item.customizations as customization}
-                      {#if customization.name}
-                        <span 
-                          class="badge badge-sm" 
-                          style={
-                            getKeyById(customization.belongsTo || '')?.labelColor 
-                              ? `background-color: ${getKeyById(customization.belongsTo || '')?.labelColor}; color: white;` 
-                              : ''
-                          }
-                        >
-                          {customization.name}
-                        </span>
-                      {/if}
-                    {/each}
-                  </div>
-                {/if}
-              </div>
-            </td>
-            <td>{item.price},-</td>
-          </tr>
+          {@render CartItem({ item, index })}
         {/each}
       {:else}
-        <tr>
-          <td>Ingenting</td>
-          <td></td>
-        </tr>
+        {@render EmptyCartRow()}
       {/if}
     </tbody>
-    <tfoot>
-      <tr>
-        <th>Total: <span class="text-neutral">{$cart.length}</span></th>
-        <th><span class="text-bold text-lg text-primary">{$totalPrice},-</span></th>
-      </tr>
-    </tfoot>
+    {@render CartFooter()}
   </table>
 </div>
+
+{#snippet CustomizationBadge({ customization }: { customization: CustomizationValue })}
+  <span 
+    class="badge badge-sm" 
+    style={
+      customization.belongsTo && colors[customization.belongsTo]
+        ? `background-color: ${colors[customization.belongsTo]}; color: white;` 
+        : ''
+    }
+  >
+    {customization.name}
+  </span>
+{/snippet}
+
+{#snippet CartItem({ item, index }: { item: any, index: number })}
+  <tr 
+    class="hover select-none" 
+    onclick={() => removeFromCart(index)}
+  >
+    <td>
+      <div>
+        <div>{item.name}</div>
+        {#if item.customizations && item.customizations.length > 0}
+          <div class="flex flex-wrap gap-1 mt-1">
+            {#each item.customizations as customization}
+              {#if customization.name}
+                {@render CustomizationBadge({ customization })}
+              {/if}
+            {/each}
+          </div>
+        {/if}
+      </div>
+    </td>
+    <td>{item.price},-</td>
+  </tr>
+{/snippet}
+
+{#snippet EmptyCartRow()}
+  <tr>
+    <td>Ingenting</td>
+    <td></td>
+  </tr>
+{/snippet}
+
+{#snippet CartFooter()}
+  <tfoot>
+    <tr>
+      <th>Total: <span class="text-neutral">{$cart.length}</span></th>
+      <th><span class="text-bold text-lg text-primary">{$totalPrice},-</span></th>
+    </tr>
+  </tfoot>
+{/snippet}
