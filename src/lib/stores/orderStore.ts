@@ -89,31 +89,49 @@ const createItemCustomizations = async (customizationsByKey: Record<string, Cust
     Object.entries(customizationsByKey).map(async ([keyId, values]) => {
       try {
         const valueIds = values.map(v => v.id);
-        const existingCustomizations = await pb.collection(Collections.ItemCustomization).getList(1, 1, {
-          filter: `key = "${keyId}" && value ~ "${valueIds.join('"||value ~ "')}"`
-        });
+        const existingId = await findExistingCustomization(keyId, valueIds);
         
-        for (const existing of existingCustomizations.items) {
-          const existingValueIds = existing.value || [];
-          if (existingValueIds.length === valueIds.length && 
-              valueIds.every(id => existingValueIds.includes(id))) {
-            return existing.id;
-          }
+        if (existingId) {
+          return existingId;
         }
         
-        // If no exact match, create a new customization
-        const response = await pb.collection(Collections.ItemCustomization).create({
-          key: keyId,
-          value: values.map(v => v.id)
-        });
-        
-        return response.id;
+        return createNewCustomization(keyId, valueIds);
       } catch (error) {
         console.error("Error creating item customization:", error);
         throw error;
       }
     })
   );
+};
+
+const findExistingCustomization = async (keyId: string, valueIds: RecordIdString[]): Promise<RecordIdString | null> => {
+  const existingCustomizations = await pb.collection(Collections.ItemCustomization).getList(1, 1, {
+    filter: `key = "${keyId}" && value ~ "${valueIds.join('"||value ~ "')}"`
+  });
+  
+  // Already created?
+  for (const existing of existingCustomizations.items) {
+    const existingValueIds = existing.value || [];
+    if (isExactValueMatch(existingValueIds, valueIds)) {
+      return existing.id;
+    }
+  }
+  
+  return null;
+};
+
+const isExactValueMatch = (existingValueIds: RecordIdString[], valueIds: RecordIdString[]): boolean => {
+  return existingValueIds.length === valueIds.length && 
+         valueIds.every(id => existingValueIds.includes(id));
+};
+
+const createNewCustomization = async (keyId: string, valueIds: RecordIdString[]): Promise<RecordIdString> => {
+  const response = await pb.collection(Collections.ItemCustomization).create({
+    key: keyId,
+    value: valueIds
+  });
+  
+  return response.id;
 };
 
 const verifyCustomizationsAttached = async (orderItemId: RecordIdString) => {
