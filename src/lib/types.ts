@@ -50,7 +50,6 @@ export class User {
   }
 }
 
-// orders
 export type ExpandedOrderRecord = OrderResponse & {
   expand: { items: ExpandedOrderItemRecord[] };
 };
@@ -88,7 +87,6 @@ export class OrderItem implements RecordBase {
   ) {}
 
   toPb() {
-    // Extract customization IDs if they exist
     const customizationIds = this.customizations && this.customizations.length > 0
       ? this.customizations.map(c => c.id)
       : undefined;
@@ -101,7 +99,6 @@ export class OrderItem implements RecordBase {
   }
 
   static fromPb(data: ExpandedOrderItemRecord): OrderItem {
-    // If there are customizations in the data, map them
     const customizations: CustomizationValue[] = [];
     
     if (data.expand?.customization && Array.isArray(data.expand.customization)) {
@@ -173,7 +170,6 @@ export class Category implements RecordBase {
   }
 }
 
-// messages
 export class Message implements RecordBase {
   constructor(
     public readonly id: RecordIdString,
@@ -216,7 +212,6 @@ export class Status implements RecordBase {
   }
 }
 
-// Customization types
 export class CustomizationKey implements RecordBase {
   constructor(
     public readonly id: RecordIdString,

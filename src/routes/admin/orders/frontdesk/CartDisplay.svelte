@@ -3,7 +3,6 @@
   import type { CustomizationKey } from "$lib/types";
   import { customizationKeys } from "$stores/menuStore";
   
-  // Helper function to get customization key by id
   function getKeyById(keyId: string): CustomizationKey | undefined {
     return $customizationKeys.find(key => key.id === keyId);
   }
