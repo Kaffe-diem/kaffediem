@@ -1,7 +1,7 @@
 <script lang="ts">
   import { addToCart, cart, clearCart, type CartItem } from "$stores/cartStore";
   import auth from "$stores/authStore";
-  import orderStore from "$stores/orderStore";
+  import orderStore, { type OrderItemWithCustomizations } from "$stores/orderStore";
   import CustomizationSelection from "./CustomizationSelection.svelte";
   import CartDisplay from "./CartDisplay.svelte";
   import { type Item } from "$lib/types";
@@ -18,9 +18,14 @@
   }
 
   function completeOrder() {
+    const orderItems: OrderItemWithCustomizations[] = $cart.map((item: CartItem) => ({
+      itemId: item.id,
+      customizations: item.customizations
+    }));
+    
     orderStore.create(
       $auth.user.id,
-      $cart.map((item: CartItem) => item.id)
+      orderItems
     );
     
     clearCart();
@@ -28,7 +33,7 @@
 </script>
 
 <div class="flex h-full flex-col justify-between gap-4">
-  <CustomizationSelection bind:this={customizationSelection} {selectedItem} />
+  <CustomizationSelection bind:this={customizationSelection} />
   
   <CartDisplay />
   

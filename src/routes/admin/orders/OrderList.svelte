@@ -10,57 +10,97 @@
     label: string;
   }>();
 
-
   function getKeyById(keyId: string): CustomizationKey | undefined {
     const keys = $customizationKeys as CustomizationKey[];
     
     return keys.find((key: CustomizationKey) => key.id === keyId);
+  }
+  
+  function handleOrderClick(orderId: RecordIdString) {
+    orders.updateState(orderId, onclick);
   }
 </script>
 
 <div class="h-full w-full overflow-y-auto">
   <h2
     class="sticky top-0 z-50 bg-base-100 pb-2 text-center text-4xl font-bold text-neutral md:mb-6"
+    id="order-list-heading"
   >
     {label}
   </h2>
-  <table class="table table-sm table-auto">
-    <tbody>
-      {#each $orders as order}
+  <table class="table table-auto" aria-labelledby="order-list-heading">
+    <thead class="sr-only">
+      <tr>
+        <th>Order Number</th>
+        <th>Order Items</th>
+      </tr>
+    </thead>
+    <tbody class="space-y-4">
+      {#each $orders as order, index}
         {#if order && show.includes(order.state)}
-          <tr class="hover border-none" onclick={() => orders.updateState(order.id, onclick)}>
-            <td class="text-lg">{$orders.indexOf(order) + 100}</td>
-            <td>
-              {#each order.items as orderItem}
-                <div class="mb-2">
-                  <span class="badge badge-ghost m-1 whitespace-nowrap p-3 text-lg">
-                    {orderItem.item.name}
-                  </span>
-                  
-                  {#if orderItem.customizations && orderItem.customizations.length > 0}
-                    <div class="flex flex-wrap gap-1 mt-1 ml-2">
-                      {#each orderItem.customizations as customization}
-                        {#if customization.name}
-                          <span 
-                            class="badge badge-sm" 
-                            style={
-                              getKeyById(customization.belongsTo || '')?.labelColor 
-                                ? `background-color: ${getKeyById(customization.belongsTo || '')?.labelColor}; color: white;` 
-                                : ''
-                            }
-                          >
-                            {customization.name}
-                          </span>
-                        {/if}
-                      {/each}
-                    </div>
-                  {/if}
-                </div>
-              {/each}
-            </td>
-          </tr>
+          {@render OrderRow({ 
+            order, 
+            orderNumber: index + 100, 
+            onOrderClick: handleOrderClick 
+          })}
         {/if}
       {/each}
     </tbody>
   </table>
 </div>
+
+{#snippet OrderRow({ order, orderNumber, onOrderClick })}
+  <tr 
+    class="bg-base-300 rounded cursor-pointer transition-colors mb-4 block" 
+    onclick={() => onOrderClick(order.id)}
+    role="button"
+    tabindex="0"
+    onkeydown={(e) => e.key === 'Enter' && onOrderClick(order.id)}
+    aria-label={`Order ${orderNumber} with ${order.items.length} items`}
+  >
+    <td class="text-lg font-semibold">{orderNumber}</td>
+    <td>
+      <ul class="space-y-4">
+        {#each order.items as orderItem}
+          {@render OrderItem({ orderItem })}
+        {/each}
+      </ul>
+    </td>
+  </tr>
+{/snippet}
+
+{#snippet OrderItem({ orderItem })}
+  <li class="rounded bg-base-100 p-3 shadow-sm">
+    <div class="flex flex-col">
+      <span class="text-lg font-medium mb-1">
+        {orderItem.item.name}
+      </span>
+      
+      {#if orderItem.customizations && orderItem.customizations.length > 0}
+        <ul class="flex flex-wrap gap-1 mt-1" aria-label="Customizations">
+          {#each orderItem.customizations as customization}
+            {#if customization.name}
+              {@render CustomizationBadge({ customization })}
+            {/if}
+          {/each}
+        </ul>
+      {/if}
+    </div>
+  </li>
+{/snippet}
+
+{#snippet CustomizationBadge({ customization })}
+  {@const keyId = customization.belongsTo || ''}
+  {@const key = getKeyById(keyId)}
+  {@const keyColor = key?.labelColor}
+  {@const keyName = key?.name || 'Option'}
+  <li>
+    <span 
+      class="badge badge-sm px-2 py-1"
+      style={keyColor ? `background-color: ${keyColor}; color: white;` : ''}
+      aria-label={`${keyName}: ${customization.name}`}
+    >
+      {customization.name}
+    </span>
+  </li>
+{/snippet}

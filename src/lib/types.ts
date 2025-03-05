@@ -73,22 +73,53 @@ export class Order implements RecordBase {
 }
 
 export type ExpandedOrderItemRecord = OrderItemResponse & {
-  expand: { item: ItemResponse };
+  expand: { 
+    item: ItemResponse;
+    customization?: Array<ExpandedItemCustomizationRecord>; 
+  };
 };
 
 export class OrderItem implements RecordBase {
   constructor(
     public readonly id: RecordIdString,
     public readonly name: string,
-    public readonly item: Item
+    public readonly item: Item,
+    public readonly customizations: CustomizationValue[] = []
   ) {}
 
   toPb() {
-    return { name: this.name, item: this.item };
+    // Extract customization IDs if they exist
+    const customizationIds = this.customizations && this.customizations.length > 0
+      ? this.customizations.map(c => c.id)
+      : undefined;
+      
+    return { 
+      name: this.name, 
+      item: this.item.id,
+      customization: customizationIds
+    };
   }
 
   static fromPb(data: ExpandedOrderItemRecord): OrderItem {
-    return new OrderItem(data.id, data.expand.item.name, Item.fromPb(data.expand.item));
+    // If there are customizations in the data, map them
+    const customizations: CustomizationValue[] = [];
+    
+    if (data.expand?.customization && Array.isArray(data.expand.customization)) {
+      data.expand.customization.forEach((customizationRecord: ExpandedItemCustomizationRecord) => {
+        if (customizationRecord.expand?.value && Array.isArray(customizationRecord.expand.value)) {
+          customizationRecord.expand.value.forEach((valueRecord: CustomizationValueResponse) => {
+            customizations.push(CustomizationValue.fromPb(valueRecord));
+          });
+        }
+      });
+    }
+    
+    return new OrderItem(
+      data.id, 
+      data.expand.item.name, 
+      Item.fromPb(data.expand.item),
+      customizations
+    );
   }
 }
 
@@ -224,7 +255,7 @@ export class CustomizationValue implements RecordBase {
     return new CustomizationValue(
       data.id,
       data.name,
-      data.shortname,
+      undefined, // shortname is not in the response type
       data.price_increment_nok,
       data.belongs_to
     );
