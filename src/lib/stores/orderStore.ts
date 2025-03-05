@@ -1,34 +1,49 @@
 import { createGenericPbStore, createPbStore } from "$stores/pbStore";
 import pb, { Collections, type RecordIdString } from "$lib/pocketbase";
-import { State, Order } from "$lib/types";
+import { State, Order, CustomizationValue } from "$lib/types";
 import auth from "$stores/authStore";
 import { get } from "svelte/store";
 
 const today = new Date().toISOString().split("T")[0];
 
 const baseOptions = {
-  //   Table `item`
-  // + col `item` which references `order_item`
-  expand: "items,items.item",
-  filter: `created >= "${today}"`
+  expand: [
+    "items",
+    "items.item",
+    "items.customization",
+    "items.customization.key",
+    "items.customization.value"
+  ].join(","),
+  filter: `created >= "${today}"`,
+  sort: "-created"
 };
+
+export interface OrderItemWithCustomizations {
+  itemId: RecordIdString;
+  customizations: CustomizationValue[];
+}
 
 export default {
   subscribe: createPbStore(Collections.Order, Order, baseOptions),
 
-  create: async (userId: RecordIdString, itemIds: RecordIdString[]) => {
-    const getOrderItemIds = async (): Promise<RecordIdString[]> => {
-      return await Promise.all(
-        itemIds.map(async (itemId) => {
-          const response = await pb.collection(Collections.OrderItem).create({ item: itemId });
-          return response.id;
-        })
-      );
-    };
+  create: async (userId: RecordIdString, items: OrderItemWithCustomizations[]) => {
+    const orderItemIds = await Promise.all(
+      items.map(async ({ itemId, customizations }) => {
+        const orderItemResponse = await pb.collection(Collections.OrderItem).create({
+          item: itemId
+        });
+
+        if (customizations.length > 0) {
+          await attachCustomizationsToOrderItem(orderItemResponse.id, customizations);
+        }
+
+        return orderItemResponse.id;
+      })
+    );
 
     await pb.collection(Collections.Order).create({
       customer: userId,
-      items: await getOrderItemIds(),
+      items: orderItemIds,
       state: State.received,
       payment_fulfilled: false
     });
@@ -36,6 +51,111 @@ export default {
 
   updateState: (orderId: RecordIdString, state: State) => {
     pb.collection(Collections.Order).update(orderId, { state });
+  }
+};
+
+const attachCustomizationsToOrderItem = async (
+  orderItemId: RecordIdString,
+  customizations: CustomizationValue[]
+) => {
+  const customizationsByKey = groupCustomizationsByKey(customizations);
+  const itemCustomizationIds = await createItemCustomizations(customizationsByKey);
+
+  if (itemCustomizationIds.length > 0) {
+    await pb.collection(Collections.OrderItem).update(orderItemId, {
+      customization: itemCustomizationIds
+    });
+
+    await verifyCustomizationsAttached(orderItemId);
+  }
+};
+
+const groupCustomizationsByKey = (customizations: CustomizationValue[]) => {
+  const groupedCustomizations: Record<string, CustomizationValue[]> = {};
+
+  customizations.forEach((customization) => {
+    const keyId = customization.belongsTo;
+
+    if (!groupedCustomizations[keyId]) {
+      groupedCustomizations[keyId] = [];
+    }
+
+    groupedCustomizations[keyId].push(customization);
+  });
+
+  return groupedCustomizations;
+};
+
+const createItemCustomizations = async (
+  customizationsByKey: Record<string, CustomizationValue[]>
+) => {
+  return Promise.all(
+    Object.entries(customizationsByKey).map(async ([keyId, values]) => {
+      try {
+        const valueIds = values.map((v) => v.id);
+        const existingId = await findExistingCustomization(keyId, valueIds);
+
+        if (existingId) {
+          return existingId;
+        }
+
+        return createNewCustomization(keyId, valueIds);
+      } catch (error) {
+        console.error("Error creating item customization:", error);
+        throw error;
+      }
+    })
+  );
+};
+
+const findExistingCustomization = async (
+  keyId: string,
+  valueIds: RecordIdString[]
+): Promise<RecordIdString | null> => {
+  const existingCustomizations = await pb.collection(Collections.ItemCustomization).getList(1, 1, {
+    filter: `key = "${keyId}" && value ~ "${valueIds.join('"||value ~ "')}"`
+  });
+
+  // Already created?
+  for (const existing of existingCustomizations.items) {
+    const existingValueIds = existing.value || [];
+    if (isExactValueMatch(existingValueIds, valueIds)) {
+      return existing.id;
+    }
+  }
+
+  return null;
+};
+
+const isExactValueMatch = (
+  existingValueIds: RecordIdString[],
+  valueIds: RecordIdString[]
+): boolean => {
+  return (
+    existingValueIds.length === valueIds.length &&
+    valueIds.every((id) => existingValueIds.includes(id))
+  );
+};
+
+const createNewCustomization = async (
+  keyId: string,
+  valueIds: RecordIdString[]
+): Promise<RecordIdString> => {
+  const response = await pb.collection(Collections.ItemCustomization).create({
+    key: keyId,
+    value: valueIds
+  });
+
+  return response.id;
+};
+
+const verifyCustomizationsAttached = async (orderItemId: RecordIdString) => {
+  const updatedOrderItem = await pb.collection(Collections.OrderItem).getOne(orderItemId, {
+    expand: "customization"
+  });
+
+  if (!updatedOrderItem.customization || updatedOrderItem.customization.length === 0) {
+    console.error("Failed to update order item with customizations", updatedOrderItem);
   }
 };
 
