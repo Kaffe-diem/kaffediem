@@ -1,7 +1,7 @@
 <script lang="ts">
   import { categories } from "$stores/menuStore";
   import type { MenuItem } from "$lib/types";
-  
+
   let { selectedItem = $bindable() } = $props();
 </script>
 
@@ -24,13 +24,7 @@
 
 {#snippet ItemCard({ item }: { item: MenuItem })}
   <label>
-    <input
-      type="radio"
-      name="item"
-      class="peer hidden"
-      value={item}
-      bind:group={selectedItem}
-    />
+    <input type="radio" name="item" class="peer hidden" value={item} bind:group={selectedItem} />
     <div
       class="btn relative flex h-24 w-full flex-col items-center justify-center border-4 peer-checked:border-accent"
     >

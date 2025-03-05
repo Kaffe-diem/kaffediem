@@ -72,9 +72,9 @@ export class Order implements RecordBase {
 }
 
 export type ExpandedOrderItemRecord = OrderItemResponse & {
-  expand: { 
+  expand: {
     item: ItemResponse;
-    customization?: Array<ExpandedItemCustomizationRecord>; 
+    customization?: Array<ExpandedItemCustomizationRecord>;
   };
 };
 
@@ -87,12 +87,13 @@ export class OrderItem implements RecordBase {
   ) {}
 
   toPb() {
-    const customizationIds = this.customizations && this.customizations.length > 0
-      ? this.customizations.map(c => c.id)
-      : undefined;
-      
-    return { 
-      name: this.name, 
+    const customizationIds =
+      this.customizations && this.customizations.length > 0
+        ? this.customizations.map((c) => c.id)
+        : undefined;
+
+    return {
+      name: this.name,
       item: this.item.id,
       customization: customizationIds
     };
@@ -100,7 +101,7 @@ export class OrderItem implements RecordBase {
 
   static fromPb(data: ExpandedOrderItemRecord): OrderItem {
     const customizations: CustomizationValue[] = [];
-    
+
     if (data.expand?.customization && Array.isArray(data.expand.customization)) {
       data.expand.customization.forEach((customizationRecord: ExpandedItemCustomizationRecord) => {
         if (customizationRecord.expand?.value && Array.isArray(customizationRecord.expand.value)) {
@@ -110,10 +111,10 @@ export class OrderItem implements RecordBase {
         }
       });
     }
-    
+
     return new OrderItem(
-      data.id, 
-      data.expand.item.name, 
+      data.id,
+      data.expand.item.name,
       Item.fromPb(data.expand.item),
       customizations
     );
@@ -238,8 +239,8 @@ export class CustomizationValue implements RecordBase {
   ) {}
 
   toPb() {
-    return { 
-      name: this.name, 
+    return {
+      name: this.name,
       shortname: this.shortname,
       price_increment_nok: this.priceIncrementNok,
       belongs_to: this.belongsTo
@@ -258,9 +259,9 @@ export class CustomizationValue implements RecordBase {
 }
 
 export type ExpandedItemCustomizationRecord = ItemCustomizationResponse & {
-  expand: { 
-    key?: CustomizationKeyResponse,
-    value?: CustomizationValueResponse[]
+  expand: {
+    key?: CustomizationKeyResponse;
+    value?: CustomizationValueResponse[];
   };
 };
 
@@ -272,9 +273,9 @@ export class ItemCustomization implements RecordBase {
   ) {}
 
   toPb() {
-    return { 
+    return {
       key: this.key?.id,
-      value: this.values?.map(v => v.id)
+      value: this.values?.map((v) => v.id)
     };
   }
 

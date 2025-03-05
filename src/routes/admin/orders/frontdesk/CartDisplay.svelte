@@ -2,9 +2,9 @@
   import { cart, totalPrice, removeFromCart } from "$stores/cartStore";
   import type { CustomizationValue } from "$lib/types";
   import { customizationKeys } from "$stores/menuStore";
-  
+
   const colors = $derived(
-    Object.fromEntries($customizationKeys.map(key => [key.id, key.labelColor]))
+    Object.fromEntries($customizationKeys.map((key) => [key.id, key.labelColor]))
   );
 </script>
 
@@ -30,28 +30,23 @@
 </div>
 
 {#snippet CustomizationBadge({ customization }: { customization: CustomizationValue })}
-  <span 
-    class="badge badge-sm" 
-    style={
-      customization.belongsTo && colors[customization.belongsTo]
-        ? `background-color: ${colors[customization.belongsTo]}; color: white;` 
-        : ''
-    }
+  <span
+    class="badge badge-sm"
+    style={customization.belongsTo && colors[customization.belongsTo]
+      ? `background-color: ${colors[customization.belongsTo]}; color: white;`
+      : ""}
   >
     {customization.name}
   </span>
 {/snippet}
 
-{#snippet CartItem({ item, index }: { item: any, index: number })}
-  <tr 
-    class="hover select-none" 
-    onclick={() => removeFromCart(index)}
-  >
+{#snippet CartItem({ item, index }: { item: any; index: number })}
+  <tr class="hover select-none" onclick={() => removeFromCart(index)}>
     <td>
       <div>
         <div>{item.name}</div>
         {#if item.customizations && item.customizations.length > 0}
-          <div class="flex flex-wrap gap-1 mt-1">
+          <div class="mt-1 flex flex-wrap gap-1">
             {#each item.customizations as customization}
               {#if customization.name}
                 {@render CustomizationBadge({ customization })}
