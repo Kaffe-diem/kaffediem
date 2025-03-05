@@ -87,16 +87,13 @@ const groupCustomizationsByKey = (customizations: CustomizationValue[]) => {
 const createItemCustomizations = async (customizationsByKey: Record<string, CustomizationValue[]>) => {
   return Promise.all(
     Object.entries(customizationsByKey).map(async ([keyId, values]) => {
-      // Check if a customization with this key and value combination already exists
       try {
         const valueIds = values.map(v => v.id);
         const existingCustomizations = await pb.collection(Collections.ItemCustomization).getList(1, 1, {
           filter: `key = "${keyId}" && value ~ "${valueIds.join('"||value ~ "')}"`
         });
         
-        // If an exact match exists (same key and same values array), use it
         for (const existing of existingCustomizations.items) {
-          // Check if the existing customization has exactly the same values (no more, no less)
           const existingValueIds = existing.value || [];
           if (existingValueIds.length === valueIds.length && 
               valueIds.every(id => existingValueIds.includes(id))) {
