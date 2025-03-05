@@ -75,7 +75,6 @@ const groupCustomizationsByKey = (customizations: CustomizationValue[]) => {
 
   customizations.forEach((customization) => {
     const keyId = customization.belongsTo;
-    if (!keyId) return;
 
     if (!groupedCustomizations[keyId]) {
       groupedCustomizations[keyId] = [];

@@ -106,16 +106,16 @@ export type CategoryRecord = {
 export type CustomizationKeyRecord = {
 	created?: IsoDateString
 	id: string
-	label_color?: string
-	name?: string
+	label_color: string
+	name: string
 	updated?: IsoDateString
 }
 
 export type CustomizationValueRecord = {
-	belongs_to?: RecordIdString
+	belongs_to: RecordIdString
 	created?: IsoDateString
 	id: string
-	name?: string
+	name: string
 	price_increment_nok?: number
 	updated?: IsoDateString
 }
@@ -133,9 +133,9 @@ export type ItemRecord = {
 export type ItemCustomizationRecord = {
 	created?: IsoDateString
 	id: string
-	key?: RecordIdString
+	key: RecordIdString
 	updated?: IsoDateString
-	value?: RecordIdString[]
+	value: RecordIdString[]
 }
 
 export type MessageRecord = {
@@ -153,12 +153,12 @@ export enum OrderStateOptions {
 	"dispatched" = "dispatched",
 }
 export type OrderRecord = {
+	correction?: RecordIdString[]
 	created?: IsoDateString
 	customer?: RecordIdString
-	field?: RecordIdString
 	id: string
 	items: RecordIdString[]
-	state?: OrderStateOptions
+	state: OrderStateOptions
 	updated?: IsoDateString
 }
 

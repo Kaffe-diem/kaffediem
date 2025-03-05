@@ -4,8 +4,9 @@
  * todo: name convention change.
  */
 
-import { writable, derived } from "svelte/store";
+import { writable, derived, get } from "svelte/store";
 import type { Item, CustomizationValue } from "$lib/types";
+import { customizationValues } from "./menuStore";
 
 export interface CartItem extends Item {
   customizations: CustomizationValue[];
@@ -19,20 +20,30 @@ export const totalPrice = derived(cart, ($cart) =>
   $cart.reduce((sum, item) => sum + item.price, 0)
 );
 
-export function resetCustomizations() {
-  selectedCustomizations.set({});
+export function initializeCustomizations() {
+  const map: Record<string, string> = {};
+  const values = get(customizationValues);
+  const defaultCustomizations = ["Hel", "Egen"];
+
+  values.forEach((value) => {
+    if (defaultCustomizations.includes(value.name)) {
+      map[value.belongsTo] = value.id;
+    }
+  });
+
+  selectedCustomizations.set(map);
 }
 
 export function selectCustomization(keyId: string, valueId: string) {
-  selectedCustomizations.update((current) => ({
-    ...current,
-    [keyId]: valueId
-  }));
+  selectedCustomizations.update((current) => {
+    current[keyId] = valueId;
+    return current;
+  });
 }
 
 export function addToCart(item: Item, customizations: CustomizationValue[]) {
   const totalCustomizationPrice = customizations.reduce(
-    (sum, customization) => sum + (customization.priceIncrementNok || 0),
+    (sum, customization) => sum + customization.priceIncrementNok,
     0
   );
 
@@ -42,9 +53,12 @@ export function addToCart(item: Item, customizations: CustomizationValue[]) {
     customizations: customizations
   } as CartItem;
 
-  cart.update((current) => [...current, itemToAdd]);
+  cart.update((current) => {
+    current.push(itemToAdd);
+    return current;
+  });
 
-  resetCustomizations();
+  initializeCustomizations();
 }
 
 export function removeFromCart(index: number) {
@@ -56,4 +70,5 @@ export function removeFromCart(index: number) {
 
 export function clearCart() {
   cart.set([]);
+  initializeCustomizations();
 }

@@ -1,15 +1,31 @@
 <script lang="ts">
   import { CustomizationKey, CustomizationValue } from "$lib/types";
   import { customizationKeys, customizationValues } from "$stores/menuStore";
-  import { selectedCustomizations, selectCustomization } from "$stores/cartStore";
+  import {
+    selectedCustomizations,
+    selectCustomization,
+    initializeCustomizations
+  } from "$stores/cartStore";
+  import { onMount } from "svelte";
 
-  const getValuesByKey = (keyId: string): CustomizationValue[] =>
-    $customizationValues.filter((value) => value.belongsTo === keyId);
+  const getValuesByKey = (keyId: string): CustomizationValue[] => {
+    const values = $customizationValues.filter((value) => value.belongsTo === keyId);
+
+    return values.sort((a, b) => {
+      if (a.name === "Hel" || a.name === "Egen") return -1;
+      if (b.name === "Hel" || b.name === "Egen") return 1;
+      return a.name.localeCompare(b.name);
+    });
+  };
 
   export const getSelectedCustomizationsForItem = (): CustomizationValue[] =>
     Object.entries($selectedCustomizations)
       .map(([, valueId]) => $customizationValues.find((v) => v.id === valueId))
       .filter(Boolean) as CustomizationValue[];
+
+  onMount(() => {
+    initializeCustomizations();
+  });
 </script>
 
 <div class="overflow-y-auto">
@@ -39,13 +55,14 @@
     <button
       class="btn relative flex w-full items-center justify-between border-2 px-3 py-2
              transition-all duration-200 ease-in-out hover:bg-opacity-90 focus:outline-none
-             {$selectedCustomizations[key.id] === value.id
-        ? 'border-amber-500'
-        : 'border-base-300'}"
+             {$selectedCustomizations[key.id] === value.id ? 'border-amber-500' : 'border-base-300'}
+             {value.name === 'Hel' || value.name === 'Egen' ? 'font-bold' : ''}"
       style="background-color: {key.labelColor || 'inherit'};"
       onclick={() => selectCustomization(key.id, value.id)}
     >
-      <span>{value.name}</span>
+      <span>
+        {value.name}
+      </span>
     </button>
   </div>
 {/snippet}

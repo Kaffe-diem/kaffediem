@@ -233,8 +233,8 @@ export class CustomizationValue implements RecordBase {
   constructor(
     public readonly id: RecordIdString,
     public readonly name: string,
-    public readonly priceIncrementNok?: number,
-    public readonly belongsTo?: RecordIdString
+    public readonly priceIncrementNok: number,
+    public readonly belongsTo: RecordIdString
   ) {}
 
   toPb() {
