@@ -13,8 +13,10 @@
   import { customizationKeys } from "$stores/menuStore";
   import { type Item, type CustomizationValue } from "$lib/types";
 
-  let { selectedItem } = $props<{ selectedItem: Item | null }>();
-  let customizationSelection: CustomizationSelection;
+  let { selectedItem, customizationSelection } = $props<{
+    selectedItem: Item | null;
+    customizationSelection: CustomizationSelection;
+  }>();
 
   const colors = $derived(
     Object.fromEntries($customizationKeys.map((key) => [key.id, key.labelColor]))
@@ -40,9 +42,7 @@
   }
 </script>
 
-<div class="flex h-full flex-col justify-between gap-4">
-  <CustomizationSelection bind:this={customizationSelection} />
-
+<div class="flex flex-col justify-between gap-4">
   {@render CartDisplay()}
 
   <div class="flex flex-row justify-center gap-2">
@@ -51,28 +51,27 @@
   </div>
 </div>
 
-
 {#snippet CartDisplay()}
-<div class="overflow-y-auto">
-  <table class="table table-pin-rows table-auto list-none shadow-2xl">
-    <thead>
-      <tr>
-        <th class="w-full">Drikke</th>
-        <th class="whitespace-nowrap">Pris</th>
-      </tr>
-    </thead>
-    <tbody>
-      {#if $cart.length > 0}
-        {#each $cart as item, index}
-          {@render CartItem({ item, index })}
-        {/each}
-      {:else}
-        {@render EmptyCartRow()}
-      {/if}
-    </tbody>
-    {@render CartFooter()}
-  </table>
-</div>
+  <div class="overflow-y-auto">
+    <table class="table table-pin-rows table-auto list-none shadow-2xl">
+      <thead>
+        <tr>
+          <th class="w-full">Drikke</th>
+          <th class="whitespace-nowrap">Pris</th>
+        </tr>
+      </thead>
+      <tbody>
+        {#if $cart.length > 0}
+          {#each $cart as item, index}
+            {@render CartItem({ item, index })}
+          {/each}
+        {:else}
+          {@render EmptyCartRow()}
+        {/if}
+      </tbody>
+      {@render CartFooter()}
+    </table>
+  </div>
 {/snippet}
 
 {#snippet CustomizationBadge({ customization }: { customization: CustomizationValue })}
