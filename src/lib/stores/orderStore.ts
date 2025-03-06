@@ -3,6 +3,7 @@ import pb, { Collections, type RecordIdString } from "$lib/pocketbase";
 import { State, Order, CustomizationValue } from "$lib/types";
 import auth from "$stores/authStore";
 import { get } from "svelte/store";
+import * as R from "remeda";
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -18,6 +19,8 @@ const baseOptions = {
   sort: "-created"
 };
 
+// this is very similar to CartItem from CartStore
+// todo: address issue simultaneously
 export interface OrderItemWithCustomizations {
   itemId: RecordIdString;
   customizations: CustomizationValue[];
@@ -33,7 +36,7 @@ export default {
           item: itemId
         });
 
-        if (customizations.length > 0) {
+        if (!R.isEmpty(customizations)) {
           await attachCustomizationsToOrderItem(orderItemResponse.id, customizations);
         }
 
@@ -58,48 +61,29 @@ const attachCustomizationsToOrderItem = async (
   orderItemId: RecordIdString,
   customizations: CustomizationValue[]
 ) => {
-  const customizationsByKey = groupCustomizationsByKey(customizations);
-  const itemCustomizationIds = await createItemCustomizations(customizationsByKey);
+  const itemCustomizationIds = await createItemCustomizations(
+    R.groupBy(customizations, (customization) => customization.belongsTo)
+  );
 
-  if (itemCustomizationIds.length > 0) {
+  if (!R.isEmpty(itemCustomizationIds)) {
     await pb.collection(Collections.OrderItem).update(orderItemId, {
       customization: itemCustomizationIds
     });
-
-    await verifyCustomizationsAttached(orderItemId);
   }
-};
-
-const groupCustomizationsByKey = (customizations: CustomizationValue[]) => {
-  const groupedCustomizations: Record<string, CustomizationValue[]> = {};
-
-  customizations.forEach((customization) => {
-    const keyId = customization.belongsTo;
-
-    if (!groupedCustomizations[keyId]) {
-      groupedCustomizations[keyId] = [];
-    }
-
-    groupedCustomizations[keyId].push(customization);
-  });
-
-  return groupedCustomizations;
 };
 
 const createItemCustomizations = async (
   customizationsByKey: Record<string, CustomizationValue[]>
 ) => {
+  const entries = Object.entries(customizationsByKey);
+
   return Promise.all(
-    Object.entries(customizationsByKey).map(async ([keyId, values]) => {
+    entries.map(async ([keyId, values]) => {
       try {
-        const valueIds = values.map((v) => v.id);
+        const valueIds = R.map(values, (v) => v.id);
         const existingId = await findExistingCustomization(keyId, valueIds);
 
-        if (existingId) {
-          return existingId;
-        }
-
-        return createNewCustomization(keyId, valueIds);
+        return existingId ? existingId : createNewCustomization(keyId, valueIds);
       } catch (error) {
         console.error("Error creating item customization:", error);
         throw error;
@@ -113,29 +97,23 @@ const findExistingCustomization = async (
   valueIds: RecordIdString[]
 ): Promise<RecordIdString | null> => {
   const existingCustomizations = await pb.collection(Collections.ItemCustomization).getList(1, 1, {
+    // key is key and value is one of valueIds
     filter: `key = "${keyId}" && value ~ "${valueIds.join('"||value ~ "')}"`
   });
 
-  // Already created?
-  for (const existing of existingCustomizations.items) {
-    const existingValueIds = existing.value || [];
-    if (isExactValueMatch(existingValueIds, valueIds)) {
-      return existing.id;
-    }
-  }
+  const match = R.find(existingCustomizations.items, (existing) =>
+    isExactValueMatch(existing.value || [], valueIds)
+  );
 
-  return null;
+  return match ? match.id : null;
 };
 
 const isExactValueMatch = (
   existingValueIds: RecordIdString[],
   valueIds: RecordIdString[]
-): boolean => {
-  return (
-    existingValueIds.length === valueIds.length &&
-    valueIds.every((id) => existingValueIds.includes(id))
-  );
-};
+): boolean =>
+  existingValueIds.length === valueIds.length &&
+  R.intersection(existingValueIds, valueIds).length === valueIds.length;
 
 const createNewCustomization = async (
   keyId: string,
@@ -147,16 +125,6 @@ const createNewCustomization = async (
   });
 
   return response.id;
-};
-
-const verifyCustomizationsAttached = async (orderItemId: RecordIdString) => {
-  const updatedOrderItem = await pb.collection(Collections.OrderItem).getOne(orderItemId, {
-    expand: "customization"
-  });
-
-  if (!updatedOrderItem.customization || updatedOrderItem.customization.length === 0) {
-    console.error("Failed to update order item with customizations", updatedOrderItem);
-  }
 };
 
 export const userOrders = createGenericPbStore(Collections.Order, Order, {

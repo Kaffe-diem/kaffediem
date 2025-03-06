@@ -102,15 +102,11 @@ export class OrderItem implements RecordBase {
   static fromPb(data: ExpandedOrderItemRecord): OrderItem {
     const customizations: CustomizationValue[] = [];
 
-    if (data.expand?.customization && Array.isArray(data.expand.customization)) {
-      data.expand.customization.forEach((customizationRecord: ExpandedItemCustomizationRecord) => {
-        if (customizationRecord.expand?.value && Array.isArray(customizationRecord.expand.value)) {
-          customizationRecord.expand.value.forEach((valueRecord: CustomizationValueResponse) => {
-            customizations.push(CustomizationValue.fromPb(valueRecord));
-          });
-        }
+    data.expand?.customization?.forEach((customizationRecord) => {
+      customizationRecord.expand?.value?.forEach((valueRecord) => {
+        customizations.push(CustomizationValue.fromPb(valueRecord));
       });
-    }
+    });
 
     return new OrderItem(
       data.id,

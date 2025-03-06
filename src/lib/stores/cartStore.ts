@@ -1,7 +1,7 @@
 /**
- * This module is the only store which is not mapping to a pocketbase collection,
- * therefore the naming is misleading, even if it still a proper svelte store.
- * todo: name convention change.
+ * This module is the only store that does not map to a PocketBase collection,
+ * making the naming slightly misleading, even though it is a proper Svelte store.
+ * TODO: Rename to reflect its purpose more clearly.
  */
 
 import { writable, derived, get } from "svelte/store";
@@ -20,7 +20,7 @@ export const totalPrice = derived(cart, ($cart) =>
   $cart.reduce((sum, item) => sum + item.price, 0)
 );
 
-export function initializeCustomizations() {
+export const initializeCustomizations = () => {
   const map: Record<string, string> = {};
   const values = get(customizationValues);
   const defaultCustomizations = ["Hel", "Egen"];
@@ -32,43 +32,36 @@ export function initializeCustomizations() {
   });
 
   selectedCustomizations.set(map);
-}
+};
 
-export function selectCustomization(keyId: string, valueId: string) {
-  selectedCustomizations.update((current) => {
-    current[keyId] = valueId;
-    return current;
-  });
-}
+export const selectCustomization = (keyId: string, valueId: string) => {
+  selectedCustomizations.update((customizations) => ({
+    ...customizations,
+    [keyId]: valueId
+  }));
+};
 
-export function addToCart(item: Item, customizations: CustomizationValue[]) {
+export const addToCart = (item: Item, customizations: CustomizationValue[]) => {
   const totalCustomizationPrice = customizations.reduce(
-    (sum, customization) => sum + customization.priceIncrementNok,
+    (sum, customization) => sum + (customization.priceIncrementNok || 0),
     0
   );
 
-  const itemToAdd = {
+  const itemToAdd: CartItem = {
     ...item,
     price: item.price + totalCustomizationPrice,
-    customizations: customizations
+    customizations
   } as CartItem;
 
-  cart.update((current) => {
-    current.push(itemToAdd);
-    return current;
-  });
-
+  cart.update((c) => [...c, itemToAdd]);
   initializeCustomizations();
-}
+};
 
-export function removeFromCart(index: number) {
-  cart.update((current) => {
-    current.splice(index, 1);
-    return current;
-  });
-}
+export const removeFromCart = (index: number) => {
+  cart.update((c) => c.filter((_, i) => i !== index));
+};
 
-export function clearCart() {
+export const clearCart = () => {
   cart.set([]);
   initializeCustomizations();
-}
+};
