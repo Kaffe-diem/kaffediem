@@ -5,17 +5,16 @@
     clearCart,
     type CartItem,
     removeFromCart,
-    totalPrice
+    totalPrice,
+    selectedCustomizations
   } from "$stores/cartStore";
   import auth from "$stores/authStore";
   import orderStore, { type OrderItemWithCustomizations } from "$stores/orderStore";
-  import CustomizationSelection from "./CustomizationSelection.svelte";
-  import { customizationKeys } from "$stores/menuStore";
+  import { customizationKeys, customizationValues } from "$stores/menuStore";
   import { type Item, type CustomizationValue } from "$lib/types";
 
-  let { selectedItem, customizationSelection } = $props<{
-    selectedItem: Item | null;
-    customizationSelection: CustomizationSelection;
+  let { selectedItem } = $props<{
+    selectedItem: Item | undefined;
   }>();
 
   const colors = $derived(
@@ -25,7 +24,13 @@
   function handleAddToCart() {
     if (!selectedItem) return;
 
-    const customizations = customizationSelection.getSelectedCustomizationsForItem();
+    const customizations = Object.entries($selectedCustomizations)
+      .flatMap(([, valueIds]) => 
+        valueIds.map(valueId => 
+          $customizationValues.find((v) => v.id === valueId)
+        )
+      )
+      .filter(Boolean) as CustomizationValue[];
 
     addToCart(selectedItem, customizations);
   }
@@ -56,7 +61,7 @@
     <table class="table table-pin-rows table-auto list-none shadow-2xl">
       <thead>
         <tr>
-          <th class="w-full">Drikke</th>
+          <th class="w-full">Produkt</th>
           <th class="whitespace-nowrap">Pris</th>
         </tr>
       </thead>

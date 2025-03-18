@@ -4,15 +4,16 @@
  * TODO: Rename to reflect its purpose more clearly.
  */
 
-import { writable, derived, get } from "svelte/store";
+import * as R from "remeda"
+
+import { writable, derived } from "svelte/store";
 import type { Item, CustomizationValue } from "$lib/types";
-import { customizationValues } from "./menuStore";
 
 export interface CartItem extends Item {
   customizations: CustomizationValue[];
 }
 
-export const selectedCustomizations = writable<Record<string, string>>({});
+export const selectedCustomizations = writable<Record<string, string[]>>({});
 
 export const cart = writable<CartItem[]>([]);
 
@@ -21,24 +22,37 @@ export const totalPrice = derived(cart, ($cart) =>
 );
 
 export const initializeCustomizations = () => {
-  const map: Record<string, string> = {};
-  const values = get(customizationValues);
-  const defaultCustomizations = ["Hel", "Egen"];
-
-  values.forEach((value) => {
-    if (defaultCustomizations.includes(value.name)) {
-      map[value.belongsTo] = value.id;
-    }
-  });
-
+  const map: Record<string, string[]> = {};
   selectedCustomizations.set(map);
 };
 
 export const selectCustomization = (keyId: string, valueId: string) => {
-  selectedCustomizations.update((customizations) => ({
-    ...customizations,
-    [keyId]: valueId
-  }));
+  selectedCustomizations.update((customizations) => {
+    const currentValues = customizations[keyId] || [];
+    const valueIndex = currentValues.indexOf(valueId);
+
+    if (valueIndex > -1) {
+      // Remove value if already selected
+      const newValues = [...currentValues];
+      newValues.splice(valueIndex, 1);
+      if (newValues.length === 0) {
+        // If no values left, remove the key entirely
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { [keyId]: _, ...rest } = customizations;
+        return rest;
+      }
+      return {
+        ...customizations,
+        [keyId]: newValues
+      };
+    } else {
+      // Add new value
+      return {
+        ...customizations,
+        [keyId]: [...(customizations[keyId] || []), valueId]
+      };
+    }
+  });
 };
 
 export const addToCart = (item: Item, customizations: CustomizationValue[]) => {

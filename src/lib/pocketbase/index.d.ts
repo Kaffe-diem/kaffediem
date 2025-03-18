@@ -124,7 +124,7 @@ export type ItemRecord = {
 	category: RecordIdString
 	created?: IsoDateString
 	id: string
-	image: string
+	image?: string
 	name: string
 	price_nok: number
 	updated?: IsoDateString

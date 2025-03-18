@@ -15,8 +15,7 @@ const baseOptions = {
     "items.customization.key",
     "items.customization.value"
   ].join(","),
-  filter: `created >= "${today}"`,
-  sort: "-created"
+  filter: `created >= "${today}"`
 };
 
 // this is very similar to CartItem from CartStore
