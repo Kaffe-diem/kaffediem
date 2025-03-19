@@ -4,22 +4,13 @@
   import {
     selectedCustomizations,
     selectCustomization,
-    initializeCustomizations
+    initializeCustomizations,
   } from "$stores/cartStore";
   import { onMount } from "svelte";
 
   const getValuesByKey = (keyId: string): CustomizationValue[] => {
     return $customizationValues.filter((value) => value.belongsTo === keyId);
   };
-
-  export const getSelectedCustomizationsForItem = (): CustomizationValue[] =>
-    Object.entries($selectedCustomizations)
-      .flatMap(([, valueIds]) => 
-        valueIds.map(valueId => 
-          $customizationValues.find((v) => v.id === valueId)
-        )
-      )
-      .filter(Boolean) as CustomizationValue[];
 
   onMount(() => {
     initializeCustomizations();
@@ -55,9 +46,9 @@
     <button
       class="btn relative flex w-full items-center justify-between border-2 px-3 py-2
              transition-all duration-200 ease-in-out hover:bg-opacity-90 focus:outline-none
-             {$selectedCustomizations[key.id]?.includes(value.id) ? 'border-amber-500' : 'border-base-300'}"
+             {$selectedCustomizations[key.id]?.some(v => v.id === value.id) ? 'border-amber-500' : 'border-base-300'}"
       style="background-color: {key.labelColor || 'inherit'};"
-      onclick={() => selectCustomization(key.id, value.id)}
+      onclick={() => selectCustomization(key.id, value)}
     >
       <span>
         {value.name}

@@ -1,16 +1,16 @@
 <script lang="ts">
+
   import {
     addToCart,
     cart,
     clearCart,
     type CartItem,
     removeFromCart,
-    totalPrice,
-    selectedCustomizations
+    totalPrice
   } from "$stores/cartStore";
   import auth from "$stores/authStore";
   import orderStore, { type OrderItemWithCustomizations } from "$stores/orderStore";
-  import { customizationKeys, customizationValues } from "$stores/menuStore";
+  import { customizationKeys } from "$stores/menuStore";
   import { type Item, type CustomizationValue } from "$lib/types";
 
   let { selectedItem } = $props<{
@@ -23,26 +23,18 @@
 
   function handleAddToCart() {
     if (!selectedItem) return;
-
-    const customizations = Object.entries($selectedCustomizations)
-      .flatMap(([, valueIds]) => 
-        valueIds.map(valueId => 
-          $customizationValues.find((v) => v.id === valueId)
-        )
-      )
-      .filter(Boolean) as CustomizationValue[];
-
-    addToCart(selectedItem, customizations);
+    addToCart(selectedItem);
   }
 
   function completeOrder() {
-    const orderItems: OrderItemWithCustomizations[] = $cart.map((item: CartItem) => ({
-      itemId: item.id,
-      customizations: item.customizations
-    }));
+    const orderItems: OrderItemWithCustomizations[] = $cart.map((item: CartItem) => {
+      return {
+        itemId: item.id,
+        customizations: item.customizations
+      };
+    });
 
     orderStore.create($auth.user.id, orderItems);
-
     clearCart();
   }
 </script>

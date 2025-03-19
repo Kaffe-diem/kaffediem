@@ -4,16 +4,14 @@
  * TODO: Rename to reflect its purpose more clearly.
  */
 
-import * as R from "remeda"
-
-import { writable, derived } from "svelte/store";
+import { writable, derived, get } from "svelte/store";
 import type { Item, CustomizationValue } from "$lib/types";
 
 export interface CartItem extends Item {
   customizations: CustomizationValue[];
 }
 
-export const selectedCustomizations = writable<Record<string, string[]>>({});
+export const selectedCustomizations = writable<Record<string, CustomizationValue[]>>({});
 
 export const cart = writable<CartItem[]>([]);
 
@@ -22,40 +20,59 @@ export const totalPrice = derived(cart, ($cart) =>
 );
 
 export const initializeCustomizations = () => {
-  const map: Record<string, string[]> = {};
+  const map: Record<string, CustomizationValue[]> = {};
   selectedCustomizations.set(map);
 };
 
-export const selectCustomization = (keyId: string, valueId: string) => {
+export const selectCustomization = (keyId: string, value: CustomizationValue) => {
   selectedCustomizations.update((customizations) => {
     const currentValues = customizations[keyId] || [];
-    const valueIndex = currentValues.indexOf(valueId);
+    const valueIndex = currentValues.findIndex(v => v.id === value.id);
 
     if (valueIndex > -1) {
-      // Remove value if already selected
-      const newValues = [...currentValues];
-      newValues.splice(valueIndex, 1);
-      if (newValues.length === 0) {
-        // If no values left, remove the key entirely
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { [keyId]: _, ...rest } = customizations;
-        return rest;
-      }
-      return {
-        ...customizations,
-        [keyId]: newValues
-      };
+      return removeCustomizationValue(customizations, keyId, currentValues, valueIndex);
     } else {
-      // Add new value
-      return {
-        ...customizations,
-        [keyId]: [...(customizations[keyId] || []), valueId]
-      };
+      return addCustomizationValue(customizations, keyId, value);
     }
   });
 };
 
-export const addToCart = (item: Item, customizations: CustomizationValue[]) => {
+const removeCustomizationValue = (
+  customizations: Record<string, CustomizationValue[]>,
+  keyId: string,
+  currentValues: CustomizationValue[],
+  valueIndex: number
+): Record<string, CustomizationValue[]> => {
+  const newValues = [...currentValues];
+  newValues.splice(valueIndex, 1);
+
+  if (newValues.length === 0) {
+    // If no values left, remove the key
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { [keyId]: _, ...rest } = customizations;
+    return rest;
+  }
+
+  return {
+    ...customizations,
+    [keyId]: newValues
+  };
+};
+
+const addCustomizationValue = (
+  customizations: Record<string, CustomizationValue[]>,
+  keyId: string,
+  value: CustomizationValue
+): Record<string, CustomizationValue[]> => {
+  return {
+    ...customizations,
+    [keyId]: [...(customizations[keyId] || []), value]
+  };
+};
+
+export const addToCart = (item: Item) => {
+  const customizations = Object.values(get(selectedCustomizations)).flat();
+  
   const totalCustomizationPrice = customizations.reduce(
     (sum, customization) => sum + (customization.priceIncrementNok || 0),
     0
