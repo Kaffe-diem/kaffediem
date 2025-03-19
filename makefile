@@ -21,4 +21,4 @@ lint:
 	npx prettier --check . 
 	npx svelte-kit sync 
 	npx svelte-check --tsconfig ./tsconfig.json
-	npx eslint src 
+	npx eslint src
