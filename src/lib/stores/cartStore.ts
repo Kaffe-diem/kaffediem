@@ -71,6 +71,8 @@ const addCustomizationValue = (
 };
 
 export const addToCart = (item: Item) => {
+  // the initial selection maps to the categories of the customizations
+  // so we just flatten this structure for the purposes of summation
   const customizations = Object.values(get(selectedCustomizations)).flat();
 
   const totalCustomizationPrice = customizations.reduce(
