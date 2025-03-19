@@ -15,8 +15,8 @@
   <div class="divider divider-horizontal m-1 p-1"></div>
 
   <div class="flex h-full flex-col gap-4">
-    <CustomizationSelection/>
-    <Cart selectedItem={selectedItem} />
+    <CustomizationSelection />
+    <Cart {selectedItem} />
   </div>
 
   <div class="divider divider-horizontal m-1 p-1"></div>

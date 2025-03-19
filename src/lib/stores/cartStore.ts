@@ -27,7 +27,7 @@ export const initializeCustomizations = () => {
 export const selectCustomization = (keyId: string, value: CustomizationValue) => {
   selectedCustomizations.update((customizations) => {
     const currentValues = customizations[keyId] || [];
-    const valueIndex = currentValues.findIndex(v => v.id === value.id);
+    const valueIndex = currentValues.findIndex((v) => v.id === value.id);
 
     if (valueIndex > -1) {
       return removeCustomizationValue(customizations, keyId, currentValues, valueIndex);
@@ -72,7 +72,7 @@ const addCustomizationValue = (
 
 export const addToCart = (item: Item) => {
   const customizations = Object.values(get(selectedCustomizations)).flat();
-  
+
   const totalCustomizationPrice = customizations.reduce(
     (sum, customization) => sum + (customization.priceIncrementNok || 0),
     0

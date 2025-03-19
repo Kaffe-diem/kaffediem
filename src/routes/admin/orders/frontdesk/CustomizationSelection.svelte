@@ -4,7 +4,7 @@
   import {
     selectedCustomizations,
     selectCustomization,
-    initializeCustomizations,
+    initializeCustomizations
   } from "$stores/cartStore";
   import { onMount } from "svelte";
 
@@ -46,7 +46,9 @@
     <button
       class="btn relative flex w-full items-center justify-between border-2 px-3 py-2
              transition-all duration-200 ease-in-out hover:bg-opacity-90 focus:outline-none
-             {$selectedCustomizations[key.id]?.some(v => v.id === value.id) ? 'border-amber-500' : 'border-base-300'}"
+             {$selectedCustomizations[key.id]?.some((v) => v.id === value.id)
+        ? 'border-amber-500'
+        : 'border-base-300'}"
       style="background-color: {key.labelColor || 'inherit'};"
       onclick={() => selectCustomization(key.id, value)}
     >
