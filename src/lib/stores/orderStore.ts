@@ -60,7 +60,7 @@ const attachCustomizationsToOrderItem = async (
   orderItemId: RecordIdString,
   customizations: CustomizationValue[]
 ) => {
-  const itemCustomizationIds = await createItemCustomizations(
+  const itemCustomizationIds = await createCustomizations(
     R.groupBy(customizations, (customization) => customization.belongsTo)
   );
 
@@ -71,7 +71,7 @@ const attachCustomizationsToOrderItem = async (
   }
 };
 
-const createItemCustomizations = async (
+const createCustomizations = async (
   customizationsByKey: Record<string, CustomizationValue[]>
 ) => {
   const entries = Object.entries(customizationsByKey);
@@ -80,9 +80,7 @@ const createItemCustomizations = async (
     entries.map(async ([keyId, values]) => {
       try {
         const valueIds = R.map(values, (v) => v.id);
-        const existingId = await findExistingCustomization(keyId, valueIds);
-
-        return existingId ? existingId : createNewCustomization(keyId, valueIds);
+        return createCustomization(keyId, valueIds);
       } catch (error) {
         console.error("Error creating item customization:", error);
         throw error;
@@ -91,30 +89,7 @@ const createItemCustomizations = async (
   );
 };
 
-const findExistingCustomization = async (
-  keyId: string,
-  valueIds: RecordIdString[]
-): Promise<RecordIdString | null> => {
-  const existingCustomizations = await pb.collection(Collections.ItemCustomization).getList(1, 1, {
-    // key is key and value is one of valueIds
-    filter: `key = "${keyId}" && value ~ "${valueIds.join('"||value ~ "')}"`
-  });
-
-  const match = R.find(existingCustomizations.items, (existing) =>
-    isExactValueMatch(existing.value || [], valueIds)
-  );
-
-  return match ? match.id : null;
-};
-
-const isExactValueMatch = (
-  existingValueIds: RecordIdString[],
-  valueIds: RecordIdString[]
-): boolean =>
-  existingValueIds.length === valueIds.length &&
-  R.intersection(existingValueIds, valueIds).length === valueIds.length;
-
-const createNewCustomization = async (
+const createCustomization = async (
   keyId: string,
   valueIds: RecordIdString[]
 ): Promise<RecordIdString> => {
