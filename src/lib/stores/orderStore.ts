@@ -71,9 +71,7 @@ const attachCustomizationsToOrderItem = async (
   }
 };
 
-const createCustomizations = async (
-  customizationsByKey: Record<string, CustomizationValue[]>
-) => {
+const createCustomizations = async (customizationsByKey: Record<string, CustomizationValue[]>) => {
   const entries = Object.entries(customizationsByKey);
 
   return Promise.all(
