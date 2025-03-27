@@ -25,7 +25,7 @@
           >Kjøp</button
         >
       {/if}
-      <span class="ml-auto">{item.price},-</span>
+      <span class="ml-auto text-primary">{item.price},-</span>
     </div>
   </div>
 </div>

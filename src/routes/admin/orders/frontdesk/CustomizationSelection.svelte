@@ -29,11 +29,6 @@
   <div class="grid grid-cols-1 gap-y-2 p-2">
     <div class="font-medium">
       {key.name}
-      <!-- this is not super ideal, but is to reduce repitition
-           as every item in extra has the same price -->
-      {#if key.name === "Ekstra"}
-        <span class="text-primary">+{5},-</span>
-      {/if}
     </div>
     {#each getValuesByKey(key.id) as value}
       {@render CustomizationOption({ key, value })}
@@ -44,7 +39,7 @@
 {#snippet CustomizationOption({ key, value }: { key: CustomizationKey; value: CustomizationValue })}
   <div>
     <button
-      class="btn relative flex w-full items-center justify-between border-2 px-3 py-2
+      class="btn relative flex w-full items-center justify-between border-2 pl-3 pr-2 py-2
              transition-all duration-200 ease-in-out hover:bg-opacity-90 focus:outline-none
              {$selectedCustomizations[key.id]?.some((v) => v.id === value.id)
         ? 'border-amber-500'
@@ -52,8 +47,11 @@
       style="background-color: {key.labelColor || 'inherit'};"
       onclick={() => selectCustomization(key.id, value)}
     >
-      <span>
-        {value.name}
+      <span class="flex justify-between w-full">
+        <span>{value.name}</span>
+        {#if value.priceIncrementNok > 0}
+          <span class="text-xs font-bold">{value.priceIncrementNok},-</span>
+        {/if}
       </span>
     </button>
   </div>
