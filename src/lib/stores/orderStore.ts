@@ -50,7 +50,7 @@ export default {
 
     const _orderStore = get({ subscribe: _subscribe });
     const orderNumber = _orderStore.length + 100;
-    
+
     toasts.success(`✅ ${orderNumber}`);
   },
 
