@@ -4,6 +4,7 @@ import pb, { Collections, type RecordIdString } from "$lib/pocketbase";
 import { State, Order, CustomizationValue } from "$lib/types";
 import auth from "$stores/authStore";
 import { get } from "svelte/store";
+import { type CartItem } from "$stores/cartStore";
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -18,25 +19,18 @@ const baseOptions = {
   filter: `created >= "${today}"`
 };
 
-// this is very similar to CartItem from CartStore
-// todo: address issue simultaneously
-export interface OrderItemWithCustomizations {
-  itemId: RecordIdString;
-  customizations: CustomizationValue[];
-}
-
 export default {
   subscribe: createPbStore(Collections.Order, Order, baseOptions),
 
-  create: async (userId: RecordIdString, items: OrderItemWithCustomizations[]) => {
+  create: async (userId: RecordIdString, items: CartItem[]) => {
     const orderItemIds = await Promise.all(
-      items.map(async ({ itemId, customizations }) => {
+      items.map(async (item) => {
         const orderItemResponse = await pb.collection(Collections.OrderItem).create({
-          item: itemId
+          item: item.id
         });
 
-        if (!_.isEmpty(customizations)) {
-          await attachCustomizationsToOrderItem(orderItemResponse.id, customizations);
+        if (!_.isEmpty(item.customizations)) {
+          await attachCustomizationsToOrderItem(orderItemResponse.id, item.customizations);
         }
 
         return orderItemResponse.id;
