@@ -39,7 +39,7 @@
 {#snippet CustomizationOption({ key, value }: { key: CustomizationKey; value: CustomizationValue })}
   <div>
     <button
-      class="btn relative text-white flex w-full items-center justify-between border-2 pl-3 pr-2 py-2
+      class="btn relative flex w-full items-center justify-between border-2 py-2 pl-3 pr-2 text-white
              transition-all duration-200 ease-in-out hover:bg-opacity-90 focus:outline-none
              {$selectedCustomizations[key.id]?.some((v) => v.id === value.id)
         ? 'border-amber-500'
@@ -47,7 +47,7 @@
       style="background-color: {key.labelColor || 'inherit'};"
       onclick={() => selectCustomization(key.id, value)}
     >
-      <span class="flex justify-between w-full">
+      <span class="flex w-full justify-between">
         <span>{value.name}</span>
         {#if value.priceIncrementNok > 0}
           <span class="text-xs font-bold">{value.priceIncrementNok},-</span>
