@@ -11,6 +11,7 @@
   import orderStore from "$stores/orderStore";
   import { customizationKeys } from "$stores/menuStore";
   import { type Item, type CustomizationValue } from "$lib/types";
+  import orders from "$stores/orderStore";
 
   let { selectedItem } = $props<{
     selectedItem: Item | undefined;
@@ -35,6 +36,9 @@
   {@render CartDisplay()}
 
   <div class="flex flex-row justify-center gap-2">
+    <button class="btn btn-lg bg-base-200 text-3xl font-normal text-neutral">
+      ({$orders.length + 100})
+    </button>
     <button class="bold btn btn-lg text-xl" onclick={completeOrder}>Ferdig</button>
     <button class="bold btn btn-primary btn-lg text-3xl" onclick={handleAddToCart}>+</button>
   </div>
