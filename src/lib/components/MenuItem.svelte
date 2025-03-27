@@ -1,6 +1,6 @@
 <script lang="ts">
   import auth from "$stores/authStore";
-  import orders from "$stores/orderStore";
+  import { addToCart } from "$stores/cartStore";
   import { Item } from "$lib/types";
 
   interface Props {
@@ -21,7 +21,7 @@
       {#if $auth.isAuthenticated && buyButton}
         <button
           class="btn btn-secondary"
-          onclick={() => orders.create($auth.user.id, [{ itemId: item.id, customizations: [] }])}
+          onclick={() => addToCart(item)} 
           >Kjøp</button
         >
       {/if}
