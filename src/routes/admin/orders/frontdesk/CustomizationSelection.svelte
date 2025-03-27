@@ -39,7 +39,7 @@
 {#snippet CustomizationOption({ key, value }: { key: CustomizationKey; value: CustomizationValue })}
   <div>
     <button
-      class="btn relative flex w-full items-center justify-between border-2 pl-3 pr-2 py-2
+      class="btn relative text-white flex w-full items-center justify-between border-2 pl-3 pr-2 py-2
              transition-all duration-200 ease-in-out hover:bg-opacity-90 focus:outline-none
              {$selectedCustomizations[key.id]?.some((v) => v.id === value.id)
         ? 'border-amber-500'
