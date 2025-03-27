@@ -32,7 +32,6 @@
     "@types/node": "^20.17.10",
     "eventsource": "^2.0.2",
     "pocketbase": "<0.22.0",
-    "remeda": "^2.21.0",
     "vite-plugin-node-polyfills": "^0.22.0"
   }
 }

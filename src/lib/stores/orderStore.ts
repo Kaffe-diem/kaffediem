@@ -1,9 +1,9 @@
 import { createGenericPbStore, createPbStore } from "$stores/pbStore";
+import * as _ from "$lib/utils";
 import pb, { Collections, type RecordIdString } from "$lib/pocketbase";
 import { State, Order, CustomizationValue } from "$lib/types";
 import auth from "$stores/authStore";
 import { get } from "svelte/store";
-import * as R from "remeda";
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -35,7 +35,7 @@ export default {
           item: itemId
         });
 
-        if (!R.isEmpty(customizations)) {
+        if (!_.isEmpty(customizations)) {
           await attachCustomizationsToOrderItem(orderItemResponse.id, customizations);
         }
 
@@ -61,10 +61,10 @@ const attachCustomizationsToOrderItem = async (
   customizations: CustomizationValue[]
 ) => {
   const itemCustomizationIds = await createCustomizations(
-    R.groupBy(customizations, (customization) => customization.belongsTo)
+    _.groupBy(customizations, (customization) => customization.belongsTo)
   );
 
-  if (!R.isEmpty(itemCustomizationIds)) {
+  if (!_.isEmpty(itemCustomizationIds)) {
     await pb.collection(Collections.OrderItem).update(orderItemId, {
       customization: itemCustomizationIds
     });
@@ -77,7 +77,7 @@ const createCustomizations = async (customizationsByKey: Record<string, Customiz
   return Promise.all(
     entries.map(async ([keyId, values]) => {
       try {
-        const valueIds = R.map(values, (v) => v.id);
+        const valueIds = _.map(values, (v) => v.id);
         return createCustomization(keyId, valueIds);
       } catch (error) {
         console.error("Error creating item customization:", error);
