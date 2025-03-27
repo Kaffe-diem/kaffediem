@@ -5,6 +5,7 @@ import { State, Order, CustomizationValue } from "$lib/types";
 import auth from "$stores/authStore";
 import { get } from "svelte/store";
 import { type CartItem } from "$stores/cartStore";
+import { toasts } from "$lib/stores/toastStore";
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -19,8 +20,11 @@ const baseOptions = {
   filter: `created >= "${today}"`
 };
 
+// Create the store so we can reference it in methods
+const _subscribe = createPbStore(Collections.Order, Order, baseOptions);
+
 export default {
-  subscribe: createPbStore(Collections.Order, Order, baseOptions),
+  subscribe: _subscribe,
 
   create: async (userId: RecordIdString, items: CartItem[]) => {
     const orderItemIds = await Promise.all(
@@ -43,6 +47,11 @@ export default {
       state: State.received,
       payment_fulfilled: false
     });
+
+    const _orderStore = get({ subscribe: _subscribe });
+    const orderNumber = _orderStore.length + 100;
+    
+    toasts.success(`✅ ${orderNumber}`);
   },
 
   updateState: (orderId: RecordIdString, state: State) => {

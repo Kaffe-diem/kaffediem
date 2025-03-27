@@ -3,6 +3,7 @@
   import { page } from "$app/stores";
   import Nav from "$components/Nav.svelte";
   import Footer from "$components/Footer.svelte";
+  import Toast from "$components/Toast.svelte";
 
   import { hideNavbar, hideFooter } from "$lib/constants";
   let { children } = $props();
@@ -24,3 +25,5 @@
     <Footer />
   {/if}
 </div>
+
+<Toast />
