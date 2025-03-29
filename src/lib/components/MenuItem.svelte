@@ -1,6 +1,6 @@
 <script lang="ts">
   import auth from "$stores/authStore";
-  import orders from "$stores/orderStore";
+  import { addToCart } from "$stores/cartStore";
   import { Item } from "$lib/types";
 
   interface Props {
@@ -19,11 +19,9 @@
     <h2 class="card-title">{item.name}</h2>
     <div class="card-actions items-center justify-between">
       {#if $auth.isAuthenticated && buyButton}
-        <button class="btn btn-secondary" onclick={() => orders.create($auth.user.id, [item.id])}
-          >Kjøp</button
-        >
+        <button class="btn btn-secondary" onclick={() => addToCart(item)}>Kjøp</button>
       {/if}
-      <span class="ml-auto">{item.price},-</span>
+      <span class="ml-auto text-primary">{item.price},-</span>
     </div>
   </div>
 </div>

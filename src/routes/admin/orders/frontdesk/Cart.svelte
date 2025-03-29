@@ -1,60 +1,115 @@
 <script lang="ts">
-  import { Item } from "$lib/types";
-  let { selectedItem } = $props();
-  import order from "$stores/orderStore";
+  import {
+    addToCart,
+    cart,
+    clearCart,
+    type CartItem,
+    removeFromCart,
+    totalPrice
+  } from "$stores/cartStore";
   import auth from "$stores/authStore";
+  import orderStore from "$stores/orderStore";
+  import { customizationKeys } from "$stores/menuStore";
+  import { type Item, type CustomizationValue } from "$lib/types";
+  import orders from "$stores/orderStore";
 
-  let cart = $state<Item[]>([]);
-  let totalPrice = $derived(cart.reduce((sum, item) => sum + item.price, 0));
+  let { selectedItem } = $props<{
+    selectedItem: Item | undefined;
+  }>();
+
+  const colors = $derived(
+    Object.fromEntries($customizationKeys.map((key) => [key.id, key.labelColor]))
+  );
+
+  function handleAddToCart() {
+    if (!selectedItem) return;
+    addToCart(selectedItem);
+  }
+
+  function completeOrder() {
+    orderStore.create($auth.user.id, $cart);
+    clearCart();
+  }
 </script>
 
-<div class="flex h-full flex-col justify-center gap-8">
-  <div class="h-1/2 overflow-y-auto">
-    <table class="table table-pin-rows table-auto list-none p-4 shadow-2xl">
+<div class="flex flex-col justify-between gap-4">
+  {@render CartDisplay()}
+
+  <div class="flex flex-row justify-center gap-2">
+    <button class="btn btn-lg bg-base-200 text-3xl font-normal text-neutral">
+      ({$orders.length + 100})
+    </button>
+    <button class="bold btn btn-lg text-xl" onclick={completeOrder}>Ferdig</button>
+    <button class="bold btn btn-primary btn-lg text-3xl" onclick={handleAddToCart}>+</button>
+  </div>
+</div>
+
+{#snippet CartDisplay()}
+  <div class="overflow-y-auto">
+    <table class="table table-pin-rows table-auto list-none shadow-2xl">
       <thead>
         <tr>
-          <th class="w-full">Drikke</th>
+          <th class="w-full">Produkt</th>
           <th class="whitespace-nowrap">Pris</th>
         </tr>
       </thead>
       <tbody>
-        {#if cart.length > 0}
-          {#each cart as item, index}
-            <tr class="hover select-none" onclick={() => cart.splice(index, 1)}>
-              <td>{item.name}</td>
-              <td>{item.price},-</td>
-            </tr>
+        {#if $cart.length > 0}
+          {#each $cart as item, index}
+            {@render CartItem({ item, index })}
           {/each}
         {:else}
-          <tr>
-            <td>Ingenting</td>
-            <td></td>
-          </tr>
+          {@render EmptyCartRow()}
         {/if}
       </tbody>
-      <tfoot>
-        <tr>
-          <th>Total: <span class="text-neutral">{cart.length}</span></th>
-          <th><span class="text-bold text-lg text-primary">{totalPrice},-</span></th>
-        </tr>
-      </tfoot>
+      {@render CartFooter()}
     </table>
   </div>
+{/snippet}
 
-  <div class="flex flex-row justify-center gap-2">
-    <button
-      class="bold btn btn-lg text-xl"
-      onclick={() => {
-        order.create(
-          $auth.user.id,
-          cart.map((item) => item.id)
-        );
-        cart = [];
-      }}>Ferdig</button
-    >
-    <button
-      class="bold btn btn-primary btn-lg text-3xl"
-      onclick={() => cart.push(selectedItem as Item)}>+</button
-    >
-  </div>
-</div>
+{#snippet CustomizationBadge({ customization }: { customization: CustomizationValue })}
+  <span
+    class="badge badge-sm"
+    style={customization.belongsTo && colors[customization.belongsTo]
+      ? `background-color: ${colors[customization.belongsTo]}; color: white;`
+      : ""}
+  >
+    {customization.name}
+  </span>
+{/snippet}
+
+{#snippet CartItem({ item, index }: { item: CartItem; index: number })}
+  <tr class="hover select-none" onclick={() => removeFromCart(index)}>
+    <td>
+      <div>
+        <div>{item.name}</div>
+        {#if item.customizations && item.customizations.length > 0}
+          <div class="mt-1 flex flex-wrap gap-1">
+            {#each item.customizations as customization}
+              {#if customization.name}
+                {@render CustomizationBadge({ customization })}
+              {/if}
+            {/each}
+          </div>
+        {/if}
+      </div>
+    </td>
+    <td>{item.price},-</td>
+  </tr>
+{/snippet}
+
+{#snippet EmptyCartRow()}
+  <tr>
+    <td>Ingenting</td>
+    <td></td>
+  </tr>
+{/snippet}
+
+{#snippet CartFooter()}
+  <tfoot>
+    <tr>
+      <th>Total: <span class="text-neutral">{$cart.length}</span></th>
+      <th><span class="text-bold text-lg text-primary">{$totalPrice},-</span></th>
+    </tr>
+  </tfoot>
+{/snippet}

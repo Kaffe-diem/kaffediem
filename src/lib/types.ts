@@ -6,7 +6,10 @@ import pb, {
   type OrderResponse,
   type OrderItemResponse,
   type CategoryResponse,
-  type StatusResponse
+  type StatusResponse,
+  type CustomizationKeyResponse,
+  type CustomizationValueResponse,
+  type ItemCustomizationResponse
 } from "$lib/pocketbase";
 import { restrictedRoutes, adminRoutes } from "$lib/constants";
 import type { AuthModel } from "pocketbase";
@@ -47,7 +50,6 @@ export class User {
   }
 }
 
-// orders
 export type ExpandedOrderRecord = OrderResponse & {
   expand: { items: ExpandedOrderItemRecord[] };
 };
@@ -70,22 +72,48 @@ export class Order implements RecordBase {
 }
 
 export type ExpandedOrderItemRecord = OrderItemResponse & {
-  expand: { item: ItemResponse };
+  expand: {
+    item: ItemResponse;
+    customization?: Array<ExpandedItemCustomizationRecord>;
+  };
 };
 
 export class OrderItem implements RecordBase {
   constructor(
     public readonly id: RecordIdString,
     public readonly name: string,
-    public readonly item: Item
+    public readonly item: Item,
+    public readonly customizations: CustomizationValue[] = []
   ) {}
 
   toPb() {
-    return { name: this.name, item: this.item };
+    const customizationIds =
+      this.customizations && this.customizations.length > 0
+        ? this.customizations.map((c) => c.id)
+        : undefined;
+
+    return {
+      name: this.name,
+      item: this.item.id,
+      customization: customizationIds
+    };
   }
 
   static fromPb(data: ExpandedOrderItemRecord): OrderItem {
-    return new OrderItem(data.id, data.expand.item.name, Item.fromPb(data.expand.item));
+    const customizations: CustomizationValue[] = [];
+
+    data.expand?.customization?.forEach((customizationRecord) => {
+      customizationRecord.expand?.value?.forEach((valueRecord) => {
+        customizations.push(CustomizationValue.fromPb(valueRecord));
+      });
+    });
+
+    return new OrderItem(
+      data.id,
+      data.expand.item.name,
+      Item.fromPb(data.expand.item),
+      customizations
+    );
   }
 }
 
@@ -139,7 +167,6 @@ export class Category implements RecordBase {
   }
 }
 
-// messages
 export class Message implements RecordBase {
   constructor(
     public readonly id: RecordIdString,
@@ -178,6 +205,73 @@ export class Status implements RecordBase {
       messages.filter((m) => m.id == status.message)[0] || Message.baseValue,
       messages,
       status.online
+    );
+  }
+}
+
+export class CustomizationKey implements RecordBase {
+  constructor(
+    public readonly id: RecordIdString,
+    public readonly name: string,
+    public readonly labelColor?: string
+  ) {}
+
+  toPb() {
+    return { name: this.name, label_color: this.labelColor };
+  }
+
+  static fromPb(data: CustomizationKeyResponse): CustomizationKey {
+    return new CustomizationKey(data.id, data.name || "", data.label_color);
+  }
+}
+
+export class CustomizationValue implements RecordBase {
+  constructor(
+    public readonly id: RecordIdString,
+    public readonly name: string,
+    public readonly priceIncrementNok: number,
+    public readonly belongsTo: RecordIdString
+  ) {}
+
+  toPb() {
+    return {
+      name: this.name,
+      price_increment_nok: this.priceIncrementNok,
+      belongs_to: this.belongsTo
+    };
+  }
+
+  static fromPb(data: CustomizationValueResponse): CustomizationValue {
+    return new CustomizationValue(data.id, data.name, data.price_increment_nok, data.belongs_to);
+  }
+}
+
+export type ExpandedItemCustomizationRecord = ItemCustomizationResponse & {
+  expand: {
+    key?: CustomizationKeyResponse;
+    value?: CustomizationValueResponse[];
+  };
+};
+
+export class ItemCustomization implements RecordBase {
+  constructor(
+    public readonly id: RecordIdString,
+    public readonly key?: CustomizationKey,
+    public readonly values?: CustomizationValue[]
+  ) {}
+
+  toPb() {
+    return {
+      key: this.key?.id,
+      value: this.values?.map((v) => v.id)
+    };
+  }
+
+  static fromPb(data: ExpandedItemCustomizationRecord): ItemCustomization {
+    return new ItemCustomization(
+      data.id,
+      data.expand.key ? CustomizationKey.fromPb(data.expand.key) : undefined,
+      data.expand.value ? data.expand.value.map(CustomizationValue.fromPb) : undefined
     );
   }
 }
