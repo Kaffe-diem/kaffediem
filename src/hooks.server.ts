@@ -12,9 +12,7 @@ export const authentication: Handle = async ({ event, resolve }) => {
   // NOTE: should get rid of that shared state anyways..
   // This instance of pb is only used for authentication purposes, everything else uses the shared one.
   event.locals.pb = new PocketBase(PUBLIC_PB_HOST);
-  event.locals.pb.authStore.loadFromCookie(event.cookies.get("pb_auth") || "");
-
-  console.log(event.locals.pb.authStore);
+  event.locals.pb.authStore.loadFromCookie(`pb_auth=${event.cookies.get("pb_auth") || ""}`);
 
   try {
     if (event.locals.pb.authStore.isValid)
