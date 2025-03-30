@@ -1,3 +1,6 @@
+import PocketBase from "pocketbase";
+import { PUBLIC_PB_HOST } from "$env/static/public";
+
 import { restrictedRoutes, adminRoutes } from "$lib/constants";
 import pb from "$lib/pocketbase";
 import { redirect, type Handle } from "@sveltejs/kit";
@@ -5,14 +8,16 @@ import { sequence } from "@sveltejs/kit/hooks";
 import { Collections } from "$lib/pocketbase";
 
 export const authentication: Handle = async ({ event, resolve }) => {
-  event.locals.pb = pb;
+  // Does not work with the shared pb
+  // NOTE: should get rid of that shared state anyways..
+  event.locals.pb = new PocketBase(PUBLIC_PB_HOST);
   event.locals.pb.authStore.loadFromCookie(event.cookies.get("pb_auth") || "");
 
   console.log(event.locals.pb.authStore);
 
   try {
-    // if (event.locals.pb.authStore.isValid)
-    //   event.locals.pb.collection(Collections.User).authRefresh();
+    if (event.locals.pb.authStore.isValid)
+      event.locals.pb.collection(Collections.User).authRefresh();
   } catch {
     event.locals.pb.authStore.clear();
   }
