@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { PageProps } from "./$types";
   import { items, categories } from "$stores/menuStore";
+  import { Item } from "$lib/types";
+  import pb from "$lib/pocketbase";
 
   let { data }: PageProps = $props();
   const id = data.id;
@@ -8,18 +10,32 @@
   let itemName: string = $state();
   let itemPrice: number = $state();
   let itemCategory: string = $state();
+  let itemImage: string = $state();
+  let itemImageName: string = $state();
   $effect(() => {
     const item = $items.find((item) => item.id === id);
-    const category = $categories.find((category) => category.id == item.category);
     if (item) {
       itemName = item.name;
       itemPrice = item.price;
-      itemCategory = category.id;
+      itemCategory = item.category;
+      itemImage = item.image;
+      itemImageName = item.imageName;
     }
   });
 
+  function updateImage() {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        itemImage = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
   function updateItem() {
-    console.log(itemName, itemPrice, itemCategory);
+    items.update(new Item(id, itemName, itemPrice, itemCategory, itemImageName, itemImage));
   }
 </script>
 
@@ -48,6 +64,20 @@
           {/each}
         {/if}
       </select>
+    </fieldset>
+  </div>
+  <div class="divider col-span-2"></div>
+  <div class="col-span-2 flex flex-col gap-2">
+    {#if itemImage}
+      <div class="flex items-center justify-center">
+        <img src={itemImage} alt="Bilde av {itemName}" class="max-h-96 w-auto rounded-xl" />
+      </div>
+    {:else}
+      (Bilde mangler)
+    {/if}
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Last opp et nytt bilde</legend>
+      <input onchange={updateImage} type="file" class="file-input w-full" />
     </fieldset>
   </div>
   <div class="col-span-2">

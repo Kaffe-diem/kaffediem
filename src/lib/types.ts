@@ -123,11 +123,17 @@ export class Item implements RecordBase {
     public readonly name: string,
     public readonly price: number,
     public readonly category: string,
+    public readonly imageName: string,
     public readonly image: string
   ) {}
 
   toPb() {
-    return { name: this.name, price_nok: this.price, category: this.category, image: this.image };
+    return {
+      name: this.name,
+      price_nok: this.price,
+      category: this.category,
+      image: this.imageName
+    };
   }
 
   static fromPb(data: ItemResponse): Item {
@@ -136,6 +142,7 @@ export class Item implements RecordBase {
       data.name,
       data.price_nok,
       data.category,
+      data.image,
       pb.files.getUrl(data, data.image)
     );
   }
