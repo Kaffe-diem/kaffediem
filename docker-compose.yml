@@ -5,3 +5,7 @@ services:
       - "8080:8080"
     volumes:
       - "./pocketbase-data:/pb/pb_data"
+  app:
+    build: .
+    ports:
+      - "3000:3000"
