@@ -125,7 +125,7 @@ export class Item implements RecordBase {
     public readonly category: string,
     public readonly imageName: string, // pb field value
     public readonly image: string, // url to actual image
-    public readonly imageFile: string | null = null // file with uploaded image contents
+    public readonly imageFile: File | null = null // file with uploaded image contents
   ) {}
 
   toPb() {

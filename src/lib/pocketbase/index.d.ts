@@ -18,7 +18,6 @@ export enum Collections {
 	ItemCustomization = "item_customization",
 	Message = "message",
 	Order = "order",
-	OrderCorrection = "order_correction",
 	OrderItem = "order_item",
 	Status = "status",
 	User = "user",
@@ -153,21 +152,11 @@ export enum OrderStateOptions {
 	"dispatched" = "dispatched",
 }
 export type OrderRecord = {
-	correction?: RecordIdString[]
 	created?: IsoDateString
 	customer?: RecordIdString
 	id: string
 	items: RecordIdString[]
 	state: OrderStateOptions
-	updated?: IsoDateString
-}
-
-export type OrderCorrectionRecord = {
-	created?: IsoDateString
-	description?: string
-	id: string
-	name?: string
-	system_tag?: string
 	updated?: IsoDateString
 }
 
@@ -215,7 +204,6 @@ export type ItemResponse<Texpand = unknown> = Required<ItemRecord> & BaseSystemF
 export type ItemCustomizationResponse<Texpand = unknown> = Required<ItemCustomizationRecord> & BaseSystemFields<Texpand>
 export type MessageResponse<Texpand = unknown> = Required<MessageRecord> & BaseSystemFields<Texpand>
 export type OrderResponse<Texpand = unknown> = Required<OrderRecord> & BaseSystemFields<Texpand>
-export type OrderCorrectionResponse<Texpand = unknown> = Required<OrderCorrectionRecord> & BaseSystemFields<Texpand>
 export type OrderItemResponse<Texpand = unknown> = Required<OrderItemRecord> & BaseSystemFields<Texpand>
 export type StatusResponse<Texpand = unknown> = Required<StatusRecord> & BaseSystemFields<Texpand>
 export type UserResponse<Texpand = unknown> = Required<UserRecord> & AuthSystemFields<Texpand>
@@ -235,7 +223,6 @@ export type CollectionRecords = {
 	item_customization: ItemCustomizationRecord
 	message: MessageRecord
 	order: OrderRecord
-	order_correction: OrderCorrectionRecord
 	order_item: OrderItemRecord
 	status: StatusRecord
 	user: UserRecord
@@ -254,7 +241,6 @@ export type CollectionResponses = {
 	item_customization: ItemCustomizationResponse
 	message: MessageResponse
 	order: OrderResponse
-	order_correction: OrderCorrectionResponse
 	order_item: OrderItemResponse
 	status: StatusResponse
 	user: UserResponse
@@ -276,7 +262,6 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: 'item_customization'): RecordService<ItemCustomizationResponse>
 	collection(idOrName: 'message'): RecordService<MessageResponse>
 	collection(idOrName: 'order'): RecordService<OrderResponse>
-	collection(idOrName: 'order_correction'): RecordService<OrderCorrectionResponse>
 	collection(idOrName: 'order_item'): RecordService<OrderItemResponse>
 	collection(idOrName: 'status'): RecordService<StatusResponse>
 	collection(idOrName: 'user'): RecordService<UserResponse>

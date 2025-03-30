@@ -1,17 +1,17 @@
 <script lang="ts">
+  // @ts-expect-error Is present, but lint fails
   import type { PageProps } from "./$types";
   import { items, categories } from "$stores/menuStore";
   import { Item } from "$lib/types";
-  import pb from "$lib/pocketbase";
 
   let { data }: PageProps = $props();
   const id = data.id;
 
-  let itemName: string = $state();
-  let itemPrice: number = $state();
-  let itemCategory: string = $state();
-  let itemImage: string = $state();
-  let itemImageName: string = $state();
+  let itemName: string | undefined = $state();
+  let itemPrice: number | undefined = $state();
+  let itemCategory: string | undefined = $state();
+  let itemImage: string | undefined = $state();
+  let itemImageName: string | undefined = $state();
   $effect(() => {
     const item = $items.find((item) => item.id === id);
     if (item) {
@@ -23,21 +23,22 @@
     }
   });
 
+  let imageFiles: FileList | null | undefined = $state();
   let imageFile: File | null = null;
-  function updateImage() {
-    imageFile = event.target.files[0];
-    if (imageFile) {
+  $effect(() => {
+    if (imageFiles) {
+      imageFile = imageFiles[0]!;
       const reader = new FileReader();
       reader.onload = () => {
-        itemImage = reader.result;
+        itemImage = reader.result as string;
       };
-      reader.readAsDataURL(imageFile);
+      reader.readAsDataURL(imageFile as Blob);
     }
-  }
+  });
 
   function deleteImage() {
     if (window.confirm("Er du sikker på at du vil slette bildet?")) {
-      itemImage = null;
+      itemImage = undefined;
       itemImageName = "";
       imageFile = null;
     }
@@ -45,7 +46,7 @@
 
   function updateItem() {
     items.update(
-      new Item(id, itemName, itemPrice, itemCategory, itemImageName, itemImage, imageFile)
+      new Item(id, itemName!, itemPrice!, itemCategory!, itemImageName!, itemImage!, imageFile)
     );
   }
 </script>
@@ -69,7 +70,7 @@
       <select class="select" bind:value={itemCategory}>
         {#if itemCategory}
           {#each $categories as category}
-            <option value={category.id} selected={category.id == itemCategory.id}
+            <option value={category.id} selected={category.id == itemCategory}
               >{category.name}</option
             >
           {/each}
@@ -88,7 +89,7 @@
     </div>
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Last opp et nytt bilde</legend>
-      <input onchange={updateImage} type="file" class="file-input w-full" />
+      <input bind:files={imageFiles} type="file" class="file-input w-full" />
     </fieldset>
     <button onclick={deleteImage} class="btn btn-error h-full">Slett bilde</button>
   </div>
