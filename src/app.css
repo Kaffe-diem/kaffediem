@@ -3,6 +3,10 @@
 @plugin "daisyui" {
   themes: light;
 }
+/*
+ * Manually written. Can generate new with
+ * https://daisyui.com/theme-generator/
+ * */
 @plugin "daisyui/theme" {
   name: "light";
   default: true;
