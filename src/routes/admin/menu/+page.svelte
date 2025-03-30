@@ -3,19 +3,22 @@
   import type { Category, Item } from "$lib/types";
 </script>
 
-<div class="flex flex-col overflow-y-auto">
+<div class="flex flex-col gap-8 overflow-y-auto">
+  <a href="/admin/menu/edit/new" class="btn w-full">Opprett et nytt produkt</a>
   {#each $categories as category}
     {@render CategorySection({ category })}
   {/each}
 </div>
 
 {#snippet CategorySection({ category }: { category: Category })}
-  <h2 class="text-2xl">{category.name}</h2>
-  <ul class="mb-8 list-none">
-    {#each category.items as item}
-      {@render ItemCard({ item })}
-    {/each}
-  </ul>
+  <div>
+    <h2 class="mb-4 text-2xl">{category.name}</h2>
+    <ul class="list-none">
+      {#each category.items as item}
+        {@render ItemCard({ item })}
+      {/each}
+    </ul>
+  </div>
 {/snippet}
 
 {#snippet ItemCard({ item }: { item: Item })}
