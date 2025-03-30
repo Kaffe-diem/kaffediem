@@ -56,6 +56,13 @@ export default {
 
   updateState: (orderId: RecordIdString, state: State) => {
     pb.collection(Collections.Order).update(orderId, { state });
+  },
+
+  setAll: async (state: State) => {
+    const orders = await pb.collection(Collections.Order).getFullList();
+    orders.map((order) => {
+      pb.collection(Collections.Order).update(order.id, { state });
+    });
   }
 };
 
