@@ -1,4 +1,6 @@
 <script>
+  import BackButton from "$components/BackButton.svelte";
+
   let { children } = $props();
 </script>
 
@@ -6,6 +8,4 @@
   {@render children?.()}
 </main>
 
-<div class="fixed right-0 bottom-0 m-8 hidden md:flex">
-  <a href="/admin" class="btn btn-secondary">Tilbake</a>
-</div>
+<BackButton />
