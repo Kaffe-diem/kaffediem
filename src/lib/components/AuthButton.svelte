@@ -1,6 +1,5 @@
 <script lang="ts">
   import auth from "$stores/authStore";
-  import { goto } from "$app/navigation";
   interface Props {
     children?: import("svelte").Snippet;
     class?: string;

@@ -2,7 +2,6 @@ import PocketBase from "pocketbase";
 import { PUBLIC_PB_HOST } from "$env/static/public";
 
 import { restrictedRoutes, adminRoutes } from "$lib/constants";
-import pb from "$lib/pocketbase";
 import { redirect, type Handle } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { Collections } from "$lib/pocketbase";

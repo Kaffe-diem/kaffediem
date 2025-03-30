@@ -4,7 +4,9 @@
   import type { ClientResponseError } from "pocketbase";
   import { goto } from "$app/navigation";
 
-  let email, password, errorMessage;
+  let email: string = "";
+  let password: string = "";
+  let errorMessage: string = "";
 
   async function login() {
     try {
@@ -20,8 +22,7 @@
       goto("/");
     } catch (e) {
       const error = e as ClientResponseError;
-      console.error(error);
-      errorMessage = e.message;
+      errorMessage = error.message;
     }
   }
 </script>
