@@ -19,3 +19,8 @@ if (typeof document !== "undefined") {
 }
 
 export default auth;
+
+export function logout() {
+  pb.authStore.clear();
+  document.cookie = pb.authStore.exportToCookie();
+}

@@ -4,11 +4,7 @@
   import NavItems from "$components/NavItems.svelte";
   import { NavItem } from "$lib/types";
 
-  const navItems = [
-    new NavItem("/login", "Logg inn"),
-    new NavItem("/account", "Min bruker"),
-    new NavItem("/admin", "Admin")
-  ];
+  const navItems = [new NavItem("/account", "Min bruker"), new NavItem("/admin", "Admin")];
 </script>
 
 <div class="drawer drawer-end z-[2]">

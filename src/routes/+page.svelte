@@ -28,7 +28,7 @@
 
 {#if !$auth.isAuthenticated}
   <div>
-    <a href="/login" class="btn m-2">Logg inn for å bestille</a>
+    <AuthButton class="btn m-2">Logg inn for å bestille</AuthButton>
     <p class="text-xs">
       Ved å opprette en bruker samtykker du til våre <a href="/tos" class="link-primary"
         >vilkår for bruk</a
