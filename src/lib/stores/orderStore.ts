@@ -20,6 +20,8 @@ const baseOptions = {
   filter: `created >= "${today}"`
 };
 
+const actionHistory = [];
+
 // Create the store so we can reference it in methods
 const _subscribe = createPbStore(Collections.Order, Order, baseOptions);
 
@@ -41,21 +43,60 @@ export default {
       })
     );
 
-    await pb.collection(Collections.Order).create({
+    const order = await pb.collection(Collections.Order).create({
       customer: userId,
       items: orderItemIds,
       state: State.received,
       payment_fulfilled: false
     });
 
-    const _orderStore = get({ subscribe: _subscribe });
-    const orderNumber = _orderStore.length + 100;
+    actionHistory.push({
+      action: "create",
+      orderId: order.id,
+      orderItemIds: orderItemIds
+    });
 
-    toasts.success(`✅ ${orderNumber - 1}`);
+    const _orderStore = get({ subscribe: _subscribe });
+    const orderNumber = _orderStore.length + 100 - 1;
+
+    toasts.success(`✅ ${orderNumber}`);
   },
 
-  updateState: (orderId: RecordIdString, state: State) => {
-    pb.collection(Collections.Order).update(orderId, { state });
+  updateState: async (orderId: RecordIdString, state: State) => {
+    const order = await pb.collection(Collections.Order).getOne(orderId);
+
+    actionHistory.push({
+      action: "updateState",
+      orderId: orderId,
+      previousState: order.state
+    });
+
+    await pb.collection(Collections.Order).update(orderId, { state });
+  },
+
+  undoLastAction: async () => {
+    if (actionHistory.length === 0) {
+      return;
+    }
+
+    const lastAction = actionHistory.pop();
+
+    switch (lastAction.action) {
+      case "create":
+        // FIXME: Ustabilt
+        //   await Promise.all(
+        //     lastAction.orderItemIds.map((itemId: RecordIdString) => {
+        //       pb.collection(Collections.OrderItem).delete(itemId);
+        //     })
+        //   );
+        //   await pb.collection(Collections.Order).delete(lastAction.orderId);
+        break;
+      case "updateState":
+        pb.collection(Collections.Order).update(lastAction.orderId, {
+          state: lastAction.previousState
+        });
+        break;
+    }
   }
 };
 
