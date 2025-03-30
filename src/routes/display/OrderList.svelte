@@ -12,7 +12,7 @@
 <div class="flex flex-wrap gap-2">
   {#each $orders as order, index}
     {#if show.includes(order?.state)}
-      <button class="btn btn-lg bg-base-200 text-3xl font-normal text-neutral">{index + 100}</button
+      <button class="btn btn-lg bg-base-200 text-neutral text-3xl font-normal">{index + 100}</button
       >
     {/if}
   {/each}

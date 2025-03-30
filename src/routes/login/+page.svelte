@@ -1,5 +1,5 @@
 <div class="flex justify-center">
-  <form action="?/login" method="post" class="flex flex-col gap-4 w-lg">
+  <form action="?/login" method="post" class="flex w-lg flex-col gap-4">
     <label class="input w-full">
       <span class="label">Mail</span>
       <input class="input" name="email" type="email" placeholder="mail@example.com" />

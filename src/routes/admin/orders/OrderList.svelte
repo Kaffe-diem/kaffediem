@@ -19,7 +19,7 @@
 
 <div class="h-full w-full overflow-y-auto">
   <h2
-    class="sticky top-0 z-50 bg-base-100 pb-2 text-center text-4xl font-bold text-neutral md:mb-6"
+    class="bg-base-100 text-neutral sticky top-0 z-50 pb-2 text-center text-4xl font-bold md:mb-6"
     id="order-list-heading"
   >
     {label}
@@ -46,7 +46,7 @@
 
 {#snippet OrderRow({ order, orderNumber }: { order: Order; orderNumber: number })}
   <tr
-    class="mb-4 block cursor-pointer rounded bg-base-200 shadow-md transition-colors"
+    class="bg-base-200 mb-4 block cursor-pointer rounded shadow-md transition-colors"
     onclick={() => orders.updateState(order.id, onclick)}
     role="button"
     tabindex="0"
@@ -65,7 +65,7 @@
 {/snippet}
 
 {#snippet OrderItem({ orderItem }: { orderItem: OrderItem })}
-  <li class="rounded bg-base-300 p-3 shadow">
+  <li class="bg-base-300 rounded p-3 shadow">
     <div class="flex flex-col">
       <span class="mb-1 text-lg font-medium">
         {orderItem.item.name}
