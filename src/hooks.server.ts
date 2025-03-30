@@ -10,6 +10,7 @@ import { Collections } from "$lib/pocketbase";
 export const authentication: Handle = async ({ event, resolve }) => {
   // Does not work with the shared pb
   // NOTE: should get rid of that shared state anyways..
+  // This instance of pb is only used for authentication purposes, everything else uses the shared one.
   event.locals.pb = new PocketBase(PUBLIC_PB_HOST);
   event.locals.pb.authStore.loadFromCookie(event.cookies.get("pb_auth") || "");
 
