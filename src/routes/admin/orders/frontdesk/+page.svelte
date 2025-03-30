@@ -9,7 +9,7 @@
   let selectedItem = $state<Item | undefined>();
 </script>
 
-<div class="grid h-full grid-cols-[2fr,auto,1fr,auto,1fr] grid-rows-[100%] gap-2">
+<div class="grid h-full grid-cols-[2fr_auto_1fr_auto_1fr] grid-rows-[100%] gap-2">
   <ItemSelection bind:selectedItem />
 
   <div class="divider divider-horizontal m-1 p-1"></div>

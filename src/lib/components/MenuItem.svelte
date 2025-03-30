@@ -21,7 +21,7 @@
       {#if $auth.isAuthenticated && buyButton}
         <button class="btn btn-secondary" onclick={() => addToCart(item)}>Kjøp</button>
       {/if}
-      <span class="ml-auto text-primary">{item.price},-</span>
+      <span class="text-primary ml-auto">{item.price},-</span>
     </div>
   </div>
 </div>

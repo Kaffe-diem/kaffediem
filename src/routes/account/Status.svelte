@@ -12,7 +12,7 @@
     </h2>
   {/if}
 
-  <ul class="steps steps-vertical mt-12 text-xl md:steps-horizontal">
+  <ul class="steps steps-vertical md:steps-horizontal mt-12 text-xl">
     <Step state={true}>Motatt</Step>
     <Step state={false}>Straks ferdig...</Step>
     <Step state={false}>Kom og hent!</Step>

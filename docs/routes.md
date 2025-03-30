@@ -11,6 +11,8 @@ Dette er et system for kaffe-diem for å håndtere bestilling av kaffe.
 │       ├── /frontdesk # Ta imot bestillinger
 │       └── /kitchen # Se aktive bestillinger
 ├── /display # Storskjerm som viser info
+├── /login # Innlogging
+├── /logout # Utlogging
 └── /tos # Vilkår for bruk
 ```
 
@@ -57,6 +59,14 @@ Kjøkkenet. Den er delt inn i to kolloner:
 ### /message
 
 Endring av meldingen. Denne meldingen skal vises på `/display`, og blokkerer alt annet innhold. Siden har en liste over ulike valg for hva som skal vises som meldingen. Man kan velge med en radio knapp, og endre tittel / beskrivelse med input-bokser.
+
+## /login
+
+Innloggingsside.
+
+## /logout
+
+Utlogging. Logger automatisk ut og redirecter deretter til `/´.
 
 ## /tos
 
