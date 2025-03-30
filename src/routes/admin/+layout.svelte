@@ -17,6 +17,6 @@
   {@render children?.()}
 </main>
 
-<div class="absolute right-0 bottom-0 m-8 hidden md:flex">
+<div class="fixed right-0 bottom-0 m-8 hidden md:flex">
   <button onclick={redirectToPrevious} class="btn btn-secondary">Tilbake</button>
 </div>
