@@ -20,7 +20,12 @@ const baseOptions = {
   filter: `created >= "${today}"`
 };
 
-const actionHistory = [];
+const actionHistory: {
+  action: string;
+  orderId: RecordIdString;
+  orderItemIds?: RecordIdString[];
+  previousState?: State;
+}[] = [];
 
 // Create the store so we can reference it in methods
 const _subscribe = createPbStore(Collections.Order, Order, baseOptions);
@@ -81,7 +86,7 @@ export default {
 
     const lastAction = actionHistory.pop();
 
-    switch (lastAction.action) {
+    switch (lastAction!.action) {
       case "create":
         // FIXME: Ustabilt
         //   await Promise.all(
@@ -92,8 +97,8 @@ export default {
         //   await pb.collection(Collections.Order).delete(lastAction.orderId);
         break;
       case "updateState":
-        pb.collection(Collections.Order).update(lastAction.orderId, {
-          state: lastAction.previousState
+        pb.collection(Collections.Order).update(lastAction!.orderId, {
+          state: lastAction!.previousState
         });
         break;
     }
