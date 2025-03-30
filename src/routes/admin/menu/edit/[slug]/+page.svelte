@@ -23,19 +23,30 @@
     }
   });
 
+  let imageFile: File | null = null;
   function updateImage() {
-    const file = event.target.files[0];
-    if (file) {
+    imageFile = event.target.files[0];
+    if (imageFile) {
       const reader = new FileReader();
       reader.onload = () => {
         itemImage = reader.result;
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(imageFile);
+    }
+  }
+
+  function deleteImage() {
+    if (window.confirm("Er du sikker på at du vil slette bildet?")) {
+      itemImage = null;
+      itemImageName = "";
+      imageFile = null;
     }
   }
 
   function updateItem() {
-    items.update(new Item(id, itemName, itemPrice, itemCategory, itemImageName, itemImage));
+    items.update(
+      new Item(id, itemName, itemPrice, itemCategory, itemImageName, itemImage, imageFile)
+    );
   }
 </script>
 
@@ -67,18 +78,19 @@
     </fieldset>
   </div>
   <div class="divider col-span-2"></div>
-  <div class="col-span-2 flex flex-col gap-2">
-    {#if itemImage}
-      <div class="flex items-center justify-center">
+  <div class="col-span-2 grid grid-cols-2 gap-2">
+    <div class="col-span-2 flex items-center justify-center">
+      {#if itemImage}
         <img src={itemImage} alt="Bilde av {itemName}" class="max-h-96 w-auto rounded-xl" />
-      </div>
-    {:else}
-      (Bilde mangler)
-    {/if}
+      {:else}
+        (Bilde mangler)
+      {/if}
+    </div>
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Last opp et nytt bilde</legend>
       <input onchange={updateImage} type="file" class="file-input w-full" />
     </fieldset>
+    <button onclick={deleteImage} class="btn btn-error h-full">Slett bilde</button>
   </div>
   <div class="col-span-2">
     <button class="btn btn-primary w-full" onclick={updateItem}>Lagre</button>

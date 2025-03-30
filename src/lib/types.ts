@@ -123,17 +123,23 @@ export class Item implements RecordBase {
     public readonly name: string,
     public readonly price: number,
     public readonly category: string,
-    public readonly imageName: string,
-    public readonly image: string
+    public readonly imageName: string, // pb field value
+    public readonly image: string, // url to actual image
+    public readonly imageFile: string | null = null // file with uploaded image contents
   ) {}
 
   toPb() {
-    return {
-      name: this.name,
-      price_nok: this.price,
-      category: this.category,
-      image: this.imageName
-    };
+    // Looks like FormData is necessary when dealing with files.
+    const formData = new FormData();
+    formData.append("name", this.name);
+    formData.append("price_nok", this.price.toString());
+    formData.append("category", this.category);
+    if (this.imageFile) {
+      formData.append("image", this.imageFile);
+    } else {
+      formData.append("image", this.imageName);
+    }
+    return formData;
   }
 
   static fromPb(data: ItemResponse): Item {
