@@ -33,7 +33,7 @@
   </div>
   <div class="drawer-side">
     <label for="drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-    <ul class="menu min-h-full w-80 bg-base-100 p-4">
+    <ul class="menu bg-base-100 min-h-full w-80 p-4">
       <NavItems
         {navItems}
         isAuthenticated={$auth.isAuthenticated}

@@ -36,7 +36,7 @@
   {@render CartDisplay()}
 
   <div class="flex flex-row justify-center gap-2">
-    <button class="btn btn-lg bg-base-200 text-3xl font-normal text-neutral">
+    <button class="btn btn-lg bg-base-200 text-neutral text-3xl font-normal">
       ({$orders.length + 100})
     </button>
     <button class="bold btn btn-lg text-xl" onclick={completeOrder}>Ferdig</button>
@@ -46,7 +46,7 @@
 
 {#snippet CartDisplay()}
   <div class="overflow-y-auto">
-    <table class="table table-pin-rows table-auto list-none shadow-2xl">
+    <table class="table-pin-rows table table-auto list-none shadow-2xl">
       <thead>
         <tr>
           <th class="w-full">Produkt</th>
@@ -109,7 +109,7 @@
   <tfoot>
     <tr>
       <th>Total: <span class="text-neutral">{$cart.length}</span></th>
-      <th><span class="text-bold text-lg text-primary">{$totalPrice},-</span></th>
+      <th><span class="text-bold text-primary text-lg">{$totalPrice},-</span></th>
     </tr>
   </tfoot>
 {/snippet}
