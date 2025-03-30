@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { NavItem } from "$lib/types";
-  import AuthButton from "$components/AuthButton.svelte";
 
   interface Props {
     navItems: NavItem[];
@@ -20,5 +19,4 @@
       </li>
     {/if}
   {/each}
-  <li><AuthButton /></li>
 </ul>
