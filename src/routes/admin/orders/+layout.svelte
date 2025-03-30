@@ -28,6 +28,7 @@
   </div>
 {:else}
   <main class="relative mx-auto h-screen w-11/12 py-4">
+    <button class="btn btn-lg" onclick={() => console.log("oops")}>oops</button>
     {@render children?.()}
   </main>
 {/if}
