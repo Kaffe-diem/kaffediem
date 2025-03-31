@@ -4,7 +4,10 @@
 </script>
 
 <div class="flex flex-col gap-8 overflow-y-auto">
-  <a href="/admin/menu/item/new" class="btn w-full">Opprett et nytt produkt</a>
+  <div class="flex flex-col gap-2">
+    <a href="/admin/menu/item/new" class="btn w-full">Opprett et nytt produkt</a>
+    <a href="/admin/menu/category/new" class="btn w-full">Opprett en ny kategori</a>
+  </div>
   {#each $categories as category}
     {@render CategorySection({ category })}
   {/each}

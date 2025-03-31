@@ -177,7 +177,7 @@ export class Category implements RecordBase {
       data.name,
       data.sort_order,
       data.enable,
-      data.expand.item_via_category.map(Item.fromPb)
+      (data.expand.item_via_category ?? []).map(Item.fromPb)
     );
   }
 }

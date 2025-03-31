@@ -7,6 +7,7 @@
 
   let { data }: PageProps = $props();
   const id = data.id;
+  const create = id == "new";
 
   let categoryName: string | undefined = $state();
   let categorySort: boolean | undefined = $state();
@@ -25,11 +26,20 @@
   }
 
   function updateCategory() {
-    categories.update(new Category(id, categoryName, categorySort, categoryEnabled));
+    if (create) {
+      categories.create(new Category(id, categoryName, categorySort, categoryEnabled));
+      goto("/admin/menu");
+    } else {
+      categories.update(new Category(id, categoryName, categorySort, categoryEnabled));
+    }
   }
 </script>
 
-{#if categoryName}
+{#if create}
+  <h1 class="text-center text-xl">Opprett en kategori</h1>
+  <div class="divider"></div>
+{/if}
+{#if categoryName || create}
   <div class="grid w-full grid-cols-2 gap-2">
     <div class="col-span-2">
       <fieldset class="fieldset">
@@ -63,7 +73,14 @@
     </div>
     <div class="divider col-span-2"></div>
     <div class="col-span-2">
-      <button class="btn btn-primary w-full" onclick={updateCategory}>Lagre</button>
+      <button class="btn btn-primary w-full" onclick={updateCategory}
+        >{#if create}Opprett{:else}Lagre{/if}</button
+      >
     </div>
+  </div>
+{:else}
+  <div class="mx-30 grid grid-cols-1 gap-4">
+    <h1 class="text-center text-xl">Kunne ikke finne kategori!</h1>
+    <a href="/admin/menu/category/new" class="btn">Opprett en ny kategori</a>
   </div>
 {/if}
