@@ -4,7 +4,7 @@
 </script>
 
 <div class="flex flex-col gap-8 overflow-y-auto">
-  <a href="/admin/menu/edit/new" class="btn w-full">Opprett et nytt produkt</a>
+  <a href="/admin/menu/item/new" class="btn w-full">Opprett et nytt produkt</a>
   {#each $categories as category}
     {@render CategorySection({ category })}
   {/each}
@@ -24,6 +24,6 @@
 {#snippet ItemCard({ item }: { item: Item })}
   <li class="m-2 flex flex-row justify-between">
     <span>{item.name}</span>
-    <a href="/admin/menu/edit/{item.id}" class="btn btn-neutral">Rediger</a>
+    <a href="/admin/menu/item/{item.id}" class="btn btn-neutral">Rediger</a>
   </li>
 {/snippet}

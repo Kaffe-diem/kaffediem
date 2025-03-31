@@ -119,6 +119,6 @@
 {:else}
   <div class="mx-30 grid grid-cols-1 gap-4">
     <h1 class="text-center text-xl">Kunne ikke finne produkt!</h1>
-    <a href="/admin/menu/edit/new" class="btn">Opprett et nytt produkt</a>
+    <a href="/admin/menu/item/new" class="btn">Opprett et nytt produkt</a>
   </div>
 {/if}
