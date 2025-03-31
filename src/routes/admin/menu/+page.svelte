@@ -12,7 +12,15 @@
 
 {#snippet CategorySection({ category }: { category: Category })}
   <div>
-    <h2 class="mb-4 text-2xl">{category.name}</h2>
+    <div class="mb-4 flex flex-row items-center justify-between px-2">
+      <span class="text-2xl">{category.name}</span>
+      <div class="flex flex-row items-center gap-4">
+        {#if !category.enabled}
+          <span class="badge badge-soft badge-neutral">Deaktivert</span>
+        {/if}
+        <a href="/admin/menu/category/{category.id}" class="btn">Rediger</a>
+      </div>
+    </div>
     <ul class="list-none">
       {#each category.items as item}
         {@render ItemCard({ item })}
