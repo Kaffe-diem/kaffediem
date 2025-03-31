@@ -30,7 +30,7 @@
           orders.setAll(State.dispatched);
         }
       }}
-      >Reset bestillinger
+      >Nullstill bestillinger
     </button>
   </li>
   {#each adminPages as page}
