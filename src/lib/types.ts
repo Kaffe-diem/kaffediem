@@ -164,7 +164,7 @@ export class Category implements RecordBase {
     public readonly name: string,
     public readonly sortOrder: number,
     public readonly enabled: boolean,
-    public readonly items: Item[]
+    public readonly items: Item[] = []
   ) {}
 
   toPb() {
