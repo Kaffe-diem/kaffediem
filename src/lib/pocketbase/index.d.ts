@@ -96,6 +96,7 @@ export type SuperusersRecord = {
 
 export type CategoryRecord = {
 	created?: IsoDateString
+	enable?: boolean
 	id: string
 	name: string
 	sort_order: number
