@@ -1,4 +1,7 @@
 <script lang="ts">
+  import orders from "$stores/orderStore";
+  import { State } from "$lib/types";
+
   class AdminPage {
     href: string;
     text: string;
@@ -19,6 +22,17 @@
 </script>
 
 <ul>
+  <li>
+    <button
+      class="btn relative m-4 flex h-24 w-full flex-col items-center justify-center text-3xl text-red-500 lg:text-5xl"
+      onclick={() => {
+        if (window.confirm(`Er du sikker på at du vil sette alle bestillinger som utlevert?`)) {
+          orders.setAll(State.dispatched);
+        }
+      }}
+      >Nullstill bestillinger
+    </button>
+  </li>
   {#each adminPages as page}
     <li>
       <a
