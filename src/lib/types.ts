@@ -163,11 +163,12 @@ export class Category implements RecordBase {
     public readonly id: RecordIdString,
     public readonly name: string,
     public readonly sortOrder: number,
+    public readonly enabled: boolean,
     public readonly items: Item[]
   ) {}
 
   toPb() {
-    return { name: this.name, sort_order: this.sortOrder };
+    return { name: this.name, sort_order: this.sortOrder, enable: this.enabled };
   }
 
   static fromPb(data: ExpandedCategoryRecord): Category {
@@ -175,6 +176,7 @@ export class Category implements RecordBase {
       data.id,
       data.name,
       data.sort_order,
+      data.enable,
       data.expand.item_via_category.map(Item.fromPb)
     );
   }
