@@ -13,7 +13,7 @@
   let itemPrice: number | undefined = $state();
   let itemCategory: string | undefined = $state();
   let itemImage: string | undefined = $state();
-  let itemImageName: string | undefined = $state();
+  let itemImageName: string | undefined = $state("");
   $effect(() => {
     const item = $items.find((item) => item.id === id);
     if (item) {
