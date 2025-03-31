@@ -123,11 +123,23 @@ export class Item implements RecordBase {
     public readonly name: string,
     public readonly price: number,
     public readonly category: string,
-    public readonly image: string
+    public readonly imageName: string, // pb field value
+    public readonly image: string, // url to actual image
+    public readonly imageFile: File | null = null // file with uploaded image contents
   ) {}
 
   toPb() {
-    return { name: this.name, price_nok: this.price, category: this.category, image: this.image };
+    // Looks like FormData is necessary when dealing with files.
+    const formData = new FormData();
+    formData.append("name", this.name);
+    formData.append("price_nok", this.price.toString());
+    formData.append("category", this.category);
+    if (this.imageFile) {
+      formData.append("image", this.imageFile);
+    } else {
+      formData.append("image", this.imageName);
+    }
+    return formData;
   }
 
   static fromPb(data: ItemResponse): Item {
@@ -136,6 +148,7 @@ export class Item implements RecordBase {
       data.name,
       data.price_nok,
       data.category,
+      data.image,
       pb.files.getUrl(data, data.image)
     );
   }
@@ -150,11 +163,12 @@ export class Category implements RecordBase {
     public readonly id: RecordIdString,
     public readonly name: string,
     public readonly sortOrder: number,
-    public readonly items: Item[]
+    public readonly enabled: boolean,
+    public readonly items: Item[] = []
   ) {}
 
   toPb() {
-    return { name: this.name, sort_order: this.sortOrder };
+    return { name: this.name, sort_order: this.sortOrder, enable: this.enabled };
   }
 
   static fromPb(data: ExpandedCategoryRecord): Category {
@@ -162,7 +176,8 @@ export class Category implements RecordBase {
       data.id,
       data.name,
       data.sort_order,
-      data.expand.item_via_category.map(Item.fromPb)
+      data.enable,
+      (data.expand.item_via_category ?? []).map(Item.fromPb)
     );
   }
 }

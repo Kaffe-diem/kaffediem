@@ -8,7 +8,9 @@
 
 <div class="flex flex-col overflow-y-auto">
   {#each $categories as category}
-    {@render CategorySection({ category })}
+    {#if category.enabled}
+      {@render CategorySection({ category })}
+    {/if}
   {/each}
 </div>
 
