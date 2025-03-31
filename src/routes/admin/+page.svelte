@@ -24,7 +24,7 @@
 <ul>
   <li>
     <button
-      class="btn relative m-4 flex h-24 w-full flex-col items-center justify-center text-3xl text-red-500 lg:text-5xl"
+      class="btn btn-error relative m-4 flex h-24 w-full flex-col items-center justify-center text-3xl lg:text-5xl"
       onclick={() => {
         if (window.confirm(`Er du sikker på at du vil sette alle bestillinger som utlevert?`)) {
           orders.setAll(State.dispatched);
