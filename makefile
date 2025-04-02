@@ -3,7 +3,7 @@
 default: dev
 
 dev: pb_types
-	npx vite dev
+	docker-compose up --watch
 
 build: pb_types
 	npx vite build

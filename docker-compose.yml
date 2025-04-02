@@ -4,8 +4,58 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - "./pocketbase-data:/pb/pb_data"
+      - "./pocketbase/pb_data:/pb/pb_data"
+      - "./pocketbase/pb_migrations:/pb/pb_migrations"
+    restart: unless-stopped
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8080/api/health || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 5
   app:
-    build: .
+    build: 
+      context: .
+      target: development
     ports:
-      - "3000:3000"
+      - "5173:5173"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=development
+      - PUBLIC_PB_HOST=http://pb:8080
+    volumes:
+      - svelte_kit_data:/app/.svelte-kit
+    depends_on:
+      pb:
+        condition: service_healthy
+    develop:
+      watch:
+
+        - action: sync
+          path: ./src
+          target: /app/src
+          ignore:
+            - "node_modules/"
+            - "**/*.test.ts"
+            - "**/*.spec.ts"
+        - action: sync
+          path: ./static
+          target: /app/static
+
+        - action: sync+restart
+          path: ./vite.config.ts
+          target: /app/vite.config.ts
+        - action: sync+restart
+          path: ./svelte.config.js
+          target: /app/svelte.config.js
+        - action: sync+restart
+          path: ./tsconfig.json
+          target: /app/tsconfig.json
+        - action: sync+restart
+          path: ./.env
+          target: /app/.env
+
+        - action: rebuild
+          path: package.json
+
+volumes:
+  svelte_kit_data:
