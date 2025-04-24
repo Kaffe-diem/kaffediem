@@ -6,6 +6,8 @@
 
     if (route === "/admin") {
       goto("/");
+    } else if (route.startsWith("/admin/menu/customization/")) {
+      goto("/admin/menu/customization");
     } else if (route.startsWith("/admin/menu/")) {
       goto("/admin/menu");
     } else {
