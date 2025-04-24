@@ -21,7 +21,7 @@ const baseOptions = {
 };
 
 const actionHistory: {
-  action: string;
+  action: "create" | "updateState" | "setAll";
   orderId: RecordIdString;
   orderItemIds?: RecordIdString[];
   previousState?: State;
@@ -48,6 +48,7 @@ export default {
       })
     );
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const order = await pb.collection(Collections.Order).create({
       customer: userId,
       items: orderItemIds,
@@ -55,11 +56,11 @@ export default {
       payment_fulfilled: false
     });
 
-    actionHistory.push({
-      action: "create",
-      orderId: order.id,
-      orderItemIds: orderItemIds
-    });
+    // actionHistory.push({
+    //   action: "create",
+    //   orderId: order.id,
+    //   orderItemIds: orderItemIds
+    // });
 
     const _orderStore = get({ subscribe: _subscribe });
     const orderNumber = _orderStore.length + 100 - 1;
@@ -86,6 +87,7 @@ export default {
     });
   },
 
+  // TODO: maybe something cleaner and more generic https://1000experiments.dev/posts/command-store
   undoLastAction: async () => {
     if (actionHistory.length === 0) {
       return;
@@ -95,7 +97,7 @@ export default {
 
     switch (lastAction!.action) {
       case "create":
-        // FIXME: Ustabilt
+        // FIXME: Ustabilt, maybe set state to "Invalid" instead of delete?
         //   await Promise.all(
         //     lastAction.orderItemIds.map((itemId: RecordIdString) => {
         //       pb.collection(Collections.OrderItem).delete(itemId);
@@ -107,6 +109,9 @@ export default {
         pb.collection(Collections.Order).update(lastAction!.orderId, {
           state: lastAction!.previousState
         });
+        break;
+      case "setAll":
+        // TODO
         break;
     }
   }
