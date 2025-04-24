@@ -79,6 +79,13 @@ export default {
     await pb.collection(Collections.Order).update(orderId, { state });
   },
 
+  setAll: async (state: State) => {
+    const orders = await pb.collection(Collections.Order).getFullList();
+    orders.map((order) => {
+      pb.collection(Collections.Order).update(order.id, { state });
+    });
+  },
+
   undoLastAction: async () => {
     if (actionHistory.length === 0) {
       return;

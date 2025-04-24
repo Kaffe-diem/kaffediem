@@ -18,7 +18,7 @@ format:
 	npx prettier --write .
 
 lint:
-	npx prettier --check . 
-	npx svelte-kit sync 
+	npx svelte-kit sync
 	npx svelte-check --tsconfig ./tsconfig.json
 	npx eslint src
+	npx prettier --check .
