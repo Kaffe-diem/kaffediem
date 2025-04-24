@@ -81,6 +81,6 @@
 {:else}
   <div class="mx-30 grid grid-cols-1 gap-4">
     <h1 class="text-center text-xl">Kunne ikke finne kategori!</h1>
-    <a href="/admin/menu/category/new" class="btn">Opprett en ny kategori</a>
+    <a href="/admin/menu/category/new" rel="external" class="btn">Opprett en ny kategori</a>
   </div>
 {/if}

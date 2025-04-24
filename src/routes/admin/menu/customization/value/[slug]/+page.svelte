@@ -88,6 +88,8 @@
 {:else}
   <div class="mx-30 grid grid-cols-1 gap-4">
     <h1 class="text-center text-xl">Kunne ikke finne tilpasning!</h1>
-    <a href="/admin/menu/customization/value/new" class="btn">Opprett en ny tilpasning</a>
+    <a href="/admin/menu/customization/value/new" rel="external" class="btn"
+      >Opprett en ny tilpasning</a
+    >
   </div>
 {/if}
