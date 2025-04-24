@@ -28,10 +28,10 @@
   function updateCategory() {
     if (create) {
       categories.create(new Category(id, categoryName!, categorySort!, categoryEnabled!));
-      goto("/admin/menu");
     } else {
       categories.update(new Category(id, categoryName!, categorySort!, categoryEnabled!));
     }
+    goto("/admin/menu");
   }
 </script>
 

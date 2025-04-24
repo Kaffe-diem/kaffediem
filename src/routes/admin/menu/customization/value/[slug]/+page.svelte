@@ -26,12 +26,12 @@
       customizationValues.create(
         new CustomizationValue(id, customizationName!, customizationPrice!, customizationKey!)
       );
-      goto("/admin/menu/customization");
     } else {
       customizationValues.update(
         new CustomizationValue(id, customizationName!, customizationPrice!, customizationKey!)
       );
     }
+    goto("/admin/menu/customization");
   }
 </script>
 

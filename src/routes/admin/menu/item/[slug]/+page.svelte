@@ -51,12 +51,12 @@
       items.create(
         new Item(id, itemName!, itemPrice!, itemCategory!, itemImageName!, itemImage!, imageFile)
       );
-      goto("/admin/menu");
     } else {
       items.update(
         new Item(id, itemName!, itemPrice!, itemCategory!, itemImageName!, itemImage!, imageFile)
       );
     }
+    goto("/admin/menu");
   }
 </script>
 

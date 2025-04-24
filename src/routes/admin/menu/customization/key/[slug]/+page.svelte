@@ -22,10 +22,10 @@
   function updateKey() {
     if (create) {
       customizationKeys.create(new CustomizationKey(id, customizationName!, customizationColor!));
-      goto("/admin/menu/customization");
     } else {
       customizationKeys.update(new CustomizationKey(id, customizationName!, customizationColor!));
     }
+    goto("/admin/menu/customization");
   }
 </script>
 
