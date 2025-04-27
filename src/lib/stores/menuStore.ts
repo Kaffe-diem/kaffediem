@@ -9,8 +9,7 @@ import {
 } from "$lib/types";
 
 export const categories = createGenericPbStore(Collections.Category, Category, {
-  sort: "sort_order",
-  expand: "item_via_category"
+  sort: "sort_order"
 });
 
 export const items = createGenericPbStore(Collections.Item, Item);
