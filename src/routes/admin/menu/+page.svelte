@@ -46,6 +46,11 @@
 {#snippet ItemCard({ item }: { item: Item })}
   <li class="m-2 flex flex-row justify-between">
     <span>{item.name}</span>
-    <a href="/admin/menu/item/{item.id}" class="btn btn-neutral">Rediger</a>
+    <div class="flex flex-row items-center gap-4">
+      {#if !item.enabled}
+        <span class="badge badge-soft badge-neutral">Deaktivert</span>
+      {/if}
+      <a href="/admin/menu/item/{item.id}" class="btn btn-neutral">Rediger</a>
+    </div>
   </li>
 {/snippet}

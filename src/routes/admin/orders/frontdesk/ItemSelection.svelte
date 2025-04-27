@@ -19,7 +19,9 @@
     <h1 class="text-primary mb-4 text-2xl font-bold">{category.name}</h1>
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {#each category.items as item}
-        {@render ItemCard({ item })}
+        {#if item.enabled}
+          {@render ItemCard({ item })}
+        {/if}
       {/each}
     </div>
   </div>

@@ -10,7 +10,9 @@
       <h1 class="text-primary mb-4 text-3xl">{category.name}</h1>
       <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
         {#each category.items as item}
-          <MenuItem {item} buyButton={!$status.online} />
+          {#if item.enabled}
+            <MenuItem {item} buyButton={!$status.online} />
+          {/if}
         {/each}
       </div>
     </div>

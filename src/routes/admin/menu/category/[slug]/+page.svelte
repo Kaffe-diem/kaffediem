@@ -11,7 +11,7 @@
 
   let categoryName: string | undefined = $state();
   let categorySort: number | undefined = $state();
-  let categoryEnabled: boolean | undefined = $state();
+  let categoryEnabled: boolean | undefined = $state(true);
   $effect(() => {
     const category = $categories.find((category) => category.id === id);
     if (category) {

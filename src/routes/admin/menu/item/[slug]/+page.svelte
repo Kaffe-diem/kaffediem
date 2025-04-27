@@ -14,6 +14,7 @@
   let itemCategory: string | undefined = $state();
   let itemImage: string | undefined = $state();
   let itemImageName: string | undefined = $state("");
+  let itemEnabled: boolean | undefined = $state(true);
   $effect(() => {
     const item = $items.find((item) => item.id === id);
     if (item) {
@@ -22,8 +23,13 @@
       itemCategory = item.category;
       itemImage = item.image;
       itemImageName = item.imageName;
+      itemEnabled = item.enabled;
     }
   });
+
+  function toggleState() {
+    itemEnabled = !itemEnabled;
+  }
 
   let imageFiles: FileList | null | undefined = $state();
   let imageFile: File | null = null;
@@ -49,11 +55,29 @@
   function updateItem() {
     if (create) {
       items.create(
-        new Item(id, itemName!, itemPrice!, itemCategory!, itemImageName!, itemImage!, imageFile)
+        new Item(
+          id,
+          itemName!,
+          itemPrice!,
+          itemCategory!,
+          itemImageName!,
+          itemImage!,
+          itemEnabled,
+          imageFile
+        )
       );
     } else {
       items.update(
-        new Item(id, itemName!, itemPrice!, itemCategory!, itemImageName!, itemImage!, imageFile)
+        new Item(
+          id,
+          itemName!,
+          itemPrice!,
+          itemCategory!,
+          itemImageName!,
+          itemImage!,
+          itemEnabled,
+          imageFile
+        )
       );
     }
     goto("/admin/menu");
@@ -91,6 +115,14 @@
             {/each}
           {/if}
         </select>
+      </fieldset>
+    </div>
+    <div class="col-span-2">
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Aktivert</legend>
+        <button class="btn {itemEnabled ? '' : 'btn-neutral'}" onclick={toggleState}
+          >{#if itemEnabled}Synlig{:else}Deaktivert{/if}</button
+        >
       </fieldset>
     </div>
     <div class="divider col-span-2"></div>

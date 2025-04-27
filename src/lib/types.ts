@@ -125,6 +125,7 @@ export class Item implements RecordBase {
     public readonly category: string,
     public readonly imageName: string, // pb field value
     public readonly image: string, // url to actual image
+    public readonly enabled: boolean,
     public readonly imageFile: File | null = null // file with uploaded image contents
   ) {}
 
@@ -134,6 +135,7 @@ export class Item implements RecordBase {
     formData.append("name", this.name);
     formData.append("price_nok", this.price.toString());
     formData.append("category", this.category);
+    formData.append("enable", this.enabled.toString()); // FormData expects string
     if (this.imageFile) {
       formData.append("image", this.imageFile);
     } else {
@@ -149,7 +151,8 @@ export class Item implements RecordBase {
       data.price_nok,
       data.category,
       data.image,
-      pb.files.getUrl(data, data.image)
+      pb.files.getUrl(data, data.image),
+      data.enable
     );
   }
 }

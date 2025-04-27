@@ -124,6 +124,7 @@ export type CustomizationValueRecord = {
 export type ItemRecord = {
 	category: RecordIdString
 	created?: IsoDateString
+	enable?: boolean
 	id: string
 	image?: string
 	name: string
