@@ -11,7 +11,7 @@
 
   let categoryName: string | undefined = $state();
   let categorySort: number | undefined = $state();
-  let categoryEnabled: boolean | undefined = $state(true);
+  let categoryEnabled: boolean = $state(true);
   $effect(() => {
     const category = $categories.find((category) => category.id === id);
     if (category) {
@@ -27,9 +27,9 @@
 
   function updateCategory() {
     if (create) {
-      categories.create(new Category(id, categoryName!, categorySort!, categoryEnabled!));
+      categories.create(new Category(id, categoryName!, categorySort!, categoryEnabled));
     } else {
-      categories.update(new Category(id, categoryName!, categorySort!, categoryEnabled!));
+      categories.update(new Category(id, categoryName!, categorySort!, categoryEnabled));
     }
     goto("/admin/menu");
   }

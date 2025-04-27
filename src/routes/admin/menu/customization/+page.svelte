@@ -1,16 +1,5 @@
 <script lang="ts">
-  import { customizationKeys, customizationValues } from "$stores/menuStore";
-
-  // TODO: Extract this logic into the store itself, such that it does not have to be done manually every time.
-  const customizationGroups = $derived(
-    $customizationValues.reduce((acc, item) => {
-      if (!acc[item.belongsTo]) {
-        acc[item.belongsTo] = [];
-      }
-      acc[item.belongsTo].push(item);
-      return acc;
-    }, {})
-  );
+  import { customizationKeys, customizationsByKey } from "$stores/menuStore";
 </script>
 
 <h1 class="mb-8 text-2xl">Tilpasninger</h1>
@@ -34,7 +23,7 @@
         </div>
       </div>
       <ul class="list-none">
-        {#each customizationGroups[key.id] as customization}
+        {#each $customizationsByKey[key.id] ?? [] as customization}
           <li class="m-2 flex flex-row justify-between">
             <span>{customization.name}</span>
             <div class="flex flex-row items-center gap-4">

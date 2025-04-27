@@ -10,9 +10,9 @@
   const create = id == "new";
 
   let customizationName: string | undefined = $state();
-  let customizationPrice: number | undefined = $state();
+  let customizationPrice: number = $state(0);
   let customizationKey: string | undefined = $state();
-  let customizationEnabled: bool | undefined = $state(true);
+  let customizationEnabled: boolean = $state(true);
   $effect(() => {
     const value = $customizationValues.find((value) => value.id === id);
     if (value) {
@@ -35,7 +35,7 @@
           customizationName!,
           customizationPrice!,
           customizationKey!,
-          customizationEnabled!
+          customizationEnabled
         )
       );
     } else {
@@ -45,7 +45,7 @@
           customizationName!,
           customizationPrice!,
           customizationKey!,
-          customizationEnabled!
+          customizationEnabled
         )
       );
     }

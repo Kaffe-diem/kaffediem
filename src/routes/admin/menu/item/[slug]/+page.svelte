@@ -14,7 +14,7 @@
   let itemCategory: string | undefined = $state();
   let itemImage: string | undefined = $state();
   let itemImageName: string | undefined = $state("");
-  let itemEnabled: boolean | undefined = $state(true);
+  let itemEnabled: boolean = $state(true);
   $effect(() => {
     const item = $items.find((item) => item.id === id);
     if (item) {

@@ -10,7 +10,7 @@
   const create = id == "new";
 
   let customizationName: string | undefined = $state();
-  let customizationEnabled: boolean | undefined = $state(true);
+  let customizationEnabled: boolean = $state(true);
   let customizationColor: string | undefined = $state("#CCCCCC");
   $effect(() => {
     const key = $customizationKeys.find((key) => key.id === id);
@@ -28,11 +28,11 @@
   function updateKey() {
     if (create) {
       customizationKeys.create(
-        new CustomizationKey(id, customizationName!, customizationEnabled!, customizationColor!)
+        new CustomizationKey(id, customizationName!, customizationEnabled, customizationColor!)
       );
     } else {
       customizationKeys.update(
-        new CustomizationKey(id, customizationName!, customizationEnabled!, customizationColor!)
+        new CustomizationKey(id, customizationName!, customizationEnabled, customizationColor!)
       );
     }
     goto("/admin/menu/customization");

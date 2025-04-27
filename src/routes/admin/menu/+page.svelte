@@ -1,16 +1,6 @@
 <script lang="ts">
-  import { categories, items } from "$stores/menuStore";
+  import { categories, itemsByCategory } from "$stores/menuStore";
   import type { Category, Item } from "$lib/types";
-
-  const itemsByCategory = $derived(
-    $items.reduce((acc, item) => {
-      if (!acc[item.category]) {
-        acc[item.category] = [];
-      }
-      acc[item.category].push(item);
-      return acc;
-    }, {})
-  );
 </script>
 
 <div class="flex flex-col gap-8 overflow-y-auto">
@@ -36,7 +26,7 @@
       </div>
     </div>
     <ul class="list-none">
-      {#each itemsByCategory[category.id] as item}
+      {#each $itemsByCategory[category.id] ?? [] as item}
         {@render ItemCard({ item })}
       {/each}
     </ul>
