@@ -5,6 +5,8 @@
   import { Item } from "$lib/types";
   import { goto } from "$app/navigation";
 
+  import StateToggle from "$components/menu/StateToggle.svelte";
+
   let { data }: PageProps = $props();
   const id = data.id;
   const create = id == "new";
@@ -26,10 +28,6 @@
       itemEnabled = item.enabled;
     }
   });
-
-  function toggleState() {
-    itemEnabled = !itemEnabled;
-  }
 
   let imageFiles: FileList | null | undefined = $state();
   let imageFile: File | null = null;
@@ -118,12 +116,7 @@
       </fieldset>
     </div>
     <div class="col-span-2">
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">Aktivert</legend>
-        <button class="btn {itemEnabled ? '' : 'btn-neutral'}" onclick={toggleState}
-          >{#if itemEnabled}Synlig{:else}Deaktivert{/if}</button
-        >
-      </fieldset>
+      <StateToggle bind:state={itemEnabled} />
     </div>
     <div class="divider col-span-2"></div>
     <div class="col-span-2 grid grid-cols-2 gap-2">

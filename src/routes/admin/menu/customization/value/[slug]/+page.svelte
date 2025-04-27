@@ -5,6 +5,8 @@
   import { CustomizationValue } from "$lib/types";
   import { goto } from "$app/navigation";
 
+  import StateToggle from "$components/menu/StateToggle.svelte";
+
   let { data }: PageProps = $props();
   const id = data.id;
   const create = id == "new";
@@ -22,10 +24,6 @@
       customizationEnabled = value.enabled;
     }
   });
-
-  function toggleState() {
-    customizationEnabled = !customizationEnabled;
-  }
 
   function updateValue() {
     if (create) {
@@ -97,12 +95,7 @@
       </fieldset>
     </div>
     <div class="col-span-2">
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">Aktivert</legend>
-        <button class="btn {customizationEnabled ? '' : 'btn-neutral'}" onclick={toggleState}
-          >{#if customizationEnabled}Synlig{:else}Deaktivert{/if}</button
-        >
-      </fieldset>
+      <StateToggle bind:state={customizationEnabled} />
     </div>
     <div class="divider col-span-2"></div>
     <div class="col-span-2">

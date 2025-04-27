@@ -5,6 +5,8 @@
   import { Category } from "$lib/types";
   import { goto } from "$app/navigation";
 
+  import StateToggle from "$components/menu/StateToggle.svelte";
+
   let { data }: PageProps = $props();
   const id = data.id;
   const create = id == "new";
@@ -20,10 +22,6 @@
       categoryEnabled = category.enabled;
     }
   });
-
-  function toggleState() {
-    categoryEnabled = !categoryEnabled;
-  }
 
   function updateCategory() {
     if (create) {
@@ -53,12 +51,7 @@
       </fieldset>
     </div>
     <div>
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">Aktivert</legend>
-        <button class="btn {categoryEnabled ? '' : 'btn-neutral'}" onclick={toggleState}
-          >{#if categoryEnabled}Synlig{:else}Deaktivert{/if}</button
-        >
-      </fieldset>
+      <StateToggle bind:state={categoryEnabled} />
     </div>
     <div>
       <fieldset class="fieldset">
