@@ -6,6 +6,7 @@
   import { goto } from "$app/navigation";
 
   import StateToggle from "$components/menu/StateToggle.svelte";
+  import Input from "$components/menu/Input.svelte";
 
   let { data }: PageProps = $props();
   const id = data.id;
@@ -89,16 +90,10 @@
 {#if itemName || create}
   <div class="grid w-full grid-cols-2 gap-2">
     <div class="col-span-2">
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">Navn</legend>
-        <input type="text" class="input w-full" bind:value={itemName} placeholder="Produktnavn" />
-      </fieldset>
+      <Input label="Navn" type="text" placeholder="Produktnavn" bind:value={itemName} />
     </div>
     <div>
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">Pris</legend>
-        <input type="number" class="input w-full" bind:value={itemPrice} placeholder="Pris" />
-      </fieldset>
+      <Input label="Pris" type="number" placeholder="Pris" bind:value={itemPrice} />
     </div>
     <div>
       <fieldset class="fieldset">

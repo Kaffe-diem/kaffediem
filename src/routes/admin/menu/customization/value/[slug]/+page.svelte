@@ -6,6 +6,7 @@
   import { goto } from "$app/navigation";
 
   import StateToggle from "$components/menu/StateToggle.svelte";
+  import Input from "$components/menu/Input.svelte";
 
   let { data }: PageProps = $props();
   const id = data.id;
@@ -58,10 +59,7 @@
 {#if customizationName || create}
   <div class="grid w-full grid-cols-2 gap-2">
     <div class="col-span-2">
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">Navn</legend>
-        <input type="text" class="input w-full" bind:value={customizationName} placeholder="Navn" />
-      </fieldset>
+      <Input label="Navn" type="text" placeholder="Navn" bind:value={customizationName} />
     </div>
     <div>
       <fieldset class="fieldset">
