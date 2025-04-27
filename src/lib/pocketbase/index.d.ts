@@ -106,6 +106,7 @@ export type CategoryRecord = {
 
 export type CustomizationKeyRecord = {
 	created?: IsoDateString
+	enable?: boolean
 	id: string
 	label_color: string
 	name: string
@@ -115,6 +116,7 @@ export type CustomizationKeyRecord = {
 export type CustomizationValueRecord = {
 	belongs_to: RecordIdString
 	created?: IsoDateString
+	enable?: boolean
 	id: string
 	name: string
 	price_increment_nok?: number

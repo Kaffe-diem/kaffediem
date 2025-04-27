@@ -27,6 +27,9 @@
       <div class="mb-4 flex flex-row items-center justify-between px-2">
         <span class="text-2xl">{key.name}</span>
         <div class="flex flex-row items-center gap-4">
+          {#if !key.enabled}
+            <span class="badge badge-soft badge-neutral">Deaktivert</span>
+          {/if}
           <a href="/admin/menu/customization/key/{key.id}" class="btn btn-neutral">Rediger</a>
         </div>
       </div>
@@ -34,11 +37,16 @@
         {#each customizationGroups[key.id] as customization}
           <li class="m-2 flex flex-row justify-between">
             <span>{customization.name}</span>
-            <a
-              href="/admin/menu/customization/value/{customization.id}"
-              class="btn"
-              style={key.labelColor ? `background-color: ${key.labelColor};` : null}>Rediger</a
-            >
+            <div class="flex flex-row items-center gap-4">
+              {#if !customization.enabled}
+                <span class="badge badge-soft badge-neutral">Deaktivert</span>
+              {/if}
+              <a
+                href="/admin/menu/customization/value/{customization.id}"
+                class="btn"
+                style={key.labelColor ? `background-color: ${key.labelColor};` : null}>Rediger</a
+              >
+            </div>
           </li>
         {/each}
       </ul>

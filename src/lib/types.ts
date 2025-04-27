@@ -231,15 +231,16 @@ export class CustomizationKey implements RecordBase {
   constructor(
     public readonly id: RecordIdString,
     public readonly name: string,
+    public readonly enabled: boolean,
     public readonly labelColor?: string
   ) {}
 
   toPb() {
-    return { name: this.name, label_color: this.labelColor };
+    return { name: this.name, enable: this.enabled, label_color: this.labelColor };
   }
 
   static fromPb(data: CustomizationKeyResponse): CustomizationKey {
-    return new CustomizationKey(data.id, data.name || "", data.label_color);
+    return new CustomizationKey(data.id, data.name || "", data.enable, data.label_color);
   }
 }
 
@@ -248,19 +249,27 @@ export class CustomizationValue implements RecordBase {
     public readonly id: RecordIdString,
     public readonly name: string,
     public readonly priceIncrementNok: number,
-    public readonly belongsTo: RecordIdString
+    public readonly belongsTo: RecordIdString,
+    public readonly enabled: boolean
   ) {}
 
   toPb() {
     return {
       name: this.name,
       price_increment_nok: this.priceIncrementNok,
-      belongs_to: this.belongsTo
+      belongs_to: this.belongsTo,
+      enable: this.enabled
     };
   }
 
   static fromPb(data: CustomizationValueResponse): CustomizationValue {
-    return new CustomizationValue(data.id, data.name, data.price_increment_nok, data.belongs_to);
+    return new CustomizationValue(
+      data.id,
+      data.name,
+      data.price_increment_nok,
+      data.belongs_to,
+      data.enable
+    );
   }
 }
 

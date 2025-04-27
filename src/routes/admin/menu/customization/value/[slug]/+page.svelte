@@ -12,23 +12,41 @@
   let customizationName: string | undefined = $state();
   let customizationPrice: number | undefined = $state();
   let customizationKey: string | undefined = $state();
+  let customizationEnabled: bool | undefined = $state(true);
   $effect(() => {
     const value = $customizationValues.find((value) => value.id === id);
     if (value) {
       customizationName = value.name;
       customizationPrice = value.priceIncrementNok;
       customizationKey = value.belongsTo;
+      customizationEnabled = value.enabled;
     }
   });
+
+  function toggleState() {
+    customizationEnabled = !customizationEnabled;
+  }
 
   function updateValue() {
     if (create) {
       customizationValues.create(
-        new CustomizationValue(id, customizationName!, customizationPrice!, customizationKey!)
+        new CustomizationValue(
+          id,
+          customizationName!,
+          customizationPrice!,
+          customizationKey!,
+          customizationEnabled!
+        )
       );
     } else {
       customizationValues.update(
-        new CustomizationValue(id, customizationName!, customizationPrice!, customizationKey!)
+        new CustomizationValue(
+          id,
+          customizationName!,
+          customizationPrice!,
+          customizationKey!,
+          customizationEnabled!
+        )
       );
     }
     goto("/admin/menu/customization");
@@ -76,6 +94,14 @@
             {/each}
           {/if}
         </select>
+      </fieldset>
+    </div>
+    <div class="col-span-2">
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Aktivert</legend>
+        <button class="btn {customizationEnabled ? '' : 'btn-neutral'}" onclick={toggleState}
+          >{#if customizationEnabled}Synlig{:else}Deaktivert{/if}</button
+        >
       </fieldset>
     </div>
     <div class="divider col-span-2"></div>

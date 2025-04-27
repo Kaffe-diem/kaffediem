@@ -10,20 +10,30 @@
   const create = id == "new";
 
   let customizationName: string | undefined = $state();
+  let customizationEnabled: boolean | undefined = $state(true);
   let customizationColor: string | undefined = $state("#CCCCCC");
   $effect(() => {
     const key = $customizationKeys.find((key) => key.id === id);
     if (key) {
       customizationName = key.name;
+      customizationEnabled = key.enabled;
       customizationColor = key.labelColor;
     }
   });
 
+  function toggleState() {
+    customizationEnabled = !customizationEnabled;
+  }
+
   function updateKey() {
     if (create) {
-      customizationKeys.create(new CustomizationKey(id, customizationName!, customizationColor!));
+      customizationKeys.create(
+        new CustomizationKey(id, customizationName!, customizationEnabled!, customizationColor!)
+      );
     } else {
-      customizationKeys.update(new CustomizationKey(id, customizationName!, customizationColor!));
+      customizationKeys.update(
+        new CustomizationKey(id, customizationName!, customizationEnabled!, customizationColor!)
+      );
     }
     goto("/admin/menu/customization");
   }
@@ -34,8 +44,8 @@
   <div class="divider"></div>
 {/if}
 {#if customizationName || create}
-  <div class="grid w-full grid-cols-1 gap-2">
-    <div>
+  <div class="grid w-full grid-cols-2 gap-2">
+    <div class="col-span-2">
       <fieldset class="fieldset">
         <legend class="fieldset-legend">Navn</legend>
         <input type="text" class="input w-full" bind:value={customizationName} placeholder="Navn" />
@@ -47,8 +57,16 @@
         <input type="color" class="input w-full" bind:value={customizationColor} />
       </fieldset>
     </div>
-    <div class="divider"></div>
     <div>
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Aktivert</legend>
+        <button class="btn {customizationEnabled ? '' : 'btn-neutral'}" onclick={toggleState}
+          >{#if customizationEnabled}Synlig{:else}Deaktivert{/if}</button
+        >
+      </fieldset>
+    </div>
+    <div class="divider col-span-2"></div>
+    <div class="col-span-2">
       <button class="btn btn-primary w-full" onclick={updateKey}
         >{#if create}Opprett{:else}Lagre{/if}</button
       >
