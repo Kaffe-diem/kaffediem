@@ -1,7 +1,17 @@
 <script lang="ts">
-  import { categories } from "$stores/menuStore";
+  import { categories, items } from "$stores/menuStore";
   import type { Item } from "$lib/types";
   import type { Category } from "$lib/types";
+
+  const itemsByCategory = $derived(
+    $items.reduce((acc, item) => {
+      if (!acc[item.category]) {
+        acc[item.category] = [];
+      }
+      acc[item.category].push(item);
+      return acc;
+    }, {})
+  );
 
   let { selectedItem = $bindable() } = $props();
 </script>
@@ -18,7 +28,7 @@
   <div class="mb-8">
     <h1 class="text-primary mb-4 text-2xl font-bold">{category.name}</h1>
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {#each category.items as item}
+      {#each itemsByCategory[category.id] as item}
         {#if item.enabled}
           {@render ItemCard({ item })}
         {/if}
