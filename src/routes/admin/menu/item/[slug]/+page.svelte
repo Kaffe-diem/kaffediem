@@ -115,7 +115,7 @@
         <legend class="fieldset-legend">Kategori</legend>
         <select class="select w-full" required bind:value={itemCategory}>
           {#if itemCategory || create}
-            <option disabled selected={create}>Velg en kategori</option>
+            <option disabled value="" selected={create}>Velg en kategori</option>
             {#each $categories as category}
               <option value={category.id} selected={category.id == itemCategory}
                 >{category.name}</option
