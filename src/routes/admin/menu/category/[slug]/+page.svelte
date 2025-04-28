@@ -14,12 +14,17 @@
   let categoryName: string | undefined = $state();
   let categorySort: number | undefined = $state();
   let categoryEnabled: boolean = $state(true);
+
+  let exists: boolean = $state(false);
+
   $effect(() => {
     const category = $categories.find((category) => category.id === id);
     if (category) {
       categoryName = category.name;
       categorySort = category.sortOrder;
       categoryEnabled = category.enabled;
+
+      exists = true;
     }
   });
 
@@ -37,8 +42,8 @@
   <h1 class="text-center text-xl">Opprett en kategori</h1>
   <div class="divider"></div>
 {/if}
-{#if categoryName || create}
-  <div class="grid w-full grid-cols-2 gap-2">
+{#if exists}
+  <form onsubmit={updateCategory} class="grid w-full grid-cols-2 gap-2">
     <h1 class="col-span-2 text-left text-2xl">Rediger kategori</h1>
     <div class="divider col-span-2"></div>
     <div class="col-span-2">
@@ -47,6 +52,7 @@
         <input
           type="text"
           class="input w-full"
+          required
           bind:value={categoryName}
           placeholder="Kategorinavn"
         />
@@ -61,6 +67,7 @@
         <input
           type="number"
           class="input w-full"
+          required
           bind:value={categorySort}
           placeholder="Sorteringsrekkefølge"
         />
@@ -68,11 +75,11 @@
     </div>
     <div class="divider col-span-2"></div>
     <div class="col-span-2">
-      <button class="btn btn-primary w-full" onclick={updateCategory}
+      <button type="submit" class="btn btn-primary w-full"
         >{#if create}Opprett{:else}Lagre{/if}</button
       >
     </div>
-  </div>
+  </form>
 {:else}
   <div class="mx-30 grid grid-cols-1 gap-4">
     <h1 class="text-center text-xl">Kunne ikke finne kategori!</h1>
