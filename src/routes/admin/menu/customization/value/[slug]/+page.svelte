@@ -16,6 +16,9 @@
   let customizationPrice: number = $state(0);
   let customizationKey: string | undefined = $state();
   let customizationEnabled: boolean = $state(true);
+
+  let exists: boolean = $state(true);
+
   $effect(() => {
     const value = $customizationValues.find((value) => value.id === id);
     if (value) {
@@ -23,6 +26,8 @@
       customizationPrice = value.priceIncrementNok;
       customizationKey = value.belongsTo;
       customizationEnabled = value.enabled;
+
+      exists = true;
     }
   });
 
@@ -56,12 +61,12 @@
   <h1 class="text-center text-xl">Opprett en tilpasning</h1>
   <div class="divider"></div>
 {/if}
-{#if customizationName || create}
-  <div class="grid w-full grid-cols-2 gap-2">
+{#if exists}
+  <form onsubmit={updateValue} class="grid w-full grid-cols-2 gap-2">
     <h1 class="col-span-2 text-left text-2xl">Rediger tilpasning</h1>
     <div class="divider col-span-2"></div>
     <div class="col-span-2">
-      <Input label="Navn" type="text" placeholder="Navn" bind:value={customizationName} />
+      <Input label="Navn" type="text" required placeholder="Navn" bind:value={customizationName} />
     </div>
     <div>
       <fieldset class="fieldset">
@@ -73,6 +78,7 @@
           <input
             type="number"
             class="input grow"
+            required
             bind:value={customizationPrice}
             placeholder="Prisendring"
           />
@@ -82,7 +88,7 @@
     <div>
       <fieldset class="fieldset">
         <legend class="fieldset-legend">Kategori</legend>
-        <select class="select w-full" bind:value={customizationKey}>
+        <select class="select w-full" required bind:value={customizationKey}>
           {#if customizationKey || create}
             <option disabled selected={create}>Velg en kategori</option>
             {#each $customizationKeys as category}
@@ -99,11 +105,11 @@
     </div>
     <div class="divider col-span-2"></div>
     <div class="col-span-2">
-      <button class="btn btn-primary w-full" onclick={updateValue}
+      <button type="submit" class="btn btn-primary w-full"
         >{#if create}Opprett{:else}Lagre{/if}</button
       >
     </div>
-  </div>
+  </form>
 {:else}
   <div class="mx-30 grid grid-cols-1 gap-4">
     <h1 class="text-center text-xl">Kunne ikke finne tilpasning!</h1>
