@@ -20,7 +20,9 @@
 <div class="overflow-y-auto">
   <div class="grid-auto-flow-column grid auto-rows-min grid-cols-2 gap-x-6 gap-y-4">
     {#each $customizationKeys as key}
-      {@render CustomizationCategory({ key })}
+      {#if key.enabled}
+        {@render CustomizationCategory({ key })}
+      {/if}
     {/each}
   </div>
 </div>
@@ -31,7 +33,9 @@
       {key.name}
     </div>
     {#each getValuesByKey(key.id) as value}
-      {@render CustomizationOption({ key, value })}
+      {#if value.enabled}
+        {@render CustomizationOption({ key, value })}
+      {/if}
     {/each}
   </div>
 {/snippet}

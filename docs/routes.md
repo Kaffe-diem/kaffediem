@@ -6,6 +6,7 @@ Dette er et system for kaffe-diem for å håndtere bestilling av kaffe.
 / # Startside og menyen
 ├── /account # Info om din bruker: bestillinger osv.
 ├── /admin # Oversikt over ansattes mulige handlinger
+│   ├── /menu # Redigere menyen
 │   ├── /message # Redigere meldingen som vises på skjermen
 │   └── /orders # Sider som omfatter bestillinger
 │       ├── /frontdesk # Ta imot bestillinger
@@ -55,6 +56,10 @@ Kjøkkenet. Den er delt inn i to kolloner:
 
 - En liste over mottatte bestillinger og bestillinger i produksjon.
 - En liste over bestillinger som lages.
+
+### /menu
+
+Redigere menyen. Denne siden viser en liste over alt som selges, og lar ansatte endre ulike verdier.
 
 ### /message
 
