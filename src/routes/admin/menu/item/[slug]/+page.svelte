@@ -89,6 +89,8 @@
 {/if}
 {#if itemName || create}
   <div class="grid w-full grid-cols-2 gap-2">
+    <h1 class="col-span-2 text-left text-2xl">Rediger produkt</h1>
+    <div class="divider col-span-2"></div>
     <div class="col-span-2">
       <Input label="Navn" type="text" placeholder="Produktnavn" bind:value={itemName} />
     </div>
@@ -130,6 +132,7 @@
         <button onclick={deleteImage} class="btn btn-error h-full w-full">Slett bilde</button>
       {/if}
     </div>
+    <div class="divider col-span-2"></div>
     <div class="col-span-2">
       <button class="btn btn-primary w-full" onclick={updateItem}
         >{#if create}Opprett{:else}Lagre{/if}</button

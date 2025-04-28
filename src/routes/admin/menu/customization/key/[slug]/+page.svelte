@@ -44,14 +44,16 @@
 {/if}
 {#if customizationName || create}
   <div class="grid w-full grid-cols-2 gap-2">
+    <h1 class="col-span-2 text-left text-2xl">Rediger tilpasningskategori</h1>
+    <div class="divider col-span-2"></div>
     <div class="col-span-2">
       <Input label="Navn" type="text" placeholder="Navn" bind:value={customizationName} />
     </div>
     <div>
-      <Input label="Farge" type="color" bind:value={customizationColor} />
+      <StateToggle bind:state={customizationEnabled} />
     </div>
     <div>
-      <StateToggle bind:state={customizationEnabled} />
+      <Input label="Farge" type="color" bind:value={customizationColor} />
     </div>
     <div class="divider col-span-2"></div>
     <div class="col-span-2">
@@ -62,7 +64,7 @@
   </div>
 {:else}
   <div class="mx-30 grid grid-cols-1 gap-4">
-    <h1 class="text-center text-xl">Kunne ikke finne tilpasning!</h1>
+    <h1 class="text-center text-xl">Kunne ikke finne tilpasningskategori!</h1>
     <a href="/admin/menu/customization/key/new" rel="external" class="btn"
       >Opprett en ny tilpasningskategori</a
     >

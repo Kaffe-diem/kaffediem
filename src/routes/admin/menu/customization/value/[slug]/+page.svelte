@@ -53,11 +53,13 @@
 </script>
 
 {#if create}
-  <h1 class="text-center text-xl">Opprett en tilpasningskategori</h1>
+  <h1 class="text-center text-xl">Opprett en tilpasning</h1>
   <div class="divider"></div>
 {/if}
 {#if customizationName || create}
   <div class="grid w-full grid-cols-2 gap-2">
+    <h1 class="col-span-2 text-left text-2xl">Rediger tilpasning</h1>
+    <div class="divider col-span-2"></div>
     <div class="col-span-2">
       <Input label="Navn" type="text" placeholder="Navn" bind:value={customizationName} />
     </div>

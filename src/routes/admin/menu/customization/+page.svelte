@@ -6,6 +6,7 @@
 
 <div class="flex flex-col gap-8 overflow-y-auto">
   <div class="flex flex-col gap-2">
+    <a href="/admin/menu" class="btn btn-neutral w-full">Rediger meny</a>
     <a href="/admin/menu/customization/key/new" class="btn w-full"
       >Opprett en ny tilpasningskategori</a
     >

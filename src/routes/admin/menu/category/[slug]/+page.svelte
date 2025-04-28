@@ -39,6 +39,8 @@
 {/if}
 {#if categoryName || create}
   <div class="grid w-full grid-cols-2 gap-2">
+    <h1 class="col-span-2 text-left text-2xl">Rediger kategori</h1>
+    <div class="divider col-span-2"></div>
     <div class="col-span-2">
       <fieldset class="fieldset">
         <legend class="fieldset-legend">Navn</legend>
