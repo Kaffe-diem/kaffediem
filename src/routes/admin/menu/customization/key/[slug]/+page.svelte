@@ -15,12 +15,17 @@
   let customizationName: string | undefined = $state();
   let customizationEnabled: boolean = $state(true);
   let customizationColor: string | undefined = $state("#CCCCCC");
+
+  let exists: boolean = $state(false);
+
   $effect(() => {
     const key = $customizationKeys.find((key) => key.id === id);
     if (key) {
       customizationName = key.name;
       customizationEnabled = key.enabled;
       customizationColor = key.labelColor;
+
+      exists = true;
     }
   });
 
@@ -42,12 +47,12 @@
   <h1 class="text-center text-xl">Opprett en tilpasningskategori</h1>
   <div class="divider"></div>
 {/if}
-{#if customizationName || create}
-  <div class="grid w-full grid-cols-2 gap-2">
+{#if exists}
+  <form onsubmit={updateKey} class="grid w-full grid-cols-2 gap-2">
     <h1 class="col-span-2 text-left text-2xl">Rediger tilpasningskategori</h1>
     <div class="divider col-span-2"></div>
     <div class="col-span-2">
-      <Input label="Navn" type="text" placeholder="Navn" bind:value={customizationName} />
+      <Input label="Navn" type="text" required placeholder="Navn" bind:value={customizationName} />
     </div>
     <div>
       <StateToggle bind:state={customizationEnabled} />
@@ -57,11 +62,11 @@
     </div>
     <div class="divider col-span-2"></div>
     <div class="col-span-2">
-      <button class="btn btn-primary w-full" onclick={updateKey}
+      <button type="submit" class="btn btn-primary w-full"
         >{#if create}Opprett{:else}Lagre{/if}</button
       >
     </div>
-  </div>
+  </form>
 {:else}
   <div class="mx-30 grid grid-cols-1 gap-4">
     <h1 class="text-center text-xl">Kunne ikke finne tilpasningskategori!</h1>
