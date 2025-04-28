@@ -18,6 +18,9 @@
   let itemImage: string | undefined = $state();
   let itemImageName: string | undefined = $state("");
   let itemEnabled: boolean = $state(true);
+
+  let exists: boolean = $state(false);
+
   $effect(() => {
     const item = $items.find((item) => item.id === id);
     if (item) {
@@ -27,6 +30,8 @@
       itemImage = item.image;
       itemImageName = item.imageName;
       itemEnabled = item.enabled;
+
+      exists = true;
     }
   });
 
@@ -87,20 +92,27 @@
   <h1 class="text-center text-xl">Opprett et produkt</h1>
   <div class="divider"></div>
 {/if}
-{#if itemName || create}
-  <div class="grid w-full grid-cols-2 gap-2">
+{#if exists}
+  <form onsubmit={updateItem} class="grid w-full grid-cols-2 gap-2">
     <h1 class="col-span-2 text-left text-2xl">Rediger produkt</h1>
     <div class="divider col-span-2"></div>
     <div class="col-span-2">
-      <Input label="Navn" type="text" placeholder="Produktnavn" bind:value={itemName} />
+      <Input label="Navn" type="text" required placeholder="Produktnavn" bind:value={itemName} />
     </div>
     <div>
-      <Input label="Pris" type="number" placeholder="Pris" bind:value={itemPrice} />
+      <Input
+        label="Pris"
+        type="number"
+        required
+        min={1}
+        placeholder="Pris"
+        bind:value={itemPrice}
+      />
     </div>
     <div>
       <fieldset class="fieldset">
         <legend class="fieldset-legend">Kategori</legend>
-        <select class="select w-full" bind:value={itemCategory}>
+        <select class="select w-full" required bind:value={itemCategory}>
           {#if itemCategory || create}
             <option disabled selected={create}>Velg en kategori</option>
             {#each $categories as category}
@@ -134,11 +146,11 @@
     </div>
     <div class="divider col-span-2"></div>
     <div class="col-span-2">
-      <button class="btn btn-primary w-full" onclick={updateItem}
+      <button type="submit" class="btn btn-primary w-full"
         >{#if create}Opprett{:else}Lagre{/if}</button
       >
     </div>
-  </div>
+  </form>
 {:else}
   <div class="mx-30 grid grid-cols-1 gap-4">
     <h1 class="text-center text-xl">Kunne ikke finne produkt!</h1>
