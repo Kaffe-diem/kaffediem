@@ -89,13 +89,14 @@
 </script>
 
 {#if create}
-  <h1 class="text-center text-xl">Opprett et produkt</h1>
+  <h1 class="text-left text-2xl">Opprett et produkt</h1>
+  <div class="divider"></div>
+{:else if exists}
+  <h1 class="text-left text-2xl">Rediger produkt</h1>
   <div class="divider"></div>
 {/if}
-{#if exists}
+{#if exists || create}
   <form onsubmit={updateItem} class="grid w-full grid-cols-2 gap-2">
-    <h1 class="col-span-2 text-left text-2xl">Rediger produkt</h1>
-    <div class="divider col-span-2"></div>
     <div class="col-span-2">
       <Input label="Navn" type="text" required placeholder="Produktnavn" bind:value={itemName} />
     </div>

@@ -39,13 +39,14 @@
 </script>
 
 {#if create}
-  <h1 class="text-center text-xl">Opprett en kategori</h1>
+  <h1 class="text-left text-2xl">Opprett en kategori</h1>
+  <div class="divider"></div>
+{:else if exists}
+  <h1 class="text-left text-2xl">Rediger kategori</h1>
   <div class="divider"></div>
 {/if}
-{#if exists}
+{#if exists || create}
   <form onsubmit={updateCategory} class="grid w-full grid-cols-2 gap-2">
-    <h1 class="col-span-2 text-left text-2xl">Rediger kategori</h1>
-    <div class="divider col-span-2"></div>
     <div class="col-span-2">
       <fieldset class="fieldset">
         <legend class="fieldset-legend">Navn</legend>
