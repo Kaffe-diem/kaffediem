@@ -88,13 +88,10 @@
   }
 </script>
 
-{#if create}
-  <h1 class="text-left text-2xl">Opprett et produkt</h1>
-  <div class="divider"></div>
-{:else if exists}
-  <h1 class="text-left text-2xl">Rediger produkt</h1>
-  <div class="divider"></div>
-{/if}
+<h1 class="text-left text-2xl">
+  {#if create}Opprett et produkt{:else}Rediger produkt{/if}
+</h1>
+<div class="divider"></div>
 {#if exists || create}
   <form onsubmit={updateItem} class="grid w-full grid-cols-2 gap-2">
     <div class="col-span-2">
@@ -112,8 +109,8 @@
     </div>
     <div>
       <fieldset class="fieldset">
-        <legend class="fieldset-legend">Kategori</legend>
-        <select class="select w-full" required bind:value={itemCategory}>
+        <legend class="fieldset-legend text-xl">Kategori</legend>
+        <select class="select select-xl w-full" required bind:value={itemCategory}>
           {#if itemCategory || create}
             <option disabled value="" selected={create}>Velg en kategori</option>
             {#each $categories as category}
@@ -134,12 +131,12 @@
         {#if itemImage}
           <img src={itemImage} alt="Bilde av {itemName}" class="max-h-96 w-auto rounded-xl" />
         {:else}
-          (Bilde mangler)
+          <div class="text-xl">(Bilde mangler)</div>
         {/if}
       </div>
       <fieldset class="fieldset w-full {itemImage ? 'col-span-1' : 'col-span-2'}">
-        <legend class="fieldset-legend">Last opp et nytt bilde</legend>
-        <input bind:files={imageFiles} type="file" class="file-input w-full" />
+        <legend class="fieldset-legend text-xl">Last opp et nytt bilde</legend>
+        <input bind:files={imageFiles} type="file" class="file-input file-input-xl w-full" />
       </fieldset>
       {#if itemImage}
         <button onclick={deleteImage} class="btn btn-error h-full w-full">Slett bilde</button>
@@ -147,7 +144,7 @@
     </div>
     <div class="divider col-span-2"></div>
     <div class="col-span-2">
-      <button type="submit" class="btn btn-primary w-full"
+      <button type="submit" class="btn btn-xl btn-primary w-full"
         >{#if create}Opprett{:else}Lagre{/if}</button
       >
     </div>

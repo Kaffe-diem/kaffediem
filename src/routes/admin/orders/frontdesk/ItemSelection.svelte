@@ -5,7 +5,7 @@
   let { selectedItem = $bindable() } = $props();
 </script>
 
-<div class="flex flex-col overflow-y-auto">
+<div class="flex h-full flex-col overflow-y-auto">
   {#each $categories as category}
     {#if category.enabled}
       {@render CategorySection({ category })}
@@ -15,7 +15,7 @@
 
 {#snippet CategorySection({ category }: { category: Category })}
   <div class="mb-8">
-    <h1 class="text-primary mb-4 text-2xl font-bold">{category.name}</h1>
+    <h1 class="text-primary mb-4 text-lg font-bold xl:text-2xl">{category.name}</h1>
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {#each $itemsByCategory[category.id] ?? [] as item}
         {#if item.enabled}

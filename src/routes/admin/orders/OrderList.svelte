@@ -4,10 +4,16 @@
   import { customizationKeys } from "$lib/stores/menuStore";
   import type { CustomizationKey, CustomizationValue, Order, OrderItem } from "$lib/types";
 
-  const { show, onclick, label } = $props<{
+  const {
+    show,
+    onclick,
+    label,
+    detailed = true
+  } = $props<{
     show: OrderStateOptions[];
     onclick: OrderStateOptions;
     label: string;
+    detailed?: boolean;
   }>();
 
   function getKeyById(keyId: string): CustomizationKey | undefined {
@@ -32,11 +38,11 @@
       </tr>
     </thead>
     <tbody class="space-y-4">
-      {#each $orders as order, index}
+      {#each $orders.reverse() as order, index}
         {#if order && show.includes(order.state)}
           {@render OrderRow({
             order,
-            orderNumber: index + 100
+            orderNumber: $orders.length - index - 1 + 100
           })}
         {/if}
       {/each}
@@ -53,21 +59,23 @@
     onkeydown={(e) => e.key === "Enter" && orders.updateState(order.id, onclick)}
     aria-label={`Order ${orderNumber} with ${order.items.length} items`}
   >
-    <td class="text-lg font-semibold">{orderNumber}</td>
-    <td>
-      <ul class="space-y-4">
-        {#each order.items as orderItem}
-          {@render OrderItem({ orderItem })}
-        {/each}
-      </ul>
-    </td>
+    <td class="text-4xl font-bold">{orderNumber}</td>
+    {#if detailed}
+      <td class="w-full">
+        <ul class="space-y-2">
+          {#each order.items as orderItem}
+            {@render OrderItem({ orderItem })}
+          {/each}
+        </ul>
+      </td>
+    {/if}
   </tr>
 {/snippet}
 
 {#snippet OrderItem({ orderItem }: { orderItem: OrderItem })}
-  <li class="bg-base-300 rounded p-3 shadow">
+  <li class="bg-base-300 w-full rounded p-3 shadow">
     <div class="flex flex-col">
-      <span class="mb-1 text-lg font-medium">
+      <span class="mb-1 text-xl">
         {orderItem.item.name}
       </span>
 
@@ -91,7 +99,7 @@
   {@const keyName = key?.name || "Option"}
   <li>
     <span
-      class="badge badge-sm px-2 py-1"
+      class="badge badge-lg px-2 py-1 text-xl"
       style={keyColor ? `background-color: ${keyColor}; color: white;` : ""}
       aria-label={`${keyName}: ${customization.name}`}
     >

@@ -49,7 +49,7 @@ export default {
     });
 
     const _orderStore = get({ subscribe: _subscribe });
-    const orderNumber = _orderStore.length + 100;
+    const orderNumber = _orderStore.length + 100 - 1;
 
     toasts.success(`✅ ${orderNumber}`);
   },

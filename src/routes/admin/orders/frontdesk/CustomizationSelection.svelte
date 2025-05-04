@@ -17,8 +17,8 @@
   });
 </script>
 
-<div class="overflow-y-auto">
-  <div class="grid-auto-flow-column grid auto-rows-min grid-cols-2 gap-x-6 gap-y-4">
+<div class="h-full overflow-y-auto">
+  <div class="grid-auto-flow-column grid auto-rows-min gap-x-6 gap-y-4 md:grid-cols-2">
     {#each $customizationKeys as key}
       {#if key.enabled}
         {@render CustomizationCategory({ key })}
@@ -43,18 +43,18 @@
 {#snippet CustomizationOption({ key, value }: { key: CustomizationKey; value: CustomizationValue })}
   <div>
     <button
-      class="btn hover:bg-opacity-90 relative flex w-full items-center justify-between border-2 py-2 pr-2 pl-3
-             text-white transition-all duration-200 ease-in-out focus:outline-none
-             {$selectedCustomizations[key.id]?.some((v) => v.id === value.id)
-        ? 'border-amber-500'
-        : 'border-base-300'}"
-      style="background-color: {key.labelColor || 'inherit'};"
+      class="btn {$selectedCustomizations[key.id]?.some((v) => v.id === value.id)
+        ? 'ring-lg ring-accent scale-109 text-white shadow-xl ring'
+        : ''} bg-base-200 flex w-full transition-all duration-300 ease-in-out hover:brightness-90 focus:outline-none"
+      style="background-color: {$selectedCustomizations[key.id]?.some((v) => v.id === value.id)
+        ? key.labelColor
+        : ''};"
       onclick={() => selectCustomization(key.id, value)}
     >
       <span class="flex w-full justify-between">
         <span>{value.name}</span>
         {#if value.priceIncrementNok > 0}
-          <span class="text-xs font-bold">{value.priceIncrementNok},-</span>
+          <span>{value.priceIncrementNok},-</span>
         {/if}
       </span>
     </button>
