@@ -11,7 +11,7 @@
   let { show, label, class: className = "" }: Props = $props();
 </script>
 
-<div class="flex h-full flex-col p-4">
+<div class="flex h-full flex-col p-4 select-none">
   <h2 class="mb-3 text-4xl font-bold md:mb-6 md:text-center lg:text-6xl {className}">
     {label}
   </h2>

@@ -25,21 +25,21 @@
 
 <div class="h-full w-full overflow-y-auto">
   <h2
-    class="bg-base-100 text-neutral sticky top-0 z-50 pb-2 text-center text-4xl font-bold md:mb-6"
+    class="text-neutral sticky pb-2 text-center text-4xl font-bold md:mb-6"
     id="order-list-heading"
   >
     {label}
   </h2>
-  <table class="table table-auto" aria-labelledby="order-list-heading">
+  <table class="table" aria-labelledby="order-list-heading">
     <thead class="sr-only">
       <tr>
         <th>Order Number</th>
-        <th>Order Items</th>
+        {#if detailed}<th>Order Items</th>{/if}
       </tr>
     </thead>
     <tbody class="space-y-4">
       {#each $orders.reverse() as order, index}
-        {#if order && show.includes(order.state)}
+        {#if show.includes(order.state)}
           {@render OrderRow({
             order,
             orderNumber: $orders.length - index - 1 + 100
@@ -52,14 +52,16 @@
 
 {#snippet OrderRow({ order, orderNumber }: { order: Order; orderNumber: number })}
   <tr
-    class="bg-base-200 mb-4 block cursor-pointer rounded shadow-md transition-colors"
+    class="{!detailed
+      ? 'btn btn-xl ml-4 h-16'
+      : 'bg-base-200 cursor-pointer'} mb-6 block rounded shadow-md transition-colors"
     onclick={() => orders.updateState(order.id, onclick)}
     role="button"
     tabindex="0"
     onkeydown={(e) => e.key === "Enter" && orders.updateState(order.id, onclick)}
     aria-label={`Order ${orderNumber} with ${order.items.length} items`}
   >
-    <td class="text-4xl font-bold">{orderNumber}</td>
+    <td class="{!detailed ? 'flex justify-center' : ''} text-4xl font-bold">{orderNumber}</td>
     {#if detailed}
       <td class="w-full">
         <ul class="space-y-2">

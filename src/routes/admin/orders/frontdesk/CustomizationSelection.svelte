@@ -29,7 +29,7 @@
 
 {#snippet CustomizationCategory({ key }: { key: CustomizationKey })}
   <div class="grid grid-cols-1 gap-y-2 p-2">
-    <div class="font-medium">
+    <div class="text-primary font-bold xl:text-xl">
       {key.name}
     </div>
     {#each getValuesByKey(key.id) as value}
@@ -41,22 +41,19 @@
 {/snippet}
 
 {#snippet CustomizationOption({ key, value }: { key: CustomizationKey; value: CustomizationValue })}
-  <div>
-    <button
-      class="btn {$selectedCustomizations[key.id]?.some((v) => v.id === value.id)
-        ? 'ring-lg ring-accent scale-109 text-white shadow-xl ring'
-        : ''} bg-base-200 flex w-full transition-all duration-300 ease-in-out hover:brightness-90 focus:outline-none"
-      style="background-color: {$selectedCustomizations[key.id]?.some((v) => v.id === value.id)
-        ? key.labelColor
-        : ''};"
-      onclick={() => selectCustomization(key.id, value)}
-    >
-      <span class="flex w-full justify-between">
-        <span>{value.name}</span>
-        {#if value.priceIncrementNok > 0}
-          <span>{value.priceIncrementNok},-</span>
-        {/if}
-      </span>
-    </button>
-  </div>
+  {@const selected = $selectedCustomizations[key.id]?.some((v) => v.id === value.id)}
+  <button
+    class="btn {selected
+      ? 'ring-lg ring-accent scale-109 text-white shadow-xl ring'
+      : ''} bg-base-200 flex w-full transition-all duration-300 ease-in-out hover:brightness-90 focus:outline-none"
+    style="background-color: {selected ? key.labelColor : ''};"
+    onclick={() => selectCustomization(key.id, value)}
+  >
+    <span class="flex w-full justify-between">
+      <span>{value.name}</span>
+      {#if value.priceIncrementNok > 0}
+        <span>{value.priceIncrementNok},-</span>
+      {/if}
+    </span>
+  </button>
 {/snippet}

@@ -10,7 +10,7 @@
 </script>
 
 <div
-  class="grid h-full grid-cols-[2fr_auto_2fr_auto_1fr] grid-rows-[100%] gap-2 xl:grid-cols-[2fr_auto_1fr_auto_1fr]"
+  class="grid h-full grid-cols-[2fr_auto_2fr_auto_1fr] grid-rows-[100%] gap-0 xl:grid-cols-[2fr_auto_1fr_auto_1fr]"
 >
   <ItemSelection bind:selectedItem />
 
