@@ -43,17 +43,20 @@
   }
 </script>
 
-{#if create}
-  <h1 class="text-left text-2xl">Opprett en tilpasningskategori</h1>
-  <div class="divider"></div>
-{:else if exists}
-  <h1 class="text-left text-2xl">Rediger tilpasningskategori</h1>
-  <div class="divider"></div>
-{/if}
+<h1 class="text-left text-2xl">
+  {#if create}Opprett en tilpasningskategori{:else}Rediger tilpasningskategori{/if}
+</h1>
+<div class="divider"></div>
 {#if exists || create}
   <form onsubmit={updateKey} class="grid w-full grid-cols-2 gap-2">
     <div class="col-span-2">
-      <Input label="Navn" type="text" required placeholder="Navn" bind:value={customizationName} />
+      <Input
+        label="Navn"
+        type="text"
+        required
+        placeholder="Kategorinavn"
+        bind:value={customizationName}
+      />
     </div>
     <div>
       <StateToggle bind:state={customizationEnabled} />
@@ -63,7 +66,7 @@
     </div>
     <div class="divider col-span-2"></div>
     <div class="col-span-2">
-      <button type="submit" class="btn btn-primary w-full"
+      <button type="submit" class="btn btn-xl btn-primary w-full"
         >{#if create}Opprett{:else}Lagre{/if}</button
       >
     </div>

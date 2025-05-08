@@ -57,28 +57,31 @@
   }
 </script>
 
-{#if create}
-  <h1 class="text-left text-2xl">Opprett en tilpasning</h1>
-  <div class="divider"></div>
-{:else if exists}
-  <h1 class="text-left text-2xl">Rediger tilpasning</h1>
-  <div class="divider"></div>
-{/if}
+<h1 class="text-left text-2xl">
+  {#if create}Opprett en tilpasning{:else}Rediger tilpasning{/if}
+</h1>
+<div class="divider"></div>
 {#if exists || create}
   <form onsubmit={updateValue} class="grid w-full grid-cols-2 gap-2">
     <div class="col-span-2">
-      <Input label="Navn" type="text" required placeholder="Navn" bind:value={customizationName} />
+      <Input
+        label="Navn"
+        type="text"
+        required
+        placeholder="Tilpasningnavn"
+        bind:value={customizationName}
+      />
     </div>
     <div>
       <fieldset class="fieldset">
-        <legend class="fieldset-legend">Prisendring (kr)</legend>
-        <label class="input w-full">
+        <legend class="fieldset-legend text-xl">Prisendring (kr)</legend>
+        <label class="input input-xl w-full">
           {#if customizationPrice >= 0}
             <span>+</span>
           {/if}
           <input
             type="number"
-            class="input grow"
+            class="input input-xl grow"
             required
             bind:value={customizationPrice}
             placeholder="Prisendring"
@@ -88,8 +91,8 @@
     </div>
     <div>
       <fieldset class="fieldset">
-        <legend class="fieldset-legend">Kategori</legend>
-        <select class="select w-full" required bind:value={customizationKey}>
+        <legend class="fieldset-legend text-xl">Kategori</legend>
+        <select class="select select-xl w-full" required bind:value={customizationKey}>
           {#if customizationKey || create}
             <option disabled value="" selected={create}>Velg en kategori</option>
             {#each $customizationKeys as category}
@@ -106,7 +109,7 @@
     </div>
     <div class="divider col-span-2"></div>
     <div class="col-span-2">
-      <button type="submit" class="btn btn-primary w-full"
+      <button type="submit" class="btn btn-xl btn-primary w-full"
         >{#if create}Opprett{:else}Lagre{/if}</button
       >
     </div>
