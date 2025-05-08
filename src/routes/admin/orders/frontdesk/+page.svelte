@@ -7,7 +7,6 @@
   import type { Item } from "$lib/types";
 
   let selectedItem = $state<Item | undefined>();
-  let createdOrder = "";
 </script>
 
 <div class="grid h-full grid-cols-[3fr_auto_2fr_auto_1fr] grid-rows-[100%] gap-0">
