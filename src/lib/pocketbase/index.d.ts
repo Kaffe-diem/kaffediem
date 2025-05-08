@@ -20,7 +20,6 @@ export enum Collections {
 	Order = "order",
 	OrderItem = "order_item",
 	Status = "status",
-	Tmp = "tmp",
 	User = "user",
 }
 
@@ -181,12 +180,6 @@ export type StatusRecord = {
 	updated?: IsoDateString
 }
 
-export type TmpRecord = {
-	created?: IsoDateString
-	id: string
-	updated?: IsoDateString
-}
-
 export type UserRecord = {
 	avatar?: string
 	created?: IsoDateString
@@ -217,7 +210,6 @@ export type MessageResponse<Texpand = unknown> = Required<MessageRecord> & BaseS
 export type OrderResponse<Texpand = unknown> = Required<OrderRecord> & BaseSystemFields<Texpand>
 export type OrderItemResponse<Texpand = unknown> = Required<OrderItemRecord> & BaseSystemFields<Texpand>
 export type StatusResponse<Texpand = unknown> = Required<StatusRecord> & BaseSystemFields<Texpand>
-export type TmpResponse<Texpand = unknown> = Required<TmpRecord> & BaseSystemFields<Texpand>
 export type UserResponse<Texpand = unknown> = Required<UserRecord> & AuthSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
@@ -237,7 +229,6 @@ export type CollectionRecords = {
 	order: OrderRecord
 	order_item: OrderItemRecord
 	status: StatusRecord
-	tmp: TmpRecord
 	user: UserRecord
 }
 
@@ -256,7 +247,6 @@ export type CollectionResponses = {
 	order: OrderResponse
 	order_item: OrderItemResponse
 	status: StatusResponse
-	tmp: TmpResponse
 	user: UserResponse
 }
 
@@ -278,6 +268,5 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: 'order'): RecordService<OrderResponse>
 	collection(idOrName: 'order_item'): RecordService<OrderItemResponse>
 	collection(idOrName: 'status'): RecordService<StatusResponse>
-	collection(idOrName: 'tmp'): RecordService<TmpResponse>
 	collection(idOrName: 'user'): RecordService<UserResponse>
 }

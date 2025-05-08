@@ -7,11 +7,10 @@
   import type { Item } from "$lib/types";
 
   let selectedItem = $state<Item | undefined>();
+  let createdOrder = "";
 </script>
 
-<div
-  class="grid h-full grid-cols-[2fr_auto_2fr_auto_1fr] grid-rows-[100%] gap-0 xl:grid-cols-[2fr_auto_1fr_auto_1fr]"
->
+<div class="grid h-full grid-cols-[3fr_auto_2fr_auto_1fr] grid-rows-[100%] gap-0">
   <ItemSelection bind:selectedItem />
 
   <div class="divider divider-horizontal m-0 p-0"></div>

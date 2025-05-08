@@ -41,17 +41,16 @@ export default {
       })
     );
 
+    const _orderStore = get({ subscribe: _subscribe });
+    const orderNumber = _orderStore.length + 100;
+    toasts.success(orderNumber.toString(), 1500);
+
     await pb.collection(Collections.Order).create({
       customer: userId,
       items: orderItemIds,
       state: State.received,
       payment_fulfilled: false
     });
-
-    const _orderStore = get({ subscribe: _subscribe });
-    const orderNumber = _orderStore.length + 100 - 1;
-
-    toasts.success(`✅ ${orderNumber}`);
   },
 
   updateState: (orderId: RecordIdString, state: State) => {
