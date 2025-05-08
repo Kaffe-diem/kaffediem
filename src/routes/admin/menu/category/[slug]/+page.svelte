@@ -6,6 +6,7 @@
   import { goto } from "$app/navigation";
 
   import StateToggle from "$components/menu/StateToggle.svelte";
+  import Input from "$components/menu/Input.svelte";
 
   let { data }: PageProps = $props();
   const id = data.id;
@@ -38,45 +39,36 @@
   }
 </script>
 
-{#if create}
-  <h1 class="text-left text-2xl">Opprett en kategori</h1>
-  <div class="divider"></div>
-{:else if exists}
-  <h1 class="text-left text-2xl">Rediger kategori</h1>
-  <div class="divider"></div>
-{/if}
+<h1 class="text-left text-2xl">
+  {#if create}Opprett en kategori{:else}Rediger kategori{/if}
+</h1>
+<div class="divider"></div>
 {#if exists || create}
   <form onsubmit={updateCategory} class="grid w-full grid-cols-2 gap-2">
     <div class="col-span-2">
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">Navn</legend>
-        <input
-          type="text"
-          class="input w-full"
-          required
-          bind:value={categoryName}
-          placeholder="Kategorinavn"
-        />
-      </fieldset>
+      <Input
+        label="Navn"
+        type="text"
+        required
+        bind:value={categoryName}
+        placeholder="Kategorinavn"
+      />
     </div>
     <div>
       <StateToggle bind:state={categoryEnabled} />
     </div>
     <div>
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">Sortering (laveste først)</legend>
-        <input
-          type="number"
-          class="input w-full"
-          required
-          bind:value={categorySort}
-          placeholder="Sorteringsrekkefølge"
-        />
-      </fieldset>
+      <Input
+        label="Sortering (laveste først)"
+        type="number"
+        required
+        bind:value={categorySort}
+        placeholder="Sorteringsrekkefølge"
+      />
     </div>
     <div class="divider col-span-2"></div>
     <div class="col-span-2">
-      <button type="submit" class="btn btn-primary w-full"
+      <button type="submit" class="btn btn-xl btn-primary w-full"
         >{#if create}Opprett{:else}Lagre{/if}</button
       >
     </div>

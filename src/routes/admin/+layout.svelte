@@ -4,7 +4,7 @@
   let { children } = $props();
 </script>
 
-<main class="relative mx-auto w-11/12 py-4">
+<main class="relative mx-auto w-11/12">
   {@render children?.()}
 </main>
 

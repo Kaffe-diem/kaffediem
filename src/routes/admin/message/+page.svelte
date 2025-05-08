@@ -26,11 +26,11 @@
 <form>
   <ul class="list-none">
     {#each $messages as message}
-      <li class="my-4">
+      <li class="my-8">
         <label class="form-control grid grid-cols-[auto_1fr_1fr_auto] place-items-center gap-4">
           <input
             type="radio"
-            class="radio"
+            class="radio radio-xl"
             name="selected"
             checked={message.id == $status.message.id}
             value={message}
@@ -38,20 +38,20 @@
           />
           <input
             type="text"
-            class="input input-lg input-bordered w-full"
+            class="input input-xl w-full"
             value={message.title}
             placeholder="Tittel"
             oninput={(event) => handleTitleChange(event, message)}
           />
           <input
             type="text"
-            class="input input-lg input-bordered w-full"
+            class="input input-xl w-full"
             value={message.subtitle}
             placeholder="Beskrivelse"
             oninput={(event) => handleSubtitleChange(event, message)}
           />
           <button
-            class="btn btn-secondary btn-lg"
+            class="btn btn-secondary btn-xl"
             onclick={() => {
               if (window.confirm(`Er du sikker på at du vil slette "${message.title}"?`)) {
                 messages.delete(message.id);
@@ -65,15 +65,15 @@
       <label class="flex items-center">
         <input
           type="radio"
-          class="radio mr-4"
+          class="radio radio-xl mr-4"
           name="selected"
           checked={!$status.online}
           onchange={handleVisibilityChange}
         />
-        <span>Åpent!</span>
+        <span class="ml-3 text-xl">Åpent!</span>
       </label>
     </li>
-    <button class="btn btn-lg" onclick={() => messages.create(Message.baseValue)}
+    <button class="btn btn-xl w-full" onclick={() => messages.create(Message.baseValue)}
       >Legg til melding</button
     >
   </ul>
