@@ -21,10 +21,9 @@ const baseOptions = {
 };
 
 const actionHistory: {
-  action: "create" | "updateState" | "setAll";
+  action: "updateState";
   orderId: RecordIdString;
-  orderItemIds?: RecordIdString[];
-  previousState?: State;
+  previousState: State;
 }[] = [];
 
 // Create the store so we can reference it in methods
@@ -48,19 +47,12 @@ export default {
       })
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const order = await pb.collection(Collections.Order).create({
+    await pb.collection(Collections.Order).create({
       customer: userId,
       items: orderItemIds,
       state: State.received,
       payment_fulfilled: false
     });
-
-    // actionHistory.push({
-    //   action: "create",
-    //   orderId: order.id,
-    //   orderItemIds: orderItemIds
-    // });
 
     const _orderStore = get({ subscribe: _subscribe });
     const orderNumber = _orderStore.length + 100 - 1;
@@ -96,22 +88,10 @@ export default {
     const lastAction = actionHistory.pop();
 
     switch (lastAction!.action) {
-      case "create":
-        // FIXME: Ustabilt, maybe set state to "Invalid" instead of delete?
-        //   await Promise.all(
-        //     lastAction.orderItemIds.map((itemId: RecordIdString) => {
-        //       pb.collection(Collections.OrderItem).delete(itemId);
-        //     })
-        //   );
-        //   await pb.collection(Collections.Order).delete(lastAction.orderId);
-        break;
       case "updateState":
         pb.collection(Collections.Order).update(lastAction!.orderId, {
           state: lastAction!.previousState
         });
-        break;
-      case "setAll":
-        // TODO
         break;
     }
   }

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import orders from "$stores/orderStore";
   import { status } from "$stores/statusStore";
   import { Status } from "$lib/types";
   import { type Snippet } from "svelte";
@@ -29,7 +28,6 @@
   </div>
 {:else}
   <main class="relative mx-auto h-screen w-11/12 py-4">
-    <button class="btn btn-lg" onclick={() => orders.undoLastAction()}>oops</button>
     {@render children?.()}
   </main>
 {/if}

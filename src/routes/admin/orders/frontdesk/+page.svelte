@@ -5,6 +5,7 @@
   import CustomizationSelection from "./CustomizationSelection.svelte";
   import { OrderStateOptions as OrderStateOptions } from "$lib/pocketbase";
   import type { Item } from "$lib/types";
+  import orders from "$stores/orderStore";
 
   let selectedItem = $state<Item | undefined>();
 </script>
@@ -21,9 +22,12 @@
 
   <div class="divider divider-horizontal m-1 p-1"></div>
 
-  <OrderList
-    show={[OrderStateOptions.completed]}
-    onclick={OrderStateOptions.dispatched}
-    label="Ferdig"
-  />
+  <div class="flex h-full flex-col">
+    <OrderList
+      show={[OrderStateOptions.completed]}
+      onclick={OrderStateOptions.dispatched}
+      label="Ferdig"
+    />
+    <button class="btn btn-lg" onclick={() => orders.undoLastAction()}>oops</button>
+  </div>
 </div>
