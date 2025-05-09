@@ -6,8 +6,8 @@
   const { received, production, completed } = OrderStateOptions;
 </script>
 
-<div class="grid max-h-screen grid-rows-[1fr_auto]">
-  <div class="grid max-h-screen grid-cols-[1fr_auto_1fr] gap-4">
+<div class="grid max-h-screen grid-rows-[1fr_auto] p-4">
+  <div class="grid max-h-screen grid-cols-[1fr_auto_1fr] gap-4 overflow-y-auto">
     <OrderList show={[received]} onclick={production} label="Mottatt" />
 
     <div class="divider divider-horizontal"></div>
@@ -15,5 +15,5 @@
     <OrderList show={[production]} onclick={completed} label="Lages" />
   </div>
 
-  <button class="btn btn-lg" onclick={() => orders.undoLastAction()}>oops</button>
+  <button class="btn btn-lg mt-4" onclick={() => orders.undoLastAction()}>oops</button>
 </div>
