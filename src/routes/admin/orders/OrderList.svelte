@@ -3,6 +3,7 @@
   import orders from "$stores/orderStore";
   import { customizationKeys } from "$lib/stores/menuStore";
   import type { CustomizationKey, CustomizationValue, Order, OrderItem } from "$lib/types";
+  import CommentIcon from "$assets/CommentIcon.svelte";
 
   const {
     show,
@@ -54,14 +55,18 @@
   <tr
     class="{!detailed
       ? 'btn btn-xl ml-4 h-16'
-      : 'bg-base-200 cursor-pointer'} mb-6 block rounded shadow-md transition-colors"
+      : 'bg-base-200 cursor-pointer'}  {order.missingInformation && detailed
+      ? 'bg-warning ring-warning'
+      : ''} mb-6 block rounded shadow-md transition-colors"
     onclick={() => orders.updateState(order.id, onclick)}
     role="button"
     tabindex="0"
     onkeydown={(e) => e.key === "Enter" && orders.updateState(order.id, onclick)}
     aria-label={`Order ${orderNumber} with ${order.items.length} items`}
   >
-    <td class="{!detailed ? 'flex justify-center' : ''} text-4xl font-bold">{orderNumber}</td>
+    <td class="{!detailed ? 'flex justify-center' : ''} text-4xl font-bold"
+      >{orderNumber}{#if order.missingInformation && detailed}<CommentIcon />{/if}</td
+    >
     {#if detailed}
       <td class="w-full">
         <ul class="space-y-2">

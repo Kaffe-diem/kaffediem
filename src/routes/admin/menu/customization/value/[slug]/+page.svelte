@@ -14,6 +14,7 @@
 
   let customizationName: string | undefined = $state();
   let customizationPrice: number = $state(0);
+  let customizationConstantPrice: boolean = $state(true);
   let customizationKey: string | undefined = $state();
   let customizationEnabled: boolean = $state(true);
 
@@ -23,7 +24,8 @@
     const value = $customizationValues.find((value) => value.id === id);
     if (value) {
       customizationName = value.name;
-      customizationPrice = value.priceIncrementNok;
+      customizationPrice = value.priceChange;
+      customizationConstantPrice = value.constantPrice;
       customizationKey = value.belongsTo;
       customizationEnabled = value.enabled;
 
@@ -38,6 +40,7 @@
           id,
           customizationName!,
           customizationPrice!,
+          customizationConstantPrice!,
           customizationKey!,
           customizationEnabled
         )
@@ -48,12 +51,17 @@
           id,
           customizationName!,
           customizationPrice!,
+          customizationConstantPrice!,
           customizationKey!,
           customizationEnabled
         )
       );
     }
     goto("/admin/menu/customization");
+  }
+
+  function handlePriceChangeType() {
+    customizationConstantPrice = !customizationConstantPrice;
   }
 </script>
 
@@ -74,18 +82,23 @@
     </div>
     <div>
       <fieldset class="fieldset">
-        <legend class="fieldset-legend text-xl">Prisendring (kr)</legend>
+        <legend class="fieldset-legend text-xl"
+          >Prisendring {#if customizationConstantPrice}(kr){:else}(%){/if}</legend
+        >
         <label class="input input-xl w-full">
-          {#if customizationPrice >= 0}
+          {#if customizationPrice >= 0 && customizationConstantPrice}
             <span>+</span>
           {/if}
           <input
             type="number"
-            class="input input-xl grow"
+            class="input input-xl peer grow"
             required
             bind:value={customizationPrice}
             placeholder="Prisendring"
           />
+          <button class="btn" onclick={handlePriceChangeType}
+            >{#if customizationConstantPrice}+/-{:else}%{/if}</button
+          >
         </label>
       </fieldset>
     </div>

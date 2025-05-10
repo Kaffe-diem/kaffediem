@@ -17,7 +17,7 @@
   });
 </script>
 
-<div class="h-full overflow-y-auto">
+<div class="grid h-full grid-rows-[1fr_auto] overflow-y-auto">
   <div class="grid-auto-flow-column grid auto-rows-min gap-x-6 gap-y-4 md:grid-cols-2">
     {#each $customizationKeys as key}
       {#if key.enabled}
@@ -45,14 +45,17 @@
   <button
     class="btn {selected
       ? 'ring-lg ring-accent scale-109 text-white shadow-xl ring'
-      : ''} bg-base-200 flex w-full transition-all duration-300 ease-in-out hover:brightness-90 focus:outline-none"
+      : ''} flex w-full transition-all duration-300 ease-in-out hover:brightness-90 focus:outline-none"
     style="background-color: {selected ? key.labelColor : ''};"
     onclick={() => selectCustomization(key.id, value)}
   >
     <span class="flex w-full justify-between">
       <span>{value.name}</span>
-      {#if value.priceIncrementNok > 0}
-        <span>{value.priceIncrementNok},-</span>
+      {#if value.priceChange != 0 && value.constantPrice}
+        <span>{value.priceChange},-</span>
+      {/if}
+      {#if !value.constantPrice}
+        <span>{value.priceChange}%</span>
       {/if}
     </span>
   </button>

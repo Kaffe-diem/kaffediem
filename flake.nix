@@ -1,5 +1,5 @@
 {
-  description = "Development environments for various languages";
+  description = "Kaffediem flake";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -32,6 +32,8 @@
               emmet-ls
               vscode-langservers-extracted
               prettierd
+              tailwindcss-language-server
+              svelte-language-server
             ];
           };
         }
