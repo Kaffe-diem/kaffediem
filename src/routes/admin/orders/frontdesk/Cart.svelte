@@ -12,6 +12,7 @@
   import { customizationKeys } from "$stores/menuStore";
   import { type Item, type CustomizationValue } from "$lib/types";
   import orders from "$stores/orderStore";
+  import CommentIcon from "$assets/CommentIcon.svelte";
 
   let { selectedItem } = $props<{
     selectedItem: Item | undefined;
@@ -26,9 +27,11 @@
     addToCart(selectedItem);
   }
 
+  let missing_information = $state(false);
   function completeOrder() {
-    orderStore.create($auth.user.id, $cart);
+    orderStore.create($auth.user.id, $cart, missing_information);
     clearCart();
+    missing_information = false;
   }
 </script>
 
@@ -36,6 +39,16 @@
   {@render CartDisplay()}
 
   <div class="flex flex-row justify-center gap-2">
+    <label>
+      <input type="checkbox" name="item" class="peer hidden" bind:checked={missing_information} />
+      <div
+        class="btn btn-lg {missing_information
+          ? 'ring-lg ring-warning bg-warning shadow-xl ring'
+          : ''} flex transition-all duration-300 ease-in-out hover:brightness-90 focus:outline-none"
+      >
+        <span class="text-3xl"><CommentIcon /></span>
+      </div>
+    </label>
     <button class="bold btn btn-lg text-xl" onclick={completeOrder}
       >Ferdig ({$orders.length + 100})</button
     >
@@ -68,7 +81,7 @@
 
 {#snippet CustomizationBadge({ customization }: { customization: CustomizationValue })}
   <span
-    class="badge badge-sm md: badge-md lg:badge-lg"
+    class="badge badge-sm md:badge-md lg:badge-lg"
     style={customization.belongsTo && colors[customization.belongsTo]
       ? `background-color: ${colors[customization.belongsTo]}; color: white;`
       : ""}
