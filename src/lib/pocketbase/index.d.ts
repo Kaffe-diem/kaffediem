@@ -114,6 +114,7 @@ export type CustomizationKeyRecord = {
 
 export type CustomizationValueRecord = {
 	belongs_to: RecordIdString
+	constant_price?: boolean
 	created?: IsoDateString
 	enable?: boolean
 	id: string
@@ -160,6 +161,7 @@ export type OrderRecord = {
 	customer?: RecordIdString
 	id: string
 	items: RecordIdString[]
+	missing_information?: boolean
 	state: OrderStateOptions
 	updated?: IsoDateString
 }
