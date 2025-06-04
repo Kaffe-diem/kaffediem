@@ -49,13 +49,14 @@
       <thead class="sr-only">
         <tr>
           <th class="w-full">Produkt</th>
+        </tr>
+      </thead>
       <tbody>
           {#each $cart as item, index}
             {@render CartItem({ item, index })}
+          {:else}
+            {@render EmptyCartRow()}
           {/each}
-        {:else}
-          {@render EmptyCartRow()}
-        {/if}
       </tbody>
       {@render CartFooter()}
     </table>
@@ -64,7 +65,7 @@
 
 {#snippet CustomizationBadge({ customization }: { customization: CustomizationValue })}
   <span
-    class="badge badge-sm md: badge-md lg:badge-lg"
+    class="badge badge-sm md:badge-md lg:badge-lg"
     style={customization.belongsTo && colors[customization.belongsTo]
       ? `background-color: ${colors[customization.belongsTo]}; color: white;`
       : ""}

@@ -19,7 +19,7 @@ services:
       timeout: 5s
       retries: 5
   app:
-    build: 
+    build:
       context: .
       target: development
     ports:
@@ -36,7 +36,6 @@ services:
         condition: service_healthy
     develop:
       watch:
-
         - action: sync
           path: ./src
           target: /app/src
