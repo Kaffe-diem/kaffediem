@@ -1,10 +1,10 @@
 import PocketBase from "pocketbase";
-import { PUBLIC_PB_HOST } from "$env/static/public";
+import { PUBLIC_PB_HOST_LOCAL, PUBLIC_PB_HOST_LOCAL_DOCKER } from "$env/static/public";
 import { browser } from "$app/environment";
 import { type TypedPocketBase, Collections, OrderStateOptions } from "$lib/pocketbase/index.d";
 
-// Use localhost for client-side code (browser), and the Docker service name for server-side
-const pbUrl = browser ? PUBLIC_PB_HOST.replace('http://pb:', 'http://localhost:') : PUBLIC_PB_HOST;
+// Use the browser-specific URL for client-side code, and the Docker service name for server-side
+const pbUrl = browser ? PUBLIC_PB_HOST_LOCAL: PUBLIC_PB_HOST_LOCAL_DOCKER;
 const pb = new PocketBase(pbUrl) as TypedPocketBase;
 pb.autoCancellation(false);
 
