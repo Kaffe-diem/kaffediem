@@ -10,7 +10,7 @@ jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     env:
-      PUBLIC_PB_HOST: ${{ vars.PB_HOST }}
+      PUBLIC_PB_HOST_PROD: ${{ vars.PB_HOST }}
       PB_ADMIN_PASSWORD: ${{ secrets.PB_ADMIN_PASSWORD }}
       PB_ADMIN_EMAIL: ${{ secrets.PB_ADMIN_EMAIL }}
       FIREBASE_CLI_EXPERIMENTS: webframeworks
