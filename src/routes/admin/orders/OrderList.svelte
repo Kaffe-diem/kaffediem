@@ -4,10 +4,16 @@
   import { customizationKeys } from "$lib/stores/menuStore";
   import type { CustomizationKey, CustomizationValue, Order, OrderItem } from "$lib/types";
 
-  const { show, onclick, label } = $props<{
+  const {
+    show,
+    onclick,
+    label,
+    detailed = true
+  } = $props<{
     show: OrderStateOptions[];
     onclick: OrderStateOptions;
     label: string;
+    detailed?: boolean;
   }>();
 
   function getKeyById(keyId: string): CustomizationKey | undefined {
@@ -19,24 +25,24 @@
 
 <div class="h-full w-full overflow-y-auto">
   <h2
-    class="bg-base-100 text-neutral sticky top-0 z-50 pb-2 text-center text-4xl font-bold md:mb-6"
+    class="text-neutral sticky pb-2 text-center text-4xl font-bold md:mb-6"
     id="order-list-heading"
   >
     {label}
   </h2>
-  <table class="table table-auto" aria-labelledby="order-list-heading">
+  <table class="table" aria-labelledby="order-list-heading">
     <thead class="sr-only">
       <tr>
         <th>Order Number</th>
-        <th>Order Items</th>
+        {#if detailed}<th>Order Items</th>{/if}
       </tr>
     </thead>
     <tbody class="space-y-4">
-      {#each $orders as order, index}
-        {#if order && show.includes(order.state)}
+      {#each $orders.reverse() as order, index}
+        {#if show.includes(order.state)}
           {@render OrderRow({
             order,
-            orderNumber: index + 100
+            orderNumber: $orders.length - index - 1 + 100
           })}
         {/if}
       {/each}
@@ -46,28 +52,32 @@
 
 {#snippet OrderRow({ order, orderNumber }: { order: Order; orderNumber: number })}
   <tr
-    class="bg-base-200 mb-4 block cursor-pointer rounded shadow-md transition-colors"
+    class="{!detailed
+      ? 'btn btn-xl ml-4 h-16'
+      : 'bg-base-200 cursor-pointer'} mb-6 block rounded shadow-md transition-colors"
     onclick={() => orders.updateState(order.id, onclick)}
     role="button"
     tabindex="0"
     onkeydown={(e) => e.key === "Enter" && orders.updateState(order.id, onclick)}
     aria-label={`Order ${orderNumber} with ${order.items.length} items`}
   >
-    <td class="text-lg font-semibold">{orderNumber}</td>
-    <td>
-      <ul class="space-y-4">
-        {#each order.items as orderItem}
-          {@render OrderItem({ orderItem })}
-        {/each}
-      </ul>
-    </td>
+    <td class="{!detailed ? 'flex justify-center' : ''} text-4xl font-bold">{orderNumber}</td>
+    {#if detailed}
+      <td class="w-full">
+        <ul class="space-y-2">
+          {#each order.items as orderItem}
+            {@render OrderItem({ orderItem })}
+          {/each}
+        </ul>
+      </td>
+    {/if}
   </tr>
 {/snippet}
 
 {#snippet OrderItem({ orderItem }: { orderItem: OrderItem })}
-  <li class="bg-base-300 rounded p-3 shadow">
+  <li class="bg-base-300 w-full rounded p-3 shadow">
     <div class="flex flex-col">
-      <span class="mb-1 text-lg font-medium">
+      <span class="mb-1 text-xl">
         {orderItem.item.name}
       </span>
 
@@ -91,7 +101,7 @@
   {@const keyName = key?.name || "Option"}
   <li>
     <span
-      class="badge badge-sm px-2 py-1"
+      class="badge badge-lg px-2 py-1 text-xl"
       style={keyColor ? `background-color: ${keyColor}; color: white;` : ""}
       aria-label={`${keyName}: ${customization.name}`}
     >

@@ -9,21 +9,22 @@
   let selectedItem = $state<Item | undefined>();
 </script>
 
-<div class="grid h-full grid-cols-[2fr_auto_1fr_auto_1fr] grid-rows-[100%] gap-2">
+<div class="grid h-full grid-cols-[3fr_auto_2fr_auto_1fr] grid-rows-[100%] gap-0">
   <ItemSelection bind:selectedItem />
 
-  <div class="divider divider-horizontal m-1 p-1"></div>
+  <div class="divider divider-horizontal m-0 p-0"></div>
 
-  <div class="flex h-full flex-col gap-4">
+  <div class="flex flex-col gap-4">
     <CustomizationSelection />
     <Cart {selectedItem} />
   </div>
 
-  <div class="divider divider-horizontal m-1 p-1"></div>
+  <div class="divider divider-horizontal m-0 p-0"></div>
 
   <OrderList
     show={[OrderStateOptions.completed]}
     onclick={OrderStateOptions.dispatched}
     label="Ferdig"
+    detailed={false}
   />
 </div>

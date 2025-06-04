@@ -123,11 +123,25 @@ export class Item implements RecordBase {
     public readonly name: string,
     public readonly price: number,
     public readonly category: string,
-    public readonly image: string
+    public readonly imageName: string, // pb field value
+    public readonly image: string, // url to actual image
+    public readonly enabled: boolean,
+    public readonly imageFile: File | null = null // file with uploaded image contents
   ) {}
 
   toPb() {
-    return { name: this.name, price_nok: this.price, category: this.category, image: this.image };
+    // Looks like FormData is necessary when dealing with files.
+    const formData = new FormData();
+    formData.append("name", this.name);
+    formData.append("price_nok", this.price.toString());
+    formData.append("category", this.category);
+    formData.append("enable", this.enabled.toString()); // FormData expects string
+    if (this.imageFile) {
+      formData.append("image", this.imageFile);
+    } else {
+      formData.append("image", this.imageName);
+    }
+    return formData;
   }
 
   static fromPb(data: ItemResponse): Item {
@@ -136,7 +150,9 @@ export class Item implements RecordBase {
       data.name,
       data.price_nok,
       data.category,
-      pb.files.getUrl(data, data.image)
+      data.image,
+      pb.files.getUrl(data, data.image),
+      data.enable
     );
   }
 }
@@ -150,20 +166,15 @@ export class Category implements RecordBase {
     public readonly id: RecordIdString,
     public readonly name: string,
     public readonly sortOrder: number,
-    public readonly items: Item[]
+    public readonly enabled: boolean
   ) {}
 
   toPb() {
-    return { name: this.name, sort_order: this.sortOrder };
+    return { name: this.name, sort_order: this.sortOrder, enable: this.enabled };
   }
 
   static fromPb(data: ExpandedCategoryRecord): Category {
-    return new Category(
-      data.id,
-      data.name,
-      data.sort_order,
-      data.expand.item_via_category.map(Item.fromPb)
-    );
+    return new Category(data.id, data.name, data.sort_order, data.enable);
   }
 }
 
@@ -213,15 +224,16 @@ export class CustomizationKey implements RecordBase {
   constructor(
     public readonly id: RecordIdString,
     public readonly name: string,
+    public readonly enabled: boolean,
     public readonly labelColor?: string
   ) {}
 
   toPb() {
-    return { name: this.name, label_color: this.labelColor };
+    return { name: this.name, enable: this.enabled, label_color: this.labelColor };
   }
 
   static fromPb(data: CustomizationKeyResponse): CustomizationKey {
-    return new CustomizationKey(data.id, data.name || "", data.label_color);
+    return new CustomizationKey(data.id, data.name || "", data.enable, data.label_color);
   }
 }
 
@@ -230,19 +242,27 @@ export class CustomizationValue implements RecordBase {
     public readonly id: RecordIdString,
     public readonly name: string,
     public readonly priceIncrementNok: number,
-    public readonly belongsTo: RecordIdString
+    public readonly belongsTo: RecordIdString,
+    public readonly enabled: boolean
   ) {}
 
   toPb() {
     return {
       name: this.name,
       price_increment_nok: this.priceIncrementNok,
-      belongs_to: this.belongsTo
+      belongs_to: this.belongsTo,
+      enable: this.enabled
     };
   }
 
   static fromPb(data: CustomizationValueResponse): CustomizationValue {
-    return new CustomizationValue(data.id, data.name, data.price_increment_nok, data.belongs_to);
+    return new CustomizationValue(
+      data.id,
+      data.name,
+      data.price_increment_nok,
+      data.belongs_to,
+      data.enable
+    );
   }
 }
 

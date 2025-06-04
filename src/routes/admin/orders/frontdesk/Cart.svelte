@@ -36,10 +36,9 @@
   {@render CartDisplay()}
 
   <div class="flex flex-row justify-center gap-2">
-    <button class="btn btn-lg bg-base-200 text-neutral text-3xl font-normal">
-      ({$orders.length + 100})
-    </button>
-    <button class="bold btn btn-lg text-xl" onclick={completeOrder}>Ferdig</button>
+    <button class="bold btn btn-lg text-xl" onclick={completeOrder}
+      >Ferdig ({$orders.length + 100})</button
+    >
     <button class="bold btn btn-primary btn-lg text-3xl" onclick={handleAddToCart}>+</button>
   </div>
 </div>
@@ -47,14 +46,10 @@
 {#snippet CartDisplay()}
   <div class="overflow-y-auto">
     <table class="table-pin-rows table table-auto list-none shadow-2xl">
-      <thead>
+      <thead class="sr-only">
         <tr>
           <th class="w-full">Produkt</th>
-          <th class="whitespace-nowrap">Pris</th>
-        </tr>
-      </thead>
       <tbody>
-        {#if $cart.length > 0}
           {#each $cart as item, index}
             {@render CartItem({ item, index })}
           {/each}
@@ -69,7 +64,7 @@
 
 {#snippet CustomizationBadge({ customization }: { customization: CustomizationValue })}
   <span
-    class="badge badge-sm"
+    class="badge badge-sm md: badge-md lg:badge-lg"
     style={customization.belongsTo && colors[customization.belongsTo]
       ? `background-color: ${colors[customization.belongsTo]}; color: white;`
       : ""}
