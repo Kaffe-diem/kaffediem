@@ -1,4 +1,5 @@
--include .env
+export
+-include .env.development
 
 default: dev
 
@@ -6,7 +7,7 @@ dev: sync pb_types svelte_types
 	docker-compose up --watch
 
 build: pb_types
-	npx vite build
+	PUBLIC_PB_HOST=$(PUBLIC_PB_HOST_PROD) npx vite build --mode production
 
 pb_types:
 	@npx pocketbase-typegen --url $(PUBLIC_PB_HOST_PROD) --email $(PB_ADMIN_EMAIL) --password $(PB_ADMIN_PASSWORD) --out ./src/lib/pocketbase/index.d.ts
