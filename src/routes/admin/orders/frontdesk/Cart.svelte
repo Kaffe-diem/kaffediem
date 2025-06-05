@@ -52,11 +52,13 @@
         </tr>
       </thead>
       <tbody>
+        {#if $cart.length > 0}
           {#each $cart as item, index}
             {@render CartItem({ item, index })}
-          {:else}
-            {@render EmptyCartRow()}
           {/each}
+        {:else}
+          {@render EmptyCartRow()}
+        {/if}
       </tbody>
       {@render CartFooter()}
     </table>
