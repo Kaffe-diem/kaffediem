@@ -22,6 +22,10 @@ services:
     build:
       context: .
       target: development
+      args:
+        - PUBLIC_PB_HOST_PROD=${PUBLIC_PB_HOST_PROD}
+        - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL}
+        - PB_ADMIN_PASSWORD=${PB_ADMIN_PASSWORD}
     ports:
       - "5173:5173"
     restart: unless-stopped

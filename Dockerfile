@@ -1,4 +1,9 @@
 FROM node:20.11-alpine AS builder
+
+ARG PUBLIC_PB_HOST_PROD
+ARG PB_ADMIN_EMAIL  
+ARG PB_ADMIN_PASSWORD
+
 WORKDIR /app
 COPY package*.json .
 RUN npm ci
