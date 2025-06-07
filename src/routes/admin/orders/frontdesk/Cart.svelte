@@ -49,7 +49,6 @@
       <thead class="sr-only">
         <tr>
           <th class="w-full">Produkt</th>
-          <th class="whitespace-nowrap">Pris</th>
         </tr>
       </thead>
       <tbody>
@@ -68,7 +67,7 @@
 
 {#snippet CustomizationBadge({ customization }: { customization: CustomizationValue })}
   <span
-    class="badge badge-sm md: badge-md lg:badge-lg"
+    class="badge badge-sm md:badge-md lg:badge-lg"
     style={customization.belongsTo && colors[customization.belongsTo]
       ? `background-color: ${colors[customization.belongsTo]}; color: white;`
       : ""}
