@@ -1,6 +1,8 @@
 export
 -include .env.development
 
+.PHONY: default dev build pb_types svelte_types sync format lint clean
+
 default: dev
 
 dev: sync pb_types svelte_types
@@ -34,3 +36,10 @@ lint:
 		npx svelte-check --tsconfig ./tsconfig.json && \
 		npx eslint .)
 	npx prettier --check .
+
+clean:
+	docker-compose down --volumes --remove-orphans --rmi all
+	rm -f webapp/src/lib/pocketbase/index.d.ts
+	rm -rf webapp/.svelte-kit webapp/build
+
+
