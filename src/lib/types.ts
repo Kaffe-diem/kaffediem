@@ -58,16 +58,22 @@ export class Order implements RecordBase {
   constructor(
     public readonly id: RecordIdString,
     public readonly state: State,
-    public readonly items: Array<OrderItem>
+    public readonly items: Array<OrderItem>,
+    public readonly missingInformation: boolean
   ) {}
 
   // FIXME: implement correctly
   toPb() {
-    return { state: this.state, items: this.items };
+    return { state: this.state, items: this.items, missing_information: this.missingInformation };
   }
 
   static fromPb(data: ExpandedOrderRecord): Order {
-    return new Order(data.id, data.state, data.expand.items.map(OrderItem.fromPb));
+    return new Order(
+      data.id,
+      data.state,
+      data.expand.items.map(OrderItem.fromPb),
+      data.missing_information
+    );
   }
 }
 
@@ -241,7 +247,8 @@ export class CustomizationValue implements RecordBase {
   constructor(
     public readonly id: RecordIdString,
     public readonly name: string,
-    public readonly priceIncrementNok: number,
+    public readonly priceChange: number,
+    public readonly constantPrice: boolean,
     public readonly belongsTo: RecordIdString,
     public readonly enabled: boolean
   ) {}
@@ -249,7 +256,9 @@ export class CustomizationValue implements RecordBase {
   toPb() {
     return {
       name: this.name,
-      price_increment_nok: this.priceIncrementNok,
+      // TODO: rename in db:
+      price_increment_nok: this.priceChange,
+      constant_price: this.constantPrice,
       belongs_to: this.belongsTo,
       enable: this.enabled
     };
@@ -259,7 +268,8 @@ export class CustomizationValue implements RecordBase {
     return new CustomizationValue(
       data.id,
       data.name,
-      data.price_increment_nok,
+      data.price_increment_nok, // TODO: rename in db
+      data.constant_price,
       data.belongs_to,
       data.enable
     );

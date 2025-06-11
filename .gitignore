@@ -24,6 +24,7 @@ vite.config.ts.timestamp-*
 src/lib/pocketbase/index.d.ts
 
 # Pocketbase
-/pocketbase-data
+pb_data
+
 
 .firebase

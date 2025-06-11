@@ -32,7 +32,7 @@ const _subscribe = createPbStore(Collections.Order, Order, baseOptions);
 export default {
   subscribe: _subscribe,
 
-  create: async (userId: RecordIdString, items: CartItem[]) => {
+  create: async (userId: RecordIdString, items: CartItem[], missingInformation: boolean) => {
     const orderItemIds = await Promise.all(
       items.map(async (item) => {
         const orderItemResponse = await pb.collection(Collections.OrderItem).create({
@@ -55,7 +55,7 @@ export default {
       customer: userId,
       items: orderItemIds,
       state: State.received,
-      payment_fulfilled: false
+      missing_information: missingInformation
     });
   },
 
