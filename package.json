@@ -8,7 +8,6 @@
     "@sveltejs/adapter-node": "^5.2.7",
     "@sveltejs/kit": "^2.5.27",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
-    "@tailwindcss/postcss": "^4.0.17",
     "@tailwindcss/vite": "^4.0.17",
     "@types/eslint": "^9.6.0",
     "autoprefixer": "^10.4.20",

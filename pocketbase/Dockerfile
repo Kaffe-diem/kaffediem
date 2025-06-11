@@ -1,24 +1,14 @@
-FROM alpine:latest
+FROM ghcr.io/coollabsio/pocketbase:latest
 
-ARG PB_VERSION=0.24.1
+RUN mkdir -p /app/pb_data
 
-RUN apk add --no-cache \
-    unzip \
-    ca-certificates \
-    # this is needed only if you want to use scp to copy later your pb_data locally
-    openssh
-
-# download and unzip PocketBase
-ADD https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_amd64.zip /tmp/pb.zip
-RUN unzip /tmp/pb.zip -d /pb/
-
-# uncomment to copy the local pb_migrations dir into the container
-# COPY ./pb_migrations /pb/pb_migrations
+COPY ./pb_migrations /app/pb_migrations
 
 # uncomment to copy the local pb_hooks dir into the container
-# COPY ./pb_hooks /pb/pb_hooks
+# COPY ./pb_hooks /app/pb_hooks
+
+WORKDIR /app
 
 EXPOSE 8080
 
-# start PocketBase
-CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:8080"]
+CMD ["--dir=/app/pb_data", "--origins=http://localhost:5173,http://app:5173"]

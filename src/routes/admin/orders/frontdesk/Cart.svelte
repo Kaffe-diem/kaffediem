@@ -62,7 +62,6 @@
       <thead class="sr-only">
         <tr>
           <th class="w-full">Produkt</th>
-          <th class="whitespace-nowrap">Pris</th>
         </tr>
       </thead>
       <tbody>
