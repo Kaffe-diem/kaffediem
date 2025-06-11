@@ -29,5 +29,8 @@ format:
 	npx prettier --write .
 
 lint:
-	(cd webapp && npx svelte-kit sync && npx svelte-check --tsconfig ./tsconfig.json && npx eslint .)
+	(cd webapp && \
+		npx svelte-kit sync && \
+		npx svelte-check --tsconfig ./tsconfig.json && \
+		npx eslint .)
 	npx prettier --check .
