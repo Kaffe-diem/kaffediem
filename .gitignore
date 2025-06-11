@@ -3,8 +3,8 @@ node_modules
 # Output
 .output
 .vercel
-/.svelte-kit
-/build
+*.svelte-kit
+/webapp/build
 
 # OS
 .DS_Store
@@ -21,7 +21,7 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 # Schema
-src/lib/pocketbase/index.d.ts
+webapp/src/lib/pocketbase/index.d.ts
 
 # Pocketbase
 pb_data
