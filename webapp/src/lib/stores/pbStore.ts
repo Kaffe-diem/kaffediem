@@ -1,11 +1,14 @@
 import pb, { Collections, type RecordIdString } from "$lib/pocketbase";
 import { writable } from "svelte/store";
 import { type RecordBase } from "$lib/types";
+import { browser } from "$app/environment";
 
 // ref: https://github.com/pocketbase/js-sdk?tab=readme-ov-file#nodejs-via-npm
-import eventsource from "eventsource";
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(global as any).EventSource = eventsource;
+import * as eventsource from "eventsource";
+if (!browser) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (global as any).EventSource = (eventsource as any).EventSource;
+}
 
 export function createPbStore<Collection extends Collections, RecordClass extends RecordBase>(
   collection: Collection,

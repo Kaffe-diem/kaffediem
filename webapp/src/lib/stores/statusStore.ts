@@ -1,12 +1,15 @@
 import { createGenericPbStore } from "$stores/pbStore";
+import { browser } from "$app/environment";
 import pb, { Collections, type MessageResponse } from "$lib/pocketbase";
 import { Message, Status } from "$lib/types";
 import { writable } from "svelte/store";
 
-import eventsource from "eventsource";
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(global as any).EventSource = eventsource;
-
+// ref: https://github.com/pocketbase/js-sdk?tab=readme-ov-file#nodejs-via-npm
+import * as eventsource from "eventsource";
+if (!browser) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (global as any).EventSource = (eventsource as any).EventSource;
+}
 export const messages = createGenericPbStore(Collections.Message, Message);
 
 function createStatusStore() {

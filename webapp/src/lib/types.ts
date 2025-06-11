@@ -46,7 +46,8 @@ export class User {
   ) {}
 
   static fromPb(data: AuthModel): User {
-    return new User(data?.id, data?.name, data?.is_admin);
+    if (!data) throw new Error('Auth data is null');
+    return new User(data.id, data.name, data.is_admin);
   }
 }
 
