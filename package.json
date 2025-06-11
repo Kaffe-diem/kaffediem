@@ -1,5 +1,8 @@
 {
   "name": "kodekafe-mono",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "workspaces": [
+    "webapp"
+  ]
 }
