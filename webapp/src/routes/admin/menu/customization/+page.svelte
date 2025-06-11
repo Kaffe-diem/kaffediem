@@ -14,7 +14,7 @@
       >Opprett en ny tilpasning</a
     >
   </div>
-  {#each $customizationKeys as key}
+  {#each $customizationKeys as key (key.id)}
     <div>
       <div class="mb-4 flex flex-row items-center justify-between px-2">
         <span class="text-3xl">{key.name}</span>
@@ -27,7 +27,7 @@
         </div>
       </div>
       <ul class="list-none">
-        {#each $customizationsByKey[key.id] ?? [] as customization}
+        {#each $customizationsByKey[key.id] ?? [] as customization (customization.id)}
           <li class="m-2 flex flex-row justify-between">
             <span class="text-xl">{customization.name}</span>
             <div class="flex flex-row items-center gap-4">

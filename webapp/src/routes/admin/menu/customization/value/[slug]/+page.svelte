@@ -1,5 +1,4 @@
 <script lang="ts">
-  // @ts-expect-error Is present, but lint fails
   import type { PageProps } from "./$types";
   import { customizationKeys, customizationValues } from "$stores/menuStore";
   import { CustomizationValue } from "$lib/types";
@@ -108,7 +107,7 @@
         <select class="select select-xl w-full" required bind:value={customizationKey}>
           {#if customizationKey || create}
             <option disabled value="" selected={create}>Velg en kategori</option>
-            {#each $customizationKeys as category}
+            {#each $customizationKeys as category (category.id)}
               <option value={category.id} selected={category.id == customizationKey}
                 >{category.name}</option
               >

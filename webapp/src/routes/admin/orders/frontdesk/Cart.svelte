@@ -66,7 +66,7 @@
       </thead>
       <tbody>
         {#if $cart.length > 0}
-          {#each $cart as item, index}
+          {#each $cart as item, index (item.id + index)}
             {@render CartItem({ item, index })}
           {/each}
         {:else}
@@ -96,7 +96,7 @@
         <div>{item.name}</div>
         {#if item.customizations && item.customizations.length > 0}
           <div class="mt-1 flex flex-wrap gap-1">
-            {#each item.customizations as customization}
+            {#each item.customizations as customization (customization.id)}
               {#if customization.name}
                 {@render CustomizationBadge({ customization })}
               {/if}

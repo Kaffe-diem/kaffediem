@@ -13,7 +13,7 @@
     <a href="/admin/menu/category/new" class="btn btn-lg w-full">Opprett en ny kategori</a>
     <a href="/admin/menu/item/new" class="btn btn-lg w-full">Opprett et nytt produkt</a>
   </div>
-  {#each $categories as category}
+  {#each $categories as category (category.id)}
     {@render CategorySection({ category })}
   {/each}
 </div>
@@ -30,7 +30,7 @@
       </div>
     </div>
     <ul class="list-none">
-      {#each $itemsByCategory[category.id] ?? [] as item}
+      {#each $itemsByCategory[category.id] ?? [] as item (item.id)}
         {@render ItemCard({ item })}
       {/each}
     </ul>

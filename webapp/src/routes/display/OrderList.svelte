@@ -16,7 +16,7 @@
     {label}
   </h2>
   <div class="grid max-h-full grid-cols-4 gap-2 overflow-y-scroll">
-    {#each $orders as order, index}
+    {#each $orders as order, index (order.id)}
       {#if show.includes(order?.state)}
         <div class="bg-base-200 text-neutral px-4 py-4 text-center text-4xl">
           {index + 100}

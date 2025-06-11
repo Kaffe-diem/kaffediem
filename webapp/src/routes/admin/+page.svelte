@@ -33,7 +33,7 @@
       >Nullstill bestillinger
     </button>
   </li>
-  {#each adminPages as page}
+  {#each adminPages as page (page.href)}
     <li>
       <a
         class="btn relative m-4 flex h-24 w-full flex-col items-center justify-center text-3xl lg:text-5xl"

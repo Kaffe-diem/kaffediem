@@ -13,7 +13,7 @@
 </script>
 
 <ul class="menu {className}">
-  {#each navItems as item}
+  {#each navItems as item (item.href)}
     {#if (isAuthenticated || !item.requiresAuth) && (isAdmin || !item.requiresAdmin)}
       <li>
         <a href={item.href} tabindex="0">{item.text}</a>

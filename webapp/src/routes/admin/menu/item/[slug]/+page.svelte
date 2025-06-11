@@ -1,5 +1,4 @@
 <script lang="ts">
-  // @ts-expect-error Is present, but lint fails
   import type { PageProps } from "./$types";
   import { items, categories } from "$stores/menuStore";
   import { Item } from "$lib/types";
@@ -113,7 +112,7 @@
         <select class="select select-xl w-full" required bind:value={itemCategory}>
           {#if itemCategory || create}
             <option disabled value="" selected={create}>Velg en kategori</option>
-            {#each $categories as category}
+            {#each $categories as category (category.id)}
               <option value={category.id} selected={category.id == itemCategory}
                 >{category.name}</option
               >

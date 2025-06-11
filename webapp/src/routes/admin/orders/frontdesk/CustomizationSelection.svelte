@@ -19,7 +19,7 @@
 
 <div class="grid h-full grid-rows-[1fr_auto] overflow-y-auto">
   <div class="grid-auto-flow-column grid auto-rows-min gap-x-6 gap-y-4 md:grid-cols-2">
-    {#each $customizationKeys as key}
+    {#each $customizationKeys as key (key.id)}
       {#if key.enabled}
         {@render CustomizationCategory({ key })}
       {/if}
@@ -32,7 +32,7 @@
     <div class="text-primary font-bold xl:text-xl">
       {key.name}
     </div>
-    {#each getValuesByKey(key.id) as value}
+    {#each getValuesByKey(key.id) as value (value.id)}
       {#if value.enabled}
         {@render CustomizationOption({ key, value })}
       {/if}
