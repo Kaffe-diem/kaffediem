@@ -20,7 +20,7 @@ services:
       retries: 5
   app:
     build:
-      context: .
+      context: ./webapp
       target: development
       args:
         - PUBLIC_PB_HOST_PROD=${PUBLIC_PB_HOST_PROD}
@@ -40,31 +40,31 @@ services:
     develop:
       watch:
         - action: sync
-          path: ./src
+          path: ./webapp/src
           target: /app/src
           ignore:
             - "node_modules/"
             - "**/*.test.ts"
             - "**/*.spec.ts"
         - action: sync
-          path: ./static
+          path: ./webapp/static
           target: /app/static
 
         - action: sync+restart
-          path: ./vite.config.ts
+          path: ./webapp/vite.config.ts
           target: /app/vite.config.ts
         - action: sync+restart
-          path: ./svelte.config.js
+          path: ./webapp/svelte.config.js
           target: /app/svelte.config.js
         - action: sync+restart
-          path: ./tsconfig.json
+          path: ./webapp/tsconfig.json
           target: /app/tsconfig.json
         - action: sync+restart
           path: ./.env
           target: /app/.env
 
         - action: rebuild
-          path: package.json
+          path: ./webapp/package.json
 
 volumes:
   svelte_kit_data:

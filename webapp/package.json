@@ -1,0 +1,38 @@
+{
+  "name": "kaffediem",
+  "version": "0.0.1",
+  "private": true,
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "@sveltejs/adapter-auto": "^3.0.0",
+    "@sveltejs/adapter-node": "^5.2.7",
+    "@sveltejs/kit": "^2.5.27",
+    "@sveltejs/vite-plugin-svelte": "^4.0.0",
+    "@tailwindcss/vite": "^4.0.17",
+    "@types/eslint": "^9.6.0",
+    "autoprefixer": "^10.4.20",
+    "daisyui": "^5.0.9",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-svelte": "^2.45.1",
+    "globals": "^15.0.0",
+    "pocketbase-typegen": "^1.3.0",
+    "prettier": "^3.1.1",
+    "prettier-plugin-svelte": "^3.2.6",
+    "prettier-plugin-tailwindcss": "^0.6.5",
+    "svelte": "^5.0.0",
+    "svelte-check": "^4.0.0",
+    "tailwindcss": "^4.0.17",
+    "typescript": "^5.5.0",
+    "typescript-eslint": "^8.0.0",
+    "vite": "^5.4.4"
+  },
+  "type": "module",
+  "dependencies": {
+    "@types/eventsource": "^1.1.15",
+    "@types/node": "^20.17.10",
+    "eventsource": "^2.0.2",
+    "pocketbase": "<0.22.0",
+    "vite-plugin-node-polyfills": "^0.22.0"
+  }
+}
