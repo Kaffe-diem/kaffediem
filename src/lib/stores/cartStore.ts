@@ -76,13 +76,21 @@ export const addToCart = (item: Item) => {
   const customizations = Object.values(get(selectedCustomizations)).flat();
 
   const totalCustomizationPrice = customizations.reduce(
-    (sum, customization) => sum + (customization.priceIncrementNok || 0),
+    (sum, customization) =>
+      customization.constantPrice ? sum + (customization.priceChange || 0) : sum,
     0
+  );
+
+  const subtotal = item.price + totalCustomizationPrice;
+  const finalprice = customizations.reduce(
+    (price, customization) =>
+      !customization.constantPrice ? price * (customization.priceChange / 100) : price,
+    subtotal
   );
 
   const itemToAdd: CartItem = {
     ...item,
-    price: item.price + totalCustomizationPrice,
+    price: Math.ceil(finalprice),
     customizations
   } as CartItem;
 

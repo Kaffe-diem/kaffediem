@@ -1,8 +1,11 @@
 import PocketBase from "pocketbase";
-import { PUBLIC_PB_HOST } from "$env/static/public";
 import { type TypedPocketBase, Collections, OrderStateOptions } from "$lib/pocketbase/index.d";
+import { getPocketBasePath } from "$lib/utils/pocketbase";
 
-const pb = new PocketBase(PUBLIC_PB_HOST) as TypedPocketBase;
+const pbUrl = getPocketBasePath();
+
+const pb = new PocketBase(pbUrl) as TypedPocketBase;
+
 pb.autoCancellation(false);
 
 export default pb;

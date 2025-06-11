@@ -20,13 +20,19 @@ const baseOptions = {
   filter: `created >= "${today}"`
 };
 
+const actionHistory: {
+  action: "updateState";
+  orderId: RecordIdString;
+  previousState: State;
+}[] = [];
+
 // Create the store so we can reference it in methods
 const _subscribe = createPbStore(Collections.Order, Order, baseOptions);
 
 export default {
   subscribe: _subscribe,
 
-  create: async (userId: RecordIdString, items: CartItem[]) => {
+  create: async (userId: RecordIdString, items: CartItem[], missingInformation: boolean) => {
     const orderItemIds = await Promise.all(
       items.map(async (item) => {
         const orderItemResponse = await pb.collection(Collections.OrderItem).create({
@@ -49,12 +55,20 @@ export default {
       customer: userId,
       items: orderItemIds,
       state: State.received,
-      payment_fulfilled: false
+      missing_information: missingInformation
     });
   },
 
-  updateState: (orderId: RecordIdString, state: State) => {
-    pb.collection(Collections.Order).update(orderId, { state });
+  updateState: async (orderId: RecordIdString, state: State) => {
+    const order = await pb.collection(Collections.Order).getOne(orderId);
+
+    actionHistory.push({
+      action: "updateState",
+      orderId: orderId,
+      previousState: order.state
+    });
+
+    await pb.collection(Collections.Order).update(orderId, { state });
   },
 
   setAll: async (state: State) => {
@@ -62,6 +76,23 @@ export default {
     orders.map((order) => {
       pb.collection(Collections.Order).update(order.id, { state });
     });
+  },
+
+  // TODO: maybe something cleaner and more generic https://1000experiments.dev/posts/command-store
+  undoLastAction: async () => {
+    if (actionHistory.length === 0) {
+      return;
+    }
+
+    const lastAction = actionHistory.pop();
+
+    switch (lastAction!.action) {
+      case "updateState":
+        pb.collection(Collections.Order).update(lastAction!.orderId, {
+          state: lastAction!.previousState
+        });
+        break;
+    }
   }
 };
 
