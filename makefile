@@ -1,6 +1,8 @@
 export
 -include .env.development
 
+LOCAL_PB_HOST ?= http://localhost:8080
+
 default: dev
 
 dev: sync pb_types svelte_types
@@ -15,6 +17,7 @@ pb_types:
 		--email $(PB_ADMIN_EMAIL) \
 		--password $(PB_ADMIN_PASSWORD) \
 		--out ./src/lib/pocketbase/index.d.ts
+
 
 # ordinarily run as part of NPM pipeline.
 # Run manually, since we're not relying on that

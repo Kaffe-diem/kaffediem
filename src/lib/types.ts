@@ -157,7 +157,7 @@ export class Item implements RecordBase {
       data.price_nok,
       data.category,
       data.image,
-      pb.files.getUrl(data, data.image),
+      pb.files.getURL(data, data.image),
       data.enable
     );
   }

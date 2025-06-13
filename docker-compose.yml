@@ -9,9 +9,17 @@ services:
       - PB_ADMIN_PASSWORD=${PB_ADMIN_PASSWORD}
       - PB_TEST_ADMIN_EMAIL=${PB_TEST_ADMIN_EMAIL}
       - PB_TEST_ADMIN_PASSWORD=${PB_TEST_ADMIN_PASSWORD}
+      - POCKETBASE_ENVIRONMENT=${COOLIFY_BRANCH_SLUG:-dev}
     volumes:
-      - "./pocketbase/pb_data:/app/pb_data"
-      - "./pocketbase/pb_migrations:/app/pb_migrations"
+      - pbdata:/app/pb_data
+      - svelte_kit_data:/app/.svelte-kit      
+    depends_on:
+      pb:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pb-${COOLIFY_BRANCH_SLUG:-dev}.rule=Host(`pb-${COOLIFY_BRANCH_SLUG:-dev}.kaffediem-backend.asvg.codes`)"
+      - "traefik.http.routers.pb-${COOLIFY_BRANCH_SLUG:-dev}.entrypoints=web"
     restart: unless-stopped
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:8080/api/health || exit 1
@@ -31,12 +39,7 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=development
-      - PUBLIC_PB_HOST=${PUBLIC_PB_HOST}
-    volumes:
-      - svelte_kit_data:/app/.svelte-kit
-    depends_on:
-      pb:
-        condition: service_healthy
+      - PUBLIC_PB_HOST=${PUBLIC_PB_HOST:-https://pb-${COOLIFY_BRANCH_SLUG:-dev}.kaffediem-backend.asvg.codes}
     develop:
       watch:
         - action: sync
@@ -68,3 +71,5 @@ services:
 
 volumes:
   svelte_kit_data:
+  pbdata:
+    name: "pbdata-${COOLIFY_BRANCH_SLUG:-dev}"
