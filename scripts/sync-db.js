@@ -103,7 +103,7 @@ const logBackupInfo = (backup) => {
 
 const downloadAndExtractBackup = async (pb, backup, pbDataDir) => {
   const token = await getFileToken(pb);
-  const downloadUrl = pb.backups.getDownloadUrl(token, backup.key);
+  const downloadUrl = pb.backups.getDownloadURL(token, backup.key);
   const outputPath = await downloadBackupFile(downloadUrl, backup.key, pbDataDir);
 
   if (backup.key.endsWith(".zip")) {
@@ -128,7 +128,7 @@ const downloadBackupFile = async (downloadUrl, backupKey, pbDataDir) => {
 };
 
 const ensurePbDataDir = () => {
-  const pbDataDir = path.resolve("./pocketbase/pb_data");
+  const pbDataDir = path.resolve(process.cwd(), "pocketbase/pb_data");
   if (!fs.existsSync(pbDataDir)) {
     fs.mkdirSync(pbDataDir, { recursive: true });
   }
