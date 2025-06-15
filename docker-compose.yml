@@ -18,6 +18,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    labels:
+      - "traefik.http.services.pb.loadbalancer.server.port=8080"
   app:
     build:
       context: .
