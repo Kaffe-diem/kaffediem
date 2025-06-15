@@ -1,8 +1,8 @@
 services:
   pb:
     build: ./pocketbase
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
     environment:
       - PUBLIC_PB_HOST=${PUBLIC_PB_HOST}
       - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL}
