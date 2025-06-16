@@ -11,4 +11,4 @@ WORKDIR /app
 
 EXPOSE 8081
 
-CMD ["--dir=/app/pb_data", "--origins=http://localhost:5173,http://app:5173"]
+ENTRYPOINT ["/app/pocketbase", "serve", "--http=0.0.0.0:8081", "--dir=/app/pb_data", "--origins=http://localhost:5173,http://app:5173"]
