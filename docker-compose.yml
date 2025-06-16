@@ -1,8 +1,6 @@
 services:
   pb:
     build: ./pocketbase
-    ports:
-      - "8081:8081"
     environment:
       - PUBLIC_PB_HOST=${PUBLIC_PB_HOST}
       - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL}
@@ -23,50 +21,15 @@ services:
   app:
     build:
       context: .
-      target: development
+      target: production
       args:
         - PUBLIC_PB_HOST_PROD=${PUBLIC_PB_HOST_PROD}
         - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL}
         - PB_ADMIN_PASSWORD=${PB_ADMIN_PASSWORD}
-    ports:
-      - "5173:5173"
     restart: unless-stopped
     environment:
-      - NODE_ENV=development
-      - PUBLIC_PB_HOST=${PUBLIC_PB_HOST}
-    volumes:
-      - svelte_kit_data:/app/.svelte-kit
+      - NODE_ENV=production
+      - PUBLIC_PB_HOST=${PUBLIC_PB_HOST_PROD}
     depends_on:
       pb:
-        condition: service_healthy
-    develop:
-      watch:
-        - action: sync
-          path: ./src
-          target: /app/src
-          ignore:
-            - "node_modules/"
-            - "**/*.test.ts"
-            - "**/*.spec.ts"
-        - action: sync
-          path: ./static
-          target: /app/static
-
-        - action: sync+restart
-          path: ./vite.config.ts
-          target: /app/vite.config.ts
-        - action: sync+restart
-          path: ./svelte.config.js
-          target: /app/svelte.config.js
-        - action: sync+restart
-          path: ./tsconfig.json
-          target: /app/tsconfig.json
-        - action: sync+restart
-          path: ./.env
-          target: /app/.env
-
-        - action: rebuild
-          path: package.json
-
-volumes:
-  svelte_kit_data:
+        condition: service_healthy 
