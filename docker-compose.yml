@@ -1,4 +1,20 @@
 services:
+  app:
+    build:
+      context: .
+      target: production
+      args:
+        - PUBLIC_PB_HOST_PROD=${PUBLIC_PB_HOST_PROD}
+        - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL}
+        - PB_ADMIN_PASSWORD=${PB_ADMIN_PASSWORD}
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PUBLIC_PB_HOST=${PUBLIC_PB_HOST_PROD}
+    depends_on:
+      pb:
+        condition: service_healthy 
+
   pb:
     build: ./pocketbase
     environment:
@@ -16,24 +32,3 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-    labels:
-      - "traefik.http.services.pb.loadbalancer.server.port=8081"
-      - traefik.http.middlewares.redirect-to-http.redirectscheme.scheme=http
-
-  app:
-    build:
-      context: .
-      target: production
-      labels:
-        - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=http"
-      args:
-        - PUBLIC_PB_HOST_PROD=${PUBLIC_PB_HOST_PROD}
-        - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL}
-        - PB_ADMIN_PASSWORD=${PB_ADMIN_PASSWORD}
-    restart: unless-stopped
-    environment:
-      - NODE_ENV=production
-      - PUBLIC_PB_HOST=${PUBLIC_PB_HOST_PROD}
-    depends_on:
-      pb:
-        condition: service_healthy 
