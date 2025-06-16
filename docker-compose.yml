@@ -18,10 +18,14 @@ services:
       retries: 5
     labels:
       - "traefik.http.services.pb.loadbalancer.server.port=8081"
+      - traefik.http.middlewares.redirect-to-http.redirectscheme.scheme=http
+
   app:
     build:
       context: .
       target: production
+      labels:
+        - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=http"
       args:
         - PUBLIC_PB_HOST_PROD=${PUBLIC_PB_HOST_PROD}
         - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL}
