@@ -9,6 +9,6 @@ COPY ./pb_migrations /app/pb_migrations
 
 WORKDIR /app
 
-EXPOSE 8080
+EXPOSE 8081
 
 CMD ["--dir=/app/pb_data", "--origins=http://localhost:5173,http://app:5173"]

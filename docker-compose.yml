@@ -1,8 +1,8 @@
 services:
   pb:
     build: ./pocketbase
-    expose:
-      - "8080"
+    ports:
+      - "8081:8081"
     environment:
       - PUBLIC_PB_HOST=${PUBLIC_PB_HOST}
       - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL}
@@ -19,7 +19,7 @@ services:
       timeout: 5s
       retries: 5
     labels:
-      - "traefik.http.services.pb.loadbalancer.server.port=8080"
+      - "traefik.http.services.pb.loadbalancer.server.port=8081"
   app:
     build:
       context: .
