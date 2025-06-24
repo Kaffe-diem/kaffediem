@@ -5,8 +5,6 @@ ARG PB_VERSION=0.28.4
 RUN apk add --no-cache \
     unzip \
     ca-certificates \
-    nodejs \
-    npm \
     # this is needed only if you want to use scp to copy later your pb_data locally
     openssh
 
@@ -14,10 +12,6 @@ RUN apk add --no-cache \
 ADD https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_amd64.zip /tmp/pb.zip
 RUN unzip /tmp/pb.zip -d /pb/
 
-COPY pocketbase/package.json /app/package.json
-RUN cd /app && npm install
-
-COPY scripts/sync-db.js /app/sync-db.js
 
 # uncomment to copy the local pb_migrations dir into the container
 # COPY ./pb_migrations /pb/pb_migrations
