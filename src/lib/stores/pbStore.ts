@@ -1,6 +1,7 @@
 import pb, { Collections, type RecordIdString } from "$lib/pocketbase";
 import { writable } from "svelte/store";
 import { type RecordBase } from "$lib/types";
+import { browser } from "$app/environment";
 
 // ref: https://github.com/pocketbase/js-sdk?tab=readme-ov-file#nodejs-via-npm
 import eventsource from "eventsource";
@@ -16,35 +17,37 @@ export function createPbStore<Collection extends Collections, RecordClass extend
 ) {
   const { subscribe, set, update } = writable<RecordClass[]>([]);
 
-  (async () => {
-    const initialData = await pb.collection(collection).getFullList(fetchOptions);
-    set(initialData.map(recordClass.fromPb));
+  if (browser) {
+    (async () => {
+      const initialData = await pb.collection(collection).getFullList(fetchOptions);
+      set(initialData.map(recordClass.fromPb));
 
-    pb.collection(collection).subscribe(
-      "*",
-      (event) => {
-        update((state) => {
-          const itemIndex = state.findIndex((item) => item.id == event.record.id);
-          const item = recordClass.fromPb(event.record);
+      pb.collection(collection).subscribe(
+        "*",
+        (event) => {
+          update((state) => {
+            const itemIndex = state.findIndex((item) => item.id == event.record.id);
+            const item = recordClass.fromPb(event.record);
 
-          switch (event.action) {
-            case "create":
-              state.push(item);
-              break;
-            case "update":
-              if (itemIndex !== -1) state[itemIndex] = item;
-              break;
-            case "delete":
-              if (itemIndex !== -1) state.splice(itemIndex, 1);
-              break;
-          }
+            switch (event.action) {
+              case "create":
+                state.push(item);
+                break;
+              case "update":
+                if (itemIndex !== -1) state[itemIndex] = item;
+                break;
+              case "delete":
+                if (itemIndex !== -1) state.splice(itemIndex, 1);
+                break;
+            }
 
-          return state;
-        });
-      },
-      subscribeOptions
-    );
-  })();
+            return state;
+          });
+        },
+        subscribeOptions
+      );
+    })();
+  }
 
   return subscribe;
 }
