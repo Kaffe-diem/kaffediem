@@ -2,7 +2,7 @@ import { createGenericPbStore } from "$stores/pbStore";
 import pb, { Collections, type MessageResponse } from "$lib/pocketbase";
 import { Message, Status } from "$lib/types";
 import { writable } from "svelte/store";
-import { browser } from '$app/environment';
+import { browser } from "$app/environment";
 
 import eventsource from "eventsource";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
