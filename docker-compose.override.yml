@@ -1,0 +1,45 @@
+services:
+  pb:
+    ports:
+      - "8081:8081"
+  app:
+    build:
+      target: development
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+      - PUBLIC_PB_HOST=${PUBLIC_PB_HOST}
+    volumes:
+      - svelte_kit_data:/app/.svelte-kit
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+          ignore:
+            - "node_modules/"
+            - "**/*.test.ts"
+            - "**/*.spec.ts"
+        - action: sync
+          path: ./static
+          target: /app/static
+
+        - action: sync+restart
+          path: ./vite.config.ts
+          target: /app/vite.config.ts
+        - action: sync+restart
+          path: ./svelte.config.js
+          target: /app/svelte.config.js
+        - action: sync+restart
+          path: ./tsconfig.json
+          target: /app/tsconfig.json
+        - action: sync+restart
+          path: ./.env
+          target: /app/.env
+
+        - action: rebuild
+          path: package.json
+
+volumes:
+  svelte_kit_data:
