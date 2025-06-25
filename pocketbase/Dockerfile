@@ -1,14 +1,12 @@
-FROM alpine:latest
+FROM node:20.11-slim
 
 ARG PB_VERSION=0.28.4
 
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
     unzip \
     ca-certificates \
-    # this is needed only if you want to use scp to copy later your pb_data locally
-    openssh \
-    nodejs \
-    npm
+    wget \
+    && rm -rf /var/lib/apt/lists/*
 
 # download and unzip PocketBase
 ADD https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_amd64.zip /tmp/pb.zip
@@ -22,7 +20,6 @@ RUN npm ci
 COPY scripts/sync-db.js ./scripts/
 COPY pocketbase/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
-
 
 # uncomment to copy the local pb_migrations dir into the container
 # COPY ./pb_migrations /pb/pb_migrations
