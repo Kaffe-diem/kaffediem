@@ -18,8 +18,6 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY scripts/sync-db.js ./scripts/
-COPY pocketbase/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # uncomment to copy the local pb_migrations dir into the container
 # COPY ./pb_migrations /pb/pb_migrations
@@ -30,5 +28,4 @@ EXPOSE 8081
 ENV PORT=8081
 
 # start PocketBase
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:8081", "--dir=/app/pb_data", "--migrationsDir=/app/pb_migrations"]
