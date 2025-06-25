@@ -1,9 +1,8 @@
-import { PUBLIC_PB_HOST } from "$env/static/public";
 import { browser } from "$app/environment";
 
 export const getPocketBasePath = (): string => {
 	if (!browser) {
-		return "http://pb:8081";
+    return "http://pb:8081";
 	}
 
 	const { hostname } = window.location;
@@ -17,5 +16,5 @@ export const getPocketBasePath = (): string => {
 		return `https://${subdomain}.kaffebase.okpl.us`;
 	}
 
-	return PUBLIC_PB_HOST;
+  return "http://0.0.0.0:8081";
 };
