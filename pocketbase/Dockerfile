@@ -6,11 +6,22 @@ RUN apk add --no-cache \
     unzip \
     ca-certificates \
     # this is needed only if you want to use scp to copy later your pb_data locally
-    openssh
+    openssh \
+    nodejs \
+    npm
 
 # download and unzip PocketBase
 ADD https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_amd64.zip /tmp/pb.zip
 RUN unzip /tmp/pb.zip -d /pb/
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY scripts/sync-db.js ./scripts/
+COPY pocketbase/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 
 # uncomment to copy the local pb_migrations dir into the container
@@ -22,4 +33,5 @@ EXPOSE 8081
 ENV PORT=8081
 
 # start PocketBase
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:8081", "--dir=/app/pb_data", "--migrationsDir=/app/pb_migrations"]
