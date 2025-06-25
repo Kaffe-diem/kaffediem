@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# Exit on error
-set -e
-
 # Check if we are on a preview branch (not main)
 if [ -n "$COOLIFY_BRANCH" ] && [ "$COOLIFY_BRANCH" != "main" ]; then
   echo "Preview branch '$COOLIFY_BRANCH' detected. Running db sync..."
@@ -24,4 +21,4 @@ fi
 
 echo "Starting PocketBase..."
 # Execute the original command
-exec /pb/pocketbase serve --http=0.0.0.0:8081 --dir=/app/pb_data --migrationsDir=/app/pb_migrations 
+exec "$@" 
