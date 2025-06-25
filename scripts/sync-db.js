@@ -128,7 +128,7 @@ const downloadBackupFile = async (downloadUrl, backupKey, pbDataDir) => {
 };
 
 const ensurePbDataDir = () => {
-  const pbDataDir = path.resolve("./pocketbase/pb_data");
+  const pbDataDir = path.resolve("./pb_data");
   if (!fs.existsSync(pbDataDir)) {
     fs.mkdirSync(pbDataDir, { recursive: true });
   }
