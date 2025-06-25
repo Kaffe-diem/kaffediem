@@ -75,7 +75,7 @@ const validateArgs = (args) => {
 
 const authenticateAdmin = async (pb, email, password) => {
   console.log("Authenticating as superuser...");
-  await pb.collection("_superusers").authWithPassword(email, password);
+  await pb.admins.authWithPassword(email, password);
 };
 
 const getLatestBackup = async (pb) => {
