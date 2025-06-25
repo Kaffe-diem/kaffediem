@@ -43,7 +43,7 @@ const main = async () => {
       `✅ Backup ${latestRemoteBackup.key} downloaded and extracted successfully. Local version updated.`
     );
   } catch (error) {
-    console.error("❌ Error:", error.message);
+    console.error("❌ Error:", error.message, error.stack);
     process.exit(1);
   }
 };
