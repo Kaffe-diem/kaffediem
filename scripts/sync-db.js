@@ -166,8 +166,8 @@ const extractBackup = async (outputPath) => {
     await execAsync(`unzip -o "${outputPath}" -d "${pbDataDir}"`);
     console.log(`📂 Extracted to: ${pbDataDir}`);
 
-    fs.unlinkSync(outputPath);
-    console.log("🗑️  Removed zip file");
+    // fs.unlinkSync(outputPath);
+    // console.log("🗑️  Removed zip file");
   } catch (error) {
     console.error("❌ Extraction failed:", error.message);
     console.log("💾 Zip file preserved at:", outputPath);
