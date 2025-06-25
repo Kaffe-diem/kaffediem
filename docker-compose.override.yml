@@ -2,6 +2,9 @@ services:
   pb:
     ports:
       - "8081:8081"
+    volumes:
+      - ./pocketbase/pb_data:/app/pb_data
+      - ./pocketbase/pb_migrations:/app/pb_migrations
   app:
     build:
       target: development
