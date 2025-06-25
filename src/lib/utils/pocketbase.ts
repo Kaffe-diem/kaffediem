@@ -13,7 +13,7 @@ export const getPocketBasePath = (): string => {
 
   if (hostname.endsWith(".kaffediem.okpl.us")) {
     const subdomain = hostname.split(".")[0];
-    return `https://${subdomain}.kaffebase.okpl.us`;
+    return `http://${subdomain}.kaffebase.okpl.us`;
   }
 
   if (hostname === "localhost" || hostname === "127.0.0.1") {
