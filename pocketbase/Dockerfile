@@ -28,4 +28,4 @@ EXPOSE 8081
 ENV PORT=8081
 
 # start PocketBase
-CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:8081", "--dir=/app/pb_data", "--migrationsDir=/app/pb_migrations", "--origins=https://kaffediem.okpl.us,https://*.kaffediem.okpl.us"]
+CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:8081", "--dir=/app/pb_data", "--migrationsDir=/app/pb_migrations", "--origins=https://kaffediem.okpl.us,https://*.kaffediem.okpl.us,http://app:3000"]
