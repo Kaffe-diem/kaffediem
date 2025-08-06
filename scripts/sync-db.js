@@ -43,7 +43,7 @@ const main = async () => {
       `✅ Backup ${latestRemoteBackup.key} downloaded and extracted successfully. Local version updated.`
     );
   } catch (error) {
-    console.error("❌ Error:", error.message);
+    console.error("❌ Error:", error.message, error);
     process.exit(1);
   }
 };
@@ -75,7 +75,7 @@ const validateArgs = (args) => {
 
 const authenticateAdmin = async (pb, email, password) => {
   console.log("Authenticating as superuser...");
-  await pb.collection("_superusers").authWithPassword(email, password);
+  await pb.admins.authWithPassword(email, password);
 };
 
 const getLatestBackup = async (pb) => {
@@ -128,7 +128,7 @@ const downloadBackupFile = async (downloadUrl, backupKey, pbDataDir) => {
 };
 
 const ensurePbDataDir = () => {
-  const pbDataDir = path.resolve("./pocketbase/pb_data");
+  const pbDataDir = path.resolve("./pb_data");
   if (!fs.existsSync(pbDataDir)) {
     fs.mkdirSync(pbDataDir, { recursive: true });
   }
@@ -166,8 +166,8 @@ const extractBackup = async (outputPath) => {
     await execAsync(`unzip -o "${outputPath}" -d "${pbDataDir}"`);
     console.log(`📂 Extracted to: ${pbDataDir}`);
 
-    fs.unlinkSync(outputPath);
-    console.log("🗑️  Removed zip file");
+    // fs.unlinkSync(outputPath);
+    // console.log("🗑️  Removed zip file");
   } catch (error) {
     console.error("❌ Extraction failed:", error.message);
     console.log("💾 Zip file preserved at:", outputPath);
