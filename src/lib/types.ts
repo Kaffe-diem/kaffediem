@@ -46,7 +46,7 @@ export class User {
   ) {}
 
   static fromPb(data: AuthModel): User {
-    return new User(data!.id, data!.name, data!.is_admin);
+    return new User(data?.id ?? "", data?.name, data?.is_admin);
   }
 }
 
@@ -157,7 +157,7 @@ export class Item implements RecordBase {
       data.price_nok,
       data.category,
       data.image,
-      pb.files.getUrl(data, data.image),
+      pb.files.getURL(data, data.image),
       data.enable
     );
   }
