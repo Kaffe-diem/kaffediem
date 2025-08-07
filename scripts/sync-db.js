@@ -103,7 +103,7 @@ const logBackupInfo = (backup) => {
 
 const downloadAndExtractBackup = async (pb, backup, pbDataDir) => {
   const token = await getFileToken(pb);
-  const downloadUrl = pb.backups.getDownloadUrl(token, backup.key);
+  const downloadUrl = pb.backups.getDownloadURL(token, backup.key);
   const outputPath = await downloadBackupFile(downloadUrl, backup.key, pbDataDir);
 
   if (backup.key.endsWith(".zip")) {
