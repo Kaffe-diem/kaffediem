@@ -1,4 +1,5 @@
 import { browser } from "$app/environment";
+import { PUBLIC_PB_HOST } from "$env/static/public";
 
 export const getPocketBasePath = (): string => {
   if (!browser) {
@@ -8,12 +9,18 @@ export const getPocketBasePath = (): string => {
   const { hostname } = window.location;
 
   if (hostname === "kaffediem.okpl.us") {
-    return "https://kaffebase.okpl.us";
+    return PUBLIC_PB_HOST;
   }
 
   if (hostname.endsWith(".kaffediem.okpl.us")) {
     const subdomain = hostname.split(".")[0];
-    return `http://${subdomain}.kaffebase.okpl.us`;
+    try {
+      const baseUrl = new URL(PUBLIC_PB_HOST);
+      baseUrl.hostname = `${subdomain}.${baseUrl.hostname}`;
+      return baseUrl.href.replace(/\/$/, "");
+    } catch {
+      return PUBLIC_PB_HOST;
+    }
   }
 
   if (hostname === "localhost" || hostname === "127.0.0.1") {
