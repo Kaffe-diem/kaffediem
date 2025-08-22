@@ -14,10 +14,7 @@ RUN unzip /tmp/pb.zip -d /pb/
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm ci
 
-COPY scripts/sync-db.js ./scripts/
 
 # uncomment to copy the local pb_migrations dir into the container
 # COPY ./pb_migrations /pb/pb_migrations

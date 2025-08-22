@@ -9,11 +9,11 @@ primary_region = 'arn'
 [build]
 
 [mounts]
-  destination = "/pb/pb_data"
-  source = "pb_data"
+  source = 'pb_data'
+  destination = '/app/pb_data'
 
 [http_service]
-  internal_port = 8080
+  internal_port = 8081
   force_https = true
   auto_stop_machines = 'stop'
   auto_start_machines = true
