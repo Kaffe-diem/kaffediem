@@ -15,7 +15,7 @@
 
   <div class="divider divider-horizontal m-0 p-0"></div>
 
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col">
     <CustomizationSelection />
     <Cart {selectedItem} />
   </div>
@@ -29,6 +29,6 @@
       label="Ferdig"
       detailed={false}
     />
-    <button class="btn btn-lg" onclick={() => orders.undoLastAction()}>oops</button>
+    <button class="btn btn-lg mb-16 2xl:mb-0" onclick={() => orders.undoLastAction()}>oops</button>
   </div>
 </div>

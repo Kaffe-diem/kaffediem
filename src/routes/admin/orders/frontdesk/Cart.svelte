@@ -13,6 +13,7 @@
   import { type Item, type CustomizationValue } from "$lib/types";
   import orders from "$stores/orderStore";
   import CommentIcon from "$assets/CommentIcon.svelte";
+  import CompleteOrder from "$assets/CompleteOrder.svelte";
 
   let { selectedItem } = $props<{
     selectedItem: Item | undefined;
@@ -46,18 +47,18 @@
           ? 'ring-lg ring-warning bg-warning shadow-xl ring'
           : ''} flex transition-all duration-300 ease-in-out hover:brightness-90 focus:outline-none"
       >
-        <span class="text-3xl"><CommentIcon /></span>
+        <span class="text-2xl"><CommentIcon /></span>
       </div>
     </label>
-    <button class="bold btn btn-lg text-xl" onclick={completeOrder}
-      >Ferdig ({$orders.length + 100})</button
+    <button class="bold btn btn-lg" onclick={completeOrder}
+      ><CompleteOrder />{$orders.length + 100}</button
     >
-    <button class="bold btn btn-primary btn-lg text-3xl" onclick={handleAddToCart}>+</button>
+    <button class="bold btn btn-lg btn-primary text-3xl" onclick={handleAddToCart}>+</button>
   </div>
 </div>
 
 {#snippet CartDisplay()}
-  <div class="overflow-y-auto">
+  <div class="overflow-y-auto {missing_information ? 'bg-warning' : ''}">
     <table class="table-pin-rows table table-auto list-none shadow-2xl">
       <thead class="sr-only">
         <tr>
@@ -111,16 +112,14 @@
 
 {#snippet EmptyCartRow()}
   <tr>
-    <td>Ingenting</td>
+    <td class="italic">Ingenting</td>
     <td></td>
   </tr>
 {/snippet}
 
 {#snippet CartFooter()}
-  <tfoot>
-    <tr>
-      <th>Total: <span class="text-neutral">{$cart.length}</span></th>
-      <th><span class="text-bold text-primary text-lg">{$totalPrice},-</span></th>
-    </tr>
-  </tfoot>
+  <tr>
+    <th>Total: {$cart.length}</th>
+    <th class="text-primary">{$totalPrice},-</th>
+  </tr>
 {/snippet}

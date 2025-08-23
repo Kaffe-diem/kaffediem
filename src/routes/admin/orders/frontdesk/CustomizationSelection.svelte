@@ -18,7 +18,7 @@
 </script>
 
 <div class="grid h-full grid-rows-[1fr_auto] overflow-y-auto">
-  <div class="grid-auto-flow-column grid auto-rows-min gap-x-6 gap-y-4 md:grid-cols-2">
+  <div class="grid-auto-flow-column grid grid-cols-2">
     {#each $customizationKeys as key}
       {#if key.enabled}
         {@render CustomizationCategory({ key })}
@@ -49,7 +49,7 @@
     style="background-color: {selected ? key.labelColor : ''};"
     onclick={() => selectCustomization(key.id, value)}
   >
-    <span class="flex w-full justify-between">
+    <span class="flex w-full justify-between font-normal">
       <span>{value.name}</span>
       {#if value.priceChange != 0 && value.constantPrice}
         <span>{value.priceChange},-</span>
