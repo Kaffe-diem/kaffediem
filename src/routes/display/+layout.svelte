@@ -17,7 +17,7 @@
     <span class="p-2 text-4xl md:text-6xl">{$status.message.subtitle}</span>
   </div>
 {:else}
-  <main class="relative mx-auto h-screen w-11/12 cursor-none py-4">
+  <main class="relative min-h-screen w-full cursor-none py-4">
     {@render children?.()}
   </main>
 {/if}
