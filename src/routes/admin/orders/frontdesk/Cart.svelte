@@ -37,22 +37,38 @@
 </script>
 
 <div class="flex flex-col justify-between gap-4">
-  {@render CartDisplay()}
+  {#if $cart.length > 0}
+    {@render CartDisplay()}
+  {/if}
 
   <div class="flex flex-row justify-center gap-2">
-    <label>
-      <input type="checkbox" name="item" class="peer hidden" bind:checked={missing_information} />
-      <div
-        class="btn btn-lg {missing_information
-          ? 'ring-lg ring-warning bg-warning shadow-xl ring'
-          : ''} flex transition-all duration-300 ease-in-out hover:brightness-90 focus:outline-none"
-      >
-        <span class="text-2xl"><CommentIcon /></span>
-      </div>
-    </label>
-    <button class="bold btn btn-lg" onclick={completeOrder}
-      ><CompleteOrder />{$orders.length + 100}</button
-    >
+    <div class="relative inline-flex items-center gap-2">
+      <label class={$cart.length > 0 ? "" : "invisible"}>
+        <input type="checkbox" name="item" class="peer hidden" bind:checked={missing_information} />
+        <div
+          class="btn btn-lg {missing_information
+            ? 'ring-lg ring-warning bg-warning shadow-xl ring'
+            : ''} flex hover:brightness-90 focus:outline-none"
+        >
+          <span class="text-2xl"><CommentIcon /></span>
+        </div>
+      </label>
+
+      <button class="bold btn btn-lg {$cart.length > 0 ? '' : 'invisible'}" onclick={completeOrder}>
+        <CompleteOrder />{$orders.length + 100}
+      </button>
+
+      {#if $orders.length > 0}
+        <span
+          class="{$cart.length > 0
+            ? 'hidden'
+            : ''} pointer-events-none absolute inset-0 flex items-center justify-center text-lg font-bold"
+        >
+          Forrige: {$orders.length + 100 - 1}
+        </span>
+      {/if}
+    </div>
+
     <button class="bold btn btn-lg btn-primary text-3xl" onclick={handleAddToCart}>+</button>
   </div>
 </div>
@@ -66,13 +82,9 @@
         </tr>
       </thead>
       <tbody>
-        {#if $cart.length > 0}
-          {#each $cart as item, index}
-            {@render CartItem({ item, index })}
-          {/each}
-        {:else}
-          {@render EmptyCartRow()}
-        {/if}
+        {#each $cart as item, index}
+          {@render CartItem({ item, index })}
+        {/each}
       </tbody>
       {@render CartFooter()}
     </table>
@@ -107,13 +119,6 @@
       </div>
     </td>
     <td>{item.price},-</td>
-  </tr>
-{/snippet}
-
-{#snippet EmptyCartRow()}
-  <tr>
-    <td class="italic">Ingenting</td>
-    <td></td>
   </tr>
 {/snippet}
 
