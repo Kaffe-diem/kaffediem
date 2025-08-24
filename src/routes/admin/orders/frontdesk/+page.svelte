@@ -29,6 +29,8 @@
       label="Ferdig"
       detailed={false}
     />
-    <button class="btn btn-lg mb-16 2xl:mb-0" onclick={() => orders.undoLastAction()}>oops</button>
+    <button class="btn btn-lg btn-error mb-16 2xl:mb-0" onclick={() => orders.undoLastAction()}
+      >oops</button
+    >
   </div>
 </div>
