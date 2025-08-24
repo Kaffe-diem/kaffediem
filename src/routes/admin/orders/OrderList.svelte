@@ -22,14 +22,18 @@
 
     return keys.find((key: CustomizationKey) => key.id === keyId);
   }
+
+  function amount() {
+    return $orders.filter((order) => order.state == show).length;
+  }
 </script>
 
 <div class="h-full w-full overflow-y-auto">
   <h2
-    class="text-neutral sticky pb-2 text-center text-4xl font-bold md:mb-6"
+    class="text-neutral sticky pb-2 text-center text-2xl font-bold md:mb-6"
     id="order-list-heading"
   >
-    {label}
+    {amount() > 0 ? label + " " + amount() : label}
   </h2>
   <table class="table" aria-labelledby="order-list-heading">
     <thead class="sr-only">
@@ -39,6 +43,9 @@
       </tr>
     </thead>
     <tbody class="space-y-4">
+      {#if amount() == 0}
+        <tr><td class="text-center italic">ingenting</td></tr>
+      {/if}
       {#each $orders.reverse() as order, index}
         {#if show.includes(order.state)}
           {@render OrderRow({

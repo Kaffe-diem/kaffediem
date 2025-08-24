@@ -15,5 +15,5 @@
     <OrderList show={[production]} onclick={completed} label="Lages" />
   </div>
 
-  <button class="btn btn-lg mt-4" onclick={() => orders.undoLastAction()}>oops</button>
+  <button class="btn btn-lg btn-error mt-4" onclick={() => orders.undoLastAction()}>oops</button>
 </div>
