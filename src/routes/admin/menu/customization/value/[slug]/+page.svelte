@@ -96,7 +96,7 @@
             bind:value={customizationPrice}
             placeholder="Prisendring"
           />
-          <button class="btn" onclick={handlePriceChangeType}
+          <button type="button" class="btn" onclick={handlePriceChangeType}
             >{#if customizationConstantPrice}+/-{:else}%{/if}</button
           >
         </label>
