@@ -28,16 +28,18 @@
 </div>
 
 {#snippet CustomizationCategory({ key }: { key: CustomizationKey })}
-  <div class="grid grid-cols-1 gap-y-2 p-2">
-    <div class="text-primary font-bold xl:text-xl">
-      {key.name}
+  {#if getValuesByKey(key.id).filter((value) => value.enabled).length > 0}
+    <div class="grid grid-cols-1 gap-y-2 p-2">
+      <div class="text-primary font-bold xl:text-xl">
+        {key.name}
+      </div>
+      {#each getValuesByKey(key.id) as value}
+        {#if value.enabled}
+          {@render CustomizationOption({ key, value })}
+        {/if}
+      {/each}
     </div>
-    {#each getValuesByKey(key.id) as value}
-      {#if value.enabled}
-        {@render CustomizationOption({ key, value })}
-      {/if}
-    {/each}
-  </div>
+  {/if}
 {/snippet}
 
 {#snippet CustomizationOption({ key, value }: { key: CustomizationKey; value: CustomizationValue })}

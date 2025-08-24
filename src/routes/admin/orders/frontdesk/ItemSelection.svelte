@@ -14,16 +14,18 @@
 </div>
 
 {#snippet CategorySection({ category }: { category: Category })}
-  <div class="mr-2 mb-4 ml-2">
-    <h1 class="text-primary mb-2 font-bold xl:text-xl">{category.name}</h1>
-    <div class="grid grid-cols-2 gap-4 xl:grid-cols-4">
-      {#each $itemsByCategory[category.id] ?? [] as item}
-        {#if item.enabled}
-          {@render ItemCard({ item })}
-        {/if}
-      {/each}
+  {#if ($itemsByCategory[category.id] ?? []).filter((item) => item.enabled).length > 0}
+    <div class="mr-2 mb-4 ml-2">
+      <h1 class="text-primary mb-2 font-bold xl:text-xl">{category.name}</h1>
+      <div class="grid grid-cols-2 gap-4 xl:grid-cols-4">
+        {#each $itemsByCategory[category.id] ?? [] as item}
+          {#if item.enabled}
+            {@render ItemCard({ item })}
+          {/if}
+        {/each}
+      </div>
     </div>
-  </div>
+  {/if}
 {/snippet}
 
 {#snippet ItemCard({ item }: { item: Item })}
