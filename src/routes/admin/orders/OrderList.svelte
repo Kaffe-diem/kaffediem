@@ -33,7 +33,7 @@
     class="text-neutral sticky pb-2 text-center text-2xl font-bold md:mb-6"
     id="order-list-heading"
   >
-    {amount() > 0 ? label + " " + amount() : label}
+    {amount() > 0 ? `${label}: ${amount()}` : label}
   </h2>
   <table class="table" aria-labelledby="order-list-heading">
     <thead class="sr-only">
