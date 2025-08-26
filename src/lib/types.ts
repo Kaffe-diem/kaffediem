@@ -46,7 +46,10 @@ export class User {
   ) {}
 
   static fromPb(data: AuthModel): User {
-    return new User(data?.id ?? "", data?.name, data?.is_admin);
+    if (!data) {
+      return new User("", "", false);
+    }
+    return new User(data?.id, data?.name, data?.is_admin);
   }
 }
 

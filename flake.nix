@@ -18,6 +18,7 @@
         pkgs: with pkgs; rec {
           default = mkShell {
             nativeBuildInputs = [
+              unzip
               # Nix
               nixd
               nixfmt-rfc-style
