@@ -12,7 +12,7 @@
     "@types/eslint": "^9.6.0",
     "autoprefixer": "^10.4.20",
     "daisyui": "^5.0.9",
-    "eslint": "^9.0.0",
+    "eslint": "^9.34.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-svelte": "^2.45.1",
     "globals": "^15.0.0",
