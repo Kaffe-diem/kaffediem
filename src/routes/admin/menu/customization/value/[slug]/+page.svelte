@@ -1,5 +1,4 @@
 <script lang="ts">
-  // @ts-expect-error Is present, but lint fails
   import type { PageProps } from "./$types";
   import { customizationKeys, customizationValues } from "$stores/menuStore";
   import { CustomizationValue } from "$lib/types";
