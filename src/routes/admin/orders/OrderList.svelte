@@ -50,7 +50,7 @@
         {#if show.includes(order.state)}
           {@render OrderRow({
             order,
-            orderNumber: $orders.length - index - 1 + 100
+            orderNumber: order.dayId
           })}
         {/if}
       {/each}
