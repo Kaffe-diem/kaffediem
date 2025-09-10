@@ -159,6 +159,7 @@ export enum OrderStateOptions {
 export type OrderRecord = {
 	created?: IsoDateString
 	customer?: RecordIdString
+	day_id?: number
 	id: string
 	items: RecordIdString[]
 	missing_information?: boolean

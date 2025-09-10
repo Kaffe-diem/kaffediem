@@ -30,7 +30,7 @@
 
   let missing_information = $state(false);
   function completeOrder() {
-    orderStore.create($auth.user.id, $cart, missing_information);
+    orderStore.create($auth.user.id, $cart, missing_information, $orders.length + 100);
     clearCart();
     missing_information = false;
   }

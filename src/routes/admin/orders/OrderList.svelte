@@ -46,11 +46,11 @@
       {#if amount() == 0}
         <tr><td class="text-center italic">ingenting</td></tr>
       {/if}
-      {#each $orders.reverse() as order, index}
+      {#each $orders.reverse() as order}
         {#if show.includes(order.state)}
           {@render OrderRow({
             order,
-            orderNumber: $orders.length - index - 1 + 100
+            orderNumber: order.dayId
           })}
         {/if}
       {/each}
