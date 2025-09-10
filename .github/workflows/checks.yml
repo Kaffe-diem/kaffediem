@@ -31,4 +31,4 @@ jobs:
         run: npm ci
 
       - name: Lint and check formatting
-        run: make lint
+        run: npx svelte-kit sync && npx svelte-check --tsconfig ./tsconfig.json && npx eslint src && npx prettier --check .
