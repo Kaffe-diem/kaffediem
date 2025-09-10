@@ -34,10 +34,7 @@ format:
 	@docker compose run --rm tools npx prettier --write .
 
 lint:
-	npx svelte-kit sync
-	npx svelte-check --tsconfig ./tsconfig.json
-	npx eslint src
-	npx prettier --check .
+	docker compose run --rm tools sh -c "npx svelte-kit sync && npx svelte-check --tsconfig ./tsconfig.json && npx eslint src && npx prettier --check ."
 
 clean:
 	-docker compose down -v --remove-orphans
