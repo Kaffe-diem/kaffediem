@@ -31,7 +31,7 @@ pb_up:
 	docker compose up --wait pb
 
 format:
-	npx prettier --write .
+	@docker compose run --rm tools npx prettier --write .
 
 lint:
 	npx svelte-kit sync

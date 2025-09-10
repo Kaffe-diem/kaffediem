@@ -5,7 +5,6 @@
   Original Author: Martin Kleiven & 🤖.
 */
 
-
 import PocketBase from "pocketbase";
 import fs from "fs";
 import path from "path";
@@ -211,19 +210,33 @@ const ensureSafeToWrite = async (pbDataDir, args) => {
   }
   fs.writeFileSync(lockPath, String(Date.now()));
   const cleanup = () => {
-    try { fs.unlinkSync(lockPath); } catch (e) { void e; }
+    try {
+      fs.unlinkSync(lockPath);
+    } catch (e) {
+      void e;
+    }
   };
   process.on("exit", cleanup);
-  process.on("SIGINT", () => { cleanup(); process.exit(1); });
-  process.on("SIGTERM", () => { cleanup(); process.exit(1); });
+  process.on("SIGINT", () => {
+    cleanup();
+    process.exit(1);
+  });
+  process.on("SIGTERM", () => {
+    cleanup();
+    process.exit(1);
+  });
   const localHealth = args.localHealth || "http://localhost:8081/api/health";
   try {
     const res = await fetch(localHealth, { method: "HEAD" });
     if (res.ok && args.force !== "true") {
-      console.error(`Refusing to modify pb_data while PocketBase is running at ${localHealth}. Re-run with --force=true if you know what you're doing.`);
+      console.error(
+        `Refusing to modify pb_data while PocketBase is running at ${localHealth}. Re-run with --force=true if you know what you're doing.`
+      );
       process.exit(1);
     }
-  } catch (e) { void e; }
+  } catch (e) {
+    void e;
+  }
 };
 
 const downloadFile = async (url, outputPath) => {
