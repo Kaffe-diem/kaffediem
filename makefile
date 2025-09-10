@@ -5,7 +5,7 @@ export
 default: dev
 
 dev: sync pb_types svelte_types
-	docker compose up --watch
+	docker compose watch
 
 build: pb_types
 	PUBLIC_PB_HOST=$(PUBLIC_PB_HOST_PROD) npx vite build
