@@ -17,7 +17,8 @@
     new AdminPage("/admin/orders/kitchen", "Kjøkken"),
     new AdminPage("/display", "Visning"),
     new AdminPage("/admin/message", "Rediger skjermmelding"),
-    new AdminPage("/admin/menu", "Rediger meny")
+    new AdminPage("/admin/menu", "Rediger meny"),
+    new AdminPage("/admin/orders/stats", "Dagens bestillinger")
   ];
 </script>
 
