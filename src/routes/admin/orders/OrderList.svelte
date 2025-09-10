@@ -12,7 +12,7 @@
     detailed = true
   } = $props<{
     show: OrderStateOptions[];
-    onclick: OrderStateOptions;
+    onclick?: OrderStateOptions;
     label: string;
     detailed?: boolean;
   }>();
@@ -24,7 +24,7 @@
   }
 
   function amount() {
-    return $orders.filter((order) => order.state == show).length;
+    return $orders.filter((order) => show.includes(order.state)).length;
   }
 </script>
 
@@ -65,7 +65,7 @@
       : 'bg-base-200 cursor-pointer'}  {order.missingInformation && detailed
       ? 'bg-warning ring-warning'
       : ''} mb-6 block rounded shadow-md transition-colors"
-    onclick={() => orders.updateState(order.id, onclick)}
+    onclick={() => onclick && orders.updateState(order.id, onclick)}
     role="button"
     tabindex="0"
     onkeydown={(e) => e.key === "Enter" && orders.updateState(order.id, onclick)}
