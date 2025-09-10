@@ -23,6 +23,14 @@ export const getPocketBasePath = (): string => {
     }
   }
 
+  if (hostname.endsWith(".app.github.dev")) {
+    const match = hostname.match(/^(.*)-\d+\.app\.github\.dev$/);
+    if (match) {
+      return `https://${match[1]}-8081.app.github.dev`;
+    }
+    return `https://${hostname}`;
+  }
+
   if (hostname === "localhost" || hostname === "127.0.0.1") {
     return "http://127.0.0.1:8081";
   }
