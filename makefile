@@ -38,3 +38,7 @@ lint:
 	npx svelte-check --tsconfig ./tsconfig.json
 	npx eslint src
 	npx prettier --check .
+
+clean:
+	-docker compose down -v --remove-orphans
+	-rm -rf ./pb_data
