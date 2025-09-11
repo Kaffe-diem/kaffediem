@@ -27,10 +27,10 @@ const actionHistory: {
 }[] = [];
 
 // Create the store so we can reference it in methods
-const _subscribe = createPbStore(Collections.Order, Order, baseOptions);
+export const raw_orders = createPbStore(Collections.Order, Order, baseOptions);
 
 export default {
-  subscribe: _subscribe,
+  ...raw_orders,
 
   create: async (
     userId: RecordIdString,
@@ -52,7 +52,7 @@ export default {
       })
     );
 
-    const _orderStore = get({ subscribe: _subscribe });
+    const _orderStore = get(raw_orders);
     const orderNumber = _orderStore.length + 100;
     toasts.success(orderNumber.toString(), 1500);
 

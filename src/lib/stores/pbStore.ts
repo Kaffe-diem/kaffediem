@@ -17,39 +17,45 @@ export function createPbStore<Collection extends Collections, RecordClass extend
 ) {
   const { subscribe, set, update } = writable<RecordClass[]>([]);
 
-  if (browser) {
-    (async () => {
-      const initialData = await pb.collection(collection).getFullList(fetchOptions);
-      set(initialData.map(recordClass.fromPb));
+  async function reset() {
+    const initialData = await pb.collection(collection).getFullList(fetchOptions);
+    set(initialData.map(recordClass.fromPb));
 
-      pb.collection(collection).subscribe(
-        "*",
-        (event) => {
-          update((state) => {
-            const itemIndex = state.findIndex((item) => item.id == event.record.id);
-            const item = recordClass.fromPb(event.record);
+    pb.collection(collection).unsubscribe();
+    pb.collection(collection).subscribe(
+      "*",
+      (event) => {
+        update((state) => {
+          const itemIndex = state.findIndex((item) => item.id == event.record.id);
+          const item = recordClass.fromPb(event.record);
 
-            switch (event.action) {
-              case "create":
-                state.push(item);
-                break;
-              case "update":
-                if (itemIndex !== -1) state[itemIndex] = item;
-                break;
-              case "delete":
-                if (itemIndex !== -1) state.splice(itemIndex, 1);
-                break;
-            }
+          switch (event.action) {
+            case "create":
+              state.push(item);
+              break;
+            case "update":
+              if (itemIndex !== -1) state[itemIndex] = item;
+              break;
+            case "delete":
+              if (itemIndex !== -1) state.splice(itemIndex, 1);
+              break;
+          }
 
-            return state;
-          });
-        },
-        subscribeOptions
-      );
-    })();
+          return state;
+        });
+      },
+      subscribeOptions
+    );
   }
 
-  return subscribe;
+  if (browser) {
+    reset();
+  }
+
+  return {
+    subscribe,
+    reset
+  };
 }
 
 export function createGenericPbStore<
@@ -63,7 +69,7 @@ export function createGenericPbStore<
   subscribeOptions: { [key: string]: string } = fetchOptions
 ) {
   return {
-    subscribe: createPbStore(collection, recordClass, fetchOptions, subscribeOptions),
+    ...createPbStore(collection, recordClass, fetchOptions, subscribeOptions),
     update: async (record: RecordClass) => {
       await pb.collection(collection).update(record.id, record.toPb());
     },
