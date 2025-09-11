@@ -12,15 +12,9 @@ Dette prosjektet har blitt utviklet på kodekafe. [Bli med på Discord!](https:/
 
 Det er nyttig å enten ha Linux eller WSL.
 
-Bemerk at node versjon 20 brukes. Det kan installeres med NVM:
+1. Last ned [docker](https://www.docker.com/)
 
-```bash
-nvm use 20
-```
-
-### Teste på lokal maskin (dependencies allerede installert, hvis ikke: `npm ci`)
-
-1. .env
+2. .env
 
 ```
 PUBLIC_PB_HOST_PROD=https://kodekafe-pocketbase.fly.dev
@@ -32,31 +26,4 @@ PB_ADMIN_PASSWORD=
 
 ```bash
 make
-```
-
-Man kan også kjøre Pocketbase lokalt via docker, dette er lurt om man skal endre på schema.
-
-```bash
-make db
-```
-
-### Hvis dependencies ikke er installert (for eksempel på rpi):
-
-1. Kopier `package.json` og `package-lock.json` til `build/`
-
-```bash
-cp {package.json,package-lock.json} build/
-cd build
-```
-
-2. Installer dependencies
-
-```bash
-npm ci --omit dev
-```
-
-3. Kjør serveren:
-
-```bash
-node .
 ```
