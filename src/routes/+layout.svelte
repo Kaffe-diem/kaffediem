@@ -4,6 +4,7 @@
   import Nav from "$components/Nav.svelte";
   import Footer from "$components/Footer.svelte";
   import Toast from "$components/Toast.svelte";
+  import { resetStores } from "$stores/util";
 
   import { hideNavbar, hideFooter } from "$lib/constants";
 
@@ -15,7 +16,7 @@
   function updateOnlineStatus() {
     const status = navigator.onLine;
     if (status && !get(isOnline)) {
-      console.log("Resetting stores!");
+      resetStores();
     }
     isOnline.set(navigator.onLine);
   }
