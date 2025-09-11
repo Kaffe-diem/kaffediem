@@ -1,0 +1,65 @@
+name: PocketBase backup and release
+
+on:
+  workflow_dispatch:
+    inputs:
+      host:
+        description: PocketBase host URL (overrides secret if provided)
+        required: false
+      force:
+        description: Force sync even if local PB is running
+        required: false
+        default: "true"
+  release:
+    types: [published]
+
+jobs:
+  sync-and-upload:
+    name: Sync DB and upload artifact
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Sync latest backup from PocketBase
+        env:
+          PB_HOST: ${{ secrets.PUBLIC_PB_HOST_PROD }}
+          PB_ADMIN_EMAIL: ${{ secrets.PB_ADMIN_EMAIL }}
+          PB_ADMIN_PASSWORD: ${{ secrets.PB_ADMIN_PASSWORD }}
+        run: |
+          node scripts/sync-db.js \
+            --host="$PB_HOST" \
+            --email="$PB_ADMIN_EMAIL" \
+            --password="$PB_ADMIN_PASSWORD" \
+            --force=${{ github.event.inputs.force || 'true' }}
+
+      - name: Determine latest backup file in pb_data
+        id: latest
+        run: |
+          file=$(ls -1t pb_data/*.zip | head -n1)
+          echo "file=$file" >> $GITHUB_OUTPUT
+          echo "name=$(basename "$file")" >> $GITHUB_OUTPUT
+
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.latest.outputs.name }}
+          path: ${{ steps.latest.outputs.file }}
+
+      - name: Attach to GitHub Release (when available)
+        if: github.event_name == 'release' && github.event.action == 'published'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.latest.outputs.file }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
