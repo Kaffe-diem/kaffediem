@@ -23,12 +23,14 @@ function createStatusStore() {
     const initialData = Status.fromPb(initialActiveMessage, initialMessages.map(Message.fromPb));
     set(initialData);
 
+    pb.collection(Collections.Status).unsubscribe();
     pb.collection(Collections.Status).subscribe("*", async (event) => {
       update((state) => {
         return Status.fromPb(event.record, state.messages);
       });
     });
 
+    pb.collection(Collections.Message).unsubscribe();
     pb.collection(Collections.Message).subscribe("*", (event) => {
       update((state) => {
         const itemIndex = state.messages.findIndex((item) => item.id == event.record.id);

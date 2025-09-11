@@ -4,10 +4,40 @@
   import Nav from "$components/Nav.svelte";
   import Footer from "$components/Footer.svelte";
   import Toast from "$components/Toast.svelte";
+  import { resetStores } from "$stores/util";
 
   import { hideNavbar, hideFooter } from "$lib/constants";
+
+  import { onMount } from "svelte";
+  import { writable, get } from "svelte/store";
+
+  const isOnline = writable(true);
+
+  function updateOnlineStatus() {
+    const status = navigator.onLine;
+    if (status && !get(isOnline)) {
+      resetStores();
+    }
+    isOnline.set(navigator.onLine);
+  }
+
+  onMount(updateOnlineStatus);
+
   let { children } = $props();
 </script>
+
+<svelte:window on:online={updateOnlineStatus} on:offline={updateOnlineStatus} />
+
+{#if !$isOnline}
+  <div
+    class="bg-base-100/50 fixed top-0 left-0 z-99 grid h-screen w-screen place-items-center backdrop-blur-sm"
+  >
+    <div class="flex flex-col items-center gap-8">
+      <span class="text-6xl">Mangler internett</span>
+      <span class="text-xl">Venter på internetttilkobling</span>
+    </div>
+  </div>
+{/if}
 
 <div class="grid min-h-screen grid-rows-[1fr_auto]">
   {#if hideNavbar.some((path) => $page.url.pathname.includes(path))}
