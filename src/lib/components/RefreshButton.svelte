@@ -11,7 +11,7 @@
 
   import { raw_orders, userOrders } from "$stores/orderStore";
   import orders from "$stores/orderStore";
-  // import { status } from "$stores/statusStore"; // TODO
+  import { status } from "$stores/statusStore";
 
   function reset() {
     categories.reset();
@@ -22,6 +22,7 @@
     raw_orders.reset();
     userOrders.reset();
     orders.reset();
+    status.reset();
   }
 </script>
 
