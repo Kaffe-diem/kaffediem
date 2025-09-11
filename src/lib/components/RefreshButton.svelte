@@ -1,4 +1,6 @@
 <script lang="ts">
+  import RefreshIcon from "$assets/RefreshIcon.svelte";
+
   import {
     categories,
     items,
@@ -23,4 +25,4 @@
   }
 </script>
 
-<button onclick={reset} class="btn btn-lg btn-secondary">r</button>
+<button onclick={reset} class="btn btn-lg btn-secondary"><RefreshIcon /></button>
