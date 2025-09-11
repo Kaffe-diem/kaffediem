@@ -33,7 +33,7 @@ jobs:
 
       - name: Sync latest backup from PocketBase
         env:
-          PB_HOST: ${{ secrets.PUBLIC_PB_HOST_PROD }}
+          PB_HOST: ${{ vars.PB_HOST }}
           PB_ADMIN_EMAIL: ${{ secrets.PB_ADMIN_EMAIL }}
           PB_ADMIN_PASSWORD: ${{ secrets.PB_ADMIN_PASSWORD }}
         run: |
