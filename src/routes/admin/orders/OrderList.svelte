@@ -12,7 +12,7 @@
     detailed = true
   } = $props<{
     show: OrderStateOptions[];
-    onclick: OrderStateOptions;
+    onclick?: OrderStateOptions;
     label: string;
     detailed?: boolean;
   }>();
@@ -22,14 +22,18 @@
 
     return keys.find((key: CustomizationKey) => key.id === keyId);
   }
+
+  function amount() {
+    return $orders.filter((order) => show.includes(order.state)).length;
+  }
 </script>
 
 <div class="h-full w-full overflow-y-auto">
   <h2
-    class="text-neutral sticky pb-2 text-center text-4xl font-bold md:mb-6"
+    class="text-neutral sticky pb-2 text-center text-2xl font-bold md:mb-6"
     id="order-list-heading"
   >
-    {label}
+    {amount() > 0 ? `${label}: ${amount()}` : label}
   </h2>
   <table class="table" aria-labelledby="order-list-heading">
     <thead class="sr-only">
@@ -39,11 +43,14 @@
       </tr>
     </thead>
     <tbody class="space-y-4">
-      {#each $orders.reverse() as order, index}
+      {#if amount() == 0}
+        <tr><td class="text-center italic">ingenting</td></tr>
+      {/if}
+      {#each $orders.reverse() as order}
         {#if show.includes(order.state)}
           {@render OrderRow({
             order,
-            orderNumber: $orders.length - index - 1 + 100
+            orderNumber: order.dayId
           })}
         {/if}
       {/each}
@@ -58,7 +65,7 @@
       : 'bg-base-200 cursor-pointer'}  {order.missingInformation && detailed
       ? 'bg-warning ring-warning'
       : ''} mb-6 block rounded shadow-md transition-colors"
-    onclick={() => orders.updateState(order.id, onclick)}
+    onclick={() => onclick && orders.updateState(order.id, onclick)}
     role="button"
     tabindex="0"
     onkeydown={(e) => e.key === "Enter" && orders.updateState(order.id, onclick)}

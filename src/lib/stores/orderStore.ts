@@ -27,12 +27,17 @@ const actionHistory: {
 }[] = [];
 
 // Create the store so we can reference it in methods
-const _subscribe = createPbStore(Collections.Order, Order, baseOptions);
+export const raw_orders = createPbStore(Collections.Order, Order, baseOptions);
 
 export default {
-  subscribe: _subscribe,
+  ...raw_orders,
 
-  create: async (userId: RecordIdString, items: CartItem[], missingInformation: boolean) => {
+  create: async (
+    userId: RecordIdString,
+    items: CartItem[],
+    missingInformation: boolean,
+    dayId: number
+  ) => {
     const orderItemIds = await Promise.all(
       items.map(async (item) => {
         const orderItemResponse = await pb.collection(Collections.OrderItem).create({
@@ -47,7 +52,7 @@ export default {
       })
     );
 
-    const _orderStore = get({ subscribe: _subscribe });
+    const _orderStore = get(raw_orders);
     const orderNumber = _orderStore.length + 100;
     toasts.success(orderNumber.toString(), 1500);
 
@@ -55,7 +60,8 @@ export default {
       customer: userId,
       items: orderItemIds,
       state: State.received,
-      missing_information: missingInformation
+      missing_information: missingInformation,
+      day_id: dayId
     });
   },
 

@@ -12,12 +12,12 @@
 </script>
 
 {#if $status?.online}
-  <div class="flex h-screen flex-col items-center justify-center text-center">
+  <div class="flex h-screen cursor-none flex-col items-center justify-center text-center">
     <span class="p-2 text-7xl font-bold md:text-9xl">{$status.message.title}</span>
     <span class="p-2 text-4xl md:text-6xl">{$status.message.subtitle}</span>
   </div>
 {:else}
-  <main class="relative mx-auto h-screen w-11/12 py-4">
+  <main class="relative min-h-screen w-full cursor-none py-4">
     {@render children?.()}
   </main>
 {/if}

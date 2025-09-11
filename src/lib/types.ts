@@ -46,6 +46,9 @@ export class User {
   ) {}
 
   static fromPb(data: AuthModel): User {
+    if (!data) {
+      return new User("", "", false);
+    }
     return new User(data?.id, data?.name, data?.is_admin);
   }
 }
@@ -59,12 +62,18 @@ export class Order implements RecordBase {
     public readonly id: RecordIdString,
     public readonly state: State,
     public readonly items: Array<OrderItem>,
-    public readonly missingInformation: boolean
+    public readonly missingInformation: boolean,
+    public readonly dayId: number
   ) {}
 
   // FIXME: implement correctly
   toPb() {
-    return { state: this.state, items: this.items, missing_information: this.missingInformation };
+    return {
+      state: this.state,
+      items: this.items,
+      missing_information: this.missingInformation,
+      day_id: this.dayId
+    };
   }
 
   static fromPb(data: ExpandedOrderRecord): Order {
@@ -72,7 +81,8 @@ export class Order implements RecordBase {
       data.id,
       data.state,
       data.expand.items.map(OrderItem.fromPb),
-      data.missing_information
+      data.missing_information,
+      data.day_id
     );
   }
 }
@@ -157,7 +167,7 @@ export class Item implements RecordBase {
       data.price_nok,
       data.category,
       data.image,
-      pb.files.getUrl(data, data.image),
+      pb.files.getURL(data, data.image),
       data.enable
     );
   }

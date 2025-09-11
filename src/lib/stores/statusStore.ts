@@ -2,6 +2,7 @@ import { createGenericPbStore } from "$stores/pbStore";
 import pb, { Collections, type MessageResponse } from "$lib/pocketbase";
 import { Message, Status } from "$lib/types";
 import { writable } from "svelte/store";
+import { browser } from "$app/environment";
 
 import eventsource from "eventsource";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -12,7 +13,7 @@ export const messages = createGenericPbStore(Collections.Message, Message);
 function createStatusStore() {
   const { subscribe, set, update } = writable(Status.baseValue);
 
-  (async () => {
+  async function reset() {
     // Only use the first record. Assumes that PB already has this and only this record.
     const initialActiveMessage = await pb.collection(Collections.Status).getFirstListItem("");
     const initialMessages: MessageResponse[] = await pb
@@ -48,13 +49,20 @@ function createStatusStore() {
         return state;
       });
     });
-  })();
+  }
 
-  return subscribe;
+  if (browser) {
+    reset();
+  }
+
+  return {
+    subscribe,
+    reset
+  };
 }
 
 export const status = {
-  subscribe: createStatusStore(),
+  ...createStatusStore(),
   update: async (status: Status) => {
     await pb.collection(Collections.Status).update(status.id, status.toPb());
   }

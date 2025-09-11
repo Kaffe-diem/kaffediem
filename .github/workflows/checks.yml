@@ -10,6 +10,9 @@ jobs:
   checks:
     name: Run Checks
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     env:
       PUBLIC_PB_HOST: ${{ vars.PB_HOST }}
       PUBLIC_PB_HOST_PROD: ${{ vars.PB_HOST }}
@@ -27,8 +30,5 @@ jobs:
       - name: Get dependencies
         run: npm ci
 
-      - name: Run pocketbase-typegen
-        run: make pb_types
-
       - name: Lint and check formatting
-        run: make lint
+        run: npx svelte-kit sync && npx svelte-check --tsconfig ./tsconfig.json && npx eslint src && npx prettier --check .

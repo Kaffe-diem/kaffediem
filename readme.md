@@ -23,7 +23,7 @@ nvm use 20
 1. .env
 
 ```
-PUBLIC_PB_HOST=https://kodekafe-pocketbase.fly.dev
+PUBLIC_PB_HOST_PROD=https://kodekafe-pocketbase.fly.dev
 PB_ADMIN_EMAIL=
 PB_ADMIN_PASSWORD=
 ```

@@ -16,6 +16,4 @@
   }
 </script>
 
-<div class="fixed right-0 bottom-0 m-8 flex">
-  <button onclick={goBack} class="btn btn-lg btn-secondary">Tilbake</button>
-</div>
+<button onclick={goBack} class="btn btn-lg btn-secondary">Tilbake</button>

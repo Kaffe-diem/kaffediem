@@ -8,7 +8,7 @@
 
 <fieldset class="fieldset">
   <legend class="fieldset-legend text-xl">Aktivert</legend>
-  <button class="btn btn-xl {state ? '' : 'btn-neutral'}" onclick={toggleState}
+  <button type="button" class="btn btn-xl {state ? '' : 'btn-neutral'}" onclick={toggleState}
     >{#if state}Synlig{:else}Deaktivert{/if}</button
   >
 </fieldset>

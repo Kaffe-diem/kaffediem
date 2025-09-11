@@ -1,8 +1,24 @@
 services:
+  app:
+    build:
+      context: .
+      target: production
+      args:
+        - PUBLIC_PB_HOST_PROD=${PUBLIC_PB_HOST_PROD}
+        - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL}
+        - PB_ADMIN_PASSWORD=${PB_ADMIN_PASSWORD}
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PUBLIC_PB_HOST=${PUBLIC_PB_HOST_PROD}
+    depends_on:
+      pb:
+        condition: service_healthy
+
   pb:
-    build: ./pocketbase
-    ports:
-      - "8080:8080"
+    build:
+      context: .
+      dockerfile: pocketbase/Dockerfile
     environment:
       - PUBLIC_PB_HOST=${PUBLIC_PB_HOST}
       - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL}
@@ -10,61 +26,28 @@ services:
       - PB_TEST_ADMIN_EMAIL=${PB_TEST_ADMIN_EMAIL}
       - PB_TEST_ADMIN_PASSWORD=${PB_TEST_ADMIN_PASSWORD}
     volumes:
-      - "./pocketbase/pb_data:/app/pb_data"
-      - "./pocketbase/pb_migrations:/app/pb_migrations"
+      - "/app/pb_data"
+      - "/app/pb_migrations"
     restart: unless-stopped
     healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://localhost:8080/api/health || exit 1
+      test: wget --no-verbose --tries=1 --spider http://127.0.0.1:8081/api/health || exit 1
       interval: 5s
       timeout: 5s
       retries: 5
-  app:
+      start_period: 300s
+
+  tools:
     build:
       context: .
-      target: development
-      args:
-        - PUBLIC_PB_HOST_PROD=${PUBLIC_PB_HOST_PROD}
-        - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL}
-        - PB_ADMIN_PASSWORD=${PB_ADMIN_PASSWORD}
-    ports:
-      - "5173:5173"
-    restart: unless-stopped
+      dockerfile: tools.Dockerfile
+    working_dir: /app
     environment:
-      - NODE_ENV=development
-      - PUBLIC_PB_HOST=${PUBLIC_PB_HOST}
+      - PUBLIC_PB_HOST_PROD=${PUBLIC_PB_HOST_PROD}
+      - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL}
+      - PB_ADMIN_PASSWORD=${PB_ADMIN_PASSWORD}
     volumes:
-      - svelte_kit_data:/app/.svelte-kit
-    depends_on:
-      pb:
-        condition: service_healthy
-    develop:
-      watch:
-        - action: sync
-          path: ./src
-          target: /app/src
-          ignore:
-            - "node_modules/"
-            - "**/*.test.ts"
-            - "**/*.spec.ts"
-        - action: sync
-          path: ./static
-          target: /app/static
-
-        - action: sync+restart
-          path: ./vite.config.ts
-          target: /app/vite.config.ts
-        - action: sync+restart
-          path: ./svelte.config.js
-          target: /app/svelte.config.js
-        - action: sync+restart
-          path: ./tsconfig.json
-          target: /app/tsconfig.json
-        - action: sync+restart
-          path: ./.env
-          target: /app/.env
-
-        - action: rebuild
-          path: package.json
+      - ./:/app
+      - tools_node_modules:/app/node_modules
 
 volumes:
-  svelte_kit_data:
+  tools_node_modules:
