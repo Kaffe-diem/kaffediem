@@ -77,8 +77,8 @@
     {#if detailed}
       <td class="w-full">
         <ul class="space-y-2">
-          {#each order.items as orderItem}
-            {@render OrderItem({ orderItem })}
+          {#each order.items as orderItem, index}
+            {@render OrderItem({ orderItem, index, showIndex: order.items.length > 1 })}
           {/each}
         </ul>
       </td>
@@ -86,12 +86,27 @@
   </tr>
 {/snippet}
 
-{#snippet OrderItem({ orderItem }: { orderItem: OrderItem })}
+{#snippet OrderItem({
+  orderItem,
+  index,
+  showIndex
+}: {
+  orderItem: OrderItem;
+  index: number;
+  showIndex: boolean;
+})}
   <li class="bg-base-300 w-full rounded p-3 shadow">
     <div class="flex flex-col">
-      <span class="mb-1 text-xl">
-        {orderItem.item.name}
-      </span>
+      <div class="flex flex-row gap-4">
+        {#if showIndex}
+          <span class="mb-1 flex items-center text-xl">
+            {index + 1}
+          </span>
+        {/if}
+        <span class="mb-1 flex items-center text-xl">
+          {orderItem.item.name}
+        </span>
+      </div>
 
       {#if orderItem.customizations && orderItem.customizations.length > 0}
         <ul class="mt-1 flex flex-wrap gap-1" aria-label="Customizations">
