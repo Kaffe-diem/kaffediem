@@ -17,7 +17,7 @@ For eksempel vil den store skjermen med hvilke bestillinger som er på vei ikke 
 - [Pocketbase](https://pocketbase.io). Vårt backend og persistens. Dette er en go-applikasjon som skriver til en SQLite database. Den har også en WebUI. Vi bruker en API-klient med typings.
 - [Svelte](https://svelte.dev/). Et frontendrammeverk.
 - [Sveltekit](https://svelte.dev/docs/kit/introduction). Ymse verktøy for Svelte, blant annet routing og muligheten for server-side kode.
-- [Firebase](https://firebase.google.com). Det vi bruker til å kjøre SvelteKit, frontendapplikasjonen.
+- [Coolify](https://coolify.io/). Det vi bruker til å kjøre SvelteKit, frontendapplikasjonen.
 - [fly.io](https://fly.io). Det vi bruker til å kjøre Pocketbase, backendapplikasjonen.
 - [Docker](https://www.docker.com). Lettvektscontainere som virker likt i alle miljø.
 
