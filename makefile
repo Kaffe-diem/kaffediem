@@ -4,7 +4,7 @@ export
 
 default: dev
 
-dev: sync pb_up pb_types svelte_types
+dev: sync pb_types svelte_types
 	docker compose watch
 
 build: pb_types
