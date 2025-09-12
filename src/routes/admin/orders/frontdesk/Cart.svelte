@@ -28,9 +28,17 @@
     addToCart(selectedItem);
   }
 
+  let remoteOrderId = $derived($orders.length > 0 ? $orders.at(-1)!.dayId : 100);
+  let localOrderId = $state(0);
+  $effect(() => {
+    localOrderId = remoteOrderId;
+  });
+  let currentOrderId = $derived(Math.max(localOrderId, remoteOrderId));
+
   let missing_information = $state(false);
   function completeOrder() {
-    orderStore.create($auth.user.id, $cart, missing_information, $orders.length + 100);
+    orderStore.create($auth.user.id, $cart, missing_information, currentOrderId + 1);
+    localOrderId += 1;
     clearCart();
     missing_information = false;
   }
@@ -55,7 +63,7 @@
       </label>
 
       <button class="bold btn btn-lg {$cart.length > 0 ? '' : 'invisible'}" onclick={completeOrder}>
-        <CompleteOrder />{$orders.length + 100}
+        <CompleteOrder />{currentOrderId}
       </button>
 
       {#if $orders.length > 0}
@@ -64,7 +72,7 @@
             ? 'hidden'
             : ''} pointer-events-none absolute inset-0 flex items-center justify-center text-lg font-bold"
         >
-          Forrige: {$orders.length + 100 - 1}
+          Forrige: {currentOrderId}
         </span>
       {/if}
     </div>
