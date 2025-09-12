@@ -22,7 +22,17 @@ const main = async () => {
 
   try {
     await ensureSafeToWrite(pbDataDir, args);
-    await authenticateAdmin(pb, args.email, args.password);
+    if (args.email && args.password) {
+      await authenticateAdmin(pb, args.email, args.password);
+    } else {
+      const used = await fallbackFromGithubRelease(pbDataDir, args);
+      if (used) {
+        console.log("✅ Fallback from GitHub release succeeded.");
+        process.exit(0);
+      }
+      console.error("❌ Fallback from GitHub release did not find a usable artifact.");
+      process.exit(1);
+    }
 
     const currentLocalVersion = readCurrentLocalBackupVersion(pbDataDir);
     const latestRemoteBackup = await getLatestBackup(pb);
@@ -52,7 +62,18 @@ const main = async () => {
     );
   } catch (error) {
     console.error("❌ Error:", error.message, error);
-    process.exit(1);
+    try {
+      const used = await fallbackFromGithubRelease(pbDataDir, args);
+      if (used) {
+        console.log("✅ Fallback from GitHub release succeeded.");
+        process.exit(0);
+      }
+      console.error("❌ Fallback from GitHub release did not find a usable artifact.");
+      process.exit(1);
+    } catch (fallbackError) {
+      console.error("❌ Fallback failed:", fallbackError.message, fallbackError);
+      process.exit(1);
+    }
   }
 };
 
@@ -72,10 +93,10 @@ const parseArgs = () => {
 };
 
 const validateArgs = (args) => {
-  if (!args.host || !args.email || !args.password) {
+  if (!args.host) {
     console.error("Missing required arguments:");
     console.error(
-      "Usage: node sync-db.js --host=<pb_host> --email=<admin_email> --password=<admin_password>"
+      "Usage: node sync-db.js --host=<pb_host> [--email=<admin_email> --password=<admin_password>]"
     );
     process.exit(1);
   }
@@ -121,6 +142,44 @@ const downloadAndExtractBackup = async (pb, backup, pbDataDir) => {
     await copyExtractedToPbData(tempExtractDir, pbDataDir);
     fs.rmSync(tempExtractDir, { recursive: true, force: true });
   }
+};
+
+const fetchGithubRelease = async (repo, tag) => {
+  const url = tag && tag !== "latest"
+    ? `https://api.github.com/repos/${repo}/releases/tags/${encodeURIComponent(tag)}`
+    : `https://api.github.com/repos/${repo}/releases/latest`;
+  const res = await fetch(url, {
+    headers: {
+      Accept: "application/vnd.github+json",
+      "User-Agent": "kaffediem-sync-db"
+    }
+  });
+  if (!res.ok) {
+    throw new Error(`GitHub API ${res.status}: ${res.statusText}`);
+  }
+  return await res.json();
+};
+
+const fallbackFromGithubRelease = async (pbDataDir, args) => {
+  const repo = args.githubRepo || "Kaffe-diem/kaffediem";
+  const tag = args.githubReleaseTag || "latest";
+  console.log(`Attempting fallback from GitHub release ${repo} @ ${tag}`);
+  const release = await fetchGithubRelease(repo, tag);
+  const assets = Array.isArray(release.assets) ? release.assets : [];
+  const zipAsset = assets.find((a) => typeof a === "object" && a && typeof a.name === "string" && a.name.endsWith(".zip") && a.browser_download_url);
+  if (!zipAsset) {
+    return false;
+  }
+  const outputPath = await downloadBackupFile(zipAsset.browser_download_url, zipAsset.name, pbDataDir);
+  const tempExtractDir = path.join(pbDataDir, `tmp_extract_${Date.now()}`);
+  fs.rmSync(tempExtractDir, { recursive: true, force: true });
+  fs.mkdirSync(tempExtractDir, { recursive: true });
+  await extractBackupToDir(outputPath, tempExtractDir);
+  await copyExtractedToPbData(tempExtractDir, pbDataDir);
+  fs.rmSync(tempExtractDir, { recursive: true, force: true });
+  const versionLabel = `release:${release.tag_name || tag}:${zipAsset.name}`;
+  await writeCurrentLocalBackupVersion(pbDataDir, versionLabel);
+  return true;
 };
 
 const getFileToken = async (pb) => {
