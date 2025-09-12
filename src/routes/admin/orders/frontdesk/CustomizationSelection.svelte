@@ -46,7 +46,7 @@
   {@const selected = $selectedCustomizations[key.id]?.some((v) => v.id === value.id)}
   <button
     class="btn {selected
-      ? 'ring-lg ring-accent scale-109 text-white shadow-xl ring'
+      ? 'ring-lg ring-accent text-white shadow-xl ring'
       : ''} flex w-full transition-all duration-300 ease-in-out hover:brightness-90 focus:outline-none"
     style="background-color: {selected ? key.labelColor : ''};"
     onclick={() => selectCustomization(key.id, value)}

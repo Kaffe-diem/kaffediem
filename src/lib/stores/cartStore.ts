@@ -9,6 +9,7 @@ import type { Item, CustomizationValue } from "$lib/types";
 
 export interface CartItem extends Item {
   customizations: CustomizationValue[];
+  basePrice?: number;
 }
 
 export const selectedCustomizations = writable<Record<string, CustomizationValue[]>>({});
@@ -18,6 +19,99 @@ export const cart = writable<CartItem[]>([]);
 export const totalPrice = derived(cart, ($cart) =>
   $cart.reduce((sum, item) => sum + item.price, 0)
 );
+
+export const editingIndex = writable<number | null>(null);
+
+const computeFinalPrice = (basePrice: number, customizations: CustomizationValue[]) => {
+  const totalCustomizationPrice = customizations.reduce(
+    (sum, customization) =>
+      customization.constantPrice ? sum + (customization.priceChange || 0) : sum,
+    0
+  );
+
+  const subtotal = basePrice + totalCustomizationPrice;
+  const multiplied = customizations.reduce(
+    (price, customization) =>
+      !customization.constantPrice ? price * (customization.priceChange / 100) : price,
+    subtotal
+  );
+
+  return multiplied;
+};
+
+const computeBasePriceFromFinal = (
+  finalPrice: number,
+  customizations: CustomizationValue[]
+) => {
+  const totalCustomizationPrice = customizations.reduce(
+    (sum, customization) =>
+      customization.constantPrice ? sum + (customization.priceChange || 0) : sum,
+    0
+  );
+
+  const multiplier = customizations.reduce(
+    (acc, customization) =>
+      !customization.constantPrice ? acc * (customization.priceChange / 100) : acc,
+    1
+  );
+
+  const subtotal = multiplier ? finalPrice / multiplier : finalPrice;
+  const base = subtotal - totalCustomizationPrice;
+  return base;
+};
+
+const hydrateSelectedFromItem = (item: CartItem) => {
+  const map: Record<string, CustomizationValue[]> = {};
+  for (const value of item.customizations || []) {
+    if (!value.belongsTo) continue;
+    map[value.belongsTo] = [...(map[value.belongsTo] || []), value];
+  }
+  selectedCustomizations.set(map);
+};
+
+export const startEditing = (index: number) => {
+  editingIndex.set(index);
+  const current = get(cart)[index];
+  if (!current) return;
+  hydrateSelectedFromItem(current);
+
+  if (current.basePrice == null) {
+    const inferredBase = computeBasePriceFromFinal(current.price, current.customizations || []);
+    cart.update((c) => {
+      const next = [...c];
+      const at = next[index];
+      if (!at) return c;
+      next[index] = { ...at, basePrice: inferredBase } as CartItem;
+      return next;
+    });
+  }
+};
+
+export const stopEditing = () => {
+  editingIndex.set(null);
+};
+
+export const deleteEditingItem = () => {
+  const index = get(editingIndex);
+  if (index === null) return;
+  cart.update((c) => c.filter((_, i) => i !== index));
+  editingIndex.set(null);
+};
+
+const updateEditingItemFromSelections = (map: Record<string, CustomizationValue[]>) => {
+  const index = get(editingIndex);
+  if (index === null) return;
+  const customizations = Object.values(map).flat();
+  cart.update((c) => {
+    const next = [...c];
+    const item = next[index];
+    if (!item) return c;
+    const base = item.basePrice ?? computeBasePriceFromFinal(item.price, item.customizations || []);
+    const newPrice = Math.ceil(computeFinalPrice(base, customizations));
+    next[index] = { ...item, basePrice: base, customizations, price: newPrice } as CartItem;
+    return next;
+  });
+};
 
 export const initializeCustomizations = () => {
   const map: Record<string, CustomizationValue[]> = {};
@@ -30,9 +124,13 @@ export const selectCustomization = (keyId: string, value: CustomizationValue) =>
     const valueIndex = currentValues.findIndex((v) => v.id === value.id);
 
     if (valueIndex > -1) {
-      return removeCustomizationValue(customizations, keyId, currentValues, valueIndex);
+      const updated = removeCustomizationValue(customizations, keyId, currentValues, valueIndex);
+      updateEditingItemFromSelections(updated);
+      return updated;
     } else {
-      return addCustomizationValue(customizations, keyId, value);
+      const updated = addCustomizationValue(customizations, keyId, value);
+      updateEditingItemFromSelections(updated);
+      return updated;
     }
   });
 };
@@ -75,23 +173,14 @@ export const addToCart = (item: Item) => {
   // so we just flatten this structure for the purposes of summation
   const customizations = Object.values(get(selectedCustomizations)).flat();
 
-  const totalCustomizationPrice = customizations.reduce(
-    (sum, customization) =>
-      customization.constantPrice ? sum + (customization.priceChange || 0) : sum,
-    0
-  );
-
-  const subtotal = item.price + totalCustomizationPrice;
-  const finalprice = customizations.reduce(
-    (price, customization) =>
-      !customization.constantPrice ? price * (customization.priceChange / 100) : price,
-    subtotal
-  );
+  const basePrice = item.price;
+  const finalprice = computeFinalPrice(basePrice, customizations);
 
   const itemToAdd: CartItem = {
     ...item,
     price: Math.ceil(finalprice),
-    customizations
+    customizations,
+    basePrice
   } as CartItem;
 
   cart.update((c) => [...c, itemToAdd]);
