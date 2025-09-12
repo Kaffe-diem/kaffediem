@@ -30,7 +30,12 @@
 
   let missing_information = $state(false);
   function completeOrder() {
-    orderStore.create($auth.user.id, $cart, missing_information, $orders.length + 100);
+    orderStore.create(
+      $auth.user.id,
+      $cart,
+      missing_information,
+      $orders.length > 0 ? $orders.at(-1)!.dayId + 1 : 100
+    );
     clearCart();
     missing_information = false;
   }
@@ -55,7 +60,7 @@
       </label>
 
       <button class="bold btn btn-lg {$cart.length > 0 ? '' : 'invisible'}" onclick={completeOrder}>
-        <CompleteOrder />{$orders.length + 100}
+        <CompleteOrder />{$orders.length > 0 ? $orders.at(-1)!.dayId : 100}
       </button>
 
       {#if $orders.length > 0}
@@ -64,7 +69,7 @@
             ? 'hidden'
             : ''} pointer-events-none absolute inset-0 flex items-center justify-center text-lg font-bold"
         >
-          Forrige: {$orders.length + 100 - 1}
+          Forrige: {$orders.length > 0 ? $orders.at(-1)!.dayId : 100}
         </span>
       {/if}
     </div>
