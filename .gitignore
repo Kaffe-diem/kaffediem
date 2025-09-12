@@ -25,6 +25,3 @@ src/lib/pocketbase/index.d.ts
 
 # Pocketbase
 pb_data
-
-
-.firebase
