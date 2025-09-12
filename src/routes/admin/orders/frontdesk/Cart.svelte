@@ -28,6 +28,13 @@
     addToCart(selectedItem);
   }
 
+  let remoteOrderId = $derived($orders.length > 0 ? $orders.at(-1)!.dayId : 100);
+  let localOrderId = $state(0);
+  $effect(() => {
+    localOrderId = remoteOrderId;
+  });
+  let currentOrderId = $derived(Math.max(localOrderId, remoteOrderId));
+
   let missing_information = $state(false);
   function completeOrder() {
     orderStore.create($auth.user.id, $cart, missing_information, currentOrderId + 1);
@@ -35,13 +42,6 @@
     clearCart();
     missing_information = false;
   }
-
-  let remoteOrderId = $derived($orders.length > 0 ? $orders.at(-1)!.dayId : 100);
-  let localOrderId = $state(0);
-  $effect(() => {
-    localOrderId = remoteOrderId;
-  });
-  let currentOrderId = $derived(Math.max(localOrderId, remoteOrderId));
 </script>
 
 <div class="flex flex-col justify-between gap-4">
