@@ -145,9 +145,10 @@ const downloadAndExtractBackup = async (pb, backup, pbDataDir) => {
 };
 
 const fetchGithubRelease = async (repo, tag) => {
-  const url = tag && tag !== "latest"
-    ? `https://api.github.com/repos/${repo}/releases/tags/${encodeURIComponent(tag)}`
-    : `https://api.github.com/repos/${repo}/releases/latest`;
+  const url =
+    tag && tag !== "latest"
+      ? `https://api.github.com/repos/${repo}/releases/tags/${encodeURIComponent(tag)}`
+      : `https://api.github.com/repos/${repo}/releases/latest`;
   const res = await fetch(url, {
     headers: {
       Accept: "application/vnd.github+json",
@@ -166,11 +167,22 @@ const fallbackFromGithubRelease = async (pbDataDir, args) => {
   console.log(`Attempting fallback from GitHub release ${repo} @ ${tag}`);
   const release = await fetchGithubRelease(repo, tag);
   const assets = Array.isArray(release.assets) ? release.assets : [];
-  const zipAsset = assets.find((a) => typeof a === "object" && a && typeof a.name === "string" && a.name.endsWith(".zip") && a.browser_download_url);
+  const zipAsset = assets.find(
+    (a) =>
+      typeof a === "object" &&
+      a &&
+      typeof a.name === "string" &&
+      a.name.endsWith(".zip") &&
+      a.browser_download_url
+  );
   if (!zipAsset) {
     return false;
   }
-  const outputPath = await downloadBackupFile(zipAsset.browser_download_url, zipAsset.name, pbDataDir);
+  const outputPath = await downloadBackupFile(
+    zipAsset.browser_download_url,
+    zipAsset.name,
+    pbDataDir
+  );
   const tempExtractDir = path.join(pbDataDir, `tmp_extract_${Date.now()}`);
   fs.rmSync(tempExtractDir, { recursive: true, force: true });
   fs.mkdirSync(tempExtractDir, { recursive: true });
