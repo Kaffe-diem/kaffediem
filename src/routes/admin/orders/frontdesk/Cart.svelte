@@ -63,7 +63,7 @@
       </label>
 
       <button class="bold btn btn-lg {$cart.length > 0 ? '' : 'invisible'}" onclick={completeOrder}>
-        <CompleteOrder />{currentOrderId}
+        <CompleteOrder />{currentOrderId + 1}
       </button>
 
       {#if $orders.length > 0}
