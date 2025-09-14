@@ -101,13 +101,16 @@ export type CategoryRecord = {
 	name: string
 	sort_order: number
 	updated?: IsoDateString
+	valid_customization_keys?: RecordIdString[]
 }
 
 export type CustomizationKeyRecord = {
 	created?: IsoDateString
+	default_value?: RecordIdString
 	enable?: boolean
 	id: string
 	label_color: string
+	multiple_choice?: boolean
 	name: string
 	updated?: IsoDateString
 }

@@ -16,7 +16,7 @@
   <div class="divider divider-horizontal m-0 p-0"></div>
 
   <div class="flex flex-col">
-    <CustomizationSelection />
+    <CustomizationSelection {selectedItem} />
     <Cart {selectedItem} />
   </div>
 

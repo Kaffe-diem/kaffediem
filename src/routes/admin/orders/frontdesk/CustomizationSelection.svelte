@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CustomizationKey, CustomizationValue } from "$lib/types";
+  import { CustomizationKey, CustomizationValue, Item, Category } from "$lib/types";
   import { customizationKeys, customizationValues } from "$stores/menuStore";
   import {
     selectedCustomizations,
@@ -7,20 +7,33 @@
     initializeCustomizations
   } from "$stores/cartStore";
   import { onMount } from "svelte";
+  import { categories } from "$stores/menuStore";
 
   const getValuesByKey = (keyId: string): CustomizationValue[] => {
     return $customizationValues.filter((value) => value.belongsTo === keyId);
   };
 
+  const getCategoryById = (categoryId: string): Category | undefined => {
+    return $categories.find((value) => value.id === categoryId);
+  };
+
   onMount(() => {
     initializeCustomizations();
   });
+
+  let { selectedItem } = $props<{
+    selectedItem: Item | undefined;
+  }>();
+
+  let selectedCategory = $derived(
+    selectedItem ? getCategoryById(selectedItem.category) : undefined
+  );
 </script>
 
 <div class="grid h-full grid-rows-[1fr_auto] overflow-y-auto">
   <div class="grid-auto-flow-column grid grid-cols-2">
     {#each $customizationKeys as key}
-      {#if key.enabled}
+      {#if key.enabled && selectedCategory?.validCustomizationKeys.includes(key.id)}
         {@render CustomizationCategory({ key })}
       {/if}
     {/each}
