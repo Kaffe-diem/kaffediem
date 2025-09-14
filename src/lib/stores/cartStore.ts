@@ -24,52 +24,6 @@ export const initializeCustomizations = () => {
   selectedCustomizations.set(map);
 };
 
-export const selectCustomization = (keyId: string, value: CustomizationValue) => {
-  selectedCustomizations.update((customizations) => {
-    const currentValues = customizations[keyId] || [];
-    const valueIndex = currentValues.findIndex((v) => v.id === value.id);
-
-    if (valueIndex > -1) {
-      return removeCustomizationValue(customizations, keyId, currentValues, valueIndex);
-    } else {
-      return addCustomizationValue(customizations, keyId, value);
-    }
-  });
-};
-
-const removeCustomizationValue = (
-  customizations: Record<string, CustomizationValue[]>,
-  keyId: string,
-  currentValues: CustomizationValue[],
-  valueIndex: number
-): Record<string, CustomizationValue[]> => {
-  const newValues = [...currentValues];
-  newValues.splice(valueIndex, 1);
-
-  if (newValues.length === 0) {
-    // If no values left, remove the key
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { [keyId]: _, ...rest } = customizations;
-    return rest;
-  }
-
-  return {
-    ...customizations,
-    [keyId]: newValues
-  };
-};
-
-const addCustomizationValue = (
-  customizations: Record<string, CustomizationValue[]>,
-  keyId: string,
-  value: CustomizationValue
-): Record<string, CustomizationValue[]> => {
-  return {
-    ...customizations,
-    [keyId]: [...(customizations[keyId] || []), value]
-  };
-};
-
 export const addToCart = (item: Item) => {
   // the initial selection maps to the categories of the customizations
   // so we just flatten this structure for the purposes of summation
