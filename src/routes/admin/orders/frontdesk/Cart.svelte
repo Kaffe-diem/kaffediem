@@ -28,7 +28,9 @@
     addToCart(selectedItem);
   }
 
-  let remoteOrderId = $derived($orders.length > 0 ? $orders.at(-1)!.dayId : 100);
+  let remoteOrderId = $derived(
+    $orders.length > 0 ? $orders.sort((a, b) => a.dayId - b.dayId).at(-1)!.dayId : 100
+  );
   let localOrderId = $state(0);
   $effect(() => {
     localOrderId = remoteOrderId;
@@ -63,7 +65,7 @@
       </label>
 
       <button class="bold btn btn-lg {$cart.length > 0 ? '' : 'invisible'}" onclick={completeOrder}>
-        <CompleteOrder />{currentOrderId}
+        <CompleteOrder />{currentOrderId + 1}
       </button>
 
       {#if $orders.length > 0}
