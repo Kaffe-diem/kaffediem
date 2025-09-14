@@ -4,6 +4,7 @@
   import { categories } from "$stores/menuStore";
   import { Category } from "$lib/types";
   import { goto } from "$app/navigation";
+  import { customizationKeys } from "$stores/menuStore";
 
   import StateToggle from "$components/menu/StateToggle.svelte";
   import Input from "$components/menu/Input.svelte";
@@ -66,6 +67,19 @@
         placeholder="Sorteringsrekkefølge"
       />
     </div>
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend text-xl">Tilpasninger</legend>
+      <ul class="list-none">
+        {#each $customizationKeys as customization}
+          <li class="my-6">
+            <label class="grid grid-cols-[1fr_1fr]">
+              <span class="text-xl">{customization.name}</span>
+              <input type="checkbox" class="checkbox checkbox-xl" />
+            </label>
+          </li>
+        {/each}
+      </ul>
+    </fieldset>
     <div class="divider col-span-2"></div>
     <div class="col-span-2">
       <button type="submit" class="btn btn-xl btn-primary w-full"

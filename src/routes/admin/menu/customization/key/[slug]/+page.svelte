@@ -1,7 +1,7 @@
 <script lang="ts">
   // @ts-expect-error Is present, but lint fails
   import type { PageProps } from "./$types";
-  import { customizationKeys } from "$stores/menuStore";
+  import { customizationKeys, customizationsByKey } from "$stores/menuStore";
   import { CustomizationKey } from "$lib/types";
   import { goto } from "$app/navigation";
 
@@ -64,6 +64,23 @@
     <div>
       <Input label="Farge" type="color" bind:value={customizationColor} />
     </div>
+    <div class="col-span-2">
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend text-xl">Standard</legend>
+        <select class="select select-xl w-full">
+          <option>Ingen</option>
+          {#each $customizationsByKey[id] ?? [] as customization}
+            <option>
+              {customization.name}
+            </option>
+          {/each}
+        </select>
+      </fieldset>
+    </div>
+    <label class="mt-4">
+      <span class="text-xl font-bold">Flervalg</span>
+      <input type="checkbox" class="checkbox checkbox-xl ml-4" />
+    </label>
     <div class="divider col-span-2"></div>
     <div class="col-span-2">
       <button type="submit" class="btn btn-xl btn-primary w-full"
