@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { categories, itemsByCategory } from "$stores/menuStore";
+  import {
+    categories,
+    itemsByCategory,
+    customizationKeys,
+    customizationValues
+  } from "$stores/menuStore";
   import type { Item, Category } from "$lib/types";
   import { selectedCustomizations } from "$stores/cartStore";
 
@@ -38,9 +43,18 @@
       value={item}
       bind:group={selectedItem}
       onchange={() => {
-        for (const customizationKey in $selectedCustomizations) {
-          if (!category.validCustomizationKeys.includes(customizationKey)) {
-            $selectedCustomizations[customizationKey] = [];
+        for (const customizationKey of $customizationKeys) {
+          const defaultValueId =
+            $customizationKeys.find((key) => key.id === customizationKey.id)?.defaultValue ?? "";
+
+          if (($selectedCustomizations[customizationKey.id] ?? []).length === 0) {
+            $selectedCustomizations[customizationKey.id] = $customizationValues.filter(
+              (val) => val.id === defaultValueId
+            );
+          }
+
+          if (!category.validCustomizationKeys.includes(customizationKey.id)) {
+            $selectedCustomizations[customizationKey.id] = [];
           }
         }
       }}
