@@ -1,5 +1,5 @@
 <script lang="ts">
-  import RefreshIcon from "$assets/RefreshIcon.svelte";
+  // import RefreshIcon from "$assets/RefreshIcon.svelte";
   // import { resetStores } from "$stores/util";
 </script>
 
