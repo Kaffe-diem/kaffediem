@@ -21,7 +21,7 @@ export function createPbStore<Collection extends Collections, RecordClass extend
     const initialData = await pb.collection(collection).getFullList(fetchOptions);
     set(initialData.map(recordClass.fromPb));
 
-    pb.collection(collection).unsubscribe();
+    // pb.collection(collection).unsubscribe();
     pb.collection(collection).subscribe(
       "*",
       (event) => {
