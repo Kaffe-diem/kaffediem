@@ -1,6 +1,7 @@
 <script lang="ts">
   import { categories, itemsByCategory } from "$stores/menuStore";
   import type { Item, Category } from "$lib/types";
+  import { selectedCustomizations } from "$stores/cartStore";
 
   let { selectedItem = $bindable() } = $props();
 </script>
@@ -20,7 +21,7 @@
       <div class="grid grid-cols-2 gap-4 xl:grid-cols-4">
         {#each $itemsByCategory[category.id] ?? [] as item}
           {#if item.enabled}
-            {@render ItemCard({ item })}
+            {@render ItemCard({ item, category })}
           {/if}
         {/each}
       </div>
@@ -28,9 +29,22 @@
   {/if}
 {/snippet}
 
-{#snippet ItemCard({ item }: { item: Item })}
+{#snippet ItemCard({ item, category }: { item: Item; category: Category })}
   <label>
-    <input type="radio" name="item" class="peer hidden" value={item} bind:group={selectedItem} />
+    <input
+      type="radio"
+      name="item"
+      class="peer hidden"
+      value={item}
+      bind:group={selectedItem}
+      onchange={() => {
+        for (const customizationKey in $selectedCustomizations) {
+          if (!category.validCustomizationKeys.includes(customizationKey)) {
+            $selectedCustomizations[customizationKey] = [];
+          }
+        }
+      }}
+    />
     <div
       class="btn peer-checked:border-accent peer-checked:bg-base-300 peer-checked:ring-lg peer-checked:ring-accent relative flex h-24 w-full flex-col border-2 transition-all duration-300 ease-in-out peer-checked:scale-109 peer-checked:shadow-xl peer-checked:ring"
     >
