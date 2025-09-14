@@ -3,7 +3,7 @@
   import { Message, Status } from "$lib/types";
 
   const handleStatusChange = (message: Message) => {
-    status.update(new Status($status.id, message, $status.messages, true));
+    status.update(new Status($status.id, message, $status.messages, $status.online));
   };
 
   const handleTitleChange = (event: Event, message: Message) => {
@@ -18,8 +18,8 @@
     );
   };
 
-  const handleVisibilityChange = () => {
-    status.update(new Status($status.id, $status.message, $status.messages, false));
+  const toggleVisibility = () => {
+    status.update(new Status($status.id, $status.message, $status.messages, !$status.online));
   };
 </script>
 
@@ -51,7 +51,8 @@
             oninput={(event) => handleSubtitleChange(event, message)}
           />
           <button
-            class="btn btn-secondary btn-xl"
+            type="button"
+            class="btn btn-secondary btn-xl w-16"
             onclick={() => {
               if (window.confirm(`Er du sikker på at du vil slette "${message.title}"?`)) {
                 messages.delete(message.id);
@@ -61,20 +62,15 @@
         </label>
       </li>
     {/each}
-    <li class="my-4">
-      <label class="flex items-center">
-        <input
-          type="radio"
-          class="radio radio-xl mr-4"
-          name="selected"
-          checked={!$status.online}
-          onchange={handleVisibilityChange}
-        />
-        <span class="ml-3 text-xl">Åpent!</span>
-      </label>
-    </li>
-    <button class="btn btn-xl w-full" onclick={() => messages.create(Message.baseValue)}
-      >Legg til melding</button
-    >
+    <div class="grid grid-cols-[1fr_auto]">
+      <button type="button" class="btn btn-xl w-full" onclick={toggleVisibility}
+        >{$status.online ? "Stengt" : "Åpent"}</button
+      >
+      <button
+        type="button"
+        class="btn btn-xl btn-primary ml-4 w-16"
+        onclick={() => messages.create(Message.baseValue)}>+</button
+      >
+    </div>
   </ul>
 </form>
