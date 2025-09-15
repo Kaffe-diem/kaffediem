@@ -11,16 +11,24 @@
   let { children }: Props = $props();
 </script>
 
-{#if $status?.online}
-  <div class="flex h-screen cursor-none flex-col items-center justify-center text-center">
-    <span class="p-2 text-7xl font-bold md:text-9xl">{$status.message.title}</span>
-    <span class="p-2 text-4xl md:text-6xl">{$status.message.subtitle}</span>
+{#if $status.message.title || $status.message.subtitle}
+  <div
+    class="flex {$status.online
+      ? 'h-screen justify-center'
+      : 'h-1/3 justify-start pt-20'} bg-base-100 fixed bottom-0 z-100 w-full cursor-none flex-col items-center text-center"
+  >
+    <span class="p-2 text-7xl font-bold md:text-9xl">
+      {$status.message.title || $status.message.subtitle}
+    </span>
+    <span class="p-2 text-4xl md:text-6xl">
+      {$status.message.subtitle && $status.message.title && $status.message.subtitle}
+    </span>
   </div>
-{:else}
-  <main class="relative min-h-screen w-full cursor-none py-4">
-    {@render children?.()}
-  </main>
 {/if}
+
+<main class="relative min-h-screen w-full cursor-none py-4">
+  {@render children?.()}
+</main>
 
 <!-- <div class="absolute bottom-0 left-0 hidden md:flex">
   <a href="/">
