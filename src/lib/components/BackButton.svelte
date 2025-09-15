@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import BackButton from "$assets/BackButton.svelte";
 
   function goBack() {
     const route = window.location.pathname;
@@ -16,6 +17,4 @@
   }
 </script>
 
-<div class="fixed right-0 bottom-0 m-4 flex">
-  <button onclick={goBack} class="btn btn-lg btn-secondary">Tilbake</button>
-</div>
+<button onclick={goBack} class="btn btn-lg btn-secondary"><BackButton /></button>

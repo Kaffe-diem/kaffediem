@@ -5,6 +5,7 @@ import { browser } from "$app/environment";
 
 // ref: https://github.com/pocketbase/js-sdk?tab=readme-ov-file#nodejs-via-npm
 import eventsource from "eventsource";
+import type { UnsubscribeFunc } from "pocketbase";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (global as any).EventSource = eventsource;
 
@@ -17,39 +18,49 @@ export function createPbStore<Collection extends Collections, RecordClass extend
 ) {
   const { subscribe, set, update } = writable<RecordClass[]>([]);
 
-  if (browser) {
-    (async () => {
-      const initialData = await pb.collection(collection).getFullList(fetchOptions);
-      set(initialData.map(recordClass.fromPb));
+  let unsubscribe: UnsubscribeFunc | null = null;
 
-      pb.collection(collection).subscribe(
-        "*",
-        (event) => {
-          update((state) => {
-            const itemIndex = state.findIndex((item) => item.id == event.record.id);
-            const item = recordClass.fromPb(event.record);
+  async function reset() {
+    const initialData = await pb.collection(collection).getFullList(fetchOptions);
+    set(initialData.map(recordClass.fromPb));
 
-            switch (event.action) {
-              case "create":
-                state.push(item);
-                break;
-              case "update":
-                if (itemIndex !== -1) state[itemIndex] = item;
-                break;
-              case "delete":
-                if (itemIndex !== -1) state.splice(itemIndex, 1);
-                break;
-            }
+    if (unsubscribe) {
+      unsubscribe();
+    }
+    unsubscribe = await pb.collection(collection).subscribe(
+      "*",
+      (event) => {
+        update((state) => {
+          const itemIndex = state.findIndex((item) => item.id == event.record.id);
+          const item = recordClass.fromPb(event.record);
 
-            return state;
-          });
-        },
-        subscribeOptions
-      );
-    })();
+          switch (event.action) {
+            case "create":
+              state.push(item);
+              break;
+            case "update":
+              if (itemIndex !== -1) state[itemIndex] = item;
+              break;
+            case "delete":
+              if (itemIndex !== -1) state.splice(itemIndex, 1);
+              break;
+          }
+
+          return state;
+        });
+      },
+      subscribeOptions
+    );
   }
 
-  return subscribe;
+  if (browser) {
+    reset();
+  }
+
+  return {
+    subscribe,
+    reset
+  };
 }
 
 export function createGenericPbStore<
@@ -63,7 +74,7 @@ export function createGenericPbStore<
   subscribeOptions: { [key: string]: string } = fetchOptions
 ) {
   return {
-    subscribe: createPbStore(collection, recordClass, fetchOptions, subscribeOptions),
+    ...createPbStore(collection, recordClass, fetchOptions, subscribeOptions),
     update: async (record: RecordClass) => {
       await pb.collection(collection).update(record.id, record.toPb());
     },
