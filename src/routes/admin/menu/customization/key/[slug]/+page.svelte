@@ -1,13 +1,13 @@
 <script lang="ts">
-  import type { PageProps } from "./$types";
   import { customizationKeys } from "$stores/menuStore";
   import { CustomizationKey } from "$lib/types";
   import { goto } from "$app/navigation";
 
   import StateToggle from "$components/menu/StateToggle.svelte";
   import Input from "$components/menu/Input.svelte";
+  import { resolve } from "$app/paths";
 
-  let { data }: PageProps = $props();
+  let { data } = $props();
   const id = data.id;
   const create = id == "new";
 
@@ -38,7 +38,7 @@
         new CustomizationKey(id, customizationName!, customizationEnabled, customizationColor!)
       );
     }
-    goto("/admin/menu/customization");
+    goto(resolve("/admin/menu/customization"));
   }
 </script>
 
@@ -73,7 +73,7 @@
 {:else}
   <div class="mx-30 grid grid-cols-1 gap-4">
     <h1 class="text-center text-xl">Kunne ikke finne tilpasningskategori!</h1>
-    <a href="/admin/menu/customization/key/new" rel="external" class="btn"
+    <a href={resolve("/admin/menu/customization/key/new")} rel="external" class="btn"
       >Opprett en ny tilpasningskategori</a
     >
   </div>

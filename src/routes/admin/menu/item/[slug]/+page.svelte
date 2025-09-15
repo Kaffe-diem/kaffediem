@@ -1,13 +1,13 @@
 <script lang="ts">
-  import type { PageProps } from "./$types";
   import { items, categories } from "$stores/menuStore";
   import { Item } from "$lib/types";
   import { goto } from "$app/navigation";
 
   import StateToggle from "$components/menu/StateToggle.svelte";
   import Input from "$components/menu/Input.svelte";
+  import { resolve } from "$app/paths";
 
-  let { data }: PageProps = $props();
+  let { data } = $props();
   const id = data.id;
   const create = id == "new";
 
@@ -83,7 +83,7 @@
         )
       );
     }
-    goto("/admin/menu");
+    goto(resolve("/admin/menu"));
   }
 </script>
 
@@ -94,7 +94,7 @@
 {#if exists || create}
   <form onsubmit={updateItem} class="grid w-full grid-cols-2 gap-2">
     <div class="col-span-2">
-      <Input label="Navn" type="text" required placeholder="Produktnavn" bind:value={itemName} />
+      <Input label="Navn" type="text" required placeholder="Produktnavn" bind:value={itemName!} />
     </div>
     <div>
       <Input
@@ -103,7 +103,7 @@
         required
         min={1}
         placeholder="Pris"
-        bind:value={itemPrice}
+        bind:value={itemPrice!}
       />
     </div>
     <div>
@@ -112,7 +112,7 @@
         <select class="select select-xl w-full" required bind:value={itemCategory}>
           {#if itemCategory || create}
             <option disabled value="" selected={create}>Velg en kategori</option>
-            {#each $categories as category}
+            {#each $categories as category (category.id)}
               <option value={category.id} selected={category.id == itemCategory}
                 >{category.name}</option
               >
@@ -151,6 +151,6 @@
 {:else}
   <div class="mx-30 grid grid-cols-1 gap-4">
     <h1 class="text-center text-xl">Kunne ikke finne produkt!</h1>
-    <a href="/admin/menu/item/new" rel="external" class="btn">Opprett et nytt produkt</a>
+    <a href={resolve("/admin/menu/item/new")} rel="external" class="btn">Opprett et nytt produkt</a>
   </div>
 {/if}

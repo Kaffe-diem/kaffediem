@@ -1,18 +1,19 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import { resolve } from "$app/paths";
   import BackButton from "$assets/BackButton.svelte";
 
   function goBack() {
     const route = window.location.pathname;
 
     if (route === "/admin") {
-      goto("/");
+      goto(resolve("/"));
     } else if (route.startsWith("/admin/menu/customization/")) {
-      goto("/admin/menu/customization");
-    } else if (route.startsWith("/admin/menu/")) {
-      goto("/admin/menu");
+      goto(resolve("/admin/menu/customization"));
+    } else if (route.startsWith(resolve("/admin/menu/"))) {
+      goto(resolve("/admin/menu"));
     } else {
-      goto("/admin");
+      goto(resolve("/admin"));
     }
   }
 </script>

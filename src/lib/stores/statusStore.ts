@@ -4,10 +4,10 @@ import { Message, Status } from "$lib/types";
 import { writable } from "svelte/store";
 import { browser } from "$app/environment";
 
-import eventsource from "eventsource";
+import { EventSource } from "eventsource";
 import type { UnsubscribeFunc } from "pocketbase";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-(global as any).EventSource = eventsource;
+(global as any).EventSource = EventSource;
 
 export const messages = createGenericPbStore(Collections.Message, Message);
 
