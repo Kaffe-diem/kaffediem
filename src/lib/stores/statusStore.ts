@@ -14,8 +14,8 @@ export const messages = createGenericPbStore(Collections.Message, Message);
 function createStatusStore() {
   const { subscribe, set, update } = writable(Status.baseValue);
 
-  let unsubscribe1: UnsubscribeFunc | null = null;
-  let unsubscribe2: UnsubscribeFunc | null = null;
+  let unsubscribeStatus: UnsubscribeFunc | null = null;
+  let unsubscribeMessage: UnsubscribeFunc | null = null;
 
   async function reset() {
     // Only use the first record. Assumes that PB already has this and only this record.
@@ -27,19 +27,19 @@ function createStatusStore() {
     const initialData = Status.fromPb(initialActiveMessage, initialMessages.map(Message.fromPb));
     set(initialData);
 
-    if (unsubscribe1) {
-      unsubscribe1();
+    if (unsubscribeStatus) {
+      unsubscribeStatus();
     }
-    unsubscribe1 = await pb.collection(Collections.Status).subscribe("*", async (event) => {
+    unsubscribeStatus = await pb.collection(Collections.Status).subscribe("*", async (event) => {
       update((state) => {
         return Status.fromPb(event.record, state.messages);
       });
     });
 
-    if (unsubscribe2) {
-      unsubscribe2();
+    if (unsubscribeMessage) {
+      unsubscribeMessage();
     }
-    unsubscribe2 = await pb.collection(Collections.Message).subscribe("*", (event) => {
+    unsubscribeMessage = await pb.collection(Collections.Message).subscribe("*", (event) => {
       update((state) => {
         const itemIndex = state.messages.findIndex((item) => item.id == event.record.id);
         const item = Message.fromPb(event.record);
