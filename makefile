@@ -43,3 +43,7 @@ lint:
 clean:
 	-docker compose down -v --remove-orphans
 	-rm -rf ./pb_data
+
+_hooks:
+	@git config core.hooksPath .githooks
+	@chmod +x .githooks/* || true
