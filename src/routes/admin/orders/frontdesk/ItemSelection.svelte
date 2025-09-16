@@ -9,6 +9,23 @@
   import { selectedCustomizations } from "$stores/cartStore";
 
   let { selectedItem = $bindable() } = $props();
+
+  function syncCustomizations(category: Category) {
+    for (const key of $customizationKeys) {
+      const isValid = category.customizationKeys.includes(key.id);
+      if (!isValid) {
+        $selectedCustomizations[key.id] = [];
+        continue;
+      }
+
+      const selected = $selectedCustomizations[key.id] ?? [];
+      if (selected.length === 0 && key.defaultValue) {
+        $selectedCustomizations[key.id] = $customizationValues.filter(
+          (val) => val.id === key.defaultValue
+        );
+      }
+    }
+  }
 </script>
 
 <div class="flex h-full flex-col overflow-x-hidden overflow-y-auto">
@@ -42,22 +59,7 @@
       class="peer hidden"
       value={item}
       bind:group={selectedItem}
-      onchange={() => {
-        for (const customizationKey of $customizationKeys) {
-          const defaultValueId =
-            $customizationKeys.find((key) => key.id === customizationKey.id)?.defaultValue ?? "";
-
-          if (($selectedCustomizations[customizationKey.id] ?? []).length === 0) {
-            $selectedCustomizations[customizationKey.id] = $customizationValues.filter(
-              (val) => val.id === defaultValueId
-            );
-          }
-
-          if (!category.customizationKeys.includes(customizationKey.id)) {
-            $selectedCustomizations[customizationKey.id] = [];
-          }
-        }
-      }}
+      onchange={() => syncCustomizations(category)}
     />
     <div
       class="btn peer-checked:border-accent peer-checked:bg-base-300 peer-checked:ring-lg peer-checked:ring-accent relative flex h-24 w-full flex-col border-2 transition-all duration-300 ease-in-out peer-checked:scale-109 peer-checked:shadow-xl peer-checked:ring"
