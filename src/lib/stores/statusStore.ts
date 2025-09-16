@@ -28,7 +28,7 @@ function createStatusStore() {
     set(initialData);
 
     if (unsubscribeStatus) {
-      unsubscribeStatus();
+      await unsubscribeStatus();
     }
     unsubscribeStatus = await pb.collection(Collections.Status).subscribe("*", async (event) => {
       update((state) => {
@@ -37,7 +37,7 @@ function createStatusStore() {
     });
 
     if (unsubscribeMessage) {
-      unsubscribeMessage();
+      await unsubscribeMessage();
     }
     unsubscribeMessage = await pb.collection(Collections.Message).subscribe("*", (event) => {
       update((state) => {

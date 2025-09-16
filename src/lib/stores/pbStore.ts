@@ -25,7 +25,7 @@ export function createPbStore<Collection extends Collections, RecordClass extend
     set(initialData.map(recordClass.fromPb));
 
     if (unsubscribe) {
-      unsubscribe();
+      await unsubscribe();
     }
     unsubscribe = await pb.collection(collection).subscribe(
       "*",
