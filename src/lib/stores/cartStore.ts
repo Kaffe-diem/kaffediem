@@ -6,6 +6,7 @@
 
 import { writable, derived, get } from "svelte/store";
 import type { Item, CustomizationValue } from "$lib/types";
+import { sumBy, productBy, groupBy, assoc, updateAt } from "$lib/utils";
 
 export interface CartItem extends Item {
   customizations: CustomizationValue[];
@@ -16,52 +17,37 @@ export const selectedCustomizations = writable<Record<string, CustomizationValue
 
 export const cart = writable<CartItem[]>([]);
 
-export const totalPrice = derived(cart, ($cart) =>
-  $cart.reduce((sum, item) => sum + item.price, 0)
-);
+export const totalPrice = derived(cart, ($cart) => sumBy($cart, (item) => item.price));
 
 export const editingIndex = writable<number | null>(null);
 
 const computeFinalPrice = (basePrice: number, customizations: CustomizationValue[]) => {
-  const totalCustomizationPrice = customizations.reduce(
-    (sum, customization) =>
-      customization.constantPrice ? sum + (customization.priceChange || 0) : sum,
-    0
+  const totalCustomizationPrice = sumBy(
+    customizations,
+    (c) => (c.constantPrice ? c.priceChange || 0 : 0)
   );
 
   const subtotal = basePrice + totalCustomizationPrice;
-  const multiplied = customizations.reduce(
-    (price, customization) =>
-      !customization.constantPrice ? price * (customization.priceChange / 100) : price,
-    subtotal
-  );
-
-  return multiplied;
+  const factor = productBy(customizations, (c) => (!c.constantPrice ? c.priceChange / 100 : 1));
+  return subtotal * factor;
 };
 
 const computeBasePriceFromFinal = (finalPrice: number, customizations: CustomizationValue[]) => {
-  const totalCustomizationPrice = customizations.reduce(
-    (sum, customization) =>
-      customization.constantPrice ? sum + (customization.priceChange || 0) : sum,
-    0
+  const totalCustomizationPrice = sumBy(
+    customizations,
+    (c) => (c.constantPrice ? c.priceChange || 0 : 0)
   );
 
-  const multiplier = customizations.reduce(
-    (acc, customization) =>
-      !customization.constantPrice ? acc * (customization.priceChange / 100) : acc,
-    1
-  );
-
+  const multiplier = productBy(customizations, (c) => (!c.constantPrice ? c.priceChange / 100 : 1));
   const subtotal = multiplier ? finalPrice / multiplier : finalPrice;
-  const base = subtotal - totalCustomizationPrice;
-  return base;
+  return subtotal - totalCustomizationPrice;
 };
-
-const flattenCustomizations = (map: Record<string, CustomizationValue[]>) =>
-  Object.values(map).flat();
 
 const resolveBasePrice = (item: CartItem) =>
   item.basePrice ?? computeBasePriceFromFinal(item.price, item.customizations || []);
+
+const ensureBasePrice = (item: CartItem): CartItem =>
+  assoc(item, "basePrice", resolveBasePrice(item));
 
 const repriceItem = (item: CartItem, customizations: CustomizationValue[]): CartItem => {
   const base = resolveBasePrice(item);
@@ -70,15 +56,11 @@ const repriceItem = (item: CartItem, customizations: CustomizationValue[]): Cart
 };
 
 const hydrateSelectedFromItem = (item: CartItem) => {
-  const map = (item.customizations || []).reduce(
-    (acc, value) => {
-      if (!value.belongsTo) return acc;
-      (acc[value.belongsTo] ||= []).push(value);
-      return acc;
-    },
-    {} as Record<string, CustomizationValue[]>
+  const grouped = groupBy(
+    (item.customizations || []).filter((v) => Boolean(v.belongsTo)),
+    (v) => v.belongsTo as string
   );
-  selectedCustomizations.set(map);
+  selectedCustomizations.set(grouped);
 };
 
 export const startEditing = (index: number) => {
@@ -87,23 +69,17 @@ export const startEditing = (index: number) => {
   editingIndex.set(index);
   hydrateSelectedFromItem(current);
   if (current.basePrice == null) {
-    cart.update((c) =>
-      c.map((el, i) =>
-        i === index
-          ? Object.assign(Object.create(Object.getPrototypeOf(el)), {
-              ...el,
-              basePrice: resolveBasePrice(el)
-            })
-          : el
-      )
-    );
+    cart.update((c) => {
+      const updated = updateAt(c, index, ensureBasePrice);
+      return updated;
+    });
   }
 };
 
 export const deleteEditingItem = () => {
   const index = get(editingIndex);
   if (index === null) return;
-  cart.update((c) => c.filter((_, i) => i !== index));
+  removeFromCart(index);
   editingIndex.set(null);
 };
 
@@ -112,11 +88,11 @@ export const stopEditing = () => {
   initializeCustomizations();
 };
 
-const updateEditingItemFromSelections = (map: Record<string, CustomizationValue[]>) => {
+const repriceEditingItemBySelections = (map: Record<string, CustomizationValue[]>) => {
   const index = get(editingIndex);
   if (index === null) return;
-  const selected = flattenCustomizations(map);
-  cart.update((c) => c.map((item, i) => (i === index ? repriceItem(item, selected) : item)));
+  const selected = Object.values(map).flat();
+  cart.update((c) => updateAt(c, index, (item) => repriceItem(item, selected)));
 };
 
 export const initializeCustomizations = () => {
@@ -129,15 +105,12 @@ export const selectCustomization = (keyId: string, value: CustomizationValue) =>
     const currentValues = customizations[keyId] || [];
     const valueIndex = currentValues.findIndex((v) => v.id === value.id);
 
-    if (valueIndex > -1) {
-      const updated = removeCustomizationValue(customizations, keyId, currentValues, valueIndex);
-      updateEditingItemFromSelections(updated);
-      return updated;
-    } else {
-      const updated = addCustomizationValue(customizations, keyId, value);
-      updateEditingItemFromSelections(updated);
-      return updated;
-    }
+    const updated =
+      valueIndex > -1
+        ? removeCustomizationValue(customizations, keyId, currentValues, valueIndex)
+        : addCustomizationValue(customizations, keyId, value);
+    repriceEditingItemBySelections(updated);
+    return updated;
   });
 };
 
