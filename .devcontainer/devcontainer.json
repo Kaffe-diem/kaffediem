@@ -1,5 +1,5 @@
 {
   "name": "Kaffediem",
   "workspaceFolder": "/workspaces/kaffediem",
-  "forwardPorts": [8081, 5173],
+  "forwardPorts": [8081, 5173]
 }

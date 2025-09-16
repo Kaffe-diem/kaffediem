@@ -51,7 +51,7 @@ export const assoc = <T extends object, K extends PropertyKey, V = unknown>(
   obj: T,
   key: K,
   value: V
-): T & Record<K, V> => ({ ...(obj as object), [key]: value } as T & Record<K, V>);
+): T & Record<K, V> => ({ ...(obj as object), [key]: value }) as T & Record<K, V>;
 
 /** updates an array element at index */
 export const updateAt = <T>(array: T[], index: number, updater: (item: T) => T): T[] =>
