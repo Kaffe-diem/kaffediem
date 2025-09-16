@@ -61,7 +61,7 @@ export default {
     });
 
     const _orderStore = get(raw_orders);
-    const orderNumber = _orderStore.at(-1)!.dayId;
+    const orderNumber = _orderStore.sort((a, b) => a.dayId - b.dayId).at(-1)!.dayId;
     toasts.success(orderNumber.toString(), 1500);
   },
 

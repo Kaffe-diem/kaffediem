@@ -12,9 +12,13 @@
 </script>
 
 {#if $status?.online}
-  <div class="flex h-screen cursor-none flex-col items-center justify-center text-center">
-    <span class="p-2 text-7xl font-bold md:text-9xl">{$status.message.title}</span>
-    <span class="p-2 text-4xl md:text-6xl">{$status.message.subtitle}</span>
+  <div class="flex h-screen cursor-none flex-col items-center justify-center gap-6 text-center">
+    <span class="p-4 text-[clamp(3.5rem,10vw,16rem)] leading-tight font-bold">
+      {$status.message.title}
+    </span>
+    <span class="p-4 text-[clamp(2.5rem,6vw,9rem)] leading-tight">
+      {$status.message.subtitle}
+    </span>
   </div>
 {:else}
   <main class="relative min-h-screen w-full cursor-none py-4">

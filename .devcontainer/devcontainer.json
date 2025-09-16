@@ -1,0 +1,6 @@
+{
+  "name": "Kaffediem DevContainer",
+  "workspaceFolder": "/workspaces/kaffediem",
+  "forwardPorts": [8081, 5173],
+  "postStartCommand": "sleep 5 && gh codespace ports visibility 8081:public 5173:public"
+}

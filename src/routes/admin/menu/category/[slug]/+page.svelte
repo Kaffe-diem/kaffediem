@@ -1,6 +1,4 @@
 <script lang="ts">
-  // @ts-expect-error Is present, but lint fails
-  import type { PageProps } from "./$types";
   import { categories } from "$stores/menuStore";
   import { Category } from "$lib/types";
   import { goto } from "$app/navigation";
@@ -8,8 +6,9 @@
 
   import StateToggle from "$components/menu/StateToggle.svelte";
   import Input from "$components/menu/Input.svelte";
+  import { resolve } from "$app/paths";
 
-  let { data }: PageProps = $props();
+  let { data } = $props();
   const id = data.id;
   const create = id == "new";
   const category = $categories.find((category) => category.id === id);
@@ -54,7 +53,7 @@
         )
       );
     }
-    goto("/admin/menu");
+    goto(resolve("/admin/menu"));
   }
 </script>
 
@@ -69,7 +68,7 @@
         label="Navn"
         type="text"
         required
-        bind:value={categoryName}
+        bind:value={categoryName!}
         placeholder="Kategorinavn"
       />
     </div>
@@ -81,7 +80,7 @@
         label="Sortering (laveste først)"
         type="number"
         required
-        bind:value={categorySort}
+        bind:value={categorySort!}
         placeholder="Sorteringsrekkefølge"
       />
     </div>
@@ -126,6 +125,8 @@
 {:else}
   <div class="mx-30 grid grid-cols-1 gap-4">
     <h1 class="text-center text-xl">Kunne ikke finne kategori!</h1>
-    <a href="/admin/menu/category/new" rel="external" class="btn">Opprett en ny kategori</a>
+    <a href={resolve("/admin/menu/category/new")} rel="external" class="btn"
+      >Opprett en ny kategori</a
+    >
   </div>
 {/if}

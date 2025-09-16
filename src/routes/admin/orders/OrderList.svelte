@@ -46,7 +46,7 @@
       {#if amount() == 0}
         <tr><td class="text-center italic">ingenting</td></tr>
       {/if}
-      {#each $orders.reverse() as order}
+      {#each $orders.reverse() as order (order.id)}
         {#if show.includes(order.state)}
           {@render OrderRow({
             order,
@@ -77,7 +77,7 @@
     {#if detailed}
       <td class="w-full">
         <ul class="space-y-2">
-          {#each order.items as orderItem}
+          {#each order.items as orderItem (orderItem.id)}
             {@render OrderItem({ orderItem })}
           {/each}
         </ul>
@@ -95,7 +95,7 @@
 
       {#if orderItem.customizations && orderItem.customizations.length > 0}
         <ul class="mt-1 flex flex-wrap gap-1" aria-label="Customizations">
-          {#each orderItem.customizations as customization}
+          {#each orderItem.customizations as customization (customization.id)}
             {#if customization.name}
               {@render CustomizationBadge({ customization })}
             {/if}

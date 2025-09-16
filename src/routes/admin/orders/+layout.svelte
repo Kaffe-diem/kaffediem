@@ -2,6 +2,7 @@
   import { status } from "$stores/statusStore";
   import { Status } from "$lib/types";
   import { type Snippet } from "svelte";
+  import { resolve } from "$app/paths";
 
   interface Props {
     children: Snippet;
@@ -21,7 +22,7 @@
       >Åpne</button
     >
     <a
-      href="/admin/message"
+      href={resolve("/admin/message")}
       class="btn relative m-4 flex h-24 w-1/2 flex-col items-center justify-center text-3xl lg:text-5xl"
       >Eller endre status</a
     >

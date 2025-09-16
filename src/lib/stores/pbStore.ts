@@ -4,9 +4,10 @@ import { type RecordBase } from "$lib/types";
 import { browser } from "$app/environment";
 
 // ref: https://github.com/pocketbase/js-sdk?tab=readme-ov-file#nodejs-via-npm
-import eventsource from "eventsource";
+import { EventSource } from "eventsource";
+import type { UnsubscribeFunc } from "pocketbase";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-(global as any).EventSource = eventsource;
+(global as any).EventSource = EventSource;
 
 export function createPbStore<Collection extends Collections, RecordClass extends RecordBase>(
   collection: Collection,
@@ -17,12 +18,16 @@ export function createPbStore<Collection extends Collections, RecordClass extend
 ) {
   const { subscribe, set, update } = writable<RecordClass[]>([]);
 
+  let unsubscribe: UnsubscribeFunc | null = null;
+
   async function reset() {
     const initialData = await pb.collection(collection).getFullList(fetchOptions);
     set(initialData.map(recordClass.fromPb));
 
-    pb.collection(collection).unsubscribe();
-    pb.collection(collection).subscribe(
+    if (unsubscribe) {
+      await unsubscribe();
+    }
+    unsubscribe = await pb.collection(collection).subscribe(
       "*",
       (event) => {
         update((state) => {
