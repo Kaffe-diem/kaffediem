@@ -185,7 +185,7 @@ export class Category implements RecordBase {
     public readonly name: string,
     public readonly sortOrder: number,
     public readonly enabled: boolean,
-    public readonly validCustomizationKeys: string[]
+    public readonly customizationKeys: string[]
   ) {}
 
   toPb() {
@@ -193,18 +193,12 @@ export class Category implements RecordBase {
       name: this.name,
       sort_order: this.sortOrder,
       enable: this.enabled,
-      valid_customization_keys: this.validCustomizationKeys
+      customization_keys: this.customizationKeys
     };
   }
 
   static fromPb(data: ExpandedCategoryRecord): Category {
-    return new Category(
-      data.id,
-      data.name,
-      data.sort_order,
-      data.enable,
-      data.valid_customization_keys
-    );
+    return new Category(data.id, data.name, data.sort_order, data.enable, data.customization_keys);
   }
 }
 

@@ -53,7 +53,7 @@
             );
           }
 
-          if (!category.validCustomizationKeys.includes(customizationKey.id)) {
+          if (!category.customizationKeys.includes(customizationKey.id)) {
             $selectedCustomizations[customizationKey.id] = [];
           }
         }

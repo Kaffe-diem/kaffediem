@@ -25,7 +25,7 @@
       categoryName = category.name;
       categorySort = category.sortOrder;
       categoryEnabled = category.enabled;
-      categoryValidCustomizationKeys = category.validCustomizationKeys;
+      categoryValidCustomizationKeys = category.customizationKeys;
 
       exists = true;
     }
