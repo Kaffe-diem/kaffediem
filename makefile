@@ -5,7 +5,7 @@ export
 
 default: dev
 
-dev: .env.development sync pb_up pb_types svelte_types
+dev: .env.development sync pb_up pb_types svelte_types _hooks
 	docker compose watch
 
 build: pb_types
@@ -44,6 +44,12 @@ clean:
 	-docker compose down -v --remove-orphans
 	-rm -rf ./pb_data
 
-_hooks:
+
+
+_hooks: .git/.hooks_installed
 	@git config core.hooksPath .githooks
 	@chmod +x .githooks/* || true
+
+.git/.hooks_installed:
+	@$(MAKE) _hooks
+	@touch $@
