@@ -27,7 +27,7 @@ const actionHistory: {
 }[] = [];
 
 // Create the store so we can reference it in methods
-export const raw_orders = createPbStore(Collections.Order, Order, baseOptions);
+export const raw_orders = await createPbStore(Collections.Order, Order, baseOptions);
 
 export default {
   ...raw_orders,
@@ -145,7 +145,7 @@ const createCustomization = async (
   return response.id;
 };
 
-export const userOrders = createGenericPbStore(Collections.Order, Order, {
+export const userOrders = await createGenericPbStore(Collections.Order, Order, {
   ...baseOptions,
   filter: `customer = '${get(auth).user.id}'`
 });
