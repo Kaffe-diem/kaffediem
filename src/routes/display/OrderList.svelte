@@ -20,7 +20,7 @@
     </h2>
   {/if}
   <div class="grid max-h-full grid-cols-3 gap-4 overflow-y-auto xl:grid-cols-4">
-    {#each $orders as order}
+    {#each $orders as order (order.id)}
       {#if show.includes(order?.state)}
         <div
           class="{className} rounded-xl px-4 py-4 text-center text-[clamp(3rem,5vw,12rem)] leading-none font-bold"
