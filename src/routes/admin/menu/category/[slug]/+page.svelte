@@ -87,7 +87,7 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend text-xl">Tilpasninger</legend>
       <ul class="list-none">
-        {#each $customizationKeys as customizationKey}
+        {#each $customizationKeys as customizationKey (customizationKey.id)}
           <li class="my-6">
             <label class="grid grid-cols-[1fr_1fr]">
               <span class="text-xl">{customizationKey.name}</span>

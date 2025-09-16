@@ -86,7 +86,7 @@
         <legend class="fieldset-legend text-xl">Standard</legend>
         <select class="select select-xl w-full" bind:value={customizationDefaultValue}>
           <option value="">Ingen</option>
-          {#each $customizationsByKey[id] ?? [] as customization}
+          {#each $customizationsByKey[id] ?? [] as customization (customization.id)}
             <option value={customization.id}>
               {customization.name}
             </option>
