@@ -38,11 +38,3 @@ export const customizationsByKey = derived(customizationValues, ($customizationV
     return acc;
   }, {})
 );
-
-export const itemCustomizations = createGenericPbStore(
-  Collections.ItemCustomization,
-  ItemCustomization,
-  {
-    expand: "key,value"
-  }
-);
