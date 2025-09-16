@@ -5,7 +5,6 @@ import { browser } from "$app/environment";
 
 // ref: https://github.com/pocketbase/js-sdk?tab=readme-ov-file#nodejs-via-npm
 import eventsource from "eventsource";
-import type { UnsubscribeFunc } from "pocketbase";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (global as any).EventSource = eventsource;
 
