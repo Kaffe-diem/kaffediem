@@ -18,10 +18,10 @@
     </h2>
   {/if}
   <div class="grid max-h-full grid-cols-3 gap-4 overflow-y-scroll">
-    {#each $orders as order, index}
+    {#each $orders as order}
       {#if show.includes(order?.state)}
         <div class="{className} xl:text-10xl rounded-xl px-4 py-4 text-center text-6xl font-bold">
-          {index + 100}
+          {order.dayId}
         </div>
       {/if}
     {/each}

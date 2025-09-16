@@ -52,10 +52,6 @@ export default {
       })
     );
 
-    const _orderStore = get(raw_orders);
-    const orderNumber = _orderStore.length + 100;
-    toasts.success(orderNumber.toString(), 1500);
-
     await pb.collection(Collections.Order).create({
       customer: userId,
       items: orderItemIds,
@@ -63,6 +59,10 @@ export default {
       missing_information: missingInformation,
       day_id: dayId
     });
+
+    const _orderStore = get(raw_orders);
+    const orderNumber = _orderStore.sort((a, b) => a.dayId - b.dayId).at(-1)!.dayId;
+    toasts.success(orderNumber.toString(), 1500);
   },
 
   updateState: async (orderId: RecordIdString, state: State) => {
