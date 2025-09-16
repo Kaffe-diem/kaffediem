@@ -3,6 +3,7 @@
   import MenuIcon from "$assets/MenuIcon.svelte";
   import NavItems from "$components/NavItems.svelte";
   import { NavItem } from "$lib/types";
+  import { resolve } from "$app/paths";
 
   const navItems = [new NavItem("/account", "Min bruker"), new NavItem("/admin", "Admin")];
 </script>
@@ -12,7 +13,7 @@
   <div class="drawer-content flex flex-col">
     <div class="navbar w-full">
       <div class="flex-1">
-        <a href="/" class="btn btn-ghost text-xl">Kaffe Diem</a>
+        <a href={resolve("/")} class="btn btn-ghost text-xl">Kaffe Diem</a>
       </div>
       <div class="flex-none lg:hidden">
         <label for="drawer" aria-label="open sidebar" class="btn btn-square btn-ghost">

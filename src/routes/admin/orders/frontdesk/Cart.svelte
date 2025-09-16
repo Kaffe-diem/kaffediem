@@ -31,10 +31,7 @@
   let remoteOrderId = $derived(
     $orders.length > 0 ? $orders.sort((a, b) => a.dayId - b.dayId).at(-1)!.dayId : 100
   );
-  let localOrderId = $state(0);
-  $effect(() => {
-    localOrderId = remoteOrderId;
-  });
+  let localOrderId = $derived(remoteOrderId);
   let currentOrderId = $derived(Math.max(localOrderId, remoteOrderId));
 
   let missing_information = $state(false);
@@ -92,7 +89,7 @@
         </tr>
       </thead>
       <tbody>
-        {#each $cart as item, index}
+        {#each $cart as item, index (index)}
           {@render CartItem({ item, index })}
         {/each}
       </tbody>
@@ -119,7 +116,7 @@
         <div>{item.name}</div>
         {#if item.customizations && item.customizations.length > 0}
           <div class="mt-1 flex flex-wrap gap-1">
-            {#each item.customizations as customization}
+            {#each item.customizations as customization (customization.id)}
               {#if customization.name}
                 {@render CustomizationBadge({ customization })}
               {/if}

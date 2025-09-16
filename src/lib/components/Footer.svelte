@@ -1,4 +1,5 @@
 <script>
+  import { resolve } from "$app/paths";
   import Logo from "$assets/logo.png";
   const year = new Date().getFullYear();
 </script>
@@ -14,7 +15,7 @@
   </aside>
   <nav>
     <h6 class="footer-title">Vilkår og personvern</h6>
-    <a href="/tos" class="link-hover link">Vilkår for bruk</a>
+    <a href={resolve("/tos")} class="link-hover link">Vilkår for bruk</a>
   </nav>
   <nav>
     <h6 class="footer-title">Få hjelp</h6>
@@ -22,6 +23,6 @@
   </nav>
   <nav>
     <h6 class="footer-title">Annet</h6>
-    <a href="/display" class="link-hover link">Visning</a>
+    <a href={resolve("/display")} class="link-hover link">Visning</a>
   </nav>
 </footer>

@@ -25,7 +25,7 @@
 
 <form>
   <ul class="list-none">
-    {#each $messages as message}
+    {#each $messages as message (message.id)}
       <li class="my-8">
         <label class="form-control grid grid-cols-[auto_1fr_1fr_auto] place-items-center gap-4">
           <input
