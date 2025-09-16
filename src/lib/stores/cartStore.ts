@@ -6,18 +6,61 @@
 
 import { writable, derived, get } from "svelte/store";
 import type { Item, CustomizationValue } from "$lib/types";
+import { sumBy, groupBy, updateAt } from "$lib/utils";
+import { finalPrice } from "$lib/pricing";
 
 export interface CartItem extends Item {
   customizations: CustomizationValue[];
+  basePrice: number;
 }
 
 export const selectedCustomizations = writable<Record<string, CustomizationValue[]>>({});
 
 export const cart = writable<CartItem[]>([]);
 
-export const totalPrice = derived(cart, ($cart) =>
-  $cart.reduce((sum, item) => sum + item.price, 0)
-);
+export const totalPrice = derived(cart, ($cart) => sumBy($cart, (item) => item.price));
+
+export const editingIndex = writable<number | null>(null);
+
+const repriceItem = (item: CartItem, customizations: CustomizationValue[]): CartItem => {
+  const base = item.basePrice;
+  const price = finalPrice(base, customizations);
+  return { ...item, basePrice: base, customizations, price } as CartItem;
+};
+
+const hydrateSelectedFromItem = (item: CartItem) => {
+  const grouped = groupBy(
+    (item.customizations || []).filter((v) => Boolean(v.belongsTo)),
+    (v) => v.belongsTo as string
+  );
+  selectedCustomizations.set(grouped);
+};
+
+export const startEditing = (index: number) => {
+  const current = get(cart)[index];
+  if (!current) return;
+  editingIndex.set(index);
+  hydrateSelectedFromItem(current);
+};
+
+export const deleteEditingItem = () => {
+  const index = get(editingIndex);
+  if (index === null) return;
+  removeFromCart(index);
+  editingIndex.set(null);
+};
+
+export const stopEditing = () => {
+  editingIndex.set(null);
+  initializeCustomizations();
+};
+
+const repriceEditingItemBySelections = (map: Record<string, CustomizationValue[]>) => {
+  const index = get(editingIndex);
+  if (index === null) return;
+  const selected = Object.values(map).flat();
+  cart.update((c) => updateAt(c, index, (item) => repriceItem(item, selected)));
+};
 
 export const initializeCustomizations = () => {
   const map: Record<string, CustomizationValue[]> = {};
@@ -29,11 +72,12 @@ export const selectCustomization = (keyId: string, value: CustomizationValue) =>
     const currentValues = customizations[keyId] || [];
     const valueIndex = currentValues.findIndex((v) => v.id === value.id);
 
-    if (valueIndex > -1) {
-      return removeCustomizationValue(customizations, keyId, currentValues, valueIndex);
-    } else {
-      return addCustomizationValue(customizations, keyId, value);
-    }
+    const updated =
+      valueIndex > -1
+        ? removeCustomizationValue(customizations, keyId, currentValues, valueIndex)
+        : addCustomizationValue(customizations, keyId, value);
+    repriceEditingItemBySelections(updated);
+    return updated;
   });
 };
 
@@ -75,23 +119,14 @@ export const addToCart = (item: Item) => {
   // so we just flatten this structure for the purposes of summation
   const customizations = Object.values(get(selectedCustomizations)).flat();
 
-  const totalCustomizationPrice = customizations.reduce(
-    (sum, customization) =>
-      customization.constantPrice ? sum + (customization.priceChange || 0) : sum,
-    0
-  );
-
-  const subtotal = item.price + totalCustomizationPrice;
-  const finalprice = customizations.reduce(
-    (price, customization) =>
-      !customization.constantPrice ? price * (customization.priceChange / 100) : price,
-    subtotal
-  );
+  const basePrice = item.price;
+  const finalprice = finalPrice(basePrice, customizations);
 
   const itemToAdd: CartItem = {
     ...item,
     price: Math.ceil(finalprice),
-    customizations
+    customizations,
+    basePrice
   } as CartItem;
 
   cart.update((c) => [...c, itemToAdd]);

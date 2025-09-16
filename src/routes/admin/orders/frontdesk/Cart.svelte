@@ -4,8 +4,12 @@
     cart,
     clearCart,
     type CartItem,
-    removeFromCart,
-    totalPrice
+    totalPrice,
+    editingIndex,
+    startEditing,
+    deleteEditingItem,
+    stopEditing,
+    selectCustomization
   } from "$stores/cartStore";
   import auth from "$stores/authStore";
   import orderStore from "$stores/orderStore";
@@ -23,10 +27,14 @@
     Object.fromEntries($customizationKeys.map((key) => [key.id, key.labelColor]))
   );
 
-  function handleAddToCart() {
+  const handleAddToCart = () => {
+    if ($editingIndex !== null) {
+      stopEditing();
+      return;
+    }
     if (!selectedItem) return;
     addToCart(selectedItem);
-  }
+  };
 
   let remoteOrderId = $derived(
     $orders.length > 0 ? $orders.sort((a, b) => a.dayId - b.dayId).at(-1)!.dayId : 100
@@ -79,7 +87,9 @@
       {/if}
     </div>
 
-    <button class="bold btn btn-lg btn-primary text-3xl" onclick={handleAddToCart}>+</button>
+    <button class="bold btn btn-lg btn-primary text-3xl" onclick={handleAddToCart}
+      >{$editingIndex !== null ? "OK" : "+"}</button
+    >
   </div>
 </div>
 
@@ -113,7 +123,7 @@
 {/snippet}
 
 {#snippet CartItem({ item, index }: { item: CartItem; index: number })}
-  <tr class="hover select-none" onclick={() => removeFromCart(index)}>
+  <tr class="hover select-none" onclick={() => startEditing(index)}>
     <td>
       <div>
         <div>{item.name}</div>
@@ -121,14 +131,28 @@
           <div class="mt-1 flex flex-wrap gap-1">
             {#each item.customizations as customization}
               {#if customization.name}
-                {@render CustomizationBadge({ customization })}
+                {#if $editingIndex === index && customization.belongsTo}
+                  <button
+                    class="cursor-pointer"
+                    onclick={() => selectCustomization(customization.belongsTo, customization)}
+                  >
+                    {@render CustomizationBadge({ customization })}
+                  </button>
+                {:else}
+                  {@render CustomizationBadge({ customization })}
+                {/if}
               {/if}
             {/each}
           </div>
         {/if}
       </div>
     </td>
-    <td>{item.price},-</td>
+    <td>
+      <span>{item.price},-</span>
+      {#if $editingIndex === index}
+        <button class="text-error ml-3" onclick={deleteEditingItem}>slett</button>
+      {/if}
+    </td>
   </tr>
 {/snippet}
 
