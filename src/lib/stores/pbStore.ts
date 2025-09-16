@@ -9,7 +9,7 @@ import type { UnsubscribeFunc } from "pocketbase";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (global as any).EventSource = eventsource;
 
-export function createPbStore<Collection extends Collections, RecordClass extends RecordBase>(
+export async function createPbStore<Collection extends Collections, RecordClass extends RecordBase>(
   collection: Collection,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   recordClass: { fromPb(data: any): RecordClass },
@@ -18,16 +18,15 @@ export function createPbStore<Collection extends Collections, RecordClass extend
 ) {
   const { subscribe, set, update } = writable<RecordClass[]>([]);
 
-  let unsubscribe: UnsubscribeFunc | null = null;
-
   async function reset() {
     const initialData = await pb.collection(collection).getFullList(fetchOptions);
     set(initialData.map(recordClass.fromPb));
+  }
 
-    if (unsubscribe) {
-      await unsubscribe();
-    }
-    unsubscribe = await pb.collection(collection).subscribe(
+  if (browser) {
+    reset();
+
+    await pb.collection(collection).subscribe(
       "*",
       (event) => {
         update((state) => {
@@ -53,17 +52,13 @@ export function createPbStore<Collection extends Collections, RecordClass extend
     );
   }
 
-  if (browser) {
-    reset();
-  }
-
   return {
     subscribe,
     reset
   };
 }
 
-export function createGenericPbStore<
+export async function createGenericPbStore<
   Collection extends Collections,
   RecordClass extends RecordBase
 >(
@@ -74,7 +69,7 @@ export function createGenericPbStore<
   subscribeOptions: { [key: string]: string } = fetchOptions
 ) {
   return {
-    ...createPbStore(collection, recordClass, fetchOptions, subscribeOptions),
+    ...(await createPbStore(collection, recordClass, fetchOptions, subscribeOptions)),
     update: async (record: RecordClass) => {
       await pb.collection(collection).update(record.id, record.toPb());
     },
