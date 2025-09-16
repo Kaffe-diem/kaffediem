@@ -24,7 +24,7 @@
 
   const addMessage = () => {
     const lastMessage = $messages.at(-1);
-    if (lastMessage.title || lastMessage.subtitle) {
+    if (lastMessage?.title || lastMessage?.subtitle) {
       messages.create(Message.baseValue);
     } else {
       window.alert("Fyll ut den siste meldingen før du legger til en ny.");
