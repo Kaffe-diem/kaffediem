@@ -13,14 +13,16 @@
 
 <div class="flex h-full flex-col p-4 select-none">
   {#if label != ""}
-    <h2 class="mb-4 text-4xl font-bold md:mb-6 md:text-center lg:text-4xl">
+    <h2 class="mb-4 text-[clamp(1.75rem,4vw,5rem)] leading-tight font-bold md:mb-6 md:text-center">
       {label}
     </h2>
   {/if}
-  <div class="grid max-h-full grid-cols-3 gap-4 overflow-y-scroll">
+  <div class="grid max-h-full grid-cols-2 gap-6 overflow-y-auto md:grid-cols-3">
     {#each $orders as order}
       {#if show.includes(order?.state)}
-        <div class="{className} xl:text-10xl rounded-xl px-4 py-4 text-center text-6xl font-bold">
+        <div
+          class="{className} rounded-xl px-4 py-6 text-center text-[clamp(3.5rem,12vw,18rem)] leading-none font-bold"
+        >
           {order.dayId}
         </div>
       {/if}
