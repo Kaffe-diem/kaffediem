@@ -1,5 +1,5 @@
 {
-  "name": "Kaffediem DevContainer",
+  "name": "Kaffediem",
   "workspaceFolder": "/workspaces/kaffediem",
   "forwardPorts": [8081, 5173],
 }
