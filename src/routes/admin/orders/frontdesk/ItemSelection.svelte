@@ -1,28 +1,15 @@
 <script lang="ts">
-  import {
-    categories,
-    itemsByCategory,
-    customizationKeys,
-    customizationValues
-  } from "$stores/menuStore";
+  import { categories, itemsByCategory, customizationKeys } from "$stores/menuStore";
   import type { Item, Category } from "$lib/types";
-  import { selectedCustomizations } from "$stores/cartStore";
+  import { selectedCustomizations, applyDefaults } from "$stores/cartStore";
 
   let { selectedItem = $bindable() } = $props();
 
-  function syncCustomizations(category: Category) {
+  function validateCustomizations(category: Category) {
     for (const key of $customizationKeys) {
       const isValid = category.customizationKeys.includes(key.id);
       if (!isValid) {
         $selectedCustomizations[key.id] = [];
-        continue;
-      }
-
-      const selected = $selectedCustomizations[key.id] ?? [];
-      if (selected.length === 0 && key.defaultValue) {
-        $selectedCustomizations[key.id] = $customizationValues.filter(
-          (val) => val.id === key.defaultValue
-        );
       }
     }
   }
@@ -59,7 +46,10 @@
       class="peer hidden"
       value={item}
       bind:group={selectedItem}
-      onchange={() => syncCustomizations(category)}
+      onchange={() => {
+        applyDefaults();
+        validateCustomizations(category);
+      }}
     />
     <div
       class="btn peer-checked:border-accent peer-checked:bg-base-300 peer-checked:ring-lg peer-checked:ring-accent relative flex h-24 w-full flex-col border-2 transition-all duration-300 ease-in-out peer-checked:scale-109 peer-checked:shadow-xl peer-checked:ring"

@@ -6,6 +6,7 @@
 
 import { writable, derived, get } from "svelte/store";
 import type { Item, CustomizationValue } from "$lib/types";
+import { customizationKeys, customizationValues } from "./menuStore";
 
 export interface CartItem extends Item {
   customizations: CustomizationValue[];
@@ -19,9 +20,26 @@ export const totalPrice = derived(cart, ($cart) =>
   $cart.reduce((sum, item) => sum + item.price, 0)
 );
 
+export const applyDefaults = () => {
+  const keys = get(customizationKeys);
+  const values = get(customizationValues);
+  const selected = get(selectedCustomizations);
+
+  for (const key of keys) {
+    const current = selected[key.id] ?? [];
+
+    if (current.length === 0 && key.defaultValue) {
+      selected[key.id] = values.filter((val) => val.id === key.defaultValue);
+    }
+  }
+
+  selectedCustomizations.set({ ...selected });
+};
+
 export const initializeCustomizations = () => {
   const map: Record<string, CustomizationValue[]> = {};
   selectedCustomizations.set(map);
+  applyDefaults();
 };
 
 export const addToCart = (item: Item) => {
