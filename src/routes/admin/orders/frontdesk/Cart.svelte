@@ -4,7 +4,6 @@
     cart,
     clearCart,
     type CartItem,
-    removeFromCart,
     totalPrice,
     editingIndex,
     startEditing,
@@ -78,7 +77,9 @@
       {/if}
     </div>
 
-    <button class="bold btn btn-lg btn-primary text-3xl" onclick={handleAddToCart}>{$editingIndex !== null ? 'OK' : '+'}</button>
+    <button class="bold btn btn-lg btn-primary text-3xl" onclick={handleAddToCart}
+      >{$editingIndex !== null ? "OK" : "+"}</button
+    >
   </div>
 </div>
 
@@ -121,7 +122,10 @@
             {#each item.customizations as customization}
               {#if customization.name}
                 {#if $editingIndex === index && customization.belongsTo}
-                  <button class="cursor-pointer" onclick={() => selectCustomization(customization.belongsTo, customization)}>
+                  <button
+                    class="cursor-pointer"
+                    onclick={() => selectCustomization(customization.belongsTo, customization)}
+                  >
                     {@render CustomizationBadge({ customization })}
                   </button>
                 {:else}
@@ -136,7 +140,7 @@
     <td>
       <span>{item.price},-</span>
       {#if $editingIndex === index}
-        <button class="ml-3 text-error" onclick={deleteEditingItem}>slett</button>
+        <button class="text-error ml-3" onclick={deleteEditingItem}>slett</button>
       {/if}
     </td>
   </tr>
