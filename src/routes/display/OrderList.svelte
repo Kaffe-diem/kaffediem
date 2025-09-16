@@ -1,6 +1,6 @@
 <script lang="ts">
   import orders from "$stores/orderStore";
-  import { OrderStateOptions } from "$lib/pocketbase";
+  import type { OrderStateOptions } from "$lib/pocketbase";
 
   interface Props {
     show: OrderStateOptions[];
