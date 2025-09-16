@@ -13,7 +13,9 @@
 
 <div class="flex h-full flex-col p-4 select-none">
   {#if label != ""}
-    <h2 class="mb-4 text-[clamp(1.75rem,3vw,4.25rem)] leading-tight font-bold md:mb-6 md:text-center">
+    <h2
+      class="mb-4 text-[clamp(1.75rem,3vw,4.25rem)] leading-tight font-bold md:mb-6 md:text-center"
+    >
       {label}
     </h2>
   {/if}
