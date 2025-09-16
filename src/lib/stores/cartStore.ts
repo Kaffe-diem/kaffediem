@@ -6,11 +6,12 @@
 
 import { writable, derived, get } from "svelte/store";
 import type { Item, CustomizationValue } from "$lib/types";
-import { sumBy, productBy, groupBy, assoc, updateAt } from "$lib/utils";
+import { sumBy, groupBy, updateAt } from "$lib/utils";
+import { finalPrice } from "$lib/pricing";
 
 export interface CartItem extends Item {
   customizations: CustomizationValue[];
-  basePrice?: number;
+  basePrice: number;
 }
 
 export const selectedCustomizations = writable<Record<string, CustomizationValue[]>>({});
@@ -21,37 +22,9 @@ export const totalPrice = derived(cart, ($cart) => sumBy($cart, (item) => item.p
 
 export const editingIndex = writable<number | null>(null);
 
-const computeFinalPrice = (basePrice: number, customizations: CustomizationValue[]) => {
-  const totalCustomizationPrice = sumBy(
-    customizations,
-    (c) => (c.constantPrice ? c.priceChange || 0 : 0)
-  );
-
-  const subtotal = basePrice + totalCustomizationPrice;
-  const factor = productBy(customizations, (c) => (!c.constantPrice ? c.priceChange / 100 : 1));
-  return subtotal * factor;
-};
-
-const computeBasePriceFromFinal = (finalPrice: number, customizations: CustomizationValue[]) => {
-  const totalCustomizationPrice = sumBy(
-    customizations,
-    (c) => (c.constantPrice ? c.priceChange || 0 : 0)
-  );
-
-  const multiplier = productBy(customizations, (c) => (!c.constantPrice ? c.priceChange / 100 : 1));
-  const subtotal = multiplier ? finalPrice / multiplier : finalPrice;
-  return subtotal - totalCustomizationPrice;
-};
-
-const resolveBasePrice = (item: CartItem) =>
-  item.basePrice ?? computeBasePriceFromFinal(item.price, item.customizations || []);
-
-const ensureBasePrice = (item: CartItem): CartItem =>
-  assoc(item, "basePrice", resolveBasePrice(item));
-
 const repriceItem = (item: CartItem, customizations: CustomizationValue[]): CartItem => {
-  const base = resolveBasePrice(item);
-  const price = Math.ceil(computeFinalPrice(base, customizations));
+  const base = item.basePrice;
+  const price = finalPrice(base, customizations);
   return { ...item, basePrice: base, customizations, price } as CartItem;
 };
 
@@ -68,12 +41,6 @@ export const startEditing = (index: number) => {
   if (!current) return;
   editingIndex.set(index);
   hydrateSelectedFromItem(current);
-  if (current.basePrice == null) {
-    cart.update((c) => {
-      const updated = updateAt(c, index, ensureBasePrice);
-      return updated;
-    });
-  }
 };
 
 export const deleteEditingItem = () => {
@@ -153,7 +120,7 @@ export const addToCart = (item: Item) => {
   const customizations = Object.values(get(selectedCustomizations)).flat();
 
   const basePrice = item.price;
-  const finalprice = computeFinalPrice(basePrice, customizations);
+  const finalprice = finalPrice(basePrice, customizations);
 
   const itemToAdd: CartItem = {
     ...item,
