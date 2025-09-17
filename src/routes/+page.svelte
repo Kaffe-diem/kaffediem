@@ -1,6 +1,6 @@
 <script>
   import auth from "$stores/authStore";
-  import Logo from "$assets/logo.png";
+  import Logo from "$assets/logo.avif";
   import AuthButton from "$components/AuthButton.svelte";
   import Menu from "./Menu.svelte";
   import { status } from "$stores/statusStore";
