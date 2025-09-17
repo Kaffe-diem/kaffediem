@@ -47,9 +47,8 @@ clean:
 
 
 _hooks: .git/.hooks_installed
-	@git config core.hooksPath .githooks
-	@chmod +x .githooks/* || true
 
 .git/.hooks_installed:
-	@$(MAKE) _hooks
+	@git config core.hooksPath .githooks
+	@chmod +x .githooks/* || true
 	@touch $@
