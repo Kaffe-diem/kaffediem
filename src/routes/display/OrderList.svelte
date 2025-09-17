@@ -35,7 +35,7 @@
       {label}
     </h2>
   {/if}
-  <div class="grid max-h-full grid-cols-3 gap-4 overflow-x-hidden overflow-y-scroll xl:grid-cols-4">
+  <div class="grid max-h-full grid-cols-3 gap-4 overflow-x-hidden overflow-y-scroll">
     {#each $orders.filter((order) => show.includes(order?.state)) as order (order.id)}
       <div
         class="{className} rounded-xl px-4 py-4 text-center text-[clamp(3rem,4vw,12rem)] leading-none font-bold"
