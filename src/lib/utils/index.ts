@@ -44,3 +44,20 @@ export function groupBy<T, K extends string | number | symbol>(
 export function map<T, U>(array: T[], callback: (item: T) => U): U[] {
   return array.map(callback);
 }
+
+/**
+ * Get characters from the alphabet based on an index and use multiple characters (similar to excel) if the index exceeds the length of the alphabet.
+ */
+const alphabet = "abcdefghijklmnopqrstuvwxyzæøå".split("");
+export function getCharacters(index: number): string {
+  const base = alphabet.length;
+  let n = index;
+  let result: string = "";
+
+  while (n >= 0) {
+    result = alphabet[n % base]!.toUpperCase() + result;
+    n = Math.floor(n / base) - 1;
+  }
+
+  return result;
+}

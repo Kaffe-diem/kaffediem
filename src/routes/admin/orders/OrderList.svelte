@@ -4,6 +4,7 @@
   import { customizationKeys } from "$lib/stores/menuStore";
   import type { CustomizationKey, CustomizationValue, Order, OrderItem } from "$lib/types";
   import CommentIcon from "$assets/CommentIcon.svelte";
+  import { getCharacters } from "$lib/utils";
 
   const {
     show,
@@ -97,13 +98,13 @@
 })}
   <li class="bg-base-300 w-full rounded p-3 shadow">
     <div class="flex flex-col">
-      <div class="flex flex-row gap-4">
+      <div class="flex flex-row items-center gap-4">
         {#if showIndex}
-          <span class="mb-1 flex items-center text-xl">
-            {index + 1}
+          <span class="badge badge-outline badge-primary flex items-center text-xl">
+            {getCharacters(index)}
           </span>
         {/if}
-        <span class="mb-1 flex items-center text-xl">
+        <span class="flex items-center text-xl">
           {orderItem.item.name}
         </span>
       </div>
