@@ -11,11 +11,11 @@
   let { children }: Props = $props();
 </script>
 
-{#if $status.message.title || $status.message.subtitle}
+{#if $status.showMessage && ($status.message.title || $status.message.subtitle)}
   <div
-    class="flex {$status.online
-      ? 'h-screen justify-center'
-      : 'h-1/3 justify-start pt-20'} bg-base-100 fixed bottom-0 z-100 w-full cursor-none flex-col items-center text-center"
+    class="flex {$status.open
+      ? 'h-1/3 justify-start pt-20'
+      : 'h-screen justify-center'} bg-base-100 fixed bottom-0 z-100 w-full cursor-none flex-col items-center text-center"
   >
     <span class="p-2 text-7xl font-bold md:text-9xl">
       {$status.message.title || $status.message.subtitle}

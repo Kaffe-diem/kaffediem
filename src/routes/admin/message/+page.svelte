@@ -1,9 +1,13 @@
 <script lang="ts">
   import { messages, status } from "$stores/statusStore";
   import { Message, Status } from "$lib/types";
+  import Visible from "$assets/Visible.svelte";
+  import Hidden from "$assets/Hidden.svelte";
 
   const handleStatusChange = (message: Message) => {
-    status.update(new Status($status.id, message, $status.messages, $status.online));
+    status.update(
+      new Status($status.id, message, $status.messages, $status.open, $status.showMessage)
+    );
   };
 
   const handleTitleChange = (event: Event, message: Message) => {
@@ -18,8 +22,16 @@
     );
   };
 
-  const toggleVisibility = () => {
-    status.update(new Status($status.id, $status.message, $status.messages, !$status.online));
+  const toggleOpen = () => {
+    status.update(
+      new Status($status.id, $status.message, $status.messages, !$status.open, $status.open)
+    );
+  };
+
+  const toggleShowMessage = () => {
+    status.update(
+      new Status($status.id, $status.message, $status.messages, $status.open, !$status.showMessage)
+    );
   };
 </script>
 
@@ -62,9 +74,15 @@
         </label>
       </li>
     {/each}
-    <div class="grid grid-cols-[1fr_auto]">
-      <button type="button" class="btn btn-xl w-full" onclick={toggleVisibility}
-        >{$status.online ? "Stengt" : "Åpent"}</button
+    <div class="grid grid-cols-[auto_1fr_auto]">
+      <button
+        type="button"
+        class="btn btn-xl mr-4 {$status.open ? '' : 'invisible'}"
+        onclick={toggleShowMessage}
+        >{#if $status.showMessage}<Visible />{:else}<Hidden />{/if}</button
+      >
+      <button type="button" class="btn btn-xl w-full" onclick={toggleOpen}
+        >{$status.open ? "Åpent" : "Stengt"}</button
       >
       <button
         type="button"

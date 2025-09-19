@@ -28,15 +28,20 @@ export type IsoDateString = string
 export type RecordIdString = string
 export type HTMLString = string
 
+type ExpandType<T> = unknown extends T
+	? T extends unknown
+		? { expand?: unknown }
+		: { expand: T }
+	: { expand: T }
+
 // System fields
-export type BaseSystemFields<T = never> = {
+export type BaseSystemFields<T = unknown> = {
 	id: RecordIdString
 	collectionId: string
 	collectionName: Collections
-	expand?: T
-}
+} & ExpandType<T>
 
-export type AuthSystemFields<T = never> = {
+export type AuthSystemFields<T = unknown> = {
 	email: string
 	emailVisibility: boolean
 	username: string
@@ -159,7 +164,6 @@ export enum OrderStateOptions {
 export type OrderRecord = {
 	created?: IsoDateString
 	customer?: RecordIdString
-	day_id?: number
 	id: string
 	items: RecordIdString[]
 	missing_information?: boolean
@@ -179,7 +183,8 @@ export type StatusRecord = {
 	created?: IsoDateString
 	id: string
 	message?: RecordIdString
-	online?: boolean
+	open?: boolean
+	show_message?: boolean
 	updated?: IsoDateString
 }
 

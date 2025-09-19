@@ -217,13 +217,14 @@ export class Status implements RecordBase {
     public readonly id: RecordIdString,
     public readonly message: Message,
     public readonly messages: Message[],
-    public readonly online: boolean
+    public readonly open: boolean,
+    public readonly showMessage: boolean
   ) {}
 
-  static baseValue = new Status("", Message.baseValue, [Message.baseValue], false);
+  static baseValue = new Status("", Message.baseValue, [Message.baseValue], false, false);
 
   toPb() {
-    return { message: this.message.id, online: this.online };
+    return { message: this.message.id, open: this.open, show_message: this.showMessage };
   }
 
   static fromPb(status: StatusResponse, messages: Message[]): Status {
@@ -231,7 +232,8 @@ export class Status implements RecordBase {
       status.id,
       messages.filter((m) => m.id == status.message)[0] || Message.baseValue,
       messages,
-      status.online
+      status.open,
+      status.show_message
     );
   }
 }

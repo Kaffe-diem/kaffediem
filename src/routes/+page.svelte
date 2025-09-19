@@ -17,11 +17,16 @@
 
   <br />
   <ul>
-    {#if $status.online}
+    {#if $status.open}
+      <li>Vi er åpen!</li>
+      {#if $status.showMessage}
+        <br />
+        <li class="font-bold">{$status.message.title}</li>
+        <li>{$status.message.subtitle}</li>
+      {/if}
+    {:else}
       <li class="font-bold">{$status.message.title}</li>
       <li>{$status.message.subtitle}</li>
-    {:else}
-      <li>Vi er åpen!</li>
     {/if}
   </ul>
 </div>
