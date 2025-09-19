@@ -101,6 +101,7 @@ export type SuperusersRecord = {
 
 export type CategoryRecord = {
 	created?: IsoDateString
+	customization_keys?: RecordIdString[]
 	enable?: boolean
 	id: string
 	name: string
@@ -110,9 +111,11 @@ export type CategoryRecord = {
 
 export type CustomizationKeyRecord = {
 	created?: IsoDateString
+	default_value?: RecordIdString
 	enable?: boolean
 	id: string
 	label_color: string
+	multiple_choice?: boolean
 	name: string
 	updated?: IsoDateString
 }

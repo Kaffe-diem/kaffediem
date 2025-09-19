@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { customizationKeys } from "$stores/menuStore";
+  import { customizationKeys, customizationsByKey } from "$stores/menuStore";
   import { CustomizationKey } from "$lib/types";
   import { goto } from "$app/navigation";
 
@@ -14,6 +14,8 @@
   let customizationName: string | undefined = $state();
   let customizationEnabled: boolean = $state(true);
   let customizationColor: string | undefined = $state("#CCCCCC");
+  let customizationDefaultValue: string | undefined = $state();
+  let customizationMultipleChoice: boolean = $state(false);
 
   let exists: boolean = $state(false);
 
@@ -23,6 +25,8 @@
       customizationName = key.name;
       customizationEnabled = key.enabled;
       customizationColor = key.labelColor;
+      customizationDefaultValue = key.defaultValue;
+      customizationMultipleChoice = key.multipleChoice;
 
       exists = true;
     }
@@ -31,11 +35,25 @@
   function updateKey() {
     if (create) {
       customizationKeys.create(
-        new CustomizationKey(id, customizationName!, customizationEnabled, customizationColor!)
+        new CustomizationKey(
+          id,
+          customizationName!,
+          customizationEnabled,
+          customizationColor!,
+          customizationDefaultValue!,
+          customizationMultipleChoice
+        )
       );
     } else {
       customizationKeys.update(
-        new CustomizationKey(id, customizationName!, customizationEnabled, customizationColor!)
+        new CustomizationKey(
+          id,
+          customizationName!,
+          customizationEnabled,
+          customizationColor!,
+          customizationDefaultValue!,
+          customizationMultipleChoice
+        )
       );
     }
     goto(resolve("/admin/menu/customization"));
@@ -63,6 +81,27 @@
     <div>
       <Input label="Farge" type="color" bind:value={customizationColor} />
     </div>
+    <div class="col-span-2">
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend text-xl">Standard</legend>
+        <select class="select select-xl w-full" bind:value={customizationDefaultValue}>
+          <option value="">Ingen</option>
+          {#each $customizationsByKey[id] ?? [] as customization (customization.id)}
+            <option value={customization.id}>
+              {customization.name}
+            </option>
+          {/each}
+        </select>
+      </fieldset>
+    </div>
+    <label class="mt-4">
+      <span class="text-xl font-bold">Flervalg</span>
+      <input
+        type="checkbox"
+        class="checkbox checkbox-xl ml-4"
+        bind:checked={customizationMultipleChoice}
+      />
+    </label>
     <div class="divider col-span-2"></div>
     <div class="col-span-2">
       <button type="submit" class="btn btn-xl btn-primary w-full"

@@ -184,15 +184,21 @@ export class Category implements RecordBase {
     public readonly id: RecordIdString,
     public readonly name: string,
     public readonly sortOrder: number,
-    public readonly enabled: boolean
+    public readonly enabled: boolean,
+    public readonly customizationKeys: string[]
   ) {}
 
   toPb() {
-    return { name: this.name, sort_order: this.sortOrder, enable: this.enabled };
+    return {
+      name: this.name,
+      sort_order: this.sortOrder,
+      enable: this.enabled,
+      customization_keys: this.customizationKeys
+    };
   }
 
   static fromPb(data: ExpandedCategoryRecord): Category {
-    return new Category(data.id, data.name, data.sort_order, data.enable);
+    return new Category(data.id, data.name, data.sort_order, data.enable, data.customization_keys);
   }
 }
 
@@ -243,15 +249,30 @@ export class CustomizationKey implements RecordBase {
     public readonly id: RecordIdString,
     public readonly name: string,
     public readonly enabled: boolean,
-    public readonly labelColor?: string
+    public readonly labelColor: string,
+    public readonly defaultValue: string,
+    public readonly multipleChoice: boolean
   ) {}
 
   toPb() {
-    return { name: this.name, enable: this.enabled, label_color: this.labelColor };
+    return {
+      name: this.name,
+      enable: this.enabled,
+      label_color: this.labelColor,
+      default_value: this.defaultValue,
+      multiple_choice: this.multipleChoice
+    };
   }
 
   static fromPb(data: CustomizationKeyResponse): CustomizationKey {
-    return new CustomizationKey(data.id, data.name || "", data.enable, data.label_color);
+    return new CustomizationKey(
+      data.id,
+      data.name || "",
+      data.enable,
+      data.label_color,
+      data.default_value,
+      data.multiple_choice
+    );
   }
 }
 
