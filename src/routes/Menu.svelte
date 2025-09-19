@@ -11,7 +11,7 @@
       <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
         {#each $itemsByCategory[category.id] ?? [] as item (item.id)}
           {#if item.enabled}
-            <MenuItem {item} buyButton={!$status.online} />
+            <MenuItem {item} buyButton={$status.open} />
           {/if}
         {/each}
       </div>
