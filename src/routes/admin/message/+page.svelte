@@ -14,12 +14,14 @@
     messages.update(
       new Message(message.id, (event.target as HTMLInputElement).value, message.subtitle)
     );
+    handleStatusChange(message);
   };
 
   const handleSubtitleChange = (event: Event, message: Message) => {
     messages.update(
       new Message(message.id, message.title, (event.target as HTMLInputElement).value)
     );
+    handleStatusChange(message);
   };
 
   const toggleOpen = () => {
