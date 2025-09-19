@@ -47,7 +47,7 @@
       {#if amount() == 0}
         <tr><td class="text-center italic">ingenting</td></tr>
       {/if}
-      {#each $orders.reverse() as order (order.id)}
+      {#each $orders.sort((a, b) => b.dayId - a.dayId)  as order (order.id)}
         {#if show.includes(order.state)}
           {@render OrderRow({
             order,
