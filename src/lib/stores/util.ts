@@ -1,10 +1,4 @@
-import {
-  categories,
-  items,
-  customizationKeys,
-  customizationValues,
-  itemCustomizations
-} from "$stores/menuStore";
+import { categories, items, customizationKeys, customizationValues } from "$stores/menuStore";
 
 import { raw_orders, userOrders } from "$stores/orderStore";
 import orders from "$stores/orderStore";
@@ -15,7 +9,6 @@ export function resetStores() {
   items.reset();
   customizationKeys.reset();
   customizationValues.reset();
-  itemCustomizations.reset();
   raw_orders.reset();
   userOrders.reset();
   orders.reset();
