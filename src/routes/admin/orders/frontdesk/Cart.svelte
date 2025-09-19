@@ -28,11 +28,10 @@
     addToCart(selectedItem);
   }
 
-  let remoteOrderId = $derived($orders.length > 0 ? $orders.at(-1)!.dayId : 100);
-  let localOrderId = $state(0);
-  $effect(() => {
-    localOrderId = remoteOrderId;
-  });
+  let remoteOrderId = $derived(
+    $orders.length > 0 ? $orders.sort((a, b) => a.dayId - b.dayId).at(-1)!.dayId : 100
+  );
+  let localOrderId = $derived(remoteOrderId);
   let currentOrderId = $derived(Math.max(localOrderId, remoteOrderId));
 
   let missing_information = $state(false);
@@ -63,7 +62,7 @@
       </label>
 
       <button class="bold btn btn-lg {$cart.length > 0 ? '' : 'invisible'}" onclick={completeOrder}>
-        <CompleteOrder />{currentOrderId}
+        <CompleteOrder />{currentOrderId + 1}
       </button>
 
       {#if $orders.length > 0}
@@ -90,7 +89,7 @@
         </tr>
       </thead>
       <tbody>
-        {#each $cart as item, index}
+        {#each $cart as item, index (index)}
           {@render CartItem({ item, index })}
         {/each}
       </tbody>
@@ -117,7 +116,7 @@
         <div>{item.name}</div>
         {#if item.customizations && item.customizations.length > 0}
           <div class="mt-1 flex flex-wrap gap-1">
-            {#each item.customizations as customization}
+            {#each item.customizations as customization (customization.id)}
               {#if customization.name}
                 {@render CustomizationBadge({ customization })}
               {/if}

@@ -14,13 +14,15 @@ import pb, {
 import { restrictedRoutes, adminRoutes } from "$lib/constants";
 import type { AuthModel } from "pocketbase";
 
+type NavItems = "/account" | "/admin";
+
 export class NavItem {
-  href: string;
+  href: NavItems;
   text: string;
   requiresAuth: boolean;
   requiresAdmin: boolean;
 
-  constructor(href: string, text: string) {
+  constructor(href: NavItems, text: string) {
     this.href = href;
     this.text = text;
     this.requiresAuth = restrictedRoutes.includes(href);

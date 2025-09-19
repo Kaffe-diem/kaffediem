@@ -4,14 +4,18 @@ import { Message, Status } from "$lib/types";
 import { writable } from "svelte/store";
 import { browser } from "$app/environment";
 
-import eventsource from "eventsource";
+import { EventSource } from "eventsource";
+import type { UnsubscribeFunc } from "pocketbase";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-(global as any).EventSource = eventsource;
+(global as any).EventSource = EventSource;
 
 export const messages = createGenericPbStore(Collections.Message, Message);
 
 function createStatusStore() {
   const { subscribe, set, update } = writable(Status.baseValue);
+
+  let unsubscribeStatus: UnsubscribeFunc | null = null;
+  let unsubscribeMessage: UnsubscribeFunc | null = null;
 
   async function reset() {
     // Only use the first record. Assumes that PB already has this and only this record.
@@ -23,15 +27,19 @@ function createStatusStore() {
     const initialData = Status.fromPb(initialActiveMessage, initialMessages.map(Message.fromPb));
     set(initialData);
 
-    pb.collection(Collections.Status).unsubscribe();
-    pb.collection(Collections.Status).subscribe("*", async (event) => {
+    if (unsubscribeStatus) {
+      await unsubscribeStatus();
+    }
+    unsubscribeStatus = await pb.collection(Collections.Status).subscribe("*", async (event) => {
       update((state) => {
         return Status.fromPb(event.record, state.messages);
       });
     });
 
-    pb.collection(Collections.Message).unsubscribe();
-    pb.collection(Collections.Message).subscribe("*", (event) => {
+    if (unsubscribeMessage) {
+      await unsubscribeMessage();
+    }
+    unsubscribeMessage = await pb.collection(Collections.Message).subscribe("*", (event) => {
       update((state) => {
         const itemIndex = state.messages.findIndex((item) => item.id == event.record.id);
         const item = Message.fromPb(event.record);

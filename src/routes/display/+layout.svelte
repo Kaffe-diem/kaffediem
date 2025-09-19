@@ -17,10 +17,10 @@
       ? 'h-1/3 justify-start pt-20'
       : 'h-screen justify-center'} bg-base-100 fixed bottom-0 z-100 w-full cursor-none flex-col items-center text-center"
   >
-    <span class="p-2 text-7xl font-bold md:text-9xl">
+    <span class="p-4 text-[clamp(3.5rem,10vw,16rem)] leading-tight font-bold">
       {$status.message.title || $status.message.subtitle}
     </span>
-    <span class="p-2 text-4xl md:text-6xl">
+    <span class="p-4 text-[clamp(2.5rem,6vw,9rem)] leading-tight">
       {$status.message.subtitle && $status.message.title && $status.message.subtitle}
     </span>
   </div>

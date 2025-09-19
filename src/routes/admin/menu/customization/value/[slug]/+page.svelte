@@ -1,14 +1,13 @@
 <script lang="ts">
-  // @ts-expect-error Is present, but lint fails
-  import type { PageProps } from "./$types";
   import { customizationKeys, customizationValues } from "$stores/menuStore";
   import { CustomizationValue } from "$lib/types";
   import { goto } from "$app/navigation";
 
   import StateToggle from "$components/menu/StateToggle.svelte";
   import Input from "$components/menu/Input.svelte";
+  import { resolve } from "$app/paths";
 
-  let { data }: PageProps = $props();
+  let { data } = $props();
   const id = data.id;
   const create = id == "new";
 
@@ -57,7 +56,7 @@
         )
       );
     }
-    goto("/admin/menu/customization");
+    goto(resolve("/admin/menu/customization"));
   }
 
   function handlePriceChangeType() {
@@ -108,7 +107,7 @@
         <select class="select select-xl w-full" required bind:value={customizationKey}>
           {#if customizationKey || create}
             <option disabled value="" selected={create}>Velg en kategori</option>
-            {#each $customizationKeys as category}
+            {#each $customizationKeys as category (category.id)}
               <option value={category.id} selected={category.id == customizationKey}
                 >{category.name}</option
               >
@@ -130,7 +129,7 @@
 {:else}
   <div class="mx-30 grid grid-cols-1 gap-4">
     <h1 class="text-center text-xl">Kunne ikke finne tilpasning!</h1>
-    <a href="/admin/menu/customization/value/new" rel="external" class="btn"
+    <a href={resolve("/admin/menu/customization/value/new")} rel="external" class="btn"
       >Opprett en ny tilpasning</a
     >
   </div>

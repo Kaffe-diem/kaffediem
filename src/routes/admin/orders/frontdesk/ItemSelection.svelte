@@ -6,7 +6,7 @@
 </script>
 
 <div class="flex h-full flex-col overflow-x-hidden overflow-y-auto">
-  {#each $categories as category}
+  {#each $categories as category (category.id)}
     {#if category.enabled}
       {@render CategorySection({ category })}
     {/if}
@@ -18,7 +18,7 @@
     <div class="mr-2 mb-4 ml-2">
       <h1 class="text-primary mb-2 font-bold xl:text-xl">{category.name}</h1>
       <div class="grid grid-cols-2 gap-4 xl:grid-cols-4">
-        {#each $itemsByCategory[category.id] ?? [] as item}
+        {#each $itemsByCategory[category.id] ?? [] as item (item.id)}
           {#if item.enabled}
             {@render ItemCard({ item })}
           {/if}
