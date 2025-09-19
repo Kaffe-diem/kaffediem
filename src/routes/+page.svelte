@@ -1,9 +1,10 @@
 <script>
   import auth from "$stores/authStore";
-  import Logo from "$assets/logo.png";
+  import Logo from "$assets/logo.avif";
   import AuthButton from "$components/AuthButton.svelte";
   import Menu from "./Menu.svelte";
   import { status } from "$stores/statusStore";
+  import { resolve } from "$app/paths";
 </script>
 
 <img
@@ -30,7 +31,7 @@
   <div>
     <AuthButton class="btn m-2">Logg inn for å bestille</AuthButton>
     <p class="text-xs">
-      Ved å opprette en bruker samtykker du til våre <a href="/tos" class="link-primary"
+      Ved å opprette en bruker samtykker du til våre <a href={resolve("/tos")} class="link-primary"
         >vilkår for bruk</a
       >
     </p>

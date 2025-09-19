@@ -1,36 +1,45 @@
 export
+-include .env.development.example
 -include .env.development
 -include .env
 
 default: dev
 
-dev: sync pb_types svelte_types
+dev: .env.development sync pb_up pb_types svelte_types
 	docker compose watch
 
 build: pb_types
-	PUBLIC_PB_HOST=$(PUBLIC_PB_HOST_PROD) npx vite build
+	PUBLIC_PB_HOST=$(PUBLIC_PB_HOST) npx vite build
 
 pb_types:
-	npx pocketbase-typegen \
-		--url $(PUBLIC_PB_HOST_PROD) \
-		--email $(PB_ADMIN_EMAIL) \
-		--password $(PB_ADMIN_PASSWORD) \
-		--out ./src/lib/pocketbase/index.d.ts
+	docker compose run --rm tools sh -lc '\
+		if [ -f "./pb_data/data.db" ]; then \
+			npx pocketbase-typegen --db ./pb_data/data.db --out ./src/lib/pocketbase/index.d.ts; \
+		elif [ -n "$$PB_ADMIN_EMAIL" ] && [ -n "$$PB_ADMIN_PASSWORD" ]; then \
+			npx pocketbase-typegen --url http://pb:8081 --email "$$PB_ADMIN_EMAIL" --password "$$PB_ADMIN_PASSWORD" --out ./src/lib/pocketbase/index.d.ts; \
+		fi'
 
 # ordinarily run as part of NPM pipeline.
 # Run manually, since we're not relying on that
 # https://svelte.dev/docs/kit/cli
 svelte_types:
-	@npx svelte-kit sync
+	@docker compose run --rm tools npx svelte-kit sync
+
+.env.development: .env.development.example
+	@cp .env.development.example .env.development
 
 sync:
-	@node scripts/sync-db.js --host=$(PUBLIC_PB_HOST_PROD) --email=$(PB_ADMIN_EMAIL) --password=$(PB_ADMIN_PASSWORD)
+	docker compose run --rm tools sh -lc "npm ci && node scripts/sync-db.js --host=$$PUBLIC_PB_HOST_PROD --githubRepo=$${GITHUB_REPO:-Kaffe-diem/kaffediem} --githubReleaseTag=$${GITHUB_RELEASE_TAG:-latest}"
+
+pb_up:
+	docker compose up --wait pb
 
 format:
-	npx prettier --write .
+	@docker compose run --rm tools npx prettier --write .
 
 lint:
-	npx svelte-kit sync
-	npx svelte-check --tsconfig ./tsconfig.json
-	npx eslint src
-	npx prettier --check .
+	docker compose run --rm tools sh -c "npx svelte-kit sync && npx svelte-check --tsconfig ./tsconfig.json && npx eslint src && npx prettier --check ."
+
+clean:
+	-docker compose down -v --remove-orphans
+	-rm -rf ./pb_data

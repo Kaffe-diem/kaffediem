@@ -14,13 +14,15 @@ import pb, {
 import { restrictedRoutes, adminRoutes } from "$lib/constants";
 import type { AuthModel } from "pocketbase";
 
+type NavItems = "/account" | "/admin";
+
 export class NavItem {
-  href: string;
+  href: NavItems;
   text: string;
   requiresAuth: boolean;
   requiresAdmin: boolean;
 
-  constructor(href: string, text: string) {
+  constructor(href: NavItems, text: string) {
     this.href = href;
     this.text = text;
     this.requiresAuth = restrictedRoutes.includes(href);
@@ -62,12 +64,18 @@ export class Order implements RecordBase {
     public readonly id: RecordIdString,
     public readonly state: State,
     public readonly items: Array<OrderItem>,
-    public readonly missingInformation: boolean
+    public readonly missingInformation: boolean,
+    public readonly dayId: number
   ) {}
 
   // FIXME: implement correctly
   toPb() {
-    return { state: this.state, items: this.items, missing_information: this.missingInformation };
+    return {
+      state: this.state,
+      items: this.items,
+      missing_information: this.missingInformation,
+      day_id: this.dayId
+    };
   }
 
   static fromPb(data: ExpandedOrderRecord): Order {
@@ -75,7 +83,8 @@ export class Order implements RecordBase {
       data.id,
       data.state,
       data.expand.items.map(OrderItem.fromPb),
-      data.missing_information
+      data.missing_information,
+      data.day_id
     );
   }
 }

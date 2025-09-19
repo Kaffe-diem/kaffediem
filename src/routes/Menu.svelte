@@ -4,12 +4,12 @@
   import MenuItem from "$components/MenuItem.svelte";
 </script>
 
-{#each $categories as category}
+{#each $categories as category (category.id)}
   {#if category.enabled}
     <div class="mb-10">
       <h1 class="text-primary mb-4 text-3xl">{category.name}</h1>
       <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-        {#each $itemsByCategory[category.id] ?? [] as item}
+        {#each $itemsByCategory[category.id] ?? [] as item (item.id)}
           {#if item.enabled}
             <MenuItem {item} buyButton={!$status.online} />
           {/if}

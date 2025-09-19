@@ -13,7 +13,7 @@
     detailed = true
   } = $props<{
     show: OrderStateOptions[];
-    onclick: OrderStateOptions;
+    onclick?: OrderStateOptions;
     label: string;
     detailed?: boolean;
   }>();
@@ -25,7 +25,7 @@
   }
 
   function amount() {
-    return $orders.filter((order) => order.state == show).length;
+    return $orders.filter((order) => show.includes(order.state)).length;
   }
 </script>
 
@@ -47,11 +47,11 @@
       {#if amount() == 0}
         <tr><td class="text-center italic">ingenting</td></tr>
       {/if}
-      {#each $orders.reverse() as order, index}
+      {#each $orders.reverse() as order (order.id)}
         {#if show.includes(order.state)}
           {@render OrderRow({
             order,
-            orderNumber: $orders.length - index - 1 + 100
+            orderNumber: order.dayId
           })}
         {/if}
       {/each}
@@ -66,7 +66,7 @@
       : 'bg-base-200 cursor-pointer'}  {order.missingInformation && detailed
       ? 'bg-warning ring-warning'
       : ''} mb-6 block rounded shadow-md transition-colors"
-    onclick={() => orders.updateState(order.id, onclick)}
+    onclick={() => onclick && orders.updateState(order.id, onclick)}
     role="button"
     tabindex="0"
     onkeydown={(e) => e.key === "Enter" && orders.updateState(order.id, onclick)}
@@ -78,7 +78,7 @@
     {#if detailed}
       <td class="w-full">
         <ul class="space-y-2">
-          {#each order.items as orderItem, index}
+          {#each order.items as orderItem, index (orderItem.id)}
             {@render OrderItem({ orderItem, index, showIndex: order.items.length > 1 })}
           {/each}
         </ul>
@@ -111,7 +111,7 @@
 
       {#if orderItem.customizations && orderItem.customizations.length > 0}
         <ul class="mt-1 flex flex-wrap gap-1" aria-label="Customizations">
-          {#each orderItem.customizations as customization}
+          {#each orderItem.customizations as customization (customization.id)}
             {#if customization.name}
               {@render CustomizationBadge({ customization })}
             {/if}

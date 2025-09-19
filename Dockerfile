@@ -1,4 +1,4 @@
-FROM node:20.11-slim AS base
+FROM node:20.19-slim AS base
 WORKDIR /app
 
 FROM base AS builder
@@ -23,7 +23,7 @@ EXPOSE 5173
 ENV NODE_ENV=development
 CMD ["./node_modules/.bin/vite", "dev", "--host", "0.0.0.0"]
 
-FROM node:20.11-slim AS production
+FROM node:20.19-slim AS production
 WORKDIR /app
 COPY --from=builder /app/build build/
 COPY --from=builder /app/node_modules node_modules/

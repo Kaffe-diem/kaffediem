@@ -30,8 +30,5 @@ jobs:
       - name: Get dependencies
         run: npm ci
 
-      - name: Run pocketbase-typegen
-        run: make pb_types
-
       - name: Lint and check formatting
-        run: make lint
+        run: npx svelte-kit sync && npx svelte-check --tsconfig ./tsconfig.json && npx eslint src && npx prettier --check .
