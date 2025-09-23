@@ -23,7 +23,7 @@
 "
       onclick={() =>
         status.update(
-          new Status($status.id, $status.message, $status.messages, false, $status.showMessage)
+          new Status($status.id, $status.message, $status.messages, true, $status.showMessage)
         )}>Åpne</button
     >
     <a
