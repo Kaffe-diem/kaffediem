@@ -16,7 +16,7 @@
   let categoryName: string | undefined = $state();
   let categorySort: number | undefined = $state();
   let categoryEnabled: boolean = $state(true);
-  let categoryValidCustomizationKeys: string[] | undefined = $state();
+  let categoryValidCustomizations: string[] | undefined = $state();
 
   let exists: boolean = $state(false);
 
@@ -25,7 +25,7 @@
       categoryName = category.name;
       categorySort = category.sortOrder;
       categoryEnabled = category.enabled;
-      categoryValidCustomizationKeys = category.customizationKeys;
+      categoryValidCustomizations = category.validCustomizations;
 
       exists = true;
     }
@@ -39,7 +39,7 @@
           categoryName!,
           categorySort!,
           categoryEnabled,
-          categoryValidCustomizationKeys!
+          categoryValidCustomizations!
         )
       );
     } else {
@@ -49,7 +49,7 @@
           categoryName!,
           categorySort!,
           categoryEnabled,
-          categoryValidCustomizationKeys!
+          categoryValidCustomizations!
         )
       );
     }
@@ -93,18 +93,18 @@
               <span class="text-xl">{customizationKey.name}</span>
               <input
                 type="checkbox"
-                checked={categoryValidCustomizationKeys?.includes(customizationKey.id)}
+                checked={categoryValidCustomizations?.includes(customizationKey.id)}
                 class="checkbox checkbox-xl"
                 onchange={(event) => {
                   if (event.currentTarget.checked) {
-                    if (!categoryValidCustomizationKeys?.includes(customizationKey.id)) {
-                      categoryValidCustomizationKeys = [
-                        ...(categoryValidCustomizationKeys ?? []),
+                    if (!categoryValidCustomizations?.includes(customizationKey.id)) {
+                      categoryValidCustomizations = [
+                        ...(categoryValidCustomizations ?? []),
                         customizationKey.id
                       ];
                     }
                   } else {
-                    categoryValidCustomizationKeys = categoryValidCustomizationKeys?.filter(
+                    categoryValidCustomizations = categoryValidCustomizations?.filter(
                       (id) => id !== customizationKey.id
                     );
                   }

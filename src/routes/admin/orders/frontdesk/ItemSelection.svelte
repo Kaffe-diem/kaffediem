@@ -7,7 +7,7 @@
 
   function validateCustomizations(category: Category) {
     for (const key of $customizationKeys) {
-      const isValid = category.customizationKeys.includes(key.id);
+      const isValid = category.validCustomizations.includes(key.id);
       if (!isValid) {
         $selectedCustomizations[key.id] = [];
       }

@@ -29,7 +29,7 @@
 <div class="grid h-full grid-rows-[1fr_auto] overflow-y-auto">
   <div class="grid-auto-flow-column grid grid-cols-2">
     {#each $customizationKeys as key (key.id)}
-      {#if key.enabled && selectedCategory?.customizationKeys.includes(key.id)}
+      {#if key.enabled && selectedCategory?.validCustomizations.includes(key.id)}
         {@render CustomizationCategory({ key })}
       {/if}
     {/each}
