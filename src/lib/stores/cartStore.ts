@@ -5,7 +5,7 @@
  */
 
 import { writable, derived, get } from "svelte/store";
-import type { Item, CustomizationValue } from "$lib/types";
+import { type Item, CustomizationValue, CustomizationKey } from "$lib/types";
 import { customizationKeys, customizationValues } from "./menuStore";
 
 export interface CartItem extends Item {
@@ -40,6 +40,31 @@ export const initializeCustomizations = () => {
   const map: Record<string, CustomizationValue[]> = {};
   selectedCustomizations.set(map);
   applyDefaults();
+};
+
+const updateSelectedCustomizations = (
+  currentSelections: CustomizationValue[],
+  value: CustomizationValue,
+  multiple: boolean
+) => {
+  const alreadySelected = currentSelections?.some((v) => v.id === value.id);
+  if (multiple)
+    return alreadySelected
+      ? currentSelections.filter((v) => v.id !== value.id)
+      : [...currentSelections, value];
+  return alreadySelected ? [] : [value];
+};
+
+export const toggleCustomization = (key: CustomizationKey, value: CustomizationValue) => {
+  selectedCustomizations.update((map) => {
+    const currentSelections = map[key.id] ?? [];
+    const updatedSelections = updateSelectedCustomizations(
+      currentSelections,
+      value,
+      key.multipleChoice
+    );
+    return { ...map, [key.id]: updatedSelections };
+  });
 };
 
 export const addToCart = (item: Item) => {

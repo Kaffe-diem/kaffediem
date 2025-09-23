@@ -1,7 +1,11 @@
 <script lang="ts">
   import { CustomizationKey, CustomizationValue, Item, Category } from "$lib/types";
   import { customizationKeys, customizationValues } from "$stores/menuStore";
-  import { selectedCustomizations, initializeCustomizations } from "$stores/cartStore";
+  import {
+    selectedCustomizations,
+    initializeCustomizations,
+    toggleCustomization
+  } from "$stores/cartStore";
   import { onMount } from "svelte";
   import { categories } from "$stores/menuStore";
 
@@ -63,21 +67,7 @@
       type={key.multipleChoice ? "checkbox" : "radio"}
       class="hidden"
       checked={selected}
-      onclick={(event) => {
-        if (key.multipleChoice) {
-          if (event.currentTarget.checked) {
-            if (!$selectedCustomizations[key.id]?.some((v) => v.id === value.id)) {
-              $selectedCustomizations[key.id] = [...($selectedCustomizations[key.id] ?? []), value];
-            }
-          } else {
-            $selectedCustomizations[key.id] = ($selectedCustomizations[key.id] ?? []).filter(
-              (v) => v.id !== value.id
-            );
-          }
-        } else {
-          $selectedCustomizations[key.id] = selected ? [] : [value];
-        }
-      }}
+      onclick={() => toggleCustomization(key, value)}
     />
     <span class="flex w-full justify-between font-normal">
       <span>{value.name}</span>
