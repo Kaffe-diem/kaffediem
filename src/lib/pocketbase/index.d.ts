@@ -187,7 +187,8 @@ export type StatusRecord = {
 	created?: IsoDateString
 	id: string
 	message?: RecordIdString
-	online?: boolean
+	open?: boolean
+	show_message?: boolean
 	updated?: IsoDateString
 }
 
