@@ -13,7 +13,9 @@ export const categories = createGenericPbStore(Collections.Category, Category, {
   sort: "sort_order"
 });
 
-export const items = createGenericPbStore(Collections.Item, Item);
+export const items = createGenericPbStore(Collections.Item, Item, {
+  sort: "name"
+});
 
 export const itemsByCategory = derived(items, ($items) =>
   $items.reduce((acc: Record<string, Item[]>, item: Item) => {
