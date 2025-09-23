@@ -27,7 +27,6 @@
               plantuml
               # JS
               nodejs_20
-              nodePackages.npm
               nodePackages.typescript-language-server
               nodePackages.typescript
               emmet-ls
