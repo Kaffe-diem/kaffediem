@@ -10,11 +10,11 @@ import {
 } from "$lib/types";
 
 export const categories = createGenericPbStore(Collections.Category, Category, {
-  sort: "sort_order"
+  sort: "sort_order, name"
 });
 
 export const items = createGenericPbStore(Collections.Item, Item, {
-  sort: "name"
+  sort: "sort_order, name"
 });
 
 export const itemsByCategory = derived(items, ($items) =>
@@ -27,11 +27,15 @@ export const itemsByCategory = derived(items, ($items) =>
 
 export const customizationKeys = createGenericPbStore(
   Collections.CustomizationKey,
-  CustomizationKey
+  CustomizationKey,
+  { sort: "sort_order, name" }
 );
 export const customizationValues = createGenericPbStore(
   Collections.CustomizationValue,
-  CustomizationValue
+  CustomizationValue,
+  {
+    sort: "sort_order, name"
+  }
 );
 export const customizationsByKey = derived(customizationValues, ($customizationValues) =>
   $customizationValues.reduce((acc: Record<string, CustomizationValue[]>, item) => {

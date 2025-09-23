@@ -144,6 +144,7 @@ export class Item implements RecordBase {
     public readonly imageName: string, // pb field value
     public readonly image: string, // url to actual image
     public readonly enabled: boolean,
+    public readonly sortOrder: number,
     public readonly imageFile: File | null = null // file with uploaded image contents
   ) {}
 
@@ -154,6 +155,7 @@ export class Item implements RecordBase {
     formData.append("price_nok", this.price.toString());
     formData.append("category", this.category);
     formData.append("enable", this.enabled.toString()); // FormData expects string
+    formData.append("sort_order", this.sortOrder.toString());
     if (this.imageFile) {
       formData.append("image", this.imageFile);
     } else {
@@ -170,7 +172,8 @@ export class Item implements RecordBase {
       data.category,
       data.image,
       pb.files.getURL(data, data.image),
-      data.enable
+      data.enable,
+      data.sort_order
     );
   }
 }
@@ -259,7 +262,8 @@ export class CustomizationKey implements RecordBase {
     public readonly enabled: boolean,
     public readonly labelColor: string,
     public readonly defaultValue: string,
-    public readonly multipleChoice: boolean
+    public readonly multipleChoice: boolean,
+    public readonly sortOrder: number
   ) {}
 
   toPb() {
@@ -268,7 +272,8 @@ export class CustomizationKey implements RecordBase {
       enable: this.enabled,
       label_color: this.labelColor,
       default_value: this.defaultValue,
-      multiple_choice: this.multipleChoice
+      multiple_choice: this.multipleChoice,
+      sort_order: this.sortOrder
     };
   }
 
@@ -279,7 +284,8 @@ export class CustomizationKey implements RecordBase {
       data.enable,
       data.label_color,
       data.default_value,
-      data.multiple_choice
+      data.multiple_choice,
+      data.sort_order
     );
   }
 }
@@ -291,7 +297,8 @@ export class CustomizationValue implements RecordBase {
     public readonly priceChange: number,
     public readonly constantPrice: boolean,
     public readonly belongsTo: RecordIdString,
-    public readonly enabled: boolean
+    public readonly enabled: boolean,
+    public readonly sortOrder: number
   ) {}
 
   toPb() {
@@ -301,7 +308,8 @@ export class CustomizationValue implements RecordBase {
       price_increment_nok: this.priceChange,
       constant_price: this.constantPrice,
       belongs_to: this.belongsTo,
-      enable: this.enabled
+      enable: this.enabled,
+      sort_order: this.sortOrder
     };
   }
 
@@ -312,7 +320,8 @@ export class CustomizationValue implements RecordBase {
       data.price_increment_nok, // TODO: rename in db
       data.constant_price,
       data.belongs_to,
-      data.enable
+      data.enable,
+      data.sort_order
     );
   }
 }

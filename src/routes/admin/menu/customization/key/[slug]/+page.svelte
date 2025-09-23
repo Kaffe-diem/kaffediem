@@ -16,6 +16,7 @@
   let customizationColor: string | undefined = $state("#CCCCCC");
   let customizationDefaultValue: string | undefined = $state();
   let customizationMultipleChoice: boolean = $state(false);
+  let customizationSort: number = $state(0);
 
   let exists: boolean = $state(false);
 
@@ -27,6 +28,7 @@
       customizationColor = key.labelColor;
       customizationDefaultValue = key.defaultValue;
       customizationMultipleChoice = key.multipleChoice;
+      customizationSort = key.sortOrder;
 
       exists = true;
     }
@@ -41,7 +43,8 @@
           customizationEnabled,
           customizationColor!,
           customizationDefaultValue!,
-          customizationMultipleChoice
+          customizationMultipleChoice,
+          customizationSort
         )
       );
     } else {
@@ -52,7 +55,8 @@
           customizationEnabled,
           customizationColor!,
           customizationDefaultValue!,
-          customizationMultipleChoice
+          customizationMultipleChoice,
+          customizationSort
         )
       );
     }
@@ -65,8 +69,8 @@
 </h1>
 <div class="divider"></div>
 {#if exists || create}
-  <form onsubmit={updateKey} class="grid w-full grid-cols-2 gap-2">
-    <div class="col-span-2">
+  <form onsubmit={updateKey} class="grid w-full grid-cols-3 gap-2">
+    <div class="col-span-full">
       <Input
         label="Navn"
         type="text"
@@ -81,7 +85,16 @@
     <div>
       <Input label="Farge" type="color" bind:value={customizationColor} />
     </div>
-    <div class="col-span-2">
+    <div>
+      <Input
+        label="Sortering (laveste først)"
+        type="number"
+        required
+        bind:value={customizationSort}
+        placeholder="Sorteringsrekkefølge"
+      />
+    </div>
+    <div class="col-span-full">
       <fieldset class="fieldset">
         <legend class="fieldset-legend text-xl">Standard</legend>
         <select class="select select-xl w-full" bind:value={customizationDefaultValue}>
@@ -102,8 +115,8 @@
         bind:checked={customizationMultipleChoice}
       />
     </label>
-    <div class="divider col-span-2"></div>
-    <div class="col-span-2">
+    <div class="divider col-span-full"></div>
+    <div class="col-span-full">
       <button type="submit" class="btn btn-xl btn-primary w-full"
         >{#if create}Opprett{:else}Lagre{/if}</button
       >

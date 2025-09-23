@@ -117,6 +117,7 @@ export type CustomizationKeyRecord = {
 	label_color: string
 	multiple_choice?: boolean
 	name: string
+	sort_order?: number
 	updated?: IsoDateString
 }
 
@@ -128,6 +129,7 @@ export type CustomizationValueRecord = {
 	id: string
 	name: string
 	price_increment_nok?: number
+	sort_order?: number
 	updated?: IsoDateString
 }
 
@@ -139,6 +141,7 @@ export type ItemRecord = {
 	image?: string
 	name: string
 	price_nok: number
+	sort_order?: number
 	updated?: IsoDateString
 }
 
