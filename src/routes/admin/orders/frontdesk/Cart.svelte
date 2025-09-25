@@ -45,6 +45,7 @@
     localOrderId += 1;
     clearCart();
     missing_information = false;
+    stopEditing();
   }
 </script>
 
