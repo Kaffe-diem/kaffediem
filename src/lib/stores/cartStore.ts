@@ -6,17 +6,26 @@
 
 import { writable, derived, get } from "svelte/store";
 import type { Item, CustomizationValue, CustomizationKey } from "$lib/types";
-import { customizationKeys, customizationValues, categories, getCategoryById } from "./menuStore";
+import {
+  customizationKeys,
+  customizationValues,
+  categories,
+  getCategoryById,
+  items
+} from "./menuStore";
 import { sumBy, groupBy, updateAt } from "$lib/utils";
 import { finalPrice } from "$lib/pricing";
+import type { RecordIdString } from "$lib/pocketbase";
 
 export interface CartItem extends Item {
   customizations: CustomizationValue[];
   basePrice: number;
 }
 
-// export const selectedItem = writable(get(itemsByCategory)[get(categories)[0].id][0]);
-export const selectedItem = writable<Item | undefined>(undefined);
+export const selectedItemId = writable<RecordIdString | undefined>(undefined);
+export const selectedItem = derived(selectedItemId, ($selectedItemId) =>
+  get(items).find((i) => i.id === $selectedItemId)
+);
 export const selectedCategory = derived(selectedItem, ($selectedItem) =>
   $selectedItem ? getCategoryById($selectedItem?.category) : undefined
 );
@@ -52,6 +61,7 @@ export const startEditing = (index: number) => {
   if (!current) return;
   editingIndex.set(index);
   hydrateSelectedFromItem(current);
+  selectedItemId.set(current.id);
 };
 
 export const deleteEditingItem = () => {
@@ -151,6 +161,26 @@ export const toggleCustomization = (key: CustomizationKey, value: CustomizationV
     });
   }
   repriceEditingItemBySelections();
+};
+
+export const handleSelectedItemChange = () => {
+  applyDefaults();
+  const index = get(editingIndex);
+  if (index !== null) {
+    cart.update((c) => {
+      const item = c[index];
+      if (!item) return c;
+
+      const updatedItem: CartItem = {
+        ...get(selectedItem),
+        customizations: get(selectedCustomizationsFlat)
+      } as CartItem;
+
+      const newCart = [...c];
+      newCart[index] = updatedItem!;
+      return newCart;
+    });
+  }
 };
 
 export const addToCart = (item: Item) => {
