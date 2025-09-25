@@ -1,4 +1,4 @@
-import { derived } from "svelte/store";
+import { derived, get } from "svelte/store";
 import { createGenericPbStore } from "$stores/pbStore";
 import { Collections } from "$lib/pocketbase";
 import {
@@ -12,6 +12,10 @@ import {
 export const categories = createGenericPbStore(Collections.Category, Category, {
   sort: "sort_order, name"
 });
+
+export const getCategoryById = (categoryId: string): Category | undefined => {
+  return get(categories).find((value) => value.id === categoryId);
+};
 
 export const items = createGenericPbStore(Collections.Item, Item, {
   sort: "sort_order, name"

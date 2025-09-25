@@ -8,20 +8,17 @@
     editingIndex,
     startEditing,
     deleteEditingItem,
-    stopEditing
+    stopEditing,
+    selectedItem
   } from "$stores/cartStore";
   import auth from "$stores/authStore";
   import orderStore from "$stores/orderStore";
   import { customizationKeys } from "$stores/menuStore";
-  import { type Item, type CustomizationValue } from "$lib/types";
+  import { type CustomizationValue } from "$lib/types";
   import orders from "$stores/orderStore";
   import CommentIcon from "$assets/CommentIcon.svelte";
   import CompleteOrder from "$assets/CompleteOrder.svelte";
   import { getCharacters } from "$lib/utils";
-
-  let { selectedItem } = $props<{
-    selectedItem: Item | undefined;
-  }>();
 
   const colors = $derived(
     Object.fromEntries($customizationKeys.map((key) => [key.id, key.labelColor]))
@@ -33,7 +30,7 @@
       return;
     }
     if (!selectedItem) return;
-    addToCart(selectedItem);
+    addToCart($selectedItem);
   };
 
   let remoteOrderId = $derived(

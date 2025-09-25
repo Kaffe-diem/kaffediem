@@ -5,19 +5,20 @@
   import CustomizationSelection from "./CustomizationSelection.svelte";
   import { OrderStateOptions as OrderStateOptions } from "$lib/pocketbase";
   import orders from "$stores/orderStore";
+  import { selectedItem } from "$stores/cartStore";
   import { itemsByCategory, categories } from "$stores/menuStore";
 
-  let selectedItem = $derived($itemsByCategory[$categories!.at(0)!.id]!.at(0));
+  $selectedItem = $itemsByCategory[$categories!.at(0)!.id]!.at(0);
 </script>
 
 <div class="grid h-full grid-cols-[5fr_auto_5fr_auto_3fr] grid-rows-[100%] gap-0 p-4">
-  <ItemSelection bind:selectedItem />
+  <ItemSelection />
 
   <div class="divider divider-horizontal m-0 p-0"></div>
 
   <div class="flex flex-col">
-    <CustomizationSelection {selectedItem} />
-    <Cart {selectedItem} />
+    <CustomizationSelection />
+    <Cart />
   </div>
 
   <div class="divider divider-horizontal m-0 p-0"></div>

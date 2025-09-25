@@ -6,7 +6,13 @@
 
 import { writable, derived, get } from "svelte/store";
 import type { Item, CustomizationValue, CustomizationKey } from "$lib/types";
-import { customizationKeys, customizationValues } from "./menuStore";
+import {
+  customizationKeys,
+  customizationValues,
+  itemsByCategory,
+  categories,
+  getCategoryById
+} from "./menuStore";
 import { sumBy, groupBy, updateAt } from "$lib/utils";
 import { finalPrice } from "$lib/pricing";
 
@@ -14,6 +20,12 @@ export interface CartItem extends Item {
   customizations: CustomizationValue[];
   basePrice: number;
 }
+
+// export const selectedItem = writable(get(itemsByCategory)[get(categories)[0].id][0]);
+export const selectedItem = writable<Item | undefined>(undefined);
+export const selectedCategory = derived(selectedItem, ($selectedItem) =>
+  $selectedItem ? getCategoryById($selectedItem?.category) : undefined
+);
 
 export const selectedCustomizations = writable<Record<string, CustomizationValue[]>>({});
 export const selectedCustomizationsFlat = derived(
@@ -67,6 +79,19 @@ const repriceEditingItemBySelections = () => {
   cart.update((c) => updateAt(c, index, (item) => repriceItem(item)));
 };
 
+const validateCustomizations = () => {
+  const category = get(categories).find((c) => c === get(selectedCategory));
+  for (const key of get(customizationKeys)) {
+    const isValid = category?.validCustomizations.includes(key.id);
+    if (!isValid) {
+      selectedCustomizations.update((c) => {
+        c[key.id] = [];
+        return c;
+      });
+    }
+  }
+};
+
 export const applyDefaults = () => {
   const keys = get(customizationKeys);
   const values = get(customizationValues);
@@ -83,6 +108,7 @@ export const applyDefaults = () => {
   }
 
   selectedCustomizations.set({ ...selected });
+  validateCustomizations();
 };
 
 export const initializeCustomizations = () => {

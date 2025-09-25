@@ -1,39 +1,23 @@
 <script lang="ts">
-  import { CustomizationKey, CustomizationValue, Item, Category } from "$lib/types";
-  import { customizationKeys, customizationValues } from "$stores/menuStore";
+  import { CustomizationKey, CustomizationValue } from "$lib/types";
+  import { customizationKeys, customizationsByKey } from "$stores/menuStore";
   import {
     selectedCustomizations,
     initializeCustomizations,
-    toggleCustomization
+    toggleCustomization,
+    selectedCategory
   } from "$stores/cartStore";
   import { onMount } from "svelte";
-  import { categories } from "$stores/menuStore";
-
-  const getValuesByKey = (keyId: string): CustomizationValue[] => {
-    return $customizationValues.filter((value) => value.belongsTo === keyId);
-  };
-
-  const getCategoryById = (categoryId: string): Category | undefined => {
-    return $categories.find((value) => value.id === categoryId);
-  };
 
   onMount(() => {
     initializeCustomizations();
   });
-
-  let { selectedItem } = $props<{
-    selectedItem: Item | undefined;
-  }>();
-
-  let selectedCategory = $derived(
-    selectedItem ? getCategoryById(selectedItem.category) : undefined
-  );
 </script>
 
 <div class="grid h-full grid-rows-[1fr_auto] overflow-y-auto">
   <div class="grid-auto-flow-column grid grid-cols-2">
     {#each $customizationKeys as key (key.id)}
-      {#if key.enabled && selectedCategory?.validCustomizations.includes(key.id)}
+      {#if key.enabled && $selectedCategory?.validCustomizations.includes(key.id)}
         {@render CustomizationCategory({ key })}
       {/if}
     {/each}
@@ -41,12 +25,12 @@
 </div>
 
 {#snippet CustomizationCategory({ key }: { key: CustomizationKey })}
-  {#if getValuesByKey(key.id).filter((value) => value.enabled).length > 0}
+  {#if $customizationsByKey[key.id]!.filter((value) => value.enabled).length > 0}
     <div class="grid grid-cols-1 gap-y-2 p-2">
       <div class="text-primary font-bold xl:text-xl">
         {key.name}
       </div>
-      {#each getValuesByKey(key.id) as value (value.id)}
+      {#each $customizationsByKey[key.id]! as value (value.id)}
         {#if value.enabled}
           {@render CustomizationOption({ key, value })}
         {/if}
