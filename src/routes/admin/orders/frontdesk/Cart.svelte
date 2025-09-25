@@ -130,7 +130,7 @@
 })}
   <tr
     class="hover select-none {$editingIndex == index ? 'bg-base-300' : ''}"
-    onclick={() => startEditing(index)}
+    onclick={() => ($editingIndex == index ? stopEditing() : startEditing(index))}
   >
     <td>
       <div>
