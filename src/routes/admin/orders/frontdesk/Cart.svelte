@@ -14,6 +14,7 @@
   import orders from "$stores/orderStore";
   import CommentIcon from "$assets/CommentIcon.svelte";
   import CompleteOrder from "$assets/CompleteOrder.svelte";
+  import { getCharacters } from "$lib/utils";
 
   let { selectedItem } = $props<{
     selectedItem: Item | undefined;
@@ -31,10 +32,7 @@
   let remoteOrderId = $derived(
     $orders.length > 0 ? $orders.sort((a, b) => a.dayId - b.dayId).at(-1)!.dayId : 100
   );
-  let localOrderId = $state(0);
-  $effect(() => {
-    localOrderId = remoteOrderId;
-  });
+  let localOrderId = $derived(remoteOrderId);
   let currentOrderId = $derived(Math.max(localOrderId, remoteOrderId));
 
   let missing_information = $state(false);
@@ -92,8 +90,8 @@
         </tr>
       </thead>
       <tbody>
-        {#each $cart as item, index}
-          {@render CartItem({ item, index })}
+        {#each $cart as item, index (index)}
+          {@render CartItem({ item, index, showIndex: $cart.length > 1 })}
         {/each}
       </tbody>
       {@render CartFooter()}
@@ -112,14 +110,27 @@
   </span>
 {/snippet}
 
-{#snippet CartItem({ item, index }: { item: CartItem; index: number })}
+{#snippet CartItem({
+  item,
+  index,
+  showIndex
+}: {
+  item: CartItem;
+  index: number;
+  showIndex: boolean;
+})}
   <tr class="hover select-none" onclick={() => removeFromCart(index)}>
     <td>
       <div>
-        <div>{item.name}</div>
+        <div class="flex items-center gap-4">
+          {#if showIndex}
+            <span class="badge badge-outline badge-primary">{getCharacters(index)}</span>
+          {/if}
+          <span>{item.name}</span>
+        </div>
         {#if item.customizations && item.customizations.length > 0}
           <div class="mt-1 flex flex-wrap gap-1">
-            {#each item.customizations as customization}
+            {#each item.customizations as customization (customization.id)}
               {#if customization.name}
                 {@render CustomizationBadge({ customization })}
               {/if}

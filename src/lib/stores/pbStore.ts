@@ -4,9 +4,9 @@ import { type RecordBase } from "$lib/types";
 import { browser } from "$app/environment";
 
 // ref: https://github.com/pocketbase/js-sdk?tab=readme-ov-file#nodejs-via-npm
-import eventsource from "eventsource";
+import { EventSource } from "eventsource";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-(global as any).EventSource = eventsource;
+(global as any).EventSource = EventSource;
 
 export async function createPbStore<Collection extends Collections, RecordClass extends RecordBase>(
   collection: Collection,

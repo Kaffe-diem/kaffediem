@@ -1,14 +1,13 @@
 <script lang="ts">
-  // @ts-expect-error Is present, but lint fails
-  import type { PageProps } from "./$types";
   import { customizationKeys, customizationValues } from "$stores/menuStore";
   import { CustomizationValue } from "$lib/types";
   import { goto } from "$app/navigation";
 
   import StateToggle from "$components/menu/StateToggle.svelte";
   import Input from "$components/menu/Input.svelte";
+  import { resolve } from "$app/paths";
 
-  let { data }: PageProps = $props();
+  let { data } = $props();
   const id = data.id;
   const create = id == "new";
 
@@ -17,6 +16,7 @@
   let customizationConstantPrice: boolean = $state(true);
   let customizationKey: string | undefined = $state();
   let customizationEnabled: boolean = $state(true);
+  let customizationSort: number = $state(0);
 
   let exists: boolean = $state(true);
 
@@ -28,6 +28,7 @@
       customizationConstantPrice = value.constantPrice;
       customizationKey = value.belongsTo;
       customizationEnabled = value.enabled;
+      customizationSort = value.sortOrder;
 
       exists = true;
     }
@@ -42,7 +43,8 @@
           customizationPrice!,
           customizationConstantPrice!,
           customizationKey!,
-          customizationEnabled
+          customizationEnabled,
+          customizationSort
         )
       );
     } else {
@@ -53,11 +55,12 @@
           customizationPrice!,
           customizationConstantPrice!,
           customizationKey!,
-          customizationEnabled
+          customizationEnabled,
+          customizationSort
         )
       );
     }
-    goto("/admin/menu/customization");
+    goto(resolve("/admin/menu/customization"));
   }
 
   function handlePriceChangeType() {
@@ -70,8 +73,8 @@
 </h1>
 <div class="divider"></div>
 {#if exists || create}
-  <form onsubmit={updateValue} class="grid w-full grid-cols-2 gap-2">
-    <div class="col-span-2">
+  <form onsubmit={updateValue} class="grid w-full grid-cols-3 gap-2">
+    <div class="col-span-full">
       <Input
         label="Navn"
         type="text"
@@ -108,7 +111,7 @@
         <select class="select select-xl w-full" required bind:value={customizationKey}>
           {#if customizationKey || create}
             <option disabled value="" selected={create}>Velg en kategori</option>
-            {#each $customizationKeys as category}
+            {#each $customizationKeys as category (category.id)}
               <option value={category.id} selected={category.id == customizationKey}
                 >{category.name}</option
               >
@@ -117,11 +120,20 @@
         </select>
       </fieldset>
     </div>
-    <div class="col-span-2">
+    <div>
+      <Input
+        label="Sortering (laveste først)"
+        type="number"
+        required
+        bind:value={customizationSort}
+        placeholder="Sorteringsrekkefølge"
+      />
+    </div>
+    <div class="col-span-full">
       <StateToggle bind:state={customizationEnabled} />
     </div>
-    <div class="divider col-span-2"></div>
-    <div class="col-span-2">
+    <div class="divider col-span-full"></div>
+    <div class="col-span-full">
       <button type="submit" class="btn btn-xl btn-primary w-full"
         >{#if create}Opprett{:else}Lagre{/if}</button
       >
@@ -130,7 +142,7 @@
 {:else}
   <div class="mx-30 grid grid-cols-1 gap-4">
     <h1 class="text-center text-xl">Kunne ikke finne tilpasning!</h1>
-    <a href="/admin/menu/customization/value/new" rel="external" class="btn"
+    <a href={resolve("/admin/menu/customization/value/new")} rel="external" class="btn"
       >Opprett en ny tilpasning</a
     >
   </div>

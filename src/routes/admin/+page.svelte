@@ -1,12 +1,21 @@
 <script lang="ts">
   import orders from "$stores/orderStore";
   import { State } from "$lib/types";
+  import { resolve } from "$app/paths";
+
+  type AdminPages =
+    | "/admin/orders/frontdesk"
+    | "/admin/orders/kitchen"
+    | "/display"
+    | "/admin/message"
+    | "/admin/menu"
+    | "/admin/stats";
 
   class AdminPage {
-    href: string;
+    href: AdminPages;
     text: string;
 
-    constructor(href: string, text: string) {
+    constructor(href: AdminPages, text: string) {
       this.href = href;
       this.text = text;
     }
@@ -34,11 +43,11 @@
       >Nullstill bestillinger
     </button>
   </li>
-  {#each adminPages as page}
+  {#each adminPages as page (page.href)}
     <li>
       <a
         class="btn relative m-4 flex h-24 w-full flex-col items-center justify-center text-3xl lg:text-5xl"
-        href={page.href}
+        href={resolve(page.href)}
         >{page.text}
       </a>
     </li>

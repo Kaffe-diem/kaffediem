@@ -28,15 +28,20 @@ export type IsoDateString = string
 export type RecordIdString = string
 export type HTMLString = string
 
+type ExpandType<T> = unknown extends T
+	? T extends unknown
+		? { expand?: unknown }
+		: { expand: T }
+	: { expand: T }
+
 // System fields
-export type BaseSystemFields<T = never> = {
+export type BaseSystemFields<T = unknown> = {
 	id: RecordIdString
 	collectionId: string
 	collectionName: Collections
-	expand?: T
-}
+} & ExpandType<T>
 
-export type AuthSystemFields<T = never> = {
+export type AuthSystemFields<T = unknown> = {
 	email: string
 	emailVisibility: boolean
 	username: string
@@ -101,14 +106,18 @@ export type CategoryRecord = {
 	name: string
 	sort_order: number
 	updated?: IsoDateString
+	valid_customizations?: RecordIdString[]
 }
 
 export type CustomizationKeyRecord = {
 	created?: IsoDateString
+	default_value?: RecordIdString
 	enable?: boolean
 	id: string
 	label_color: string
+	multiple_choice?: boolean
 	name: string
+	sort_order?: number
 	updated?: IsoDateString
 }
 
@@ -120,6 +129,7 @@ export type CustomizationValueRecord = {
 	id: string
 	name: string
 	price_increment_nok?: number
+	sort_order?: number
 	updated?: IsoDateString
 }
 
@@ -131,6 +141,7 @@ export type ItemRecord = {
 	image?: string
 	name: string
 	price_nok: number
+	sort_order?: number
 	updated?: IsoDateString
 }
 
@@ -179,7 +190,8 @@ export type StatusRecord = {
 	created?: IsoDateString
 	id: string
 	message?: RecordIdString
-	online?: boolean
+	open?: boolean
+	show_message?: boolean
 	updated?: IsoDateString
 }
 

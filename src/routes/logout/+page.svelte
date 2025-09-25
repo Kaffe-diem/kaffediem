@@ -2,9 +2,10 @@
   import { onMount } from "svelte";
   import { logout } from "$stores/authStore";
   import { goto } from "$app/navigation";
+  import { resolve } from "$app/paths";
 
   onMount(() => {
     logout();
-    goto("/");
+    goto(resolve("/"));
   });
 </script>
