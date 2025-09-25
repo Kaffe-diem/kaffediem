@@ -16,6 +16,10 @@ export interface CartItem extends Item {
 }
 
 export const selectedCustomizations = writable<Record<string, CustomizationValue[]>>({});
+export const selectedCustomizationsFlat = derived(
+  selectedCustomizations,
+  ($selectedCustomizations) => Object.values($selectedCustomizations).flat()
+);
 
 export const cart = writable<CartItem[]>([]);
 
@@ -23,10 +27,10 @@ export const totalPrice = derived(cart, ($cart) => sumBy($cart, (item) => item.p
 
 export const editingIndex = writable<number | null>(null);
 
-const repriceItem = (item: CartItem, customizations: CustomizationValue[]): CartItem => {
+const repriceItem = (item: CartItem): CartItem => {
   const base = item.basePrice;
-  const price = finalPrice(base, customizations);
-  return { ...item, basePrice: base, customizations, price } as CartItem;
+  const price = finalPrice(base, get(selectedCustomizationsFlat));
+  return { ...item, basePrice: base, price } as CartItem;
 };
 
 const hydrateSelectedFromItem = (item: CartItem) => {
@@ -57,11 +61,10 @@ export const stopEditing = () => {
   initializeCustomizations();
 };
 
-const repriceEditingItemBySelections = (map: Record<string, CustomizationValue[]>) => {
+const repriceEditingItemBySelections = () => {
   const index = get(editingIndex);
   if (index === null) return;
-  const selected = Object.values(map).flat();
-  cart.update((c) => updateAt(c, index, (item) => repriceItem(item, selected)));
+  cart.update((c) => updateAt(c, index, (item) => repriceItem(item)));
 };
 
 export const applyDefaults = () => {
@@ -117,28 +120,27 @@ export const toggleCustomization = (key: CustomizationKey, value: CustomizationV
       const item = c[index];
       if (!item) return c;
 
-      const customizations = Object.values(get(selectedCustomizations)).flat();
-      const updatedItem: CartItem = { ...item, customizations: customizations } as CartItem;
+      const updatedItem: CartItem = {
+        ...item,
+        customizations: get(selectedCustomizationsFlat)
+      } as CartItem;
 
-      let newCart = [...c];
+      const newCart = [...c];
       newCart[index] = updatedItem!;
       return newCart;
     });
   }
+  repriceEditingItemBySelections();
 };
 
 export const addToCart = (item: Item) => {
-  // the initial selection maps to the categories of the customizations
-  // so we just flatten this structure for the purposes of summation
-  const customizations = Object.values(get(selectedCustomizations)).flat();
-
   const basePrice = item.price;
-  const finalprice = finalPrice(basePrice, customizations);
+  const finalprice = finalPrice(basePrice, get(selectedCustomizationsFlat));
 
   const itemToAdd: CartItem = {
     ...item,
     price: Math.ceil(finalprice),
-    customizations,
+    customizations: get(selectedCustomizationsFlat),
     basePrice
   } as CartItem;
 
