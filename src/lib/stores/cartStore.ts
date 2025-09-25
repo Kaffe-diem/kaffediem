@@ -168,12 +168,16 @@ export const handleSelectedItemChange = () => {
   const index = get(editingIndex);
   if (index !== null) {
     cart.update((c) => {
-      const item = c[index];
-      if (!item) return c;
+      const item = get(selectedItem)!;
+
+      const basePrice = item.price;
+      const finalprice = finalPrice(basePrice, get(selectedCustomizationsFlat));
 
       const updatedItem: CartItem = {
         ...get(selectedItem),
-        customizations: get(selectedCustomizationsFlat)
+        price: Math.ceil(finalprice),
+        customizations: get(selectedCustomizationsFlat),
+        basePrice
       } as CartItem;
 
       const newCart = [...c];
