@@ -4,6 +4,7 @@
   import { customizationKeys } from "$lib/stores/menuStore";
   import type { CustomizationKey, CustomizationValue, Order, OrderItem } from "$lib/types";
   import CommentIcon from "$assets/CommentIcon.svelte";
+  import { getCharacters } from "$lib/utils";
 
   const {
     show,
@@ -46,7 +47,7 @@
       {#if amount() == 0}
         <tr><td class="text-center italic">ingenting</td></tr>
       {/if}
-      {#each $orders.reverse() as order}
+      {#each $orders.sort((a, b) => b.dayId - a.dayId) as order (order.id)}
         {#if show.includes(order.state)}
           {@render OrderRow({
             order,
@@ -77,8 +78,8 @@
     {#if detailed}
       <td class="w-full">
         <ul class="space-y-2">
-          {#each order.items as orderItem}
-            {@render OrderItem({ orderItem })}
+          {#each order.items as orderItem, index (orderItem.id)}
+            {@render OrderItem({ orderItem, index, showIndex: order.items.length > 1 })}
           {/each}
         </ul>
       </td>
@@ -86,16 +87,31 @@
   </tr>
 {/snippet}
 
-{#snippet OrderItem({ orderItem }: { orderItem: OrderItem })}
+{#snippet OrderItem({
+  orderItem,
+  index,
+  showIndex
+}: {
+  orderItem: OrderItem;
+  index: number;
+  showIndex: boolean;
+})}
   <li class="bg-base-300 w-full rounded p-3 shadow">
     <div class="flex flex-col">
-      <span class="mb-1 text-xl">
-        {orderItem.item.name}
-      </span>
+      <div class="flex flex-row items-center gap-4">
+        {#if showIndex}
+          <span class="badge badge-outline badge-primary flex items-center text-xl">
+            {getCharacters(index)}
+          </span>
+        {/if}
+        <span class="flex items-center text-xl">
+          {orderItem.item.name}
+        </span>
+      </div>
 
       {#if orderItem.customizations && orderItem.customizations.length > 0}
         <ul class="mt-1 flex flex-wrap gap-1" aria-label="Customizations">
-          {#each orderItem.customizations as customization}
+          {#each orderItem.customizations as customization (customization.id)}
             {#if customization.name}
               {@render CustomizationBadge({ customization })}
             {/if}

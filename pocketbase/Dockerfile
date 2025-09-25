@@ -1,4 +1,4 @@
-FROM node:20.11-slim
+FROM node:20.19-slim
 
 ARG PB_VERSION=0.28.4
 

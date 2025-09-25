@@ -1,12 +1,22 @@
 <script lang="ts">
-  import { categories, itemsByCategory } from "$stores/menuStore";
+  import { categories, itemsByCategory, customizationKeys } from "$stores/menuStore";
   import type { Item, Category } from "$lib/types";
+  import { selectedCustomizations, applyDefaults } from "$stores/cartStore";
 
   let { selectedItem = $bindable() } = $props();
+
+  function validateCustomizations(category: Category) {
+    for (const key of $customizationKeys) {
+      const isValid = category.validCustomizations.includes(key.id);
+      if (!isValid) {
+        $selectedCustomizations[key.id] = [];
+      }
+    }
+  }
 </script>
 
 <div class="flex h-full flex-col overflow-x-hidden overflow-y-auto">
-  {#each $categories as category}
+  {#each $categories as category (category.id)}
     {#if category.enabled}
       {@render CategorySection({ category })}
     {/if}
@@ -18,9 +28,9 @@
     <div class="mr-2 mb-4 ml-2">
       <h1 class="text-primary mb-2 font-bold xl:text-xl">{category.name}</h1>
       <div class="grid grid-cols-2 gap-4 xl:grid-cols-4">
-        {#each $itemsByCategory[category.id] ?? [] as item}
+        {#each $itemsByCategory[category.id] ?? [] as item (item.id)}
           {#if item.enabled}
-            {@render ItemCard({ item })}
+            {@render ItemCard({ item, category })}
           {/if}
         {/each}
       </div>
@@ -28,9 +38,19 @@
   {/if}
 {/snippet}
 
-{#snippet ItemCard({ item }: { item: Item })}
+{#snippet ItemCard({ item, category }: { item: Item; category: Category })}
   <label>
-    <input type="radio" name="item" class="peer hidden" value={item} bind:group={selectedItem} />
+    <input
+      type="radio"
+      name="item"
+      class="peer hidden"
+      value={item}
+      bind:group={selectedItem}
+      onchange={() => {
+        applyDefaults();
+        validateCustomizations(category);
+      }}
+    />
     <div
       class="btn peer-checked:border-accent peer-checked:bg-base-300 peer-checked:ring-lg peer-checked:ring-accent relative flex h-24 w-full flex-col border-2 transition-all duration-300 ease-in-out peer-checked:scale-109 peer-checked:shadow-xl peer-checked:ring"
     >

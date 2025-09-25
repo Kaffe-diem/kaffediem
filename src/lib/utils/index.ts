@@ -56,3 +56,20 @@ export const assoc = <T extends object, K extends PropertyKey, V = unknown>(
 /** updates an array element at index */
 export const updateAt = <T>(array: T[], index: number, updater: (item: T) => T): T[] =>
   array.map((item, i) => (i === index ? updater(item) : item));
+
+/**
+ * Get characters from the alphabet based on an index and use multiple characters (similar to excel) if the index exceeds the length of the alphabet.
+ */
+const alphabet = "abcdefghijklmnopqrstuvwxyzæøå".split("");
+export function getCharacters(index: number): string {
+  const base = alphabet.length;
+  let n = index;
+  let result: string = "";
+
+  while (n >= 0) {
+    result = alphabet[n % base]!.toUpperCase() + result;
+    n = Math.floor(n / base) - 1;
+  }
+
+  return result;
+}

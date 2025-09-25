@@ -4,10 +4,10 @@
   import Cart from "./Cart.svelte";
   import CustomizationSelection from "./CustomizationSelection.svelte";
   import { OrderStateOptions as OrderStateOptions } from "$lib/pocketbase";
-  import type { Item } from "$lib/types";
   import orders from "$stores/orderStore";
+  import { itemsByCategory, categories } from "$stores/menuStore";
 
-  let selectedItem = $state<Item | undefined>();
+  let selectedItem = $derived($itemsByCategory[$categories!.at(0)!.id]!.at(0));
 </script>
 
 <div class="grid h-full grid-cols-[5fr_auto_5fr_auto_3fr] grid-rows-[100%] gap-0 p-4">
@@ -16,7 +16,7 @@
   <div class="divider divider-horizontal m-0 p-0"></div>
 
   <div class="flex flex-col">
-    <CustomizationSelection />
+    <CustomizationSelection {selectedItem} />
     <Cart {selectedItem} />
   </div>
 

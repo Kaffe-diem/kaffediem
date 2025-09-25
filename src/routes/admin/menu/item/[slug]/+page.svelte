@@ -1,14 +1,13 @@
 <script lang="ts">
-  // @ts-expect-error Is present, but lint fails
-  import type { PageProps } from "./$types";
   import { items, categories } from "$stores/menuStore";
   import { Item } from "$lib/types";
   import { goto } from "$app/navigation";
 
   import StateToggle from "$components/menu/StateToggle.svelte";
   import Input from "$components/menu/Input.svelte";
+  import { resolve } from "$app/paths";
 
-  let { data }: PageProps = $props();
+  let { data } = $props();
   const id = data.id;
   const create = id == "new";
 
@@ -18,6 +17,7 @@
   let itemImage: string | undefined = $state();
   let itemImageName: string | undefined = $state("");
   let itemEnabled: boolean = $state(true);
+  let itemSort: number = $state(0);
 
   let exists: boolean = $state(false);
 
@@ -30,6 +30,7 @@
       itemImage = item.image;
       itemImageName = item.imageName;
       itemEnabled = item.enabled;
+      itemSort = item.sortOrder;
 
       exists = true;
     }
@@ -67,6 +68,7 @@
           itemImageName!,
           itemImage!,
           itemEnabled,
+          itemSort,
           imageFile
         )
       );
@@ -80,11 +82,12 @@
           itemImageName!,
           itemImage!,
           itemEnabled,
+          itemSort,
           imageFile
         )
       );
     }
-    goto("/admin/menu");
+    goto(resolve("/admin/menu"));
   }
 </script>
 
@@ -93,9 +96,9 @@
 </h1>
 <div class="divider"></div>
 {#if exists || create}
-  <form onsubmit={updateItem} class="grid w-full grid-cols-2 gap-2">
-    <div class="col-span-2">
-      <Input label="Navn" type="text" required placeholder="Produktnavn" bind:value={itemName} />
+  <form onsubmit={updateItem} class="grid w-full grid-cols-3 gap-2">
+    <div class="col-span-full">
+      <Input label="Navn" type="text" required placeholder="Produktnavn" bind:value={itemName!} />
     </div>
     <div>
       <Input
@@ -104,7 +107,7 @@
         required
         min={1}
         placeholder="Pris"
-        bind:value={itemPrice}
+        bind:value={itemPrice!}
       />
     </div>
     <div>
@@ -113,7 +116,7 @@
         <select class="select select-xl w-full" required bind:value={itemCategory}>
           {#if itemCategory || create}
             <option disabled value="" selected={create}>Velg en kategori</option>
-            {#each $categories as category}
+            {#each $categories as category (category.id)}
               <option value={category.id} selected={category.id == itemCategory}
                 >{category.name}</option
               >
@@ -122,19 +125,28 @@
         </select>
       </fieldset>
     </div>
-    <div class="col-span-2">
+    <div>
+      <Input
+        label="Sortering (laveste først)"
+        type="number"
+        required
+        bind:value={itemSort}
+        placeholder="Sorteringsrekkefølge"
+      />
+    </div>
+    <div class="col-span-full">
       <StateToggle bind:state={itemEnabled} />
     </div>
-    <div class="divider col-span-2"></div>
-    <div class="col-span-2 grid grid-cols-2 gap-2">
-      <div class="col-span-2 flex items-center justify-center">
+    <div class="divider col-span-full"></div>
+    <div class="col-span-full grid grid-cols-2 gap-2">
+      <div class="col-span-full flex items-center justify-center">
         {#if itemImage}
           <img src={itemImage} alt="Bilde av {itemName}" class="max-h-96 w-auto rounded-xl" />
         {:else}
           <div class="text-xl">(Bilde mangler)</div>
         {/if}
       </div>
-      <fieldset class="fieldset w-full {itemImage ? 'col-span-1' : 'col-span-2'}">
+      <fieldset class="fieldset w-full {itemImage ? 'col-span-1' : 'col-span-full'}">
         <legend class="fieldset-legend text-xl">Last opp et nytt bilde</legend>
         <input bind:files={imageFiles} type="file" class="file-input file-input-xl w-full" />
       </fieldset>
@@ -142,8 +154,8 @@
         <button onclick={deleteImage} class="btn btn-error h-full w-full">Slett bilde</button>
       {/if}
     </div>
-    <div class="divider col-span-2"></div>
-    <div class="col-span-2">
+    <div class="divider col-span-full"></div>
+    <div class="col-span-full">
       <button type="submit" class="btn btn-xl btn-primary w-full"
         >{#if create}Opprett{:else}Lagre{/if}</button
       >
@@ -152,6 +164,6 @@
 {:else}
   <div class="mx-30 grid grid-cols-1 gap-4">
     <h1 class="text-center text-xl">Kunne ikke finne produkt!</h1>
-    <a href="/admin/menu/item/new" rel="external" class="btn">Opprett et nytt produkt</a>
+    <a href={resolve("/admin/menu/item/new")} rel="external" class="btn">Opprett et nytt produkt</a>
   </div>
 {/if}

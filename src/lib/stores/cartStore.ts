@@ -5,7 +5,8 @@
  */
 
 import { writable, derived, get } from "svelte/store";
-import type { Item, CustomizationValue } from "$lib/types";
+import type { Item, CustomizationValue, CustomizationKey } from "$lib/types";
+import { customizationKeys, customizationValues } from "./menuStore";
 import { sumBy, groupBy, updateAt } from "$lib/utils";
 import { finalPrice } from "$lib/pricing";
 
@@ -48,6 +49,7 @@ export const deleteEditingItem = () => {
   if (index === null) return;
   removeFromCart(index);
   editingIndex.set(null);
+  initializeCustomizations();
 };
 
 export const stopEditing = () => {
@@ -62,56 +64,67 @@ const repriceEditingItemBySelections = (map: Record<string, CustomizationValue[]
   cart.update((c) => updateAt(c, index, (item) => repriceItem(item, selected)));
 };
 
+export const applyDefaults = () => {
+  const keys = get(customizationKeys);
+  const values = get(customizationValues);
+  const selected = get(selectedCustomizations);
+
+  for (const key of keys) {
+    const current = selected[key.id] ?? [];
+
+    const defaultValue = values.find((val) => val.id === key.defaultValue)!;
+
+    if (current.length === 0 && key.defaultValue && defaultValue.enabled) {
+      selected[key.id] = [defaultValue];
+    }
+  }
+
+  selectedCustomizations.set({ ...selected });
+};
+
 export const initializeCustomizations = () => {
   const map: Record<string, CustomizationValue[]> = {};
   selectedCustomizations.set(map);
+  applyDefaults();
 };
 
-export const selectCustomization = (keyId: string, value: CustomizationValue) => {
-  selectedCustomizations.update((customizations) => {
-    const currentValues = customizations[keyId] || [];
-    const valueIndex = currentValues.findIndex((v) => v.id === value.id);
+const updateSelectedCustomizations = (
+  currentSelections: CustomizationValue[],
+  value: CustomizationValue,
+  multiple: boolean
+) => {
+  const alreadySelected = currentSelections?.some((v) => v.id === value.id);
+  if (multiple)
+    return alreadySelected
+      ? currentSelections.filter((v) => v.id !== value.id)
+      : [...currentSelections, value];
+  return alreadySelected ? [] : [value];
+};
 
-    const updated =
-      valueIndex > -1
-        ? removeCustomizationValue(customizations, keyId, currentValues, valueIndex)
-        : addCustomizationValue(customizations, keyId, value);
-    repriceEditingItemBySelections(updated);
-    return updated;
+export const toggleCustomization = (key: CustomizationKey, value: CustomizationValue) => {
+  selectedCustomizations.update((map) => {
+    const currentSelections = map[key.id] ?? [];
+    const updatedSelections = updateSelectedCustomizations(
+      currentSelections,
+      value,
+      key.multipleChoice
+    );
+    return { ...map, [key.id]: updatedSelections };
   });
-};
+  const index = get(editingIndex);
+  if (index !== null) {
+    cart.update((c) => {
+      const item = c[index];
+      if (!item) return c;
 
-const removeCustomizationValue = (
-  customizations: Record<string, CustomizationValue[]>,
-  keyId: string,
-  currentValues: CustomizationValue[],
-  valueIndex: number
-): Record<string, CustomizationValue[]> => {
-  const newValues = [...currentValues];
-  newValues.splice(valueIndex, 1);
+      const customizations = Object.values(get(selectedCustomizations)).flat();
+      const updatedItem: CartItem = { ...item, customizations: customizations } as CartItem;
 
-  if (newValues.length === 0) {
-    // If no values left, remove the key
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { [keyId]: _, ...rest } = customizations;
-    return rest;
+      let newCart = [...c];
+      newCart[index] = updatedItem!;
+      return newCart;
+    });
   }
-
-  return {
-    ...customizations,
-    [keyId]: newValues
-  };
-};
-
-const addCustomizationValue = (
-  customizations: Record<string, CustomizationValue[]>,
-  keyId: string,
-  value: CustomizationValue
-): Record<string, CustomizationValue[]> => {
-  return {
-    ...customizations,
-    [keyId]: [...(customizations[keyId] || []), value]
-  };
 };
 
 export const addToCart = (item: Item) => {

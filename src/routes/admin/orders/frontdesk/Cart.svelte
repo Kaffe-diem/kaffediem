@@ -8,8 +8,7 @@
     editingIndex,
     startEditing,
     deleteEditingItem,
-    stopEditing,
-    selectCustomization
+    stopEditing
   } from "$stores/cartStore";
   import auth from "$stores/authStore";
   import orderStore from "$stores/orderStore";
@@ -18,6 +17,7 @@
   import orders from "$stores/orderStore";
   import CommentIcon from "$assets/CommentIcon.svelte";
   import CompleteOrder from "$assets/CompleteOrder.svelte";
+  import { getCharacters } from "$lib/utils";
 
   let { selectedItem } = $props<{
     selectedItem: Item | undefined;
@@ -39,10 +39,7 @@
   let remoteOrderId = $derived(
     $orders.length > 0 ? $orders.sort((a, b) => a.dayId - b.dayId).at(-1)!.dayId : 100
   );
-  let localOrderId = $state(0);
-  $effect(() => {
-    localOrderId = remoteOrderId;
-  });
+  let localOrderId = $derived(remoteOrderId);
   let currentOrderId = $derived(Math.max(localOrderId, remoteOrderId));
 
   let missing_information = $state(false);
@@ -102,8 +99,8 @@
         </tr>
       </thead>
       <tbody>
-        {#each $cart as item, index}
-          {@render CartItem({ item, index })}
+        {#each $cart as item, index (index)}
+          {@render CartItem({ item, index, showIndex: $cart.length > 1 })}
         {/each}
       </tbody>
       {@render CartFooter()}
@@ -122,25 +119,32 @@
   </span>
 {/snippet}
 
-{#snippet CartItem({ item, index }: { item: CartItem; index: number })}
-  <tr class="hover select-none" onclick={() => startEditing(index)}>
+{#snippet CartItem({
+  item,
+  index,
+  showIndex
+}: {
+  item: CartItem;
+  index: number;
+  showIndex: boolean;
+})}
+  <tr
+    class="hover select-none {$editingIndex == index ? 'bg-base-300' : ''}"
+    onclick={() => startEditing(index)}
+  >
     <td>
       <div>
-        <div>{item.name}</div>
+        <div class="flex items-center gap-4">
+          {#if showIndex}
+            <span class="badge badge-outline badge-primary">{getCharacters(index)}</span>
+          {/if}
+          <span>{item.name}</span>
+        </div>
         {#if item.customizations && item.customizations.length > 0}
           <div class="mt-1 flex flex-wrap gap-1">
-            {#each item.customizations as customization}
+            {#each item.customizations as customization (customization.id)}
               {#if customization.name}
-                {#if $editingIndex === index && customization.belongsTo}
-                  <button
-                    class="cursor-pointer"
-                    onclick={() => selectCustomization(customization.belongsTo, customization)}
-                  >
-                    {@render CustomizationBadge({ customization })}
-                  </button>
-                {:else}
-                  {@render CustomizationBadge({ customization })}
-                {/if}
+                {@render CustomizationBadge({ customization })}
               {/if}
             {/each}
           </div>
@@ -150,7 +154,7 @@
     <td>
       <span>{item.price},-</span>
       {#if $editingIndex === index}
-        <button class="text-error ml-3" onclick={deleteEditingItem}>slett</button>
+        <button class="btn btn-error ml-3" onclick={deleteEditingItem}>slett</button>
       {/if}
     </td>
   </tr>
