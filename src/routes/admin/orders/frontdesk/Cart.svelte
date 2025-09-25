@@ -30,7 +30,7 @@
       return;
     }
     if (!selectedItem) return;
-    addToCart($selectedItem);
+    addToCart($selectedItem!);
   };
 
   let remoteOrderId = $derived(

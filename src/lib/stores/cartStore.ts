@@ -6,13 +6,7 @@
 
 import { writable, derived, get } from "svelte/store";
 import type { Item, CustomizationValue, CustomizationKey } from "$lib/types";
-import {
-  customizationKeys,
-  customizationValues,
-  itemsByCategory,
-  categories,
-  getCategoryById
-} from "./menuStore";
+import { customizationKeys, customizationValues, categories, getCategoryById } from "./menuStore";
 import { sumBy, groupBy, updateAt } from "$lib/utils";
 import { finalPrice } from "$lib/pricing";
 
