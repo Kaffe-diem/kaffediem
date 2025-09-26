@@ -1,9 +1,8 @@
-FROM node:20.19-slim
+FROM oven/bun:1.2-alpine
 
-RUN apt-get update && apt-get install -y \
+RUN apk add --no-cache \
     unzip \
     ca-certificates \
-    wget \
-    && rm -rf /var/lib/apt/lists/*
+    wget
 
 
