@@ -24,10 +24,7 @@
 
 
   const addMessage = () => {
-    const lastMessage = $messages.at(-1);
-    if (lastMessage?.title || lastMessage?.subtitle) {
       messages.create(Message.baseValue);
-    }
   };
 
   $: lastMessage = $messages.at(-1);
