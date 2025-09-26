@@ -29,7 +29,7 @@ svelte_types:
 	@cp .env.development.example .env.development
 
 sync:
-	docker compose run --rm tools sh -lc "bun install --production && bun scripts/sync-db.js --host=$$PUBLIC_PB_HOST_PROD --githubRepo=$${GITHUB_REPO:-Kaffe-diem/kaffediem} --githubReleaseTag=$${GITHUB_RELEASE_TAG:-latest}"
+	docker compose run --rm tools sh -lc "bun install --frozen-lockfile && bun scripts/sync-db.js --host=$$PUBLIC_PB_HOST_PROD --githubRepo=$${GITHUB_REPO:-Kaffe-diem/kaffediem} --githubReleaseTag=$${GITHUB_RELEASE_TAG:-latest}"
 
 pb_up:
 	docker compose up --wait pb
@@ -43,8 +43,6 @@ lint:
 clean:
 	-docker compose down -v --remove-orphans
 	-rm -rf ./pb_data
-
-
 
 _hooks: .git/.hooks_installed
 
