@@ -22,14 +22,16 @@
     status.update(new Status($status.id, $status.message, $status.messages, false));
   };
 
+
   const addMessage = () => {
     const lastMessage = $messages.at(-1);
     if (lastMessage?.title || lastMessage?.subtitle) {
       messages.create(Message.baseValue);
-    } else {
-      window.alert("Fyll ut den siste meldingen før du legger til en ny.");
     }
   };
+
+  $: lastMessage = $messages.at(-1);
+  $: disableAdd = !(lastMessage?.title || lastMessage?.subtitle);
 </script>
 
 <form>
@@ -82,7 +84,7 @@
         <span class="ml-3 text-xl">Åpent!</span>
       </label>
     </li>
-    <button class="btn btn-xl w-full" onclick={addMessage}
+    <button class="btn btn-xl w-full" onclick={addMessage} disabled={disableAdd}
       >Legg til melding</button
     >
   </ul>
