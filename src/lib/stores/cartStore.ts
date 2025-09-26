@@ -5,7 +5,8 @@
  */
 
 import { writable, derived, get } from "svelte/store";
-import type { Item, CustomizationValue } from "$lib/types";
+import { type Item, CustomizationValue, CustomizationKey } from "$lib/types";
+import { customizationKeys, customizationValues } from "./menuStore";
 
 export interface CartItem extends Item {
   customizations: CustomizationValue[];
@@ -19,55 +20,53 @@ export const totalPrice = derived(cart, ($cart) =>
   $cart.reduce((sum, item) => sum + item.price, 0)
 );
 
+export const applyDefaults = () => {
+  const keys = get(customizationKeys);
+  const values = get(customizationValues);
+  const selected = get(selectedCustomizations);
+
+  for (const key of keys) {
+    const current = selected[key.id] ?? [];
+
+    const defaultValue = values.find((val) => val.id === key.defaultValue)!;
+
+    if (current.length === 0 && key.defaultValue && defaultValue.enabled) {
+      selected[key.id] = [defaultValue];
+    }
+  }
+
+  selectedCustomizations.set({ ...selected });
+};
+
 export const initializeCustomizations = () => {
   const map: Record<string, CustomizationValue[]> = {};
   selectedCustomizations.set(map);
+  applyDefaults();
 };
 
-export const selectCustomization = (keyId: string, value: CustomizationValue) => {
-  selectedCustomizations.update((customizations) => {
-    const currentValues = customizations[keyId] || [];
-    const valueIndex = currentValues.findIndex((v) => v.id === value.id);
+const updateSelectedCustomizations = (
+  currentSelections: CustomizationValue[],
+  value: CustomizationValue,
+  multiple: boolean
+) => {
+  const alreadySelected = currentSelections?.some((v) => v.id === value.id);
+  if (multiple)
+    return alreadySelected
+      ? currentSelections.filter((v) => v.id !== value.id)
+      : [...currentSelections, value];
+  return alreadySelected ? [] : [value];
+};
 
-    if (valueIndex > -1) {
-      return removeCustomizationValue(customizations, keyId, currentValues, valueIndex);
-    } else {
-      return addCustomizationValue(customizations, keyId, value);
-    }
+export const toggleCustomization = (key: CustomizationKey, value: CustomizationValue) => {
+  selectedCustomizations.update((map) => {
+    const currentSelections = map[key.id] ?? [];
+    const updatedSelections = updateSelectedCustomizations(
+      currentSelections,
+      value,
+      key.multipleChoice
+    );
+    return { ...map, [key.id]: updatedSelections };
   });
-};
-
-const removeCustomizationValue = (
-  customizations: Record<string, CustomizationValue[]>,
-  keyId: string,
-  currentValues: CustomizationValue[],
-  valueIndex: number
-): Record<string, CustomizationValue[]> => {
-  const newValues = [...currentValues];
-  newValues.splice(valueIndex, 1);
-
-  if (newValues.length === 0) {
-    // If no values left, remove the key
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { [keyId]: _, ...rest } = customizations;
-    return rest;
-  }
-
-  return {
-    ...customizations,
-    [keyId]: newValues
-  };
-};
-
-const addCustomizationValue = (
-  customizations: Record<string, CustomizationValue[]>,
-  keyId: string,
-  value: CustomizationValue
-): Record<string, CustomizationValue[]> => {
-  return {
-    ...customizations,
-    [keyId]: [...(customizations[keyId] || []), value]
-  };
 };
 
 export const addToCart = (item: Item) => {

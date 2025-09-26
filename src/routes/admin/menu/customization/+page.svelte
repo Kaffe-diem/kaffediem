@@ -23,8 +23,9 @@
           {#if !key.enabled}
             <span class="badge badge-xl badge-soft badge-neutral italic">Deaktivert</span>
           {/if}
-          <a href={resolve("/admin/menu/customization/key/{key.id}")} class="btn btn-lg btn-neutral"
-            >Rediger</a
+          <a
+            href={resolve(`/admin/menu/customization/key/${key.id}`)}
+            class="btn btn-lg btn-neutral">Rediger</a
           >
         </div>
       </div>
@@ -37,7 +38,7 @@
                 <span class="badge badge-xl badge-soft badge-neutral">Deaktivert</span>
               {/if}
               <a
-                href={resolve("/admin/menu/customization/value/{customization.id}")}
+                href={resolve(`/admin/menu/customization/value/${customization.id}`)}
                 class="btn btn-lg"
                 style={key.labelColor ? `background-color: ${key.labelColor};` : null}>Rediger</a
               >
