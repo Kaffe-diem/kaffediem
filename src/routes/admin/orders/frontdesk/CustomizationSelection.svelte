@@ -1,26 +1,39 @@
 <script lang="ts">
-  import { CustomizationKey, CustomizationValue } from "$lib/types";
+  import { CustomizationKey, CustomizationValue, Item, Category } from "$lib/types";
   import { customizationKeys, customizationValues } from "$stores/menuStore";
   import {
     selectedCustomizations,
-    selectCustomization,
-    initializeCustomizations
+    initializeCustomizations,
+    toggleCustomization
   } from "$stores/cartStore";
   import { onMount } from "svelte";
+  import { categories } from "$stores/menuStore";
 
   const getValuesByKey = (keyId: string): CustomizationValue[] => {
     return $customizationValues.filter((value) => value.belongsTo === keyId);
   };
 
+  const getCategoryById = (categoryId: string): Category | undefined => {
+    return $categories.find((value) => value.id === categoryId);
+  };
+
   onMount(() => {
     initializeCustomizations();
   });
+
+  let { selectedItem } = $props<{
+    selectedItem: Item | undefined;
+  }>();
+
+  let selectedCategory = $derived(
+    selectedItem ? getCategoryById(selectedItem.category) : undefined
+  );
 </script>
 
 <div class="grid h-full grid-rows-[1fr_auto] overflow-y-auto">
   <div class="grid-auto-flow-column grid grid-cols-2">
     {#each $customizationKeys as key (key.id)}
-      {#if key.enabled}
+      {#if key.enabled && selectedCategory?.validCustomizations.includes(key.id)}
         {@render CustomizationCategory({ key })}
       {/if}
     {/each}
@@ -44,13 +57,18 @@
 
 {#snippet CustomizationOption({ key, value }: { key: CustomizationKey; value: CustomizationValue })}
   {@const selected = $selectedCustomizations[key.id]?.some((v) => v.id === value.id)}
-  <button
-    class="btn {selected
-      ? 'ring-lg ring-accent scale-109 text-white shadow-xl ring'
-      : ''} flex w-full transition-all duration-300 ease-in-out hover:brightness-90 focus:outline-none"
+
+  <label
+    class="btn flex w-full cursor-pointer transition-all duration-300 ease-in-out hover:brightness-90 focus:outline-none
+      {selected ? 'ring-lg ring-accent scale-109 text-white shadow-xl ring' : ''}"
     style="background-color: {selected ? key.labelColor : ''};"
-    onclick={() => selectCustomization(key.id, value)}
   >
+    <input
+      type={key.multipleChoice ? "checkbox" : "radio"}
+      class="hidden"
+      checked={selected}
+      onclick={() => toggleCustomization(key, value)}
+    />
     <span class="flex w-full justify-between font-normal">
       <span>{value.name}</span>
       {#if value.priceChange != 0 && value.constantPrice}
@@ -60,5 +78,5 @@
         <span>{value.priceChange}%</span>
       {/if}
     </span>
-  </button>
+  </label>
 {/snippet}

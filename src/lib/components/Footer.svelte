@@ -1,6 +1,6 @@
 <script>
   import { resolve } from "$app/paths";
-  import Logo from "$assets/logo.png";
+  import Logo from "$assets/logo.avif";
   const year = new Date().getFullYear();
 </script>
 
