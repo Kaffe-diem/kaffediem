@@ -14,6 +14,7 @@
   import orders from "$stores/orderStore";
   import CommentIcon from "$assets/CommentIcon.svelte";
   import CompleteOrder from "$assets/CompleteOrder.svelte";
+  import { getCharacters } from "$lib/utils";
 
   let { selectedItem } = $props<{
     selectedItem: Item | undefined;
@@ -90,7 +91,7 @@
       </thead>
       <tbody>
         {#each $cart as item, index (index)}
-          {@render CartItem({ item, index })}
+          {@render CartItem({ item, index, showIndex: $cart.length > 1 })}
         {/each}
       </tbody>
       {@render CartFooter()}
@@ -109,11 +110,24 @@
   </span>
 {/snippet}
 
-{#snippet CartItem({ item, index }: { item: CartItem; index: number })}
+{#snippet CartItem({
+  item,
+  index,
+  showIndex
+}: {
+  item: CartItem;
+  index: number;
+  showIndex: boolean;
+})}
   <tr class="hover select-none" onclick={() => removeFromCart(index)}>
     <td>
       <div>
-        <div>{item.name}</div>
+        <div class="flex items-center gap-4">
+          {#if showIndex}
+            <span class="badge badge-outline badge-primary">{getCharacters(index)}</span>
+          {/if}
+          <span>{item.name}</span>
+        </div>
         {#if item.customizations && item.customizations.length > 0}
           <div class="mt-1 flex flex-wrap gap-1">
             {#each item.customizations as customization (customization.id)}

@@ -5,17 +5,13 @@ import { writable } from "svelte/store";
 import { browser } from "$app/environment";
 
 import { EventSource } from "eventsource";
-import type { UnsubscribeFunc } from "pocketbase";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (global as any).EventSource = EventSource;
 
-export const messages = createGenericPbStore(Collections.Message, Message);
+export const messages = await createGenericPbStore(Collections.Message, Message);
 
-function createStatusStore() {
+async function createStatusStore() {
   const { subscribe, set, update } = writable(Status.baseValue);
-
-  let unsubscribeStatus: UnsubscribeFunc | null = null;
-  let unsubscribeMessage: UnsubscribeFunc | null = null;
 
   async function reset() {
     // Only use the first record. Assumes that PB already has this and only this record.
@@ -26,20 +22,18 @@ function createStatusStore() {
 
     const initialData = Status.fromPb(initialActiveMessage, initialMessages.map(Message.fromPb));
     set(initialData);
+  }
 
-    if (unsubscribeStatus) {
-      await unsubscribeStatus();
-    }
-    unsubscribeStatus = await pb.collection(Collections.Status).subscribe("*", async (event) => {
+  if (browser) {
+    reset();
+
+    await pb.collection(Collections.Status).subscribe("*", async (event) => {
       update((state) => {
         return Status.fromPb(event.record, state.messages);
       });
     });
 
-    if (unsubscribeMessage) {
-      await unsubscribeMessage();
-    }
-    unsubscribeMessage = await pb.collection(Collections.Message).subscribe("*", (event) => {
+    await pb.collection(Collections.Message).subscribe("*", (event) => {
       update((state) => {
         const itemIndex = state.messages.findIndex((item) => item.id == event.record.id);
         const item = Message.fromPb(event.record);
@@ -61,10 +55,6 @@ function createStatusStore() {
     });
   }
 
-  if (browser) {
-    reset();
-  }
-
   return {
     subscribe,
     reset
@@ -72,7 +62,7 @@ function createStatusStore() {
 }
 
 export const status = {
-  ...createStatusStore(),
+  ...(await createStatusStore()),
   update: async (status: Status) => {
     await pb.collection(Collections.Status).update(status.id, status.toPb());
   }

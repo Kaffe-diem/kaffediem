@@ -17,6 +17,7 @@
   let itemImage: string | undefined = $state();
   let itemImageName: string | undefined = $state("");
   let itemEnabled: boolean = $state(true);
+  let itemSort: number = $state(0);
 
   let exists: boolean = $state(false);
 
@@ -29,6 +30,7 @@
       itemImage = item.image;
       itemImageName = item.imageName;
       itemEnabled = item.enabled;
+      itemSort = item.sortOrder;
 
       exists = true;
     }
@@ -66,6 +68,7 @@
           itemImageName!,
           itemImage!,
           itemEnabled,
+          itemSort,
           imageFile
         )
       );
@@ -79,6 +82,7 @@
           itemImageName!,
           itemImage!,
           itemEnabled,
+          itemSort,
           imageFile
         )
       );
@@ -92,8 +96,8 @@
 </h1>
 <div class="divider"></div>
 {#if exists || create}
-  <form onsubmit={updateItem} class="grid w-full grid-cols-2 gap-2">
-    <div class="col-span-2">
+  <form onsubmit={updateItem} class="grid w-full grid-cols-3 gap-2">
+    <div class="col-span-full">
       <Input label="Navn" type="text" required placeholder="Produktnavn" bind:value={itemName!} />
     </div>
     <div>
@@ -121,19 +125,28 @@
         </select>
       </fieldset>
     </div>
-    <div class="col-span-2">
+    <div>
+      <Input
+        label="Sortering (laveste først)"
+        type="number"
+        required
+        bind:value={itemSort}
+        placeholder="Sorteringsrekkefølge"
+      />
+    </div>
+    <div class="col-span-full">
       <StateToggle bind:state={itemEnabled} />
     </div>
-    <div class="divider col-span-2"></div>
-    <div class="col-span-2 grid grid-cols-2 gap-2">
-      <div class="col-span-2 flex items-center justify-center">
+    <div class="divider col-span-full"></div>
+    <div class="col-span-full grid grid-cols-2 gap-2">
+      <div class="col-span-full flex items-center justify-center">
         {#if itemImage}
           <img src={itemImage} alt="Bilde av {itemName}" class="max-h-96 w-auto rounded-xl" />
         {:else}
           <div class="text-xl">(Bilde mangler)</div>
         {/if}
       </div>
-      <fieldset class="fieldset w-full {itemImage ? 'col-span-1' : 'col-span-2'}">
+      <fieldset class="fieldset w-full {itemImage ? 'col-span-1' : 'col-span-full'}">
         <legend class="fieldset-legend text-xl">Last opp et nytt bilde</legend>
         <input bind:files={imageFiles} type="file" class="file-input file-input-xl w-full" />
       </fieldset>
@@ -141,8 +154,8 @@
         <button onclick={deleteImage} class="btn btn-error h-full w-full">Slett bilde</button>
       {/if}
     </div>
-    <div class="divider col-span-2"></div>
-    <div class="col-span-2">
+    <div class="divider col-span-full"></div>
+    <div class="col-span-full">
       <button type="submit" class="btn btn-xl btn-primary w-full"
         >{#if create}Opprett{:else}Lagre{/if}</button
       >

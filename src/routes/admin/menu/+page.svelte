@@ -29,7 +29,7 @@
         {#if !category.enabled}
           <span class="badge badge-xl badge-soft badge-neutral italic">Deaktivert</span>
         {/if}
-        <a href={resolve("/admin/menu/category/{category.id}")} class="btn btn-lg btn-neutral"
+        <a href={resolve(`/admin/menu/category/${category.id}`)} class="btn btn-lg btn-neutral"
           >Rediger</a
         >
       </div>
@@ -49,7 +49,7 @@
       {#if !item.enabled}
         <span class="badge badge-xl badge-soft badge-neutral">Deaktivert</span>
       {/if}
-      <a href={resolve("/admin/menu/item/{item.id}")} class="btn btn-lg">Rediger</a>
+      <a href={resolve(`/admin/menu/item/${item.id}`)} class="btn btn-lg">Rediger</a>
     </div>
   </li>
 {/snippet}

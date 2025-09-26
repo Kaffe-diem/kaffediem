@@ -16,6 +16,7 @@
   let customizationConstantPrice: boolean = $state(true);
   let customizationKey: string | undefined = $state();
   let customizationEnabled: boolean = $state(true);
+  let customizationSort: number = $state(0);
 
   let exists: boolean = $state(true);
 
@@ -27,6 +28,7 @@
       customizationConstantPrice = value.constantPrice;
       customizationKey = value.belongsTo;
       customizationEnabled = value.enabled;
+      customizationSort = value.sortOrder;
 
       exists = true;
     }
@@ -41,7 +43,8 @@
           customizationPrice!,
           customizationConstantPrice!,
           customizationKey!,
-          customizationEnabled
+          customizationEnabled,
+          customizationSort
         )
       );
     } else {
@@ -52,7 +55,8 @@
           customizationPrice!,
           customizationConstantPrice!,
           customizationKey!,
-          customizationEnabled
+          customizationEnabled,
+          customizationSort
         )
       );
     }
@@ -69,8 +73,8 @@
 </h1>
 <div class="divider"></div>
 {#if exists || create}
-  <form onsubmit={updateValue} class="grid w-full grid-cols-2 gap-2">
-    <div class="col-span-2">
+  <form onsubmit={updateValue} class="grid w-full grid-cols-3 gap-2">
+    <div class="col-span-full">
       <Input
         label="Navn"
         type="text"
@@ -116,11 +120,20 @@
         </select>
       </fieldset>
     </div>
-    <div class="col-span-2">
+    <div>
+      <Input
+        label="Sortering (laveste først)"
+        type="number"
+        required
+        bind:value={customizationSort}
+        placeholder="Sorteringsrekkefølge"
+      />
+    </div>
+    <div class="col-span-full">
       <StateToggle bind:state={customizationEnabled} />
     </div>
-    <div class="divider col-span-2"></div>
-    <div class="col-span-2">
+    <div class="divider col-span-full"></div>
+    <div class="col-span-full">
       <button type="submit" class="btn btn-xl btn-primary w-full"
         >{#if create}Opprett{:else}Lagre{/if}</button
       >

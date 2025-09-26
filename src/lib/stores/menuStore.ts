@@ -9,11 +9,13 @@ import {
   ItemCustomization
 } from "$lib/types";
 
-export const categories = createGenericPbStore(Collections.Category, Category, {
-  sort: "sort_order"
+export const categories = await createGenericPbStore(Collections.Category, Category, {
+  sort: "sort_order, name"
 });
 
-export const items = createGenericPbStore(Collections.Item, Item);
+export const items = await createGenericPbStore(Collections.Item, Item, {
+  sort: "sort_order, name"
+});
 
 export const itemsByCategory = derived(items, ($items) =>
   $items.reduce((acc: Record<string, Item[]>, item: Item) => {
@@ -23,13 +25,17 @@ export const itemsByCategory = derived(items, ($items) =>
   }, {})
 );
 
-export const customizationKeys = createGenericPbStore(
+export const customizationKeys = await createGenericPbStore(
   Collections.CustomizationKey,
-  CustomizationKey
+  CustomizationKey,
+  { sort: "sort_order, name" }
 );
-export const customizationValues = createGenericPbStore(
+export const customizationValues = await createGenericPbStore(
   Collections.CustomizationValue,
-  CustomizationValue
+  CustomizationValue,
+  {
+    sort: "sort_order, name"
+  }
 );
 export const customizationsByKey = derived(customizationValues, ($customizationValues) =>
   $customizationValues.reduce((acc: Record<string, CustomizationValue[]>, item) => {
@@ -39,7 +45,7 @@ export const customizationsByKey = derived(customizationValues, ($customizationV
   }, {})
 );
 
-export const itemCustomizations = createGenericPbStore(
+export const itemCustomizations = await createGenericPbStore(
   Collections.ItemCustomization,
   ItemCustomization,
   {
