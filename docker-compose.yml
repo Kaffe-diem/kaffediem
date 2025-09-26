@@ -30,7 +30,7 @@ services:
       - "./pb_migrations:/app/pb_migrations"
     restart: unless-stopped
     healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://127.0.0.1:8081/api/health || exit 1
+      test: wget --tries=1 --spider http://127.0.0.1:8081/api/health || exit 1
       interval: 5s
       timeout: 5s
       retries: 5

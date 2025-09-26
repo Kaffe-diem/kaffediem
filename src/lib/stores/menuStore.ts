@@ -9,7 +9,7 @@ import {
   ItemCustomization
 } from "$lib/types";
 
-export const categories = createGenericPbStore(Collections.Category, Category, {
+export const categories = await createGenericPbStore(Collections.Category, Category, {
   sort: "sort_order, name"
 });
 
@@ -17,7 +17,7 @@ export const getCategoryById = (categoryId: string): Category | undefined => {
   return get(categories).find((value) => value.id === categoryId);
 };
 
-export const items = createGenericPbStore(Collections.Item, Item, {
+export const items = await createGenericPbStore(Collections.Item, Item, {
   sort: "sort_order, name"
 });
 
@@ -29,12 +29,12 @@ export const itemsByCategory = derived(items, ($items) =>
   }, {})
 );
 
-export const customizationKeys = createGenericPbStore(
+export const customizationKeys = await createGenericPbStore(
   Collections.CustomizationKey,
   CustomizationKey,
   { sort: "sort_order, name" }
 );
-export const customizationValues = createGenericPbStore(
+export const customizationValues = await createGenericPbStore(
   Collections.CustomizationValue,
   CustomizationValue,
   {
@@ -49,7 +49,7 @@ export const customizationsByKey = derived(customizationValues, ($customizationV
   }, {})
 );
 
-export const itemCustomizations = createGenericPbStore(
+export const itemCustomizations = await createGenericPbStore(
   Collections.ItemCustomization,
   ItemCustomization,
   {
