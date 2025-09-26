@@ -22,13 +22,12 @@
     status.update(new Status($status.id, $status.message, $status.messages, false));
   };
 
-
   const addMessage = () => {
-      messages.create(Message.baseValue);
+    messages.create(Message.baseValue);
   };
 
-  $: lastMessage = $messages.at(-1);
-  $: disableAdd = !(lastMessage?.title || lastMessage?.subtitle);
+  let lastMessage = $derived($messages.at(-1));
+  let disableAdd = $derived(!(lastMessage?.title || lastMessage?.subtitle));
 </script>
 
 <form>
