@@ -7,7 +7,7 @@ if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
 fi
 
 # Run formatter
-make format
+# make format
 
 # Optionally add reformatted files to commit if they changed
 # Uncomment to auto-add:
