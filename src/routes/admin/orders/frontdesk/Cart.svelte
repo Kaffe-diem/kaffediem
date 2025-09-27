@@ -4,30 +4,34 @@
     cart,
     clearCart,
     type CartItem,
-    removeFromCart,
-    totalPrice
+    totalPrice,
+    editingIndex,
+    startEditing,
+    deleteEditingItem,
+    stopEditing,
+    selectedItem
   } from "$stores/cartStore";
   import auth from "$stores/authStore";
   import orderStore from "$stores/orderStore";
   import { customizationKeys } from "$stores/menuStore";
-  import { type Item, type CustomizationValue } from "$lib/types";
+  import { type CustomizationValue } from "$lib/types";
   import orders from "$stores/orderStore";
   import CommentIcon from "$assets/CommentIcon.svelte";
   import CompleteOrder from "$assets/CompleteOrder.svelte";
   import { getCharacters } from "$lib/utils";
 
-  let { selectedItem } = $props<{
-    selectedItem: Item | undefined;
-  }>();
-
   const colors = $derived(
     Object.fromEntries($customizationKeys.map((key) => [key.id, key.labelColor]))
   );
 
-  function handleAddToCart() {
+  const handleAddToCart = () => {
+    if ($editingIndex !== null) {
+      stopEditing();
+      return;
+    }
     if (!selectedItem) return;
-    addToCart(selectedItem);
-  }
+    addToCart($selectedItem!);
+  };
 
   let remoteOrderId = $derived(
     $orders.length > 0 ? $orders.sort((a, b) => a.dayId - b.dayId).at(-1)!.dayId : 100
@@ -41,6 +45,7 @@
     localOrderId += 1;
     clearCart();
     missing_information = false;
+    stopEditing();
   }
 </script>
 
@@ -77,7 +82,9 @@
       {/if}
     </div>
 
-    <button class="bold btn btn-lg btn-primary text-3xl" onclick={handleAddToCart}>+</button>
+    <button class="bold btn btn-lg btn-primary text-3xl" onclick={handleAddToCart}
+      >{$editingIndex !== null ? "OK" : "+"}</button
+    >
   </div>
 </div>
 
@@ -119,7 +126,10 @@
   index: number;
   showIndex: boolean;
 })}
-  <tr class="hover select-none" onclick={() => removeFromCart(index)}>
+  <tr
+    class="hover select-none {$editingIndex == index ? 'bg-base-300' : ''}"
+    onclick={() => ($editingIndex == index ? stopEditing() : startEditing(index))}
+  >
     <td>
       <div>
         <div class="flex items-center gap-4">
@@ -139,7 +149,12 @@
         {/if}
       </div>
     </td>
-    <td>{item.price},-</td>
+    <td>
+      <span>{item.price},-</span>
+      {#if $editingIndex === index}
+        <button class="btn btn-error ml-3" onclick={deleteEditingItem}>slett</button>
+      {/if}
+    </td>
   </tr>
 {/snippet}
 
