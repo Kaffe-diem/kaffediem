@@ -1,52 +1,45 @@
 <script lang="ts">
-  import { CustomizationKey, CustomizationValue, Item, Category } from "$lib/types";
-  import { customizationKeys, customizationValues } from "$stores/menuStore";
+  import { CustomizationKey, CustomizationValue } from "$lib/types";
+  import { customizationKeys, customizationsByKey } from "$stores/menuStore";
   import {
     selectedCustomizations,
     initializeCustomizations,
-    toggleCustomization
+    toggleCustomization,
+    selectedCategory
   } from "$stores/cartStore";
   import { onMount } from "svelte";
-  import { categories } from "$stores/menuStore";
-
-  const getValuesByKey = (keyId: string): CustomizationValue[] => {
-    return $customizationValues.filter((value) => value.belongsTo === keyId);
-  };
-
-  const getCategoryById = (categoryId: string): Category | undefined => {
-    return $categories.find((value) => value.id === categoryId);
-  };
 
   onMount(() => {
     initializeCustomizations();
   });
 
-  let { selectedItem } = $props<{
-    selectedItem: Item | undefined;
-  }>();
-
-  let selectedCategory = $derived(
-    selectedItem ? getCategoryById(selectedItem.category) : undefined
-  );
+  const isValid = (key: CustomizationKey) =>
+    key.enabled && $selectedCategory?.validCustomizations.includes(key.id);
 </script>
 
 <div class="grid h-full grid-rows-[1fr_auto] overflow-y-auto">
-  <div class="columns-2">
-    {#each $customizationKeys as key (key.id)}
-      {#if key.enabled && selectedCategory?.validCustomizations.includes(key.id)}
-        {@render CustomizationCategory({ key })}
-      {/if}
-    {/each}
-  </div>
+  {#if $customizationKeys.some(isValid)}
+    <div class="columns-2">
+      {#each $customizationKeys as key (key.id)}
+        {#if isValid(key)}
+          {@render CustomizationCategory({ key })}
+        {/if}
+      {/each}
+    </div>
+  {:else}
+    <div class="grid items-center text-center">
+      <i>Ingen tilgjengelige tilpasninger</i>
+    </div>
+  {/if}
 </div>
 
 {#snippet CustomizationCategory({ key }: { key: CustomizationKey })}
-  {#if getValuesByKey(key.id).filter((value) => value.enabled).length > 0}
+  {#if $customizationsByKey[key.id]!.filter((value) => value.enabled).length > 0}
     <div class="inline-grid w-full grid-cols-1 gap-y-2 p-2">
       <div class="text-primary font-bold xl:text-xl">
         {key.name}
       </div>
-      {#each getValuesByKey(key.id) as value (value.id)}
+      {#each $customizationsByKey[key.id]! as value (value.id)}
         {#if value.enabled}
           {@render CustomizationOption({ key, value })}
         {/if}
@@ -57,10 +50,9 @@
 
 {#snippet CustomizationOption({ key, value }: { key: CustomizationKey; value: CustomizationValue })}
   {@const selected = $selectedCustomizations[key.id]?.some((v) => v.id === value.id)}
-
   <label
     class="btn flex w-full cursor-pointer transition-all duration-300 ease-in-out hover:brightness-90 focus:outline-none
-      {selected ? 'ring-lg ring-accent scale-109 text-white shadow-xl ring' : ''}"
+      {selected ? 'ring-lg ring-accent text-white shadow-xl ring' : ''}"
     style="background-color: {selected ? key.labelColor : ''};"
   >
     <input

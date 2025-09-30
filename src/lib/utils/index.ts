@@ -1,11 +1,8 @@
 /**
- * Stub implementations of Remeda utility functions
- * These are simplified versions of the actual Remeda methods
+ * remeda-like utility helpers used across the app
  */
 
-/**
- * Checks if an array or object is empty
- */
+/** checks if an array or object is empty */
 export function isEmpty<T extends unknown[] | Record<string, unknown>>(value: T): boolean {
   if (Array.isArray(value)) {
     return value.length === 0;
@@ -18,9 +15,7 @@ export function isEmpty<T extends unknown[] | Record<string, unknown>>(value: T)
   return false;
 }
 
-/**
- * Groups array items by a key extracted with the callback function
- */
+/** groups items by a key */
 export function groupBy<T, K extends string | number | symbol>(
   array: T[],
   callback: (item: T) => K
@@ -38,12 +33,29 @@ export function groupBy<T, K extends string | number | symbol>(
   );
 }
 
-/**
- * Maps an array using a callback function
- */
+/** maps an array */
 export function map<T, U>(array: T[], callback: (item: T) => U): U[] {
   return array.map(callback);
 }
+
+/** sums numbers projected from items */
+export const sumBy = <T>(array: T[], selector: (item: T) => number): number =>
+  array.reduce((sum, item) => sum + selector(item), 0);
+
+/** multiplies numbers projected from items */
+export const productBy = <T>(array: T[], selector: (item: T) => number): number =>
+  array.reduce((product, item) => product * selector(item), 1);
+
+/** immutably sets a property on an object */
+export const assoc = <T extends object, K extends PropertyKey, V = unknown>(
+  obj: T,
+  key: K,
+  value: V
+): T & Record<K, V> => ({ ...(obj as object), [key]: value }) as T & Record<K, V>;
+
+/** updates an array element at index */
+export const updateAt = <T>(array: T[], index: number, updater: (item: T) => T): T[] =>
+  array.map((item, i) => (i === index ? updater(item) : item));
 
 /**
  * Get characters from the alphabet based on an index and use multiple characters (similar to excel) if the index exceeds the length of the alphabet.

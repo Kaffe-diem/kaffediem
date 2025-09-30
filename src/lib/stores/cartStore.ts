@@ -5,20 +5,96 @@
  */
 
 import { writable, derived, get } from "svelte/store";
-import { type Item, CustomizationValue, CustomizationKey } from "$lib/types";
-import { customizationKeys, customizationValues } from "./menuStore";
+import type { Item, CustomizationValue, CustomizationKey } from "$lib/types";
+import {
+  customizationKeys,
+  customizationValues,
+  categories,
+  getCategoryById,
+  items
+} from "./menuStore";
+import { sumBy, groupBy, updateAt } from "$lib/utils";
+import { finalPrice } from "$lib/pricing";
+import type { RecordIdString } from "$lib/pocketbase";
 
 export interface CartItem extends Item {
   customizations: CustomizationValue[];
+  basePrice: number;
 }
 
+export const selectedItemId = writable<RecordIdString | undefined>(undefined);
+export const selectedItem = derived(selectedItemId, ($selectedItemId) =>
+  get(items).find((i) => i.id === $selectedItemId)
+);
+export const selectedCategory = derived(selectedItem, ($selectedItem) =>
+  $selectedItem ? getCategoryById($selectedItem?.category) : undefined
+);
+
 export const selectedCustomizations = writable<Record<string, CustomizationValue[]>>({});
+export const selectedCustomizationsFlat = derived(
+  selectedCustomizations,
+  ($selectedCustomizations) => Object.values($selectedCustomizations).flat()
+);
 
 export const cart = writable<CartItem[]>([]);
 
-export const totalPrice = derived(cart, ($cart) =>
-  $cart.reduce((sum, item) => sum + item.price, 0)
-);
+export const totalPrice = derived(cart, ($cart) => sumBy($cart, (item) => item.price));
+
+export const editingIndex = writable<number | null>(null);
+
+const repriceItem = (item: CartItem): CartItem => {
+  const base = item.basePrice;
+  const price = finalPrice(base, get(selectedCustomizationsFlat));
+  return { ...item, basePrice: base, price } as CartItem;
+};
+
+const hydrateSelectedFromItem = (item: CartItem) => {
+  const grouped = groupBy(
+    (item.customizations || []).filter((v) => Boolean(v.belongsTo)),
+    (v) => v.belongsTo as string
+  );
+  selectedCustomizations.set(grouped);
+};
+
+export const startEditing = (index: number) => {
+  const current = get(cart)[index];
+  if (!current) return;
+  editingIndex.set(index);
+  hydrateSelectedFromItem(current);
+  selectedItemId.set(current.id);
+};
+
+export const deleteEditingItem = () => {
+  const index = get(editingIndex);
+  if (index === null) return;
+  removeFromCart(index);
+  editingIndex.set(null);
+  initializeCustomizations();
+};
+
+export const stopEditing = () => {
+  editingIndex.set(null);
+  initializeCustomizations();
+};
+
+const repriceEditingItemBySelections = () => {
+  const index = get(editingIndex);
+  if (index === null) return;
+  cart.update((c) => updateAt(c, index, (item) => repriceItem(item)));
+};
+
+const validateCustomizations = () => {
+  const category = get(categories).find((c) => c === get(selectedCategory));
+  for (const key of get(customizationKeys)) {
+    const isValid = category?.validCustomizations.includes(key.id);
+    if (!isValid) {
+      selectedCustomizations.update((c) => {
+        c[key.id] = [];
+        return c;
+      });
+    }
+  }
+};
 
 export const applyDefaults = () => {
   const keys = get(customizationKeys);
@@ -36,6 +112,7 @@ export const applyDefaults = () => {
   }
 
   selectedCustomizations.set({ ...selected });
+  validateCustomizations();
 };
 
 export const initializeCustomizations = () => {
@@ -67,30 +144,58 @@ export const toggleCustomization = (key: CustomizationKey, value: CustomizationV
     );
     return { ...map, [key.id]: updatedSelections };
   });
+  const index = get(editingIndex);
+  if (index !== null) {
+    cart.update((c) => {
+      const item = c[index];
+      if (!item) return c;
+
+      const updatedItem: CartItem = {
+        ...item,
+        customizations: get(selectedCustomizationsFlat)
+      } as CartItem;
+
+      const newCart = [...c];
+      newCart[index] = updatedItem!;
+      return newCart;
+    });
+  }
+  repriceEditingItemBySelections();
+};
+
+export const handleSelectedItemChange = () => {
+  applyDefaults();
+  const index = get(editingIndex);
+  if (index !== null) {
+    cart.update((c) => {
+      const item = get(selectedItem)!;
+
+      const basePrice = item.price;
+      const finalprice = finalPrice(basePrice, get(selectedCustomizationsFlat));
+
+      const updatedItem: CartItem = {
+        ...get(selectedItem),
+        price: Math.ceil(finalprice),
+        customizations: get(selectedCustomizationsFlat),
+        basePrice
+      } as CartItem;
+
+      const newCart = [...c];
+      newCart[index] = updatedItem!;
+      return newCart;
+    });
+  }
 };
 
 export const addToCart = (item: Item) => {
-  // the initial selection maps to the categories of the customizations
-  // so we just flatten this structure for the purposes of summation
-  const customizations = Object.values(get(selectedCustomizations)).flat();
-
-  const totalCustomizationPrice = customizations.reduce(
-    (sum, customization) =>
-      customization.constantPrice ? sum + (customization.priceChange || 0) : sum,
-    0
-  );
-
-  const subtotal = item.price + totalCustomizationPrice;
-  const finalprice = customizations.reduce(
-    (price, customization) =>
-      !customization.constantPrice ? price * (customization.priceChange / 100) : price,
-    subtotal
-  );
+  const basePrice = item.price;
+  const finalprice = finalPrice(basePrice, get(selectedCustomizationsFlat));
 
   const itemToAdd: CartItem = {
     ...item,
     price: Math.ceil(finalprice),
-    customizations
+    customizations: get(selectedCustomizationsFlat),
+    basePrice
   } as CartItem;
 
   cart.update((c) => [...c, itemToAdd]);
