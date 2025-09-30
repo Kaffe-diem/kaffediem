@@ -12,7 +12,7 @@
 </script>
 
 {#if $status.open}
-  <main class="relative mx-auto h-screen w-full xl:w-11/12">
+  <main class="relative mx-auto h-dvh w-full xl:w-11/12">
     {@render children?.()}
   </main>
 {:else}
