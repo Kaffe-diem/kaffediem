@@ -150,13 +150,10 @@
         {/if}
       </div>
     </td>
-    <td class="relative">
+    <td>
       <span>{item.price},-</span>
       {#if $editingIndex === index}
-        <button
-          class="btn btn-error absolute right-0 bottom-0 mr-5 ml-3 transform-[translateY(-50%)]"
-          onclick={deleteEditingItem}><TrashIcon /></button
-        >
+        <button class="btn btn-error ml-3" onclick={deleteEditingItem}><TrashIcon /></button>
       {/if}
     </td>
   </tr>
