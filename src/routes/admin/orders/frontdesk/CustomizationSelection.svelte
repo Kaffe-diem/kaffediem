@@ -75,7 +75,7 @@
         <span>{value.priceChange},-</span>
       {/if}
       {#if !value.constantPrice}
-        <span>{value.priceChange}%</span>
+        <span>{value.priceChange - 100}%</span>
       {/if}
     </span>
   </label>
