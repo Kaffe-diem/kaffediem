@@ -13,7 +13,8 @@
     initializeCustomizations();
   });
 
-  const isValid = (key) => key.enabled && $selectedCategory?.validCustomizations.includes(key.id);
+  const isValid = (key: CustomizationKey) =>
+    key.enabled && $selectedCategory?.validCustomizations.includes(key.id);
 </script>
 
 <div class="grid h-full grid-rows-[1fr_auto] overflow-y-auto">
