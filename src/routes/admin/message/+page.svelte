@@ -35,6 +35,13 @@
       new Status($status.id, $status.message, $status.messages, $status.open, !$status.showMessage)
     );
   };
+
+  const addMessage = () => {
+    messages.create(Message.baseValue);
+  };
+
+  let lastMessage = $derived($messages.at(-1));
+  let disableAdd = $derived(!(lastMessage?.title || lastMessage?.subtitle));
 </script>
 
 <form>
@@ -89,7 +96,8 @@
       <button
         type="button"
         class="btn btn-xl btn-primary ml-4 w-16"
-        onclick={() => messages.create(Message.baseValue)}>+</button
+        onclick={addMessage}
+        disabled={disableAdd}>+</button
       >
     </div>
   </ul>

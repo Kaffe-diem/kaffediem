@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Only run in Git worktree (skip in CI or detached runs)
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  exit 0
+fi
+
+# Run formatter
+# make format
+
+# Optionally add reformatted files to commit if they changed
+# Uncomment to auto-add:
+# git add -A

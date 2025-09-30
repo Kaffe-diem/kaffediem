@@ -15,7 +15,7 @@
 </script>
 
 <div class="grid h-full grid-rows-[1fr_auto] overflow-y-auto">
-  <div class="grid-auto-flow-column grid grid-cols-2">
+  <div class="columns-2">
     {#each $customizationKeys as key (key.id)}
       {#if key.enabled && $selectedCategory?.validCustomizations.includes(key.id)}
         {@render CustomizationCategory({ key })}
@@ -26,7 +26,7 @@
 
 {#snippet CustomizationCategory({ key }: { key: CustomizationKey })}
   {#if $customizationsByKey[key.id]!.filter((value) => value.enabled).length > 0}
-    <div class="grid grid-cols-1 gap-y-2 p-2">
+    <div class="inline-grid w-full grid-cols-1 gap-y-2 p-2">
       <div class="text-primary font-bold xl:text-xl">
         {key.name}
       </div>
