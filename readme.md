@@ -27,3 +27,28 @@ PB_ADMIN_PASSWORD=
 ```bash
 make
 ```
+
+## Ofte stilte spørsmål
+
+### Feilmelding når jeg kjører `make`?
+
+Har du prøvd:
+
+```bash
+make clean
+docker compose build --no-cache
+```
+
+### Koden virker ikke!!! Internal server error 500 eller ClientResponseError
+
+Ofte har man en utdatert db (migrations blir IKKE appliet automatisk når du bytter branch)
+For å apply på nytt:
+
+```bash
+make clean
+make
+```
+
+### Bad gateway i prod
+
+Problem med nginx konfigurasjon; har ingenting med koden å gjøre.
