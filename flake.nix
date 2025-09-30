@@ -29,6 +29,7 @@
               nodejs_20
               nodePackages.typescript-language-server
               nodePackages.typescript
+              bun
               emmet-ls
               vscode-langservers-extracted
               prettierd
