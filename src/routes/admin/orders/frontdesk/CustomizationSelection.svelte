@@ -12,16 +12,24 @@
   onMount(() => {
     initializeCustomizations();
   });
+
+  const isValid = (key) => key.enabled && $selectedCategory?.validCustomizations.includes(key.id);
 </script>
 
 <div class="grid h-full grid-rows-[1fr_auto] overflow-y-auto">
-  <div class="columns-2">
-    {#each $customizationKeys as key (key.id)}
-      {#if key.enabled && $selectedCategory?.validCustomizations.includes(key.id)}
-        {@render CustomizationCategory({ key })}
-      {/if}
-    {/each}
-  </div>
+  {#if $customizationKeys.some(isValid)}
+    <div class="columns-2">
+      {#each $customizationKeys as key (key.id)}
+        {#if isValid(key)}
+          {@render CustomizationCategory({ key })}
+        {/if}
+      {/each}
+    </div>
+  {:else}
+    <div class="grid items-center text-center">
+      <i>Ingen tilgjengelige tilpasninger</i>
+    </div>
+  {/if}
 </div>
 
 {#snippet CustomizationCategory({ key }: { key: CustomizationKey })}
