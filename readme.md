@@ -20,7 +20,7 @@ Det er nyttig å enten ha Linux eller WSL.
 make
 ```
 
-3. Logg inn med `example@example.com` og `basic123`
+3. Logg inn med `admin@example.com` og `basic123`
 
 Dette brukes både på [pocketbase kontrollpanelet](http://127.0.0.1:8081/_) og [nettsiden](http://127.0.0.1:5173)
 
