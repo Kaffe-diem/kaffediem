@@ -1,11 +1,11 @@
 migrate(
   (app) => {
-    let superusers = app.findCollectionByNameOrId("_superusers");
-    let users = app.findCollectionByNameOrId("user");
+    const superusers = app.findCollectionByNameOrId("_superusers");
+    const users = app.findCollectionByNameOrId("user");
 
     if (process.env.POCKETBASE_ENVIRONMENT == "dev") {
       const createRecord = (collection, data) => {
-        const record = new Record(collection);
+        let record = new Record(collection);
         Object.entries(data).forEach(([key, value]) => record.set(key, value));
         app.save(record);
       };
@@ -33,15 +33,20 @@ migrate(
     }
   },
   (app) => {
+    const superusers = app.findCollectionByNameOrId("_superusers");
+    const users = app.findCollectionByNameOrId("user");
+
     const safeDelete = (collection, email) => {
       try {
         const record = app.findAuthRecordByEmail(collection, email);
         if (record) app.delete(record);
-      } catch {}
+      } catch (e) {
+        console.log(`Could not delete ${email}:`, e);
+      }
     };
 
-    safeDelete("_superusers", process.env.PB_TEST_ADMIN_EMAIL);
-    safeDelete("user", process.env.PB_TEST_USER_EMAIL);
-    safeDelete("user", process.env.PB_TEST_ADMIN_EMAIL);
+    safeDelete(superusers, process.env.PB_TEST_ADMIN_EMAIL);
+    safeDelete(users, process.env.PB_TEST_USER_EMAIL);
+    safeDelete(users, process.env.PB_TEST_ADMIN_EMAIL);
   }
 );
