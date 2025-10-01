@@ -12,7 +12,7 @@
 </script>
 
 <div
-  class="grid h-full grid-cols-1 grid-rows-[auto_auto_auto_auto_auto] md:grid-cols-[1fr_auto_1fr_auto_1fr] md:grid-rows-1"
+  class="grid-rows-[repeat(5, auto)] grid h-full grid-cols-1 md:grid-cols-[2fr_auto_1fr_auto_2fr] md:grid-rows-1"
 >
   <OrderList
     show={[received]}
@@ -27,7 +27,7 @@
   <OrderList
     show={[production]}
     label="Lages nå"
-    class="bg-base-200"
+    class="bg-warning"
     transitionSend={send}
     transitionReceive={receive}
   />

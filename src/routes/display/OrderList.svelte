@@ -35,10 +35,12 @@
       {label}
     </h2>
   {/if}
-  <div class="grid max-h-full grid-cols-3 gap-4 overflow-x-hidden overflow-y-scroll">
+  <div
+    class="grid max-h-full grid-cols-[repeat(auto-fit,_minmax(2.5em,_1fr))] gap-4 overflow-x-hidden overflow-y-scroll text-[clamp(3rem,4vw,12rem)]"
+  >
     {#each $orders.filter((order) => show.includes(order?.state)) as order (order.id)}
       <div
-        class="{className} rounded-xl px-4 py-4 text-center text-[clamp(3rem,4vw,12rem)] leading-none font-bold"
+        class="{className} rounded-xl px-[0.2em] py-[0.2em] text-center leading-none font-bold"
         in:transitionReceive|local={{ key: order.id }}
         out:transitionSend|local={{ key: order.id }}
         animate:flip={{ duration: 225, easing: cubicOut }}
