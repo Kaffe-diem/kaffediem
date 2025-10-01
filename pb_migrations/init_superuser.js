@@ -1,7 +1,7 @@
 migrate((app) => {
     let superusers = app.findCollectionByNameOrId("_superusers")
 
-    if (process.env.NODE_ENV == "development") {
+    if (process.env.POCKETBASE_ENVIRONMENT == "dev") {
       let record = new Record(superusers)
 
       record.set("email", process.env.PB_TEST_ADMIN_EMAIL)
