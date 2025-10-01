@@ -52,3 +52,21 @@ make
 ### Bad gateway i prod
 
 Problem med nginx konfigurasjon; har ingenting med koden å gjøre.
+
+### Jeg kan ikke logge inn!!!
+
+1. Gå til [pocketbase kontrollpanelet](http://127.0.0.1:8081/_)
+2. Logg inn med det du har satt i .env:
+
+```
+PB_TEST_ADMIN_EMAIL=
+PB_TEST_ADMIN_PASSWORD=
+```
+
+3. Lag en bruker i `user` collection
+
+#### Jeg klarer ikke å logge inn på pocketbase!!!
+
+Pass på at du faktisk kjører koden med `make`.
+Prøv å kjøre `pocketbase migrate up`
+Hvis `No new migrations to apply.` prøv å `pocketbase migrate down` også `pocketbase migrate up` igjen
