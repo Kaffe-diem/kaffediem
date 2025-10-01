@@ -5,3 +5,4 @@ yarn.lock
 # Generated files
 src/lib/pocketbase/index.d.ts
 pb_migrations/*
+!pb_migrations/init.js

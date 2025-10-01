@@ -23,8 +23,9 @@ services:
       - PUBLIC_PB_HOST=${PUBLIC_PB_HOST}
       - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL:-}
       - PB_ADMIN_PASSWORD=${PB_ADMIN_PASSWORD:-}
+      - PB_TEST_USER_EMAIL=${PB_TEST_USER_EMAIL}
       - PB_TEST_ADMIN_EMAIL=${PB_TEST_ADMIN_EMAIL}
-      - PB_TEST_ADMIN_PASSWORD=${PB_TEST_ADMIN_PASSWORD}
+      - PB_TEST_PASSWORD=${PB_TEST_PASSWORD}
     volumes:
       - "./pb_data:/app/pb_data"
       - "./pb_migrations:/app/pb_migrations"

@@ -1,28 +1,47 @@
-migrate((app) => {
-    let superusers = app.findCollectionByNameOrId("_superusers")
-    let users = app.findCollectionByNameOrId("user")
+migrate(
+  (app) => {
+    let superusers = app.findCollectionByNameOrId("_superusers");
+    let users = app.findCollectionByNameOrId("user");
 
     if (process.env.POCKETBASE_ENVIRONMENT == "dev") {
-      let superuser = new Record(superusers)
-      let user = new Record(users)
+      const createRecord = (collection, data) => {
+        const record = new Record(collection);
+        Object.entries(data).forEach(([key, value]) => record.set(key, value));
+        app.save(record);
+      };
 
-      superuser.set("email", process.env.PB_TEST_ADMIN_EMAIL)
-      user.set("email", process.env.PB_TEST_ADMIN_EMAIL)
-      superuser.set("password", process.env.PB_TEST_ADMIN_PASSWORD)
-      user.set("password", process.env.PB_TEST_ADMIN_PASSWORD)
+      const password = process.env.PB_TEST_PASSWORD;
 
-      user.set("is_admin", true)
-      user.set("verified", true)
+      createRecord(superusers, {
+        email: process.env.PB_TEST_ADMIN_EMAIL,
+        password
+      });
 
-      app.save(superuser)
-      app.save(user)
+      createRecord(users, {
+        email: process.env.PB_TEST_USER_EMAIL,
+        password,
+        verified: true,
+        is_admin: false
+      });
+
+      createRecord(users, {
+        email: process.env.PB_TEST_ADMIN_EMAIL,
+        password,
+        verified: true,
+        is_admin: true
+      });
     }
-}, (app) => {
-    try {
-        let superuser = app.findAuthRecordByEmail("_superusers", process.env.PB_TEST_ADMIN_EMAIL)
-        let user = app.findAuthRecordByEmail("user", process.env.PB_TEST_ADMIN_EMAIL)
-        app.delete(superuser)
-        app.delete(user)
-    } catch {
-    }
-})
+  },
+  (app) => {
+    const safeDelete = (collection, email) => {
+      try {
+        const record = app.findAuthRecordByEmail(collection, email);
+        if (record) app.delete(record);
+      } catch {}
+    };
+
+    safeDelete("_superusers", process.env.PB_TEST_ADMIN_EMAIL);
+    safeDelete("user", process.env.PB_TEST_USER_EMAIL);
+    safeDelete("user", process.env.PB_TEST_ADMIN_EMAIL);
+  }
+);
