@@ -1,5 +1,7 @@
 import PocketBase from "pocketbase";
 
+import { dev } from "$app/environment";
+import { env } from "$env/dynamic/private";
 import { restrictedRoutes, adminRoutes } from "$lib/constants";
 import { redirect, type Handle } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
@@ -20,6 +22,19 @@ export const authentication: Handle = async ({ event, resolve }) => {
       event.locals.pb.collection(Collections.User).authRefresh();
   } catch {
     event.locals.pb.authStore.clear();
+  }
+
+  if (dev && !event.locals.pb.authStore.isValid) {
+    const email = env.PB_ADMIN_EMAIL;
+    const password = env.PB_ADMIN_PASSWORD;
+
+    if (email && password) {
+      try {
+        await event.locals.pb.collection(Collections.User).authWithPassword(email, password);
+      } catch (error) {
+        console.warn("Failed to apply dev admin bypass", error);
+      }
+    }
   }
 
   const response = await resolve(event);
