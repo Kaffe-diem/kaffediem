@@ -1,0 +1,32 @@
+services:
+  app:
+    build:
+      context: .
+      target: production
+      args:
+        - PUBLIC_PB_HOST_PROD=${PUBLIC_PB_HOST_PROD}
+        - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL:-}
+        - PB_ADMIN_PASSWORD=${PB_ADMIN_PASSWORD:-}
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PUBLIC_PB_HOST=${PUBLIC_PB_HOST_PROD}
+    depends_on:
+      pb:
+        condition: service_healthy
+
+  tools:
+    build:
+      context: .
+      dockerfile: tools.Dockerfile
+    working_dir: /app
+    environment:
+      - PUBLIC_PB_HOST_PROD=${PUBLIC_PB_HOST_PROD}
+      - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL:-}
+      - PB_ADMIN_PASSWORD=${PB_ADMIN_PASSWORD:-}
+    volumes:
+      - ./:/app
+      - tools_node_modules:/app/node_modules
+
+volumes:
+  tools_node_modules:
