@@ -56,7 +56,7 @@ Problem med nginx konfigurasjon; har ingenting med koden å gjøre.
 ### Jeg kan ikke logge inn!!!
 
 1. Gå til [pocketbase kontrollpanelet](http://127.0.0.1:8081/_)
-2. Logg inn med example@example.com og basic123
+2. Logg inn med `example@example.com` og `basic123`
 3. Lag en bruker i `user` collection
 
 #### Jeg klarer ikke å logge inn på pocketbase!!!
