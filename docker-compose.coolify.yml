@@ -11,10 +11,6 @@ services:
     environment:
       - NODE_ENV=production
       - PUBLIC_PB_HOST=${PUBLIC_PB_HOST_PROD}
-    depends_on:
-      pb:
-        condition: service_healthy
-
   tools:
     build:
       context: .
