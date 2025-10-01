@@ -50,3 +50,9 @@ _hooks: .git/.hooks_installed
 	@git config core.hooksPath .githooks
 	@chmod +x .githooks/* || true
 	@touch $@
+
+migrate_up:
+	docker compose run --rm tools sh -c "/pb/pocketbase migrate up"
+
+migrate_down:
+	docker compose run --rm tools sh -c "/pb/pocketbase migrate down"
