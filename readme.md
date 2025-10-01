@@ -14,16 +14,43 @@ Det er nyttig å enten ha Linux eller WSL.
 
 1. Last ned [docker](https://www.docker.com/)
 
-2. .env
-
-```
-PUBLIC_PB_HOST_PROD=https://kodekafe-pocketbase.fly.dev
-PB_ADMIN_EMAIL=
-PB_ADMIN_PASSWORD=
-```
-
 2. Bygg og kjør appen
 
 ```bash
 make
 ```
+
+3. Logg inn med `admin@example.com` og `basic123`
+
+Dette brukes både på [pocketbase kontrollpanelet](http://127.0.0.1:8081/_) og [nettsiden](http://127.0.0.1:5173)
+
+## Ofte stilte spørsmål
+
+### Feilmelding når jeg kjører `make`?
+
+Har du prøvd:
+
+```bash
+make clean
+docker compose build --no-cache
+```
+
+### Koden virker ikke!!! Internal server error 500 eller ClientResponseError
+
+Ofte har man en utdatert db (migrations blir IKKE appliet automatisk når du bytter branch)
+For å apply på nytt:
+
+```bash
+make clean
+make
+```
+
+### Bad gateway i prod
+
+Problem med nginx konfigurasjon; har ingenting med koden å gjøre.
+
+### Jeg kan ikke logge inn!!! (pocketbase eller nettsiden)
+
+Pass på at du faktisk kjører koden med `make`.
+Prøv å kjøre `pocketbase migrate up`
+Hvis `No new migrations to apply.` prøv å `pocketbase migrate down` også `pocketbase migrate up` igjen
