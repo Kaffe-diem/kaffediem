@@ -4,6 +4,7 @@
   "private": true,
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "@playwright/test": "^1.55.1",
     "@sveltejs/adapter-node": "^5.3.2",
     "@sveltejs/kit": "^2.39.1",
     "@sveltejs/vite-plugin-svelte": "^6.2.0",
@@ -36,5 +37,6 @@
   },
   "overrides": {
     "cookie": "^0.7.0"
-  }
+  },
+  "scripts": {}
 }
