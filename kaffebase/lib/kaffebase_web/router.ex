@@ -20,6 +20,77 @@ defmodule KaffebaseWeb.Router do
     get "/", PageController, :home
   end
 
+  scope "/api/collections", KaffebaseWeb do
+    pipe_through :api
+
+    # Categories
+    get "/category/records", CategoryController, :index
+    post "/category/records", CategoryController, :create
+    get "/category/records/:id", CategoryController, :show
+    patch "/category/records/:id", CategoryController, :update
+    put "/category/records/:id", CategoryController, :update
+    delete "/category/records/:id", CategoryController, :delete
+
+    # Items
+    get "/item/records", ItemController, :index
+    post "/item/records", ItemController, :create
+    get "/item/records/:id", ItemController, :show
+    patch "/item/records/:id", ItemController, :update
+    put "/item/records/:id", ItemController, :update
+    delete "/item/records/:id", ItemController, :delete
+
+    # Customizations
+    get "/customization_key/records", CustomizationKeyController, :index
+    post "/customization_key/records", CustomizationKeyController, :create
+    get "/customization_key/records/:id", CustomizationKeyController, :show
+    patch "/customization_key/records/:id", CustomizationKeyController, :update
+    put "/customization_key/records/:id", CustomizationKeyController, :update
+    delete "/customization_key/records/:id", CustomizationKeyController, :delete
+
+    get "/customization_value/records", CustomizationValueController, :index
+    post "/customization_value/records", CustomizationValueController, :create
+    get "/customization_value/records/:id", CustomizationValueController, :show
+    patch "/customization_value/records/:id", CustomizationValueController, :update
+    put "/customization_value/records/:id", CustomizationValueController, :update
+    delete "/customization_value/records/:id", CustomizationValueController, :delete
+
+    get "/item_customization/records", ItemCustomizationController, :index
+    post "/item_customization/records", ItemCustomizationController, :create
+    get "/item_customization/records/:id", ItemCustomizationController, :show
+    patch "/item_customization/records/:id", ItemCustomizationController, :update
+    put "/item_customization/records/:id", ItemCustomizationController, :update
+    delete "/item_customization/records/:id", ItemCustomizationController, :delete
+
+    # Messages & status
+    get "/message/records", MessageController, :index
+    post "/message/records", MessageController, :create
+    get "/message/records/:id", MessageController, :show
+    patch "/message/records/:id", MessageController, :update
+    put "/message/records/:id", MessageController, :update
+    delete "/message/records/:id", MessageController, :delete
+
+    get "/status/records", StatusController, :index
+    post "/status/records", StatusController, :create
+    get "/status/records/:id", StatusController, :show
+    patch "/status/records/:id", StatusController, :update
+    put "/status/records/:id", StatusController, :update
+    delete "/status/records/:id", StatusController, :delete
+
+    # Orders
+    get "/order/records", OrderController, :index
+    post "/order/records", OrderController, :create
+    get "/order/records/:id", OrderController, :show
+    patch "/order/records/:id", OrderController, :update
+    put "/order/records/:id", OrderController, :update
+    delete "/order/records/:id", OrderController, :delete
+
+    post "/order_item/records", OrderItemController, :create
+    get "/order_item/records/:id", OrderItemController, :show
+    patch "/order_item/records/:id", OrderItemController, :update
+    put "/order_item/records/:id", OrderItemController, :update
+    delete "/order_item/records/:id", OrderItemController, :delete
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", KaffebaseWeb do
   #   pipe_through :api

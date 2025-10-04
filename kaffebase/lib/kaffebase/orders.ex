@@ -91,6 +91,27 @@ defmodule Kaffebase.Orders do
   @spec delete_order(Order.t()) :: {:ok, Order.t()} | {:error, Ecto.Changeset.t()}
   def delete_order(%Order{} = order), do: Repo.delete(order)
 
+  @spec get_order_item!(String.t()) :: OrderItem.t()
+  def get_order_item!(id), do: Repo.get!(OrderItem, id)
+
+  @spec create_order_item(map()) :: {:ok, OrderItem.t()} | {:error, Ecto.Changeset.t()}
+  def create_order_item(attrs) do
+    %OrderItem{}
+    |> OrderItem.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @spec update_order_item(OrderItem.t(), map()) ::
+          {:ok, OrderItem.t()} | {:error, Ecto.Changeset.t()}
+  def update_order_item(%OrderItem{} = order_item, attrs) do
+    order_item
+    |> OrderItem.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @spec delete_order_item(OrderItem.t()) :: {:ok, OrderItem.t()} | {:error, Ecto.Changeset.t()}
+  def delete_order_item(%OrderItem{} = order_item), do: Repo.delete(order_item)
+
   # --------------------------------------------------------------------------
   # Internal helpers
 
@@ -363,10 +384,19 @@ defmodule Kaffebase.Orders do
   defp create_order_items(repo, items) when is_list(items) do
     items
     |> Enum.reduce_while({:ok, []}, fn item_attrs, {:ok, acc} ->
-      with {:ok, order_item} <- insert_order_item(repo, item_attrs) do
-        {:cont, {:ok, [order_item | acc]}}
-      else
-        {:error, reason} -> {:halt, {:error, reason}}
+      cond do
+        is_binary(item_attrs) ->
+          {:cont, {:ok, [%OrderItem{id: item_attrs} | acc]}}
+
+        is_map(item_attrs) ->
+          with {:ok, order_item} <- insert_order_item(repo, item_attrs) do
+            {:cont, {:ok, [order_item | acc]}}
+          else
+            {:error, reason} -> {:halt, {:error, reason}}
+          end
+
+        true ->
+          {:halt, {:error, :invalid_order_item}}
       end
     end)
     |> case do
