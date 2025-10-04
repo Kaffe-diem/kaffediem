@@ -66,6 +66,8 @@
       : 'bg-base-200 cursor-pointer'}  {order.missingInformation && detailed
       ? 'bg-warning ring-warning'
       : ''} mb-6 block rounded shadow-md transition-colors"
+    data-testid="order-row"
+    data-order-number={orderNumber}
     onclick={() => onclick && orders.updateState(order.id, onclick)}
     role="button"
     tabindex="0"
