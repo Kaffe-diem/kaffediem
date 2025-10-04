@@ -3,8 +3,7 @@ import {
   createCollectionStore,
   sendCollectionRequest
 } from "$stores/websocketStore";
-import { Collections } from "$lib/pocketbase";
-import { Message, Status } from "$lib/types";
+import { Collections, Message, Status } from "$lib/types";
 import { get, writable } from "svelte/store";
 
 export const messages = createCollectionCrud(Collections.Message, {
@@ -24,11 +23,8 @@ const statusSource = createCollectionStore(
 const { subscribe, set } = writable(Status.baseValue);
 
 statusSource.subscribe((records) => {
-  if (records.length > 0) {
-    set(records[0]);
-  } else {
-    set(Status.baseValue);
-  }
+  const [first] = records;
+  set(first ?? Status.baseValue);
 });
 
 export const status = {

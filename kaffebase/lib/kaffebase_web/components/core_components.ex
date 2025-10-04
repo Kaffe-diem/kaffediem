@@ -17,7 +17,7 @@ defmodule KaffebaseWeb.CoreComponents do
   use Phoenix.Component
 
   alias Phoenix.LiveView.JS
-  import KaffebaseWeb.Gettext
+  use Gettext, backend: KaffebaseWeb.Gettext
 
   @doc """
   Renders a modal.

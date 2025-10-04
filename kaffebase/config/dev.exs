@@ -3,7 +3,7 @@ import Config
 # Configure your database
 config :kaffebase, Kaffebase.Repo,
   database: Path.expand("../kaffebase_dev.db", Path.dirname(__ENV__.file)),
-  pool_size: 5,
+  pool_size: 1,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true
 
@@ -14,9 +14,8 @@ config :kaffebase, Kaffebase.Repo,
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
 config :kaffebase, KaffebaseWeb.Endpoint,
-  # Binding to loopback ipv4 address prevents access from other machines.
-  # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
-  http: [ip: {127, 0, 0, 1}, port: 4000],
+  # Binding to all interfaces to allow access from Docker containers and host
+  http: [ip: {0, 0, 0, 0}, port: 4000],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
@@ -62,8 +61,8 @@ config :kaffebase, KaffebaseWeb.Endpoint,
 # Enable dev routes for dashboard and mailbox
 config :kaffebase, dev_routes: true
 
-# Do not include metadata nor timestamps in development logs
-config :logger, :console, format: "[$level] $message\n"
+# Include timestamps and metadata in development logs for better debugging
+config :logger, :console, format: "[$time] [$level] $message\n", metadata: [:request_id]
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.

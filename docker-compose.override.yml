@@ -1,10 +1,44 @@
 services:
-  pb:
+  backend:
+    build:
+      context: ./kaffebase
+      dockerfile: Dockerfile.dev
     ports:
-      - "8081:8081"
+      - "4000:4000"
     volumes:
-      - ./pb_data:/app/pb_data
-      - ./pb_migrations:/app/pb_migrations
+      - backend_deps:/app/deps
+      - backend_build:/app/_build
+      - ./kaffebase/kaffebase_dev.db:/app/kaffebase_dev.db
+      - ./kaffebase/kaffebase_dev.db.db-shm:/app/kaffebase_dev.db.db-shm
+      - ./kaffebase/kaffebase_dev.db.db-wal:/app/kaffebase_dev.db.db-wal
+    environment:
+      - MIX_ENV=dev
+    stdin_open: true
+    tty: true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    develop:
+      watch:
+        - action: sync
+          path: ./kaffebase/lib
+          target: /app/lib
+        - action: sync
+          path: ./kaffebase/assets
+          target: /app/assets
+        - action: sync
+          path: ./kaffebase/priv
+          target: /app/priv
+        
+        - action: sync+restart
+          path: ./kaffebase/config
+          target: /app/config
+        
+        - action: rebuild
+          path: ./kaffebase/mix.exs
+
   app:
     build:
       target: development
@@ -12,7 +46,8 @@ services:
       - "5173:5173"
     environment:
       - NODE_ENV=development
-      - PUBLIC_PB_HOST=${PUBLIC_PB_HOST}
+      - PUBLIC_BACKEND_URL=${PUBLIC_BACKEND_URL:-http://backend:4000}
+      - PUBLIC_BACKEND_WS=${PUBLIC_BACKEND_WS:-ws://backend:4000/socket}
     volumes:
       - svelte_kit_data:/app/.svelte-kit
     develop:
@@ -46,3 +81,5 @@ services:
 
 volumes:
   svelte_kit_data:
+  backend_deps:
+  backend_build:

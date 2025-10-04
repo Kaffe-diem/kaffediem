@@ -62,7 +62,7 @@ defmodule Kaffebase.DataCase do
     db_path = Keyword.fetch!(repo_config, :database)
 
     unless File.exists?(db_path) do
-      source = Path.join(Path.dirname(db_path), "data.db")
+      source = Path.join(Path.dirname(db_path), "kaffebase_dev.db")
 
       if File.exists?(source) do
         File.cp!(source, db_path)

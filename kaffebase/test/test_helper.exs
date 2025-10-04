@@ -1,6 +1,6 @@
 repo_config = Application.fetch_env!(:kaffebase, Kaffebase.Repo)
 test_db = Keyword.fetch!(repo_config, :database)
-source_db = Path.join(Path.dirname(test_db), "data.db")
+source_db = Path.join(Path.dirname(test_db), "kaffebase_dev.db")
 
 if File.exists?(source_db) do
   for suffix <- ["", "-wal", "-shm"] do

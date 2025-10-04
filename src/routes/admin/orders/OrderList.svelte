@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { OrderStateOptions } from "$lib/pocketbase";
+  import type { OrderStateOptions } from "$lib/types";
   import orders from "$stores/orderStore";
   import { customizationKeys } from "$lib/stores/menuStore";
   import type { CustomizationKey, CustomizationValue, Order, OrderItem } from "$lib/types";

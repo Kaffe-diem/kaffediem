@@ -5,7 +5,7 @@ defmodule KaffebaseWeb.Gettext do
   By using [Gettext](https://hexdocs.pm/gettext),
   your module gains a set of macros for translations, for example:
 
-      import KaffebaseWeb.Gettext
+      use Gettext, backend: KaffebaseWeb.Gettext
 
       # Simple translation
       gettext("Here is the string to translate")
@@ -20,5 +20,5 @@ defmodule KaffebaseWeb.Gettext do
 
   See the [Gettext Docs](https://hexdocs.pm/gettext) for detailed usage.
   """
-  use Gettext, otp_app: :kaffebase
+  use Gettext.Backend, otp_app: :kaffebase
 end

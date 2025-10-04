@@ -3,7 +3,7 @@
   import ItemSelection from "./ItemSelection.svelte";
   import Cart from "./Cart.svelte";
   import CustomizationSelection from "./CustomizationSelection.svelte";
-  import { OrderStateOptions as OrderStateOptions } from "$lib/pocketbase";
+  import { OrderStateOptions } from "$lib/types";
   import orders from "$stores/orderStore";
   import { selectedItemId } from "$stores/cartStore";
   import { itemsByCategory, categories } from "$stores/menuStore";

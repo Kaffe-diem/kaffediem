@@ -1,6 +1,6 @@
 import { derived, get } from "svelte/store";
 import { createCollectionCrud } from "$stores/websocketStore";
-import { Collections } from "$lib/pocketbase";
+import { Collections } from "$lib/types";
 import {
   Item,
   Category,

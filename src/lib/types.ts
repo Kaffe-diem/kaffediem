@@ -10,7 +10,7 @@ import {
   type CustomizationKeyResponse,
   type CustomizationValueResponse,
   type ItemCustomizationResponse
-} from "$lib/pocketbase";
+} from "$lib/api/contracts";
 import { restrictedRoutes, adminRoutes } from "$lib/constants";
 
 type AuthRecord = {
@@ -37,6 +37,8 @@ export class NavItem {
 
 type State = OrderStateOptions;
 export { OrderStateOptions as State };
+export { OrderStateOptions, Collections } from "$lib/api/contracts";
+export type { RecordIdString } from "$lib/api/contracts";
 
 export interface RecordBase {
   id: RecordIdString;
@@ -56,7 +58,7 @@ export class User {
     if (!data) {
       return new User("", "", false);
     }
-    return new User(data?.id, data?.name, data?.is_admin);
+    return new User(data?.id ?? "", data?.name ?? "", data?.is_admin ?? false);
   }
 }
 

@@ -1,6 +1,6 @@
 import { browser } from "$app/environment";
-import type { Collections, RecordIdString } from "$lib/pocketbase";
-import type { RecordBase } from "$lib/types";
+import { PUBLIC_BACKEND_URL } from "$env/static/public";
+import type { RecordBase, Collections, RecordIdString } from "$lib/types";
 import { getSocket } from "$lib/realtime/socket";
 import { writable } from "svelte/store";
 import type { Channel } from "phoenix";
@@ -61,11 +61,11 @@ export function createCollectionStore<
         update((items) => applyChange(items, event, handlers));
       };
 
-      channel.on("change", listener);
+      const changeRef = channel.on("change", listener);
 
       subscription = {
         teardown: async () => {
-          channel.off("change", listener);
+          channel.off("change", changeRef);
           void channel.leave();
         }
       };
@@ -138,7 +138,7 @@ export async function sendCollectionRequest(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   payload: any
 ) {
-  const url = `/api/collections/${collection}/records${id ? `/${id}` : ""}`;
+  const url = buildBackendUrl(`/api/collections/${collection}/records${id ? `/${id}` : ""}`);
   const init: RequestInit = {
     method,
     credentials: "include"
@@ -157,5 +157,28 @@ export async function sendCollectionRequest(
 
   if (!response.ok) {
     throw new Error(`Request to ${url} failed with status ${response.status}`);
+  }
+}
+
+const backendHttpBase = sanitizeBackendUrl(PUBLIC_BACKEND_URL);
+
+function buildBackendUrl(path: string) {
+  if (!backendHttpBase) {
+    return path;
+  }
+
+  return new URL(path, backendHttpBase).toString();
+}
+
+function sanitizeBackendUrl(url: string | undefined) {
+  if (!url || url.length === 0) return "";
+
+  try {
+    const parsed = new URL(url);
+    parsed.pathname = parsed.pathname.replace(/\/$/, "");
+    return parsed.toString();
+  } catch (error) {
+    console.warn("Invalid PUBLIC_BACKEND_URL", error);
+    return "";
   }
 }

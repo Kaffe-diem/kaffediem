@@ -1,7 +1,6 @@
 import { createCollectionStore, sendCollectionRequest } from "$stores/websocketStore";
 import * as _ from "$lib/utils";
-import { Collections, type RecordIdString } from "$lib/pocketbase";
-import { State, Order, CustomizationValue } from "$lib/types";
+import { Collections, type RecordIdString, State, Order, CustomizationValue } from "$lib/types";
 import auth from "$stores/authStore";
 import { get } from "svelte/store";
 import { type CartItem } from "$stores/cartStore";

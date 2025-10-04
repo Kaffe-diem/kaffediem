@@ -3,7 +3,7 @@
   import { flip } from "svelte/animate";
   import { cubicOut } from "svelte/easing";
   import type { CrossfadeParams, TransitionConfig } from "svelte/transition";
-  import type { OrderStateOptions } from "$lib/pocketbase";
+  import type { OrderStateOptions } from "$lib/types";
 
   type CrossfadeFn = (
     node: Element,

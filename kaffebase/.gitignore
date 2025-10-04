@@ -39,3 +39,5 @@ npm-debug.log
 *.db
 *.db-*
 
+# Docker specific build artifacts
+/.mix-build/
