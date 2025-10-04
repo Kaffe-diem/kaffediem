@@ -1,4 +1,4 @@
-import pb, {
+import {
   type RecordIdString,
   OrderStateOptions,
   type ItemResponse,
@@ -12,7 +12,12 @@ import pb, {
   type ItemCustomizationResponse
 } from "$lib/pocketbase";
 import { restrictedRoutes, adminRoutes } from "$lib/constants";
-import type { AuthModel } from "pocketbase";
+
+type AuthRecord = {
+  id?: RecordIdString;
+  name?: string;
+  is_admin?: boolean;
+};
 
 type NavItems = "/account" | "/admin";
 
@@ -47,7 +52,7 @@ export class User {
     public readonly isAdmin: boolean
   ) {}
 
-  static fromPb(data: AuthModel): User {
+  static fromPb(data: AuthRecord | null): User {
     if (!data) {
       return new User("", "", false);
     }
@@ -171,7 +176,7 @@ export class Item implements RecordBase {
       data.price_nok,
       data.category,
       data.image,
-      pb.files.getURL(data, data.image),
+      resolveFileUrl(data.image),
       data.enable,
       data.sort_order
     );
@@ -210,6 +215,12 @@ export class Category implements RecordBase {
     );
   }
 }
+
+const resolveFileUrl = (fileName?: string | null) => {
+  if (!fileName) return "";
+  if (fileName.startsWith("http")) return fileName;
+  return fileName;
+};
 
 export class Message implements RecordBase {
   constructor(

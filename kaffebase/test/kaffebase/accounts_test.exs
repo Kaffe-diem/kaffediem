@@ -46,7 +46,12 @@ defmodule Kaffebase.AccountsTest do
 
     test "create_user/1 with invalid data returns error changeset" do
       assert {:error, changeset} = Accounts.create_user(%{username: nil})
-      assert %{name: ["can't be blank"], username: ["can't be blank"]} = errors_on(changeset)
+
+      assert %{
+               name: ["can't be blank"],
+               username: ["can't be blank"],
+               password: ["can't be blank"]
+             } = errors_on(changeset)
     end
 
     test "update_user/2 updates fields" do

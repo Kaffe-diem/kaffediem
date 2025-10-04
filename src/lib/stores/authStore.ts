@@ -1,26 +1,39 @@
 import { writable } from "svelte/store";
-import pb from "$lib/pocketbase/";
+import { fetchSession, login as apiLogin, logout as apiLogout } from "$lib/api/session";
 import { User } from "$lib/types";
 
 const auth = writable({
-  isAuthenticated: pb.authStore.isValid,
-  user: User.fromPb(pb.authStore.record)
+  isAuthenticated: false,
+  user: new User("", "", false)
 });
 
-pb.authStore.onChange(() => {
-  auth.set({
-    isAuthenticated: pb.authStore.isValid,
-    user: User.fromPb(pb.authStore.record)
-  });
-});
+async function initialise() {
+  try {
+    const session = await fetchSession();
 
-if (typeof document !== "undefined") {
-  pb.authStore.loadFromCookie(document.cookie);
+    if (session?.record) {
+      auth.set({ isAuthenticated: true, user: User.fromPb(session.record) });
+    } else {
+      auth.set({ isAuthenticated: false, user: new User("", "", false) });
+    }
+  } catch (error) {
+    console.error("Failed to fetch session", error);
+    auth.set({ isAuthenticated: false, user: new User("", "", false) });
+  }
+}
+
+if (typeof window !== "undefined") {
+  initialise();
 }
 
 export default auth;
 
-export function logout() {
-  pb.authStore.clear();
-  document.cookie = pb.authStore.exportToCookie();
+export async function login(email: string, password: string) {
+  const session = await apiLogin(email, password);
+  auth.set({ isAuthenticated: true, user: User.fromPb(session.record) });
+}
+
+export async function logout() {
+  await apiLogout();
+  auth.set({ isAuthenticated: false, user: new User("", "", false) });
 }

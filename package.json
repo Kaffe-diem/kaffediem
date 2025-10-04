@@ -29,9 +29,8 @@
   },
   "type": "module",
   "dependencies": {
-    "@types/eventsource": "^3.0.0",
     "@types/node": "^24.4.0",
-    "eventsource": "^4.0.0",
+    "phoenix": "^1.7.18",
     "pocketbase": "^0.26.2",
     "vite-plugin-node-polyfills": "^0.24.0"
   },

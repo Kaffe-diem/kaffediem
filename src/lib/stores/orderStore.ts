@@ -1,6 +1,6 @@
-import { createGenericPbStore, createPbStore } from "$stores/pbStore";
+import { createCollectionStore, sendCollectionRequest } from "$stores/websocketStore";
 import * as _ from "$lib/utils";
-import pb, { Collections, type RecordIdString } from "$lib/pocketbase";
+import { Collections, type RecordIdString } from "$lib/pocketbase";
 import { State, Order, CustomizationValue } from "$lib/types";
 import auth from "$stores/authStore";
 import { get } from "svelte/store";
@@ -26,11 +26,28 @@ const actionHistory: {
   previousState: State;
 }[] = [];
 
-// Create the store so we can reference it in methods
-export const raw_orders = await createPbStore(Collections.Order, Order, baseOptions);
+const rawOrdersStore = createCollectionStore(
+  Collections.Order,
+  {
+    fromWire: Order.fromPb
+  },
+  baseOptions
+);
+
+export const raw_orders = rawOrdersStore;
+
+const buildCustomizationPayload = (customizations: CustomizationValue[]) =>
+  Object.entries(_.groupBy(customizations, (customization) => customization.belongsTo)).map(
+    ([keyId, values]) => ({
+      key: keyId,
+      value: values.map((value) => value.id)
+    })
+  );
 
 export default {
-  ...raw_orders,
+  subscribe: rawOrdersStore.subscribe,
+  destroy: rawOrdersStore.destroy,
+  reset: () => undefined,
 
   create: async (
     userId: RecordIdString,
@@ -38,53 +55,49 @@ export default {
     missingInformation: boolean,
     dayId: number
   ) => {
-    const orderItemIds = await Promise.all(
-      items.map(async (item) => {
-        const orderItemResponse = await pb.collection(Collections.OrderItem).create({
-          item: item.id
-        });
-
-        if (!_.isEmpty(item.customizations)) {
-          await attachCustomizationsToOrderItem(orderItemResponse.id, item.customizations);
-        }
-
-        return orderItemResponse.id;
-      })
-    );
-
-    await pb.collection(Collections.Order).create({
+    const payload = {
       customer: userId,
-      items: orderItemIds,
+      items: items.map((item) => ({
+        item: item.id,
+        customizations: buildCustomizationPayload(item.customizations ?? [])
+      })),
       state: State.received,
       missing_information: missingInformation,
       day_id: dayId
-    });
+    };
 
-    const _orderStore = get(raw_orders);
-    const orderNumber = _orderStore.sort((a, b) => a.dayId - b.dayId).at(-1)!.dayId;
-    toasts.success(orderNumber.toString(), 1500);
+    await sendCollectionRequest("POST", Collections.Order, null, payload);
+
+    const orders = get(rawOrdersStore)
+      .slice()
+      .sort((a, b) => a.dayId - b.dayId);
+    const orderNumber = orders.at(-1)?.dayId;
+    if (orderNumber) {
+      toasts.success(orderNumber.toString(), 1500);
+    }
   },
 
   updateState: async (orderId: RecordIdString, state: State) => {
-    const order = await pb.collection(Collections.Order).getOne(orderId);
+    const existing = get(rawOrdersStore).find((order) => order.id === orderId);
 
-    actionHistory.push({
-      action: "updateState",
-      orderId: orderId,
-      previousState: order.state
-    });
+    if (existing) {
+      actionHistory.push({
+        action: "updateState",
+        orderId: orderId,
+        previousState: existing.state
+      });
+    }
 
-    await pb.collection(Collections.Order).update(orderId, { state });
+    await sendCollectionRequest("PATCH", Collections.Order, orderId, { state });
   },
 
   setAll: async (state: State) => {
-    const orders = await pb.collection(Collections.Order).getFullList();
-    orders.map((order) => {
-      pb.collection(Collections.Order).update(order.id, { state });
-    });
+    const orders = get(rawOrdersStore);
+    await Promise.all(
+      orders.map((order) => sendCollectionRequest("PATCH", Collections.Order, order.id, { state }))
+    );
   },
 
-  // TODO: maybe something cleaner and more generic https://1000experiments.dev/posts/command-store
   undoLastAction: async () => {
     if (actionHistory.length === 0) {
       return;
@@ -92,60 +105,21 @@ export default {
 
     const lastAction = actionHistory.pop();
 
-    switch (lastAction!.action) {
-      case "updateState":
-        pb.collection(Collections.Order).update(lastAction!.orderId, {
-          state: lastAction!.previousState
-        });
-        break;
+    if (lastAction?.action === "updateState") {
+      await sendCollectionRequest("PATCH", Collections.Order, lastAction.orderId, {
+        state: lastAction.previousState
+      });
     }
   }
 };
 
-const attachCustomizationsToOrderItem = async (
-  orderItemId: RecordIdString,
-  customizations: CustomizationValue[]
-) => {
-  const itemCustomizationIds = await createCustomizations(
-    _.groupBy(customizations, (customization) => customization.belongsTo)
-  );
-
-  if (!_.isEmpty(itemCustomizationIds)) {
-    await pb.collection(Collections.OrderItem).update(orderItemId, {
-      customization: itemCustomizationIds
-    });
+export const userOrders = createCollectionStore(
+  Collections.Order,
+  {
+    fromWire: Order.fromPb
+  },
+  {
+    ...baseOptions,
+    filter: `customer = '${get(auth).user.id}'`
   }
-};
-
-const createCustomizations = async (customizationsByKey: Record<string, CustomizationValue[]>) => {
-  const entries = Object.entries(customizationsByKey);
-
-  return Promise.all(
-    entries.map(async ([keyId, values]) => {
-      try {
-        const valueIds = _.map(values, (v) => v.id);
-        return createCustomization(keyId, valueIds);
-      } catch (error) {
-        console.error("Error creating item customization:", error);
-        throw error;
-      }
-    })
-  );
-};
-
-const createCustomization = async (
-  keyId: string,
-  valueIds: RecordIdString[]
-): Promise<RecordIdString> => {
-  const response = await pb.collection(Collections.ItemCustomization).create({
-    key: keyId,
-    value: valueIds
-  });
-
-  return response.id;
-};
-
-export const userOrders = await createGenericPbStore(Collections.Order, Order, {
-  ...baseOptions,
-  filter: `customer = '${get(auth).user.id}'`
-});
+);

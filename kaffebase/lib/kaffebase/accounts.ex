@@ -14,6 +14,9 @@ defmodule Kaffebase.Accounts do
   @spec get_user!(String.t()) :: User.t()
   def get_user!(id), do: Repo.get!(User, id)
 
+  @spec get_user(String.t()) :: User.t() | nil
+  def get_user(id), do: Repo.get(User, id)
+
   @spec get_user_by_email(String.t()) :: User.t() | nil
   def get_user_by_email(email) when is_binary(email) do
     Repo.get_by(User, email: email)

@@ -12,6 +12,7 @@ defmodule KaffebaseWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug :fetch_session
   end
 
   scope "/", KaffebaseWeb do
@@ -89,6 +90,14 @@ defmodule KaffebaseWeb.Router do
     patch "/order_item/records/:id", OrderItemController, :update
     put "/order_item/records/:id", OrderItemController, :update
     delete "/order_item/records/:id", OrderItemController, :delete
+  end
+
+  scope "/api", KaffebaseWeb do
+    pipe_through :api
+
+    post "/session", SessionController, :create
+    delete "/session", SessionController, :delete
+    get "/session", SessionController, :show
   end
 
   # Other scopes may use custom stacks.

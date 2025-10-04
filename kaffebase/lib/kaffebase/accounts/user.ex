@@ -37,7 +37,8 @@ defmodule Kaffebase.Accounts.User do
       :verified
     ])
     |> maybe_put_id()
-    |> validate_required([:name, :username])
+    |> validate_required([:name, :username, :password])
+    |> maybe_hash_password()
   end
 
   defp maybe_put_id(changeset) do
@@ -45,6 +46,15 @@ defmodule Kaffebase.Accounts.User do
       {:data, nil} -> put_change(changeset, :id, Ids.generate())
       {:changes, nil} -> put_change(changeset, :id, Ids.generate())
       _ -> changeset
+    end
+  end
+
+  defp maybe_hash_password(changeset) do
+    if password = get_change(changeset, :password) do
+      hashed = Bcrypt.hash_pwd_salt(password)
+      put_change(changeset, :password, hashed)
+    else
+      changeset
     end
   end
 end

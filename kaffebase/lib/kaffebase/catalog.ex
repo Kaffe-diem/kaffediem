@@ -6,6 +6,7 @@ defmodule Kaffebase.Catalog do
   import Ecto.Query, warn: false
 
   alias Kaffebase.Repo
+  alias Kaffebase.CollectionNotifier
 
   alias Kaffebase.Catalog.{
     Category,
@@ -34,6 +35,7 @@ defmodule Kaffebase.Catalog do
     %Category{}
     |> Category.changeset(attrs)
     |> Repo.insert()
+    |> notify("category", "create")
   end
 
   @spec update_category(Category.t(), map()) :: {:ok, Category.t()} | {:error, Ecto.Changeset.t()}
@@ -41,10 +43,15 @@ defmodule Kaffebase.Catalog do
     category
     |> Category.changeset(attrs)
     |> Repo.update()
+    |> notify("category", "update")
   end
 
   @spec delete_category(Category.t()) :: {:ok, Category.t()} | {:error, Ecto.Changeset.t()}
-  def delete_category(%Category{} = category), do: Repo.delete(category)
+  def delete_category(%Category{} = category) do
+    category
+    |> Repo.delete()
+    |> notify_delete("category")
+  end
 
   @spec change_category(Category.t(), map()) :: Ecto.Changeset.t()
   def change_category(%Category{} = category, attrs \\ %{}),
@@ -68,6 +75,7 @@ defmodule Kaffebase.Catalog do
     %Item{}
     |> Item.changeset(attrs)
     |> Repo.insert()
+    |> notify("item", "create")
   end
 
   @spec update_item(Item.t(), map()) :: {:ok, Item.t()} | {:error, Ecto.Changeset.t()}
@@ -75,10 +83,15 @@ defmodule Kaffebase.Catalog do
     item
     |> Item.changeset(attrs)
     |> Repo.update()
+    |> notify("item", "update")
   end
 
   @spec delete_item(Item.t()) :: {:ok, Item.t()} | {:error, Ecto.Changeset.t()}
-  def delete_item(%Item{} = item), do: Repo.delete(item)
+  def delete_item(%Item{} = item) do
+    item
+    |> Repo.delete()
+    |> notify_delete("item")
+  end
 
   @spec change_item(Item.t(), map()) :: Ecto.Changeset.t()
   def change_item(%Item{} = item, attrs \\ %{}), do: Item.changeset(item, attrs)
@@ -101,6 +114,7 @@ defmodule Kaffebase.Catalog do
     %CustomizationKey{}
     |> CustomizationKey.changeset(attrs)
     |> Repo.insert()
+    |> notify("customization_key", "create")
   end
 
   @spec update_customization_key(CustomizationKey.t(), map()) ::
@@ -109,11 +123,16 @@ defmodule Kaffebase.Catalog do
     key
     |> CustomizationKey.changeset(attrs)
     |> Repo.update()
+    |> notify("customization_key", "update")
   end
 
   @spec delete_customization_key(CustomizationKey.t()) ::
           {:ok, CustomizationKey.t()} | {:error, Ecto.Changeset.t()}
-  def delete_customization_key(%CustomizationKey{} = key), do: Repo.delete(key)
+  def delete_customization_key(%CustomizationKey{} = key) do
+    key
+    |> Repo.delete()
+    |> notify_delete("customization_key")
+  end
 
   @spec change_customization_key(CustomizationKey.t(), map()) :: Ecto.Changeset.t()
   def change_customization_key(%CustomizationKey{} = key, attrs \\ %{}),
@@ -138,6 +157,7 @@ defmodule Kaffebase.Catalog do
     %CustomizationValue{}
     |> CustomizationValue.changeset(attrs)
     |> Repo.insert()
+    |> notify("customization_value", "create")
   end
 
   @spec update_customization_value(CustomizationValue.t(), map()) ::
@@ -146,11 +166,16 @@ defmodule Kaffebase.Catalog do
     value
     |> CustomizationValue.changeset(attrs)
     |> Repo.update()
+    |> notify("customization_value", "update")
   end
 
   @spec delete_customization_value(CustomizationValue.t()) ::
           {:ok, CustomizationValue.t()} | {:error, Ecto.Changeset.t()}
-  def delete_customization_value(%CustomizationValue{} = value), do: Repo.delete(value)
+  def delete_customization_value(%CustomizationValue{} = value) do
+    value
+    |> Repo.delete()
+    |> notify_delete("customization_value")
+  end
 
   @spec change_customization_value(CustomizationValue.t(), map()) :: Ecto.Changeset.t()
   def change_customization_value(%CustomizationValue{} = value, attrs \\ %{}),
@@ -189,6 +214,7 @@ defmodule Kaffebase.Catalog do
     %ItemCustomization{}
     |> ItemCustomization.changeset(attrs)
     |> Repo.insert()
+    |> notify("item_customization", "create")
   end
 
   @spec update_item_customization(ItemCustomization.t(), map()) ::
@@ -197,12 +223,16 @@ defmodule Kaffebase.Catalog do
     customization
     |> ItemCustomization.changeset(attrs)
     |> Repo.update()
+    |> notify("item_customization", "update")
   end
 
   @spec delete_item_customization(ItemCustomization.t()) ::
           {:ok, ItemCustomization.t()} | {:error, Ecto.Changeset.t()}
-  def delete_item_customization(%ItemCustomization{} = customization),
-    do: Repo.delete(customization)
+  def delete_item_customization(%ItemCustomization{} = customization) do
+    customization
+    |> Repo.delete()
+    |> notify_delete("item_customization")
+  end
 
   @spec change_item_customization(ItemCustomization.t(), map()) :: Ecto.Changeset.t()
   def change_item_customization(%ItemCustomization{} = customization, attrs \\ %{}),
@@ -274,4 +304,18 @@ defmodule Kaffebase.Catalog do
     |> Repo.all()
     |> Map.new(&{&1.id, &1})
   end
+
+  defp notify({:ok, record} = result, collection, action) do
+    CollectionNotifier.broadcast_change(collection, action, record)
+    result
+  end
+
+  defp notify(result, _collection, _action), do: result
+
+  defp notify_delete({:ok, record} = result, collection) do
+    CollectionNotifier.broadcast_delete(collection, record.id)
+    result
+  end
+
+  defp notify_delete(result, _collection), do: result
 end

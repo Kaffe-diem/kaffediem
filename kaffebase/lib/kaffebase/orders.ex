@@ -8,6 +8,7 @@ defmodule Kaffebase.Orders do
   alias Ecto.Multi
   alias Kaffebase.Catalog
   alias Kaffebase.Catalog.{Item, ItemCustomization}
+  alias Kaffebase.CollectionNotifier
   alias Kaffebase.Orders.{Order, OrderItem}
   alias Kaffebase.Repo
 
@@ -49,8 +50,12 @@ defmodule Kaffebase.Orders do
     end)
     |> Repo.transaction()
     |> case do
-      {:ok, %{order: order}} -> {:ok, order}
-      {:error, _step, reason, _changes} -> {:error, reason}
+      {:ok, %{order: order}} ->
+        broadcast_change("order", "create", order)
+        {:ok, order}
+
+      {:error, _step, reason, _changes} ->
+        {:error, reason}
     end
   end
 
@@ -67,6 +72,7 @@ defmodule Kaffebase.Orders do
     order
     |> Order.changeset(prepared_attrs)
     |> Repo.update()
+    |> notify("order", "update")
   end
 
   @spec update_order_state(Order.t() | String.t(), Order.state()) ::
@@ -75,6 +81,7 @@ defmodule Kaffebase.Orders do
     order
     |> Order.changeset(%{state: cast_state(state)})
     |> Repo.update()
+    |> notify("order", "update")
   end
 
   def update_order_state(order_id, state) when is_binary(order_id) do
@@ -85,11 +92,22 @@ defmodule Kaffebase.Orders do
 
   @spec set_all_orders_state(Order.state()) :: {non_neg_integer(), nil | [term()]}
   def set_all_orders_state(state) do
-    Repo.update_all(Order, set: [state: cast_state(state)])
+    new_state = cast_state(state)
+    {count, _} = Repo.update_all(Order, set: [state: new_state])
+
+    Order
+    |> Repo.all()
+    |> Enum.each(&broadcast_change("order", "update", &1))
+
+    {count, nil}
   end
 
   @spec delete_order(Order.t()) :: {:ok, Order.t()} | {:error, Ecto.Changeset.t()}
-  def delete_order(%Order{} = order), do: Repo.delete(order)
+  def delete_order(%Order{} = order) do
+    order
+    |> Repo.delete()
+    |> notify_delete("order")
+  end
 
   @spec get_order_item!(String.t()) :: OrderItem.t()
   def get_order_item!(id), do: Repo.get!(OrderItem, id)
@@ -99,6 +117,7 @@ defmodule Kaffebase.Orders do
     %OrderItem{}
     |> OrderItem.changeset(attrs)
     |> Repo.insert()
+    |> notify("order_item", "create")
   end
 
   @spec update_order_item(OrderItem.t(), map()) ::
@@ -107,10 +126,15 @@ defmodule Kaffebase.Orders do
     order_item
     |> OrderItem.changeset(attrs)
     |> Repo.update()
+    |> notify("order_item", "update")
   end
 
   @spec delete_order_item(OrderItem.t()) :: {:ok, OrderItem.t()} | {:error, Ecto.Changeset.t()}
-  def delete_order_item(%OrderItem{} = order_item), do: Repo.delete(order_item)
+  def delete_order_item(%OrderItem{} = order_item) do
+    order_item
+    |> Repo.delete()
+    |> notify_delete("order_item")
+  end
 
   # --------------------------------------------------------------------------
   # Internal helpers
@@ -416,6 +440,8 @@ defmodule Kaffebase.Orders do
     |> repo.insert()
     |> case do
       {:ok, order_item} ->
+        broadcast_change("order_item", "create", order_item)
+
         with {:ok, customization_ids} <-
                maybe_create_item_customizations(repo, customization_attrs) do
           update_with_customizations(repo, order_item, customization_ids)
@@ -447,8 +473,12 @@ defmodule Kaffebase.Orders do
       |> ItemCustomization.changeset(attrs)
       |> repo.insert()
       |> case do
-        {:ok, customization} -> {:cont, {:ok, [customization.id | acc]}}
-        {:error, changeset} -> {:halt, {:error, changeset}}
+        {:ok, customization} ->
+          broadcast_change("item_customization", "create", customization)
+          {:cont, {:ok, [customization.id | acc]}}
+
+        {:error, changeset} ->
+          {:halt, {:error, changeset}}
       end
     end)
     |> case do
@@ -463,5 +493,35 @@ defmodule Kaffebase.Orders do
     order_item
     |> OrderItem.changeset(%{customization: customization_ids})
     |> repo.update()
+    |> case do
+      {:ok, updated} ->
+        broadcast_change("order_item", "update", updated)
+        {:ok, updated}
+
+      other ->
+        other
+    end
+  end
+
+  defp notify({:ok, record} = result, collection, action) do
+    broadcast_change(collection, action, record)
+    result
+  end
+
+  defp notify(result, _collection, _action), do: result
+
+  defp notify_delete({:ok, record} = result, collection) do
+    broadcast_delete(collection, record.id)
+    result
+  end
+
+  defp notify_delete(result, _collection), do: result
+
+  defp broadcast_change(collection, action, record) do
+    CollectionNotifier.broadcast_change(collection, action, record)
+  end
+
+  defp broadcast_delete(collection, id) do
+    CollectionNotifier.broadcast_delete(collection, id)
   end
 end

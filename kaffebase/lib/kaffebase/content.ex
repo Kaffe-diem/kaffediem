@@ -5,6 +5,7 @@ defmodule Kaffebase.Content do
 
   import Ecto.Query, warn: false
 
+  alias Kaffebase.CollectionNotifier
   alias Kaffebase.Content.{Message, Status}
   alias Kaffebase.Repo
 
@@ -25,6 +26,7 @@ defmodule Kaffebase.Content do
     %Message{}
     |> Message.changeset(attrs)
     |> Repo.insert()
+    |> notify("message", "create")
   end
 
   @spec update_message(Message.t(), map()) :: {:ok, Message.t()} | {:error, Ecto.Changeset.t()}
@@ -32,10 +34,15 @@ defmodule Kaffebase.Content do
     message
     |> Message.changeset(attrs)
     |> Repo.update()
+    |> notify("message", "update")
   end
 
   @spec delete_message(Message.t()) :: {:ok, Message.t()} | {:error, Ecto.Changeset.t()}
-  def delete_message(%Message{} = message), do: Repo.delete(message)
+  def delete_message(%Message{} = message) do
+    message
+    |> Repo.delete()
+    |> notify_delete("message")
+  end
 
   @spec change_message(Message.t(), map()) :: Ecto.Changeset.t()
   def change_message(%Message{} = message, attrs \\ %{}), do: Message.changeset(message, attrs)
@@ -69,6 +76,7 @@ defmodule Kaffebase.Content do
     %Status{}
     |> Status.changeset(attrs)
     |> Repo.insert()
+    |> notify("status", "create")
   end
 
   @spec update_status(Status.t(), map()) :: {:ok, Status.t()} | {:error, Ecto.Changeset.t()}
@@ -76,10 +84,15 @@ defmodule Kaffebase.Content do
     status
     |> Status.changeset(attrs)
     |> Repo.update()
+    |> notify("status", "update")
   end
 
   @spec delete_status(Status.t()) :: {:ok, Status.t()} | {:error, Ecto.Changeset.t()}
-  def delete_status(%Status{} = status), do: Repo.delete(status)
+  def delete_status(%Status{} = status) do
+    status
+    |> Repo.delete()
+    |> notify_delete("status")
+  end
 
   @spec change_status(Status.t(), map()) :: Ecto.Changeset.t()
   def change_status(%Status{} = status, attrs \\ %{}), do: Status.changeset(status, attrs)
@@ -140,4 +153,18 @@ defmodule Kaffebase.Content do
     |> Repo.all()
     |> Map.new(&{&1.id, &1})
   end
+
+  defp notify({:ok, record} = result, collection, action) do
+    CollectionNotifier.broadcast_change(collection, action, record)
+    result
+  end
+
+  defp notify(result, _collection, _action), do: result
+
+  defp notify_delete({:ok, record} = result, collection) do
+    CollectionNotifier.broadcast_delete(collection, record.id)
+    result
+  end
+
+  defp notify_delete(result, _collection), do: result
 end
