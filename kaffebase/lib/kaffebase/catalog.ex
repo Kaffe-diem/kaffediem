@@ -223,7 +223,7 @@ defmodule Kaffebase.Catalog do
     order_by(query, ^orderings)
   end
 
-  defp maybe_attach(records, _what, opts) when records == [], do: records
+  defp maybe_attach(records, _what, _opts) when records == [], do: records
 
   defp maybe_attach(records, what, opts) do
     if preload?(opts, what) do

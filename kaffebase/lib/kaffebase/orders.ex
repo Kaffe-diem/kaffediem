@@ -17,7 +17,7 @@ defmodule Kaffebase.Orders do
   def list_orders(opts \\ []) do
     Order
     |> maybe_filter_from_date(opts[:from_date])
-    |> maybe_filter(:customer_id, opts[:customer_id])
+    |> maybe_filter(:customer, opts[:customer_id] || opts[:customer])
     |> maybe_apply_order(opts[:order_by] || [asc: :day_id, asc: :created])
     |> Repo.all()
     |> maybe_preload_items(opts)
@@ -427,7 +427,7 @@ defmodule Kaffebase.Orders do
     end
   end
 
-  defp update_with_customizations(repo, order_item, []), do: {:ok, order_item}
+  defp update_with_customizations(_repo, order_item, []), do: {:ok, order_item}
 
   defp update_with_customizations(repo, order_item, customization_ids) do
     order_item

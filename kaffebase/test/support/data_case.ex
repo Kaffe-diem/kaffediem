@@ -36,6 +36,7 @@ defmodule Kaffebase.DataCase do
   Sets up the sandbox based on the test tags.
   """
   def setup_sandbox(tags) do
+    ensure_test_db!()
     pid = Ecto.Adapters.SQL.Sandbox.start_owner!(Kaffebase.Repo, shared: not tags[:async])
     on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
   end
@@ -54,5 +55,20 @@ defmodule Kaffebase.DataCase do
         opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
       end)
     end)
+  end
+
+  defp ensure_test_db! do
+    repo_config = Application.fetch_env!(:kaffebase, Kaffebase.Repo)
+    db_path = Keyword.fetch!(repo_config, :database)
+
+    unless File.exists?(db_path) do
+      source = Path.join(Path.dirname(db_path), "data.db")
+
+      if File.exists?(source) do
+        File.cp!(source, db_path)
+      else
+        File.touch!(db_path)
+      end
+    end
   end
 end
