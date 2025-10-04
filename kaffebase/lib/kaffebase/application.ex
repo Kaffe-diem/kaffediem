@@ -11,8 +11,7 @@ defmodule Kaffebase.Application do
       KaffebaseWeb.Telemetry,
       Kaffebase.Repo,
       {Ecto.Migrator,
-        repos: Application.fetch_env!(:kaffebase, :ecto_repos),
-        skip: skip_migrations?()},
+       repos: Application.fetch_env!(:kaffebase, :ecto_repos), skip: skip_migrations?()},
       {DNSCluster, query: Application.get_env(:kaffebase, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Kaffebase.PubSub},
       # Start the Finch HTTP client for sending emails

@@ -1,19 +1,50 @@
 defmodule Kaffebase.Accounts.User do
   use Ecto.Schema
+  import Ecto.Changeset
+
+  alias Kaffebase.Ids
 
   @primary_key {:id, :string, autogenerate: false}
+  @timestamps_opts [type: :utc_datetime_usec, inserted_at: :created, updated_at: :updated]
 
   schema "user" do
     field :avatar, :string
-    field :created_at, :string, source: :created
     field :email, :string
     field :email_visibility, :boolean, source: :emailVisibility
+    field :is_admin, :boolean, source: :is_admin
     field :name, :string
     field :password, :string
     field :token_key, :string, source: :tokenKey
-    field :updated_at, :string, source: :updated
     field :username, :string
     field :verified, :boolean
-    field :is_admin, :boolean, source: :is_admin
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(user, attrs) do
+    user
+    |> cast(attrs, [
+      :id,
+      :avatar,
+      :email,
+      :email_visibility,
+      :is_admin,
+      :name,
+      :password,
+      :token_key,
+      :username,
+      :verified
+    ])
+    |> maybe_put_id()
+    |> validate_required([:name, :username])
+  end
+
+  defp maybe_put_id(changeset) do
+    case fetch_field(changeset, :id) do
+      {:data, nil} -> put_change(changeset, :id, Ids.generate())
+      {:changes, nil} -> put_change(changeset, :id, Ids.generate())
+      _ -> changeset
+    end
   end
 end
