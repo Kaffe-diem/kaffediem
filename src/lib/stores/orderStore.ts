@@ -39,13 +39,6 @@ export default {
   reset: () => undefined,
 
   create: async (userId: RecordIdString, items: CartItem[], missingInformation: boolean) => {
-    const computeHighestDayId = (orders: Order[]) => {
-      if (orders.length === 0) return 100;
-      return Math.max(...orders.map((order) => order.dayId));
-    };
-
-    const previousHighest = computeHighestDayId(get(rawOrdersStore));
-
     const payload = {
       customer: userId,
       items: items.map((item) => ({
