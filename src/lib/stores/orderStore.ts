@@ -38,12 +38,14 @@ export default {
   destroy: rawOrdersStore.destroy,
   reset: () => undefined,
 
-  create: async (
-    userId: RecordIdString,
-    items: CartItem[],
-    missingInformation: boolean,
-    dayId: number
-  ) => {
+  create: async (userId: RecordIdString, items: CartItem[], missingInformation: boolean) => {
+    const computeHighestDayId = (orders: Order[]) => {
+      if (orders.length === 0) return 100;
+      return Math.max(...orders.map((order) => order.dayId));
+    };
+
+    const previousHighest = computeHighestDayId(get(rawOrdersStore));
+
     const payload = {
       customer: userId,
       items: items.map((item) => ({
@@ -51,19 +53,10 @@ export default {
         customizations: buildCustomizationPayload(item.customizations ?? [])
       })),
       state: State.received,
-      missing_information: missingInformation,
-      day_id: dayId
+      missing_information: missingInformation
     };
 
     await sendCollectionRequest("POST", Collections.Order, null, payload);
-
-    const orders = get(rawOrdersStore)
-      .slice()
-      .sort((a, b) => a.dayId - b.dayId);
-    const orderNumber = orders.at(-1)?.dayId;
-    if (orderNumber) {
-      toasts.success(orderNumber.toString(), 1500);
-    }
   },
 
   updateState: async (orderId: RecordIdString, state: State) => {
@@ -101,4 +94,3 @@ export default {
     }
   }
 };
-

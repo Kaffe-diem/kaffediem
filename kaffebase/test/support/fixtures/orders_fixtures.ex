@@ -17,14 +17,13 @@ defmodule Kaffebase.OrdersFixtures do
 
     payload = %{
       customer: user.id,
-      day_id: Map.get(attrs, :day_id, 1),
       missing_information: Map.get(attrs, :missing_information, false),
       items: [Map.merge(default_item_payload, Map.get(attrs, :item_attrs, %{}))]
     }
 
     {:ok, order} =
       attrs
-      |> Map.drop([:user, :item, :customizations, :item_attrs])
+      |> Map.drop([:user, :item, :customizations, :item_attrs, :day_id])
       |> Enum.into(payload)
       |> Orders.create_order()
 

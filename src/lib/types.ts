@@ -80,20 +80,13 @@ export class Order implements RecordBase {
     return {
       state: this.state,
       items: this.items,
-      missing_information: this.missingInformation,
-      day_id: this.dayId
+      missing_information: this.missingInformation
     };
   }
 
   static fromPb(data: ExpandedOrderRecord): Order {
     const items = data.expand?.items?.map(OrderItem.fromPb) ?? [];
-    return new Order(
-      data.id,
-      data.state,
-      items,
-      data.missing_information,
-      data.day_id
-    );
+    return new Order(data.id, data.state, items, data.missing_information, data.day_id);
   }
 }
 
@@ -135,7 +128,7 @@ export class OrderItem implements RecordBase {
     });
 
     const itemData = data.expand?.item;
-    
+
     return new OrderItem(
       data.id,
       itemData?.name ?? "",

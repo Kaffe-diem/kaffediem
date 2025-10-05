@@ -14,17 +14,15 @@ defmodule Kaffebase.Orders.Commands.PlaceOrder do
   @primary_key false
 
   embedded_schema do
-    field :customer_id, :string
-    field :day_id, :integer, default: 0
-    field :missing_information, :boolean, default: false
-    field :state, Ecto.Enum, values: Order.states()
+    field(:customer_id, :string)
+    field(:missing_information, :boolean, default: false)
+    field(:state, Ecto.Enum, values: Order.states())
 
-    embeds_many :items, Item, on_replace: :delete
+    embeds_many(:items, Item, on_replace: :delete)
   end
 
   @type t :: %__MODULE__{
           customer_id: String.t() | nil,
-          day_id: integer(),
           missing_information: boolean(),
           state: Order.state(),
           items: [Item.t()]
@@ -41,7 +39,7 @@ defmodule Kaffebase.Orders.Commands.PlaceOrder do
     sanitized = sanitize(attrs)
 
     schema
-    |> cast(sanitized, [:customer_id, :day_id, :missing_information, :state])
+    |> cast(sanitized, [:customer_id, :missing_information, :state])
     |> validate_required([:state])
     |> cast_embed(:items, required: true)
     |> validate_length(:items, min: 1)
@@ -50,7 +48,6 @@ defmodule Kaffebase.Orders.Commands.PlaceOrder do
   defp sanitize(attrs) do
     %{
       customer_id: Param.extract_record_id(Param.attr(attrs, :customer)),
-      day_id: to_integer(Param.attr(attrs, :day_id, 0)),
       missing_information: to_boolean(Param.attr(attrs, :missing_information, false)),
       state: Param.cast_state(Param.attr(attrs, :state)),
       items: sanitize_items(Param.attr(attrs, :items, []))
@@ -88,19 +85,6 @@ defmodule Kaffebase.Orders.Commands.PlaceOrder do
 
   defp sanitize_item(_), do: %{}
 
-  defp to_integer(value) when is_integer(value), do: value
-
-  defp to_integer(value) when is_binary(value) do
-    case Integer.parse(value) do
-      {int, _} -> int
-      :error -> 0
-    end
-  end
-
-  defp to_integer(value) when is_float(value), do: trunc(value)
-  defp to_integer(value) when is_boolean(value), do: if(value, do: 1, else: 0)
-  defp to_integer(_), do: 0
-
   defp to_boolean(value) when value in [true, 1, "1", "true", "TRUE"], do: true
   defp to_boolean(value) when value in [false, 0, "0", "false", "FALSE", nil], do: false
   defp to_boolean(_), do: false
@@ -118,10 +102,10 @@ defmodule Kaffebase.Orders.Commands.PlaceOrder do
     @primary_key false
 
     embedded_schema do
-      field :existing_order_item_id, :string
-      field :item_id, :string
+      field(:existing_order_item_id, :string)
+      field(:item_id, :string)
 
-      embeds_many :customizations, Customization, on_replace: :delete
+      embeds_many(:customizations, Customization, on_replace: :delete)
     end
 
     @type t :: %__MODULE__{
@@ -192,8 +176,8 @@ defmodule Kaffebase.Orders.Commands.PlaceOrder do
     @primary_key false
 
     embedded_schema do
-      field :key_id, :string
-      field :value_ids, {:array, :string}, default: []
+      field(:key_id, :string)
+      field(:value_ids, {:array, :string}, default: [])
     end
 
     @type t :: %__MODULE__{key_id: String.t(), value_ids: [String.t()]}

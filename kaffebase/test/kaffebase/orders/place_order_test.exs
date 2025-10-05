@@ -16,7 +16,6 @@ defmodule Kaffebase.Orders.Commands.PlaceOrderTest do
 
       payload = %{
         "customer" => %{"id" => user.id},
-        "day_id" => "42",
         "missing_information" => "true",
         "state" => "COMPLETED",
         "items" => [
@@ -34,7 +33,6 @@ defmodule Kaffebase.Orders.Commands.PlaceOrderTest do
 
       assert {:ok, command} = PlaceOrder.new(payload)
       assert command.customer_id == user.id
-      assert command.day_id == 42
       assert command.missing_information
       assert command.state == :completed
 

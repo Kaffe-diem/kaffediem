@@ -34,16 +34,13 @@
     addToCart($selectedItem!);
   };
 
-  let remoteOrderId = $derived(
+  const currentOrderId = $derived(
     $orders.length > 0 ? $orders.sort((a, b) => a.dayId - b.dayId).at(-1)!.dayId : 100
   );
-  let localOrderId = $derived(remoteOrderId);
-  let currentOrderId = $derived(Math.max(localOrderId, remoteOrderId));
 
   let missing_information = $state(false);
   function completeOrder() {
-    orderStore.create($auth.user.id, $cart, missing_information, currentOrderId + 1);
-    localOrderId += 1;
+    orderStore.create($auth.user.id, $cart, missing_information);
     clearCart();
     missing_information = false;
     stopEditing();

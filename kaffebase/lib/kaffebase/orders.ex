@@ -11,6 +11,7 @@ defmodule Kaffebase.Orders do
   alias Kaffebase.Catalog.{Item, ItemCustomization}
   alias Kaffebase.CollectionNotifier
   alias Kaffebase.Orders.Commands.PlaceOrder
+  alias Kaffebase.Orders.DayId
   alias Kaffebase.Orders.Param
   alias Kaffebase.Orders.{Order, OrderItem}
   alias Kaffebase.Repo
@@ -39,10 +40,11 @@ defmodule Kaffebase.Orders do
     with {:ok, command} <- PlaceOrder.new(attrs) do
       Multi.new()
       |> Multi.run(:order_items, fn repo, _ -> create_order_items(repo, command.items) end)
-      |> Multi.run(:order, fn repo, %{order_items: order_items} ->
+      |> Multi.run(:day_id, fn repo, _ -> next_day_id(repo) end)
+      |> Multi.run(:order, fn repo, %{order_items: order_items, day_id: day_id} ->
         order_attrs = %{
           customer: command.customer_id,
-          day_id: command.day_id,
+          day_id: day_id,
           missing_information: command.missing_information,
           items: Enum.map(order_items, & &1.id),
           state: command.state
@@ -88,7 +90,6 @@ defmodule Kaffebase.Orders do
     prepared_attrs =
       %{}
       |> maybe_put(:customer, attrs |> Param.attr(:customer) |> Param.extract_record_id())
-      |> maybe_put(:day_id, Param.attr(attrs, :day_id))
       |> maybe_put(:missing_information, Param.attr(attrs, :missing_information))
       |> maybe_put(:items, items_value && Param.normalize_id_list(items_value))
       |> Map.put(:state, Param.cast_state(Param.attr(attrs, :state, order.state)))
@@ -447,5 +448,16 @@ defmodule Kaffebase.Orders do
 
   defp broadcast_delete(collection, id) do
     CollectionNotifier.broadcast_delete(collection, id)
+  end
+
+  defp next_day_id(repo) do
+    case DayId.next(repo) do
+      {:ok, value} ->
+        {:ok, value}
+
+      {:error, reason} = error ->
+        Logger.error("Failed to compute next day_id: #{inspect(reason)}")
+        error
+    end
   end
 end

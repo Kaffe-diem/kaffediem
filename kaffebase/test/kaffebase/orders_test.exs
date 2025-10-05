@@ -27,7 +27,6 @@ defmodule Kaffebase.OrdersTest do
       {:ok, order} =
         Orders.create_order(%{
           customer: user.id,
-          day_id: 123,
           missing_information: true,
           items: [
             %{
@@ -38,7 +37,7 @@ defmodule Kaffebase.OrdersTest do
         })
 
       assert order.customer == user.id
-      assert order.day_id == 123
+      assert order.day_id == 101
       assert order.missing_information
       assert length(order.items) == 1
 
@@ -120,6 +119,32 @@ defmodule Kaffebase.OrdersTest do
 
       assert log =~ "Order payload invalid"
     end
+
+    test "auto-increments day_id for each order created on the same day" do
+      user = AccountsFixtures.user_fixture()
+      item = CatalogFixtures.item_fixture()
+
+      {:ok, first} = Orders.create_order(%{customer: user.id, items: [%{item: item.id}]})
+      {:ok, second} = Orders.create_order(%{customer: user.id, items: [%{item: item.id}]})
+
+      assert first.day_id == 101
+      assert second.day_id == 102
+    end
+
+    test "resets day_id sequence at the start of a new day" do
+      user = AccountsFixtures.user_fixture()
+      item = CatalogFixtures.item_fixture()
+
+      {:ok, first} = Orders.create_order(%{customer: user.id, items: [%{item: item.id}]})
+
+      Repo.update!(
+        Ecto.Changeset.change(first, created: DateTime.add(DateTime.utc_now(), -1, :day))
+      )
+
+      {:ok, second} = Orders.create_order(%{customer: user.id, items: [%{item: item.id}]})
+
+      assert second.day_id == 101
+    end
   end
 
   describe "update_order/2" do
@@ -148,7 +173,6 @@ defmodule Kaffebase.OrdersTest do
       {:ok, order} =
         Orders.create_order(%{
           customer: user.id,
-          day_id: 100,
           state: "received",
           items: [%{item: item.id}]
         })
@@ -176,7 +200,6 @@ defmodule Kaffebase.OrdersTest do
       {:ok, order} =
         Orders.create_order(%{
           customer: user.id,
-          day_id: 101,
           items: [%{item: item.id}]
         })
 
@@ -201,8 +224,8 @@ defmodule Kaffebase.OrdersTest do
   describe "list_orders/1" do
     test "filters by customer and from_date" do
       user = AccountsFixtures.user_fixture()
-      older = OrdersFixtures.order_fixture(%{user: user, day_id: 1})
-      newer = OrdersFixtures.order_fixture(%{user: user, day_id: 2})
+      older = OrdersFixtures.order_fixture(%{user: user})
+      newer = OrdersFixtures.order_fixture(%{user: user})
 
       from_date = Date.utc_today() |> Date.add(-1)
       results = Orders.list_orders(customer_id: user.id, from_date: from_date)
@@ -217,7 +240,6 @@ defmodule Kaffebase.OrdersTest do
       {:ok, _old_order} =
         Orders.create_order(%{
           customer: user.id,
-          day_id: 1,
           items: [%{item: item.id}]
         })
         |> tap(fn {:ok, order} ->
@@ -230,7 +252,6 @@ defmodule Kaffebase.OrdersTest do
       {:ok, new_order} =
         Orders.create_order(%{
           customer: user.id,
-          day_id: 2,
           items: [%{item: item.id}]
         })
 
@@ -250,7 +271,6 @@ defmodule Kaffebase.OrdersTest do
       {:ok, order} =
         Orders.create_order(%{
           customer: user.id,
-          day_id: 1,
           items: [%{item: item.id}]
         })
 
@@ -268,7 +288,6 @@ defmodule Kaffebase.OrdersTest do
       {:ok, order} =
         Orders.create_order(%{
           customer: user.id,
-          day_id: 1,
           items: [%{item: item.id}]
         })
 
@@ -288,7 +307,6 @@ defmodule Kaffebase.OrdersTest do
       {:ok, order} =
         Orders.create_order(%{
           customer: user.id,
-          day_id: 1,
           items: [%{item: item.id}]
         })
 
