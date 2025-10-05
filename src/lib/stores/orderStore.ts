@@ -1,23 +1,11 @@
 import { createCollectionStore, sendCollectionRequest } from "$stores/websocketStore";
 import * as _ from "$lib/utils";
 import { Collections, type RecordIdString, State, Order, CustomizationValue } from "$lib/types";
-import auth from "$stores/authStore";
 import { get } from "svelte/store";
 import { type CartItem } from "$stores/cartStore";
 import { toasts } from "$lib/stores/toastStore";
 
 const today = new Date().toISOString().split("T")[0];
-
-const baseOptions = {
-  expand: [
-    "items",
-    "items.item",
-    "items.customization",
-    "items.customization.key",
-    "items.customization.value"
-  ].join(","),
-  filter: `created >= "${today}"`
-};
 
 const actionHistory: {
   action: "updateState";
@@ -30,7 +18,9 @@ const rawOrdersStore = createCollectionStore(
   {
     fromWire: Order.fromPb
   },
-  baseOptions
+  {
+    filter: `created >= "${today}"`
+  }
 );
 
 export const raw_orders = rawOrdersStore;
@@ -112,13 +102,3 @@ export default {
   }
 };
 
-export const userOrders = createCollectionStore(
-  Collections.Order,
-  {
-    fromWire: Order.fromPb
-  },
-  {
-    ...baseOptions,
-    filter: `customer = '${get(auth).user.id}'`
-  }
-);

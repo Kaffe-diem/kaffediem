@@ -5,7 +5,8 @@ config :kaffebase, Kaffebase.Repo,
   database: Path.expand("../kaffebase_dev.db", Path.dirname(__ENV__.file)),
   pool_size: 1,
   stacktrace: true,
-  show_sensitive_data_on_connection_error: true
+  show_sensitive_data_on_connection_error: true,
+  log: false
 
 # For development, we disable any cache and enable
 # debugging and code reloading.

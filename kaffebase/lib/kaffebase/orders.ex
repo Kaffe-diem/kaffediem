@@ -3,6 +3,7 @@ defmodule Kaffebase.Orders do
   Orders context providing PocketBase-compatible data access helpers.
   """
 
+  require Logger
   import Ecto.Query, warn: false
 
   alias Ecto.Multi
@@ -21,14 +22,14 @@ defmodule Kaffebase.Orders do
     |> maybe_filter(:customer, opts[:customer_id] || opts[:customer])
     |> maybe_apply_order(opts[:order_by] || [asc: :day_id, asc: :created])
     |> Repo.all()
-    |> maybe_preload_items(opts)
+    |> preload_all_items()
   end
 
   @spec get_order!(String.t(), keyword()) :: Order.t()
-  def get_order!(id, opts \\ []) do
+  def get_order!(id, _opts \\ []) do
     Order
     |> Repo.get!(id)
-    |> maybe_preload_items(opts)
+    |> preload_all_items()
   end
 
   @spec create_order(map()) :: {:ok, Order.t()} | {:error, term()}
@@ -51,22 +52,33 @@ defmodule Kaffebase.Orders do
     |> Repo.transaction()
     |> case do
       {:ok, %{order: order}} ->
-        broadcast_change("order", "create", order)
+        Logger.info("Order created: #{order.id}, day_id: #{order.day_id}")
+        complete_order = preload_all_items(order)
+
+        items_count = complete_order |> Map.get(:expand, %{}) |> Map.get(:items, []) |> length()
+        Logger.info("Preloaded #{items_count} items for order #{order.id}")
+
+        broadcast_change("order", "create", complete_order)
+        Logger.info("Broadcast order create for #{order.id}")
         {:ok, order}
 
       {:error, _step, reason, _changes} ->
+        Logger.error("Order creation failed: #{inspect(reason)}")
         {:error, reason}
     end
   end
 
   @spec update_order(Order.t(), map()) :: {:ok, Order.t()} | {:error, Ecto.Changeset.t()}
   def update_order(%Order{} = order, attrs) do
+    # Only include items if explicitly provided to avoid overwriting with empty list
+    items_value = attr(attrs, :items, attr(attrs, :item_ids))
+
     prepared_attrs =
       %{}
       |> maybe_put(:customer, attr(attrs, :customer) |> extract_record_id())
       |> maybe_put(:day_id, attr(attrs, :day_id))
       |> maybe_put(:missing_information, attr(attrs, :missing_information))
-      |> maybe_put(:items, normalize_id_list(attr(attrs, :items, attr(attrs, :item_ids))))
+      |> maybe_put(:items, items_value && normalize_id_list(items_value))
       |> Map.put(:state, cast_state(attr(attrs, :state, order.state)))
 
     order
@@ -97,6 +109,7 @@ defmodule Kaffebase.Orders do
 
     Order
     |> Repo.all()
+    |> preload_all_items()
     |> Enum.each(&broadcast_change("order", "update", &1))
 
     {count, nil}
@@ -292,20 +305,13 @@ defmodule Kaffebase.Orders do
     order_by(query, ^orderings)
   end
 
-  defp maybe_preload_items(orders, opts) when is_list(orders) do
-    if preload?(opts, :items) do
-      attach_order_items(orders, opts)
-    else
-      orders
-    end
+  # Always load complete order data with items and their details
+  defp preload_all_items(orders) when is_list(orders) do
+    attach_order_items(orders, preload: [:items, :item_records, :customizations])
   end
 
-  defp maybe_preload_items(order, opts) do
-    if preload?(opts, :items) do
-      attach_order_items([order], opts) |> List.first()
-    else
-      order
-    end
+  defp preload_all_items(order) do
+    attach_order_items([order], preload: [:items, :item_records, :customizations]) |> List.first()
   end
 
   defp preload?(opts, target) do
@@ -503,6 +509,18 @@ defmodule Kaffebase.Orders do
     end
   end
 
+  defp notify({:ok, record} = result, "order", action) do
+    Logger.info("Order #{action}: #{record.id}")
+    complete = preload_all_items(record)
+
+    items_count = complete |> Map.get(:expand, %{}) |> Map.get(:items, []) |> length()
+    Logger.info("Preloaded #{items_count} items for order #{record.id}")
+
+    broadcast_change("order", action, complete)
+    Logger.info("Broadcast order #{action} for #{record.id}")
+    result
+  end
+
   defp notify({:ok, record} = result, collection, action) do
     broadcast_change(collection, action, record)
     result
@@ -518,6 +536,7 @@ defmodule Kaffebase.Orders do
   defp notify_delete(result, _collection), do: result
 
   defp broadcast_change(collection, action, record) do
+    Logger.debug("Broadcasting #{collection} #{action} to collection notifier")
     CollectionNotifier.broadcast_change(collection, action, record)
   end
 

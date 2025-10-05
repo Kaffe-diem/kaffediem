@@ -111,6 +111,7 @@ function applyChange<RecordClass extends RecordBase>(
 ) {
   const next = [...items];
   const index = next.findIndex((item) => item.id === event.record.id);
+  const mapped = handlers.fromWire(event.record);
 
   switch (event.action) {
     case "delete":
@@ -119,7 +120,6 @@ function applyChange<RecordClass extends RecordBase>(
 
     case "create":
     case "update":
-      const mapped = handlers.fromWire(event.record);
       if (index !== -1) {
         next[index] = mapped;
       } else {

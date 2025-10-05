@@ -1,6 +1,8 @@
 defmodule Kaffebase.OrdersTest do
   use Kaffebase.DataCase
 
+  import ExUnit.CaptureLog
+
   alias Kaffebase.AccountsFixtures
   alias Kaffebase.CatalogFixtures
   alias Kaffebase.Orders
@@ -59,8 +61,10 @@ defmodule Kaffebase.OrdersTest do
     test "returns error when nested order item invalid" do
       user = AccountsFixtures.user_fixture()
 
-      assert {:error, %Ecto.Changeset{}} =
-               Orders.create_order(%{customer: user.id, items: [%{item: nil}]})
+      assert capture_log(fn ->
+               assert {:error, %Ecto.Changeset{}} =
+                        Orders.create_order(%{customer: user.id, items: [%{item: nil}]})
+             end) =~ ""
     end
   end
 
@@ -81,6 +85,53 @@ defmodule Kaffebase.OrdersTest do
       order = OrdersFixtures.order_fixture()
       {:ok, updated} = Orders.update_order_state(order, :dispatched)
       assert updated.state == :dispatched
+    end
+
+    test "preserves items when updating state" do
+      user = AccountsFixtures.user_fixture()
+      item = CatalogFixtures.item_fixture()
+
+      {:ok, order} =
+        Orders.create_order(%{
+          customer: user.id,
+          day_id: 100,
+          state: "received",
+          items: [%{item: item.id}]
+        })
+
+      # Verify order was created with items
+      assert length(order.items) == 1
+
+      # Update state without providing items
+      {:ok, updated} = Orders.update_order_state(order, :production)
+
+      # Items should still be present
+      assert updated.state == :production
+      assert length(updated.items) == 1
+
+      # Verify items persist after reload
+      reloaded = Orders.get_order!(updated.id)
+      assert length(reloaded.items) == 1
+      assert length(reloaded.expand.items) == 1
+    end
+
+    test "update_order preserves items when not provided" do
+      user = AccountsFixtures.user_fixture()
+      item = CatalogFixtures.item_fixture()
+
+      {:ok, order} =
+        Orders.create_order(%{
+          customer: user.id,
+          day_id: 101,
+          items: [%{item: item.id}]
+        })
+
+      # Update only state, not items
+      {:ok, updated} = Orders.update_order(order, %{state: "completed"})
+
+      # Items should still be present
+      assert updated.state == :completed
+      assert length(updated.items) == 1
     end
 
     test "set_all_orders_state/1 updates all rows" do
@@ -104,10 +155,94 @@ defmodule Kaffebase.OrdersTest do
       assert Enum.sort(Enum.map(results, & &1.id)) == Enum.sort([older.id, newer.id])
     end
 
-    test "preload: [:items] attaches expand map" do
-      order = OrdersFixtures.order_fixture()
-      [loaded] = Orders.list_orders(preload: [:items]) |> Enum.filter(&(&1.id == order.id))
+    test "filters by date range" do
+      user = AccountsFixtures.user_fixture()
+      item = CatalogFixtures.item_fixture()
+
+      # Create order from yesterday
+      {:ok, _old_order} =
+        Orders.create_order(%{
+          customer: user.id,
+          day_id: 1,
+          items: [%{item: item.id}]
+        })
+        |> tap(fn {:ok, order} ->
+          Repo.update!(Ecto.Changeset.change(order, created: DateTime.add(DateTime.utc_now(), -2, :day)))
+        end)
+
+      # Create order from today
+      {:ok, new_order} =
+        Orders.create_order(%{
+          customer: user.id,
+          day_id: 2,
+          items: [%{item: item.id}]
+        })
+
+      # Filter for today only
+      today = Date.utc_today()
+      results = Orders.list_orders(from_date: today)
+      result_ids = Enum.map(results, & &1.id)
+
+      assert new_order.id in result_ids
+      refute Enum.any?(result_ids, &(&1 != new_order.id))
+    end
+
+    test "always preloads items without explicit option" do
+      user = AccountsFixtures.user_fixture()
+      item = CatalogFixtures.item_fixture()
+
+      {:ok, order} =
+        Orders.create_order(%{
+          customer: user.id,
+          day_id: 1,
+          items: [%{item: item.id}]
+        })
+
+      # list_orders should automatically preload items
+      [loaded] = Orders.list_orders() |> Enum.filter(&(&1.id == order.id))
+
       assert [%OrderItem{}] = loaded.expand.items
+      assert loaded.expand.items |> hd() |> Map.get(:expand) |> Map.get(:item)
+    end
+
+    test "get_order! always preloads items" do
+      user = AccountsFixtures.user_fixture()
+      item = CatalogFixtures.item_fixture()
+
+      {:ok, order} =
+        Orders.create_order(%{
+          customer: user.id,
+          day_id: 1,
+          items: [%{item: item.id}]
+        })
+
+      loaded = Orders.get_order!(order.id)
+
+      assert [%OrderItem{}] = loaded.expand.items
+      assert loaded.expand.items |> hd() |> Map.get(:expand) |> Map.get(:item)
+    end
+  end
+
+  describe "create_order/1 broadcasts" do
+    test "broadcasts order with preloaded items" do
+      user = AccountsFixtures.user_fixture()
+      item = CatalogFixtures.item_fixture()
+
+      # create_order should broadcast the order with items preloaded
+      {:ok, order} =
+        Orders.create_order(%{
+          customer: user.id,
+          day_id: 1,
+          items: [%{item: item.id}]
+        })
+
+      # The broadcast happens internally, but we can verify the order
+      # returned from create_order has the structure expected for broadcast
+      assert length(order.items) == 1
+
+      # Verify that fetching the order also has items
+      fetched = Orders.get_order!(order.id)
+      assert length(fetched.expand.items) == 1
     end
   end
 end

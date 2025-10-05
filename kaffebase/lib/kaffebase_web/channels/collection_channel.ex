@@ -1,5 +1,6 @@
 defmodule KaffebaseWeb.CollectionChannel do
   use Phoenix.Channel
+  require Logger
 
   alias Kaffebase.{Catalog, Content, Orders}
   alias KaffebaseWeb.{PBSerializer, ParamParser}
@@ -7,10 +8,16 @@ defmodule KaffebaseWeb.CollectionChannel do
   @impl true
   def join("collection:" <> collection, payload, socket) do
     options = Map.get(payload, "options", %{})
+    Logger.info("Client joining collection:#{collection} with options: #{inspect(options)}")
+
     items = load_collection(collection, options)
+    Logger.info("Loaded #{length(items)} items for collection:#{collection}")
+
+    serialized_items = PBSerializer.resource(items)
+    Logger.info("Serialized #{length(serialized_items)} items for collection:#{collection}")
 
     response = %{
-      "items" => PBSerializer.resource(items),
+      "items" => serialized_items,
       "page" => 1,
       "perPage" => length(items),
       "totalItems" => length(items),
@@ -26,12 +33,16 @@ defmodule KaffebaseWeb.CollectionChannel do
   end
 
   def broadcast_change(collection, action, record) do
+    serialized = PBSerializer.resource(record)
+
     payload = %{
       "action" => action,
-      "record" => PBSerializer.resource(record)
+      "record" => serialized
     }
 
     topic = "collection:" <> collection
+    Logger.info("Broadcasting #{action} to #{topic}")
+
     KaffebaseWeb.Endpoint.broadcast(topic, "change", payload)
   end
 
@@ -92,10 +103,7 @@ defmodule KaffebaseWeb.CollectionChannel do
     filters = ParamParser.parse_order_filters(Map.get(options, "filter"))
 
     Orders.list_orders(
-      Keyword.merge(filters,
-        preload: [:items, :item_records, :customizations],
-        order_by: [asc: :day_id, asc: :created]
-      )
+      Keyword.merge(filters, order_by: [asc: :day_id, asc: :created])
     )
   end
 
