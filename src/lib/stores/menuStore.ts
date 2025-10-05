@@ -12,10 +12,7 @@ import {
 export const categories = createCollectionCrud(
   Collections.Category,
   {
-    fromWire: Category.fromPb
-  },
-  {
-    sort: "sort_order,name"
+    fromWire: Category.fromApi
   }
 );
 
@@ -26,10 +23,7 @@ export const getCategoryById = (categoryId: string): Category | undefined => {
 export const items = createCollectionCrud(
   Collections.Item,
   {
-    fromWire: Item.fromPb
-  },
-  {
-    sort: "sort_order,name"
+    fromWire: Item.fromApi
   }
 );
 
@@ -44,20 +38,14 @@ export const itemsByCategory = derived(items, ($items) =>
 export const customizationKeys = createCollectionCrud(
   Collections.CustomizationKey,
   {
-    fromWire: CustomizationKey.fromPb
-  },
-  {
-    sort: "sort_order,name"
+    fromWire: CustomizationKey.fromApi
   }
 );
 
 export const customizationValues = createCollectionCrud(
   Collections.CustomizationValue,
   {
-    fromWire: CustomizationValue.fromPb
-  },
-  {
-    sort: "sort_order,name"
+    fromWire: CustomizationValue.fromApi
   }
 );
 
@@ -72,9 +60,6 @@ export const customizationsByKey = derived(customizationValues, ($customizationV
 export const itemCustomizations = createCollectionCrud(
   Collections.ItemCustomization,
   {
-    fromWire: ItemCustomization.fromPb
-  },
-  {
-    expand: "key,value"
+    fromWire: ItemCustomization.fromApi
   }
 );

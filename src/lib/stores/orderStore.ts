@@ -1,11 +1,7 @@
-import { createCollectionStore, sendCollectionRequest } from "$stores/websocketStore";
-import * as _ from "$lib/utils";
-import { Collections, type RecordIdString, State, Order, CustomizationValue } from "$lib/types";
+import { createCollectionCrud, sendCollectionRequest } from "$stores/websocketStore";
+import { Collections, type RecordIdString, State, Order } from "$lib/types";
 import { get } from "svelte/store";
 import { type CartItem } from "$stores/cartStore";
-import { toasts } from "$lib/stores/toastStore";
-
-const today = new Date().toISOString().split("T")[0];
 
 const actionHistory: {
   action: "updateState";
@@ -13,38 +9,38 @@ const actionHistory: {
   previousState: State;
 }[] = [];
 
-const rawOrdersStore = createCollectionStore(
-  Collections.Order,
-  {
-    fromWire: Order.fromPb
-  },
-  {
-    filter: `created >= "${today}"`
-  }
-);
+const getTodayISO = () => {
+  const [date] = new Date().toISOString().split('T');
+  return date || '';
+};
 
-export const raw_orders = rawOrdersStore;
+const ordersStore = createCollectionCrud(Collections.Order, {
+  fromWire: Order.fromApi
+}, {
+  from_date: getTodayISO()
+});
 
-const buildCustomizationPayload = (customizations: CustomizationValue[]) =>
-  Object.entries(_.groupBy(customizations, (customization) => customization.belongsTo)).map(
-    ([keyId, values]) => ({
-      key: keyId,
-      value: values.map((value) => value.id)
-    })
-  );
+export const raw_orders = ordersStore;
+
+const serializeCartItems = (items: CartItem[]) =>
+  items.map((item) => ({
+    item: item.id,
+    customizations: (item.customizations ?? [])
+      .filter((customization) => Boolean(customization.belongsTo))
+      .map((customization) => ({
+        key_id: customization.belongsTo!,
+        value: customization.id
+      }))
+  }));
 
 export default {
-  subscribe: rawOrdersStore.subscribe,
-  destroy: rawOrdersStore.destroy,
-  reset: () => undefined,
+  ...ordersStore,
+  reset: ordersStore.reset,
 
   create: async (userId: RecordIdString, items: CartItem[], missingInformation: boolean) => {
     const payload = {
       customer: userId,
-      items: items.map((item) => ({
-        item: item.id,
-        customizations: buildCustomizationPayload(item.customizations ?? [])
-      })),
+      items: serializeCartItems(items),
       state: State.received,
       missing_information: missingInformation
     };
@@ -53,13 +49,13 @@ export default {
   },
 
   updateState: async (orderId: RecordIdString, state: State) => {
-    const existing = get(rawOrdersStore).find((order) => order.id === orderId);
+    const existing = get(ordersStore).find((order) => order.id === orderId);
 
     if (existing) {
       actionHistory.push({
         action: "updateState",
         orderId: orderId,
-        previousState: existing.state
+        previousState: existing.state as State
       });
     }
 
@@ -67,7 +63,7 @@ export default {
   },
 
   setAll: async (state: State) => {
-    const orders = get(rawOrdersStore);
+    const orders = get(ordersStore);
     await Promise.all(
       orders.map((order) => sendCollectionRequest("PATCH", Collections.Order, order.id, { state }))
     );

@@ -7,16 +7,13 @@ import { Collections, Message, Status } from "$lib/types";
 import { get, writable } from "svelte/store";
 
 export const messages = createCollectionCrud(Collections.Message, {
-  fromWire: Message.fromPb
+  fromWire: Message.fromApi
 });
 
 const statusSource = createCollectionStore(
   Collections.Status,
   {
-    fromWire: (data) => Status.fromPb(data, get(messages))
-  },
-  {
-    expand: "message"
+    fromWire: (data) => Status.fromApi(data, get(messages))
   }
 );
 
@@ -32,6 +29,6 @@ export const status = {
   destroy: statusSource.destroy,
   reset: () => undefined,
   update: async (status: Status) => {
-    await sendCollectionRequest("PATCH", Collections.Status, status.id, status.toPb());
+    await sendCollectionRequest("PATCH", Collections.Status, status.id, status.toApi());
   }
 };

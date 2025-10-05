@@ -92,10 +92,10 @@ export function createCollectionCrud<
   return {
     ...store,
     create: async (record: RecordClass) => {
-      await sendCollectionRequest("POST", collection, null, record.toPb());
+      await sendCollectionRequest("POST", collection, null, record.toApi());
     },
     update: async (record: RecordClass) => {
-      await sendCollectionRequest("PATCH", collection, record.id, record.toPb());
+      await sendCollectionRequest("PATCH", collection, record.id, record.toApi());
     },
     delete: async (id: RecordIdString) => {
       await sendCollectionRequest("DELETE", collection, id, undefined);
