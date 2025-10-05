@@ -26,7 +26,7 @@ defmodule Kaffebase.OrdersTest do
 
       {:ok, order} =
         Orders.create_order(%{
-          customer: user.id,
+          customer: to_string(user.id),
           missing_information: true,
           items: [
             %{
@@ -36,7 +36,7 @@ defmodule Kaffebase.OrdersTest do
           ]
         })
 
-      assert order.customer == user.id
+      assert order.customer == to_string(user.id)
       assert order.day_id == 101
       assert order.missing_information
       assert length(order.items) == 1
@@ -228,7 +228,7 @@ defmodule Kaffebase.OrdersTest do
       newer = OrdersFixtures.order_fixture(%{user: user})
 
       from_date = Date.utc_today() |> Date.add(-1)
-      results = Orders.list_orders(customer_id: user.id, from_date: from_date)
+      results = Orders.list_orders(customer_id: to_string(user.id), from_date: from_date)
       assert Enum.sort(Enum.map(results, & &1.id)) == Enum.sort([older.id, newer.id])
     end
 

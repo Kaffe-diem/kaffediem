@@ -6,35 +6,64 @@
   let email: string = "";
   let password: string = "";
   let errorMessage: string = "";
+  let isSubmitting = false;
 
   async function login() {
+    isSubmitting = true;
+    errorMessage = "";
+    
     try {
       await loginUser(email, password);
       goto(resolve("/"));
     } catch (error) {
-      errorMessage = error instanceof Error ? error.message : "Kunne ikke logge inn";
+      console.error("Login error:", error);
+      errorMessage = error instanceof Error ? error.message : "Kunne ikke logge inn. Sjekk e-post og passord.";
+    } finally {
+      isSubmitting = false;
     }
   }
 </script>
 
 <div class="flex justify-center">
   <form on:submit|preventDefault={login} method="post" class="flex w-lg flex-col gap-4">
+    <h1 class="text-2xl font-bold text-center mb-4">Logg inn</h1>
+    
     <label class="input w-full">
-      <span class="label">Mail</span>
-      <input bind:value={email} name="email" type="email" placeholder="mail@example.com" />
+      <span class="label">E-post</span>
+      <input 
+        bind:value={email} 
+        name="email" 
+        type="email" 
+        placeholder="mail@example.com" 
+        required
+        disabled={isSubmitting}
+      />
     </label>
 
     <label class="input w-full">
       <span class="label">Passord</span>
-      <input bind:value={password} name="password" type="password" placeholder="Passord" />
+      <input 
+        bind:value={password} 
+        name="password" 
+        type="password" 
+        placeholder="Passord" 
+        required
+        disabled={isSubmitting}
+      />
     </label>
 
     {#if errorMessage}
-      <div>
+      <div class="alert alert-error">
         {errorMessage}
       </div>
     {/if}
 
-    <button type="submit" class="btn">Logg inn</button>
+    <button type="submit" class="btn btn-primary" disabled={isSubmitting}>
+      {#if isSubmitting}
+        Logger inn...
+      {:else}
+        Logg inn
+      {/if}
+    </button>
   </form>
 </div>

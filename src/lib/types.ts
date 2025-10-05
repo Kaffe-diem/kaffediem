@@ -13,7 +13,7 @@ import {
 } from "$lib/api/contracts";
 import { restrictedRoutes, adminRoutes } from "$lib/constants";
 
-type AuthRecord = {
+type BackendUserRecord = {
   id?: RecordIdString;
   name?: string;
   is_admin?: boolean;
@@ -54,7 +54,7 @@ export class User {
     public readonly isAdmin: boolean
   ) {}
 
-  static fromPb(data: AuthRecord | null): User {
+  static fromBackend(data: BackendUserRecord | null): User {
     if (!data) {
       return new User("", "", false);
     }

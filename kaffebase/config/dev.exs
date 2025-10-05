@@ -2,11 +2,13 @@ import Config
 
 # Configure your database
 config :kaffebase, Kaffebase.Repo,
+  hostname: "localhost",
   database: Path.expand("../kaffebase_dev.db", Path.dirname(__ENV__.file)),
-  pool_size: 1,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
-  log: false
+  pool_size: 10
+
+config :kaffebase, dev_auto_login: true
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
@@ -15,12 +17,13 @@ config :kaffebase, Kaffebase.Repo,
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
 config :kaffebase, KaffebaseWeb.Endpoint,
-  # Binding to all interfaces to allow access from Docker containers and host
-  http: [ip: {0, 0, 0, 0}, port: 4000],
+  # Binding to loopback ipv4 address prevents access from other machines.
+  # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
+  http: [ip: {0, 0, 0, 0}, port: String.to_integer(System.get_env("PORT") || "4000")],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "NLFepuwpLJpLxUpaYULQJpd1c8FjP+qoGHAyt70cE7GySShFuKFl3+FFFX+FuyNn",
+  secret_key_base: "mQcZX+6P5XeS+O3/JZ/vbxzOF6V6iIiqPDU40ZoF7oJj6dKZ0dvJ2okM+8MtSzC8",
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:kaffebase, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:kaffebase, ~w(--watch)]}
@@ -50,22 +53,21 @@ config :kaffebase, KaffebaseWeb.Endpoint,
 # different ports.
 
 # Watch static and templates for browser reloading.
-config :kaffebase, KaffebaseWeb.Endpoint,
+  config :kaffebase, KaffebaseWeb.Endpoint,
   live_reload: [
+    web_console_logger: true,
     patterns: [
       ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/kaffebase_web/(controllers|live|components)/.*(ex|heex)$"
+      ~r"lib/kaffebase_web/(?:controllers|live|components|router)/?.*\.(ex|heex)$"
     ]
   ]
 
 # Enable dev routes for dashboard and mailbox
 config :kaffebase, dev_routes: true
 
-config :kaffebase, :dev_auto_login, true
-
-# Include timestamps and metadata in development logs for better debugging
-config :logger, :console, format: "[$time] [$level] $message\n", metadata: [:request_id]
+# Do not include metadata nor timestamps in development logs
+config :logger, :default_formatter, format: "[$level] $message\n"
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
@@ -74,8 +76,13 @@ config :phoenix, :stacktrace_depth, 20
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
 
-# Include HEEx debug annotations as HTML comments in rendered markup
-config :phoenix_live_view, :debug_heex_annotations, true
+config :phoenix_live_view,
+  # Include debug annotations and locations in rendered markup.
+  # Changing this configuration will require mix clean and a full recompile.
+  debug_heex_annotations: true,
+  debug_attributes: true,
+  # Enable helpful, but potentially expensive runtime checks
+  enable_expensive_runtime_checks: true
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false

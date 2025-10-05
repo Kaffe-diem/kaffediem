@@ -38,12 +38,11 @@ defmodule KaffebaseWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller,
-        formats: [:html, :json],
-        layouts: [html: KaffebaseWeb.Layouts]
+      use Phoenix.Controller, formats: [:html, :json]
+
+      use Gettext, backend: KaffebaseWeb.Gettext
 
       import Plug.Conn
-      use Gettext, backend: KaffebaseWeb.Gettext
 
       unquote(verified_routes())
     end
@@ -51,8 +50,7 @@ defmodule KaffebaseWeb do
 
   def live_view do
     quote do
-      use Phoenix.LiveView,
-        layout: {KaffebaseWeb.Layouts, :app}
+      use Phoenix.LiveView
 
       unquote(html_helpers())
     end
@@ -81,14 +79,17 @@ defmodule KaffebaseWeb do
 
   defp html_helpers do
     quote do
-      # HTML escaping functionality
-      import Phoenix.HTML
-      # Core UI components and translation
-      import KaffebaseWeb.CoreComponents
+      # Translation
       use Gettext, backend: KaffebaseWeb.Gettext
 
-      # Shortcut for generating JS commands
+      # HTML escaping functionality
+      import Phoenix.HTML
+      # Core UI components
+      import KaffebaseWeb.CoreComponents
+
+      # Common modules used in templates
       alias Phoenix.LiveView.JS
+      alias KaffebaseWeb.Layouts
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())
@@ -105,7 +106,7 @@ defmodule KaffebaseWeb do
   end
 
   @doc """
-  When used, dispatch to the appropriate controller/view/etc.
+  When used, dispatch to the appropriate controller/live_view/etc.
   """
   defmacro __using__(which) when is_atom(which) do
     apply(__MODULE__, which, [])

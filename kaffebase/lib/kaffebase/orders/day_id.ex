@@ -1,7 +1,7 @@
 defmodule Kaffebase.Orders.DayId do
   @moduledoc false
 
-  import Ecto.Query, only: [from: 2, lock: 2]
+  import Ecto.Query, only: [from: 2]
 
   alias Kaffebase.Orders.Order
 
@@ -18,8 +18,6 @@ defmodule Kaffebase.Orders.DayId do
           select: o.day_id
         )
 
-      query = maybe_lock(repo, query)
-
       last_id = repo.one(query) || @baseline
       {:ok, last_id + 1}
     end
@@ -33,11 +31,4 @@ defmodule Kaffebase.Orders.DayId do
     {:ok, {day_start, next_day_start}}
   end
 
-  defp maybe_lock(repo, query) do
-    if function_exported?(repo, :__adapter__, 0) and repo.__adapter__() == Ecto.Adapters.Postgres do
-      lock(query, "FOR UPDATE")
-    else
-      query
-    end
-  end
 end

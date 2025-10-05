@@ -45,6 +45,7 @@ defmodule KaffebaseWeb.ParamParser do
       cond do
         Regex.match?(~r/^created\s*>=/, segment) ->
           case Regex.run(~r/"([^"]+)"|'([^']+)'/, segment) do
+            [_, value] -> Keyword.put(acc, :from_date, value)
             [_, value, nil] -> Keyword.put(acc, :from_date, value)
             [_, nil, value] -> Keyword.put(acc, :from_date, value)
             _ -> acc
@@ -52,6 +53,7 @@ defmodule KaffebaseWeb.ParamParser do
 
         Regex.match?(~r/^customer\s*=\s*/, segment) ->
           case Regex.run(~r/'([^']+)'|"([^"]+)"/, segment) do
+            [_, value] -> Keyword.put(acc, :customer, value)
             [_, value, nil] -> Keyword.put(acc, :customer, value)
             [_, nil, value] -> Keyword.put(acc, :customer, value)
             _ -> acc

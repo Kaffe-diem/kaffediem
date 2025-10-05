@@ -8,14 +8,15 @@
   }
 
   let { children, class: className = "" }: Props = $props();
+
+  const destination = $derived($auth.isAuthenticated ? resolve("/logout") : resolve("/login"));
+  const defaultLabel = $derived($auth.isAuthenticated ? "Logg ut" : "Logg inn");
 </script>
 
-{#if $auth.isAuthenticated}
-  <a href={resolve("/logout")} class={className}
-    >{#if children}{@render children()}{:else}Logg ut{/if}</a
-  >
-{:else}
-  <a href={resolve("/login")} class={className}
-    >{#if children}{@render children()}{:else}Logg inn{/if}</a
-  >
-{/if}
+<a href={destination} class={className}>
+  {#if children}
+    {@render children()}
+  {:else}
+    {defaultLabel}
+  {/if}
+</a>

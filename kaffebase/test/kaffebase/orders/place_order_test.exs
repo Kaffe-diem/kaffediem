@@ -15,7 +15,7 @@ defmodule Kaffebase.Orders.Commands.PlaceOrderTest do
         CatalogFixtures.customization_value_fixture(%{key: customization_key})
 
       payload = %{
-        "customer" => %{"id" => user.id},
+        "customer" => %{"id" => to_string(user.id)},
         "missing_information" => "true",
         "state" => "COMPLETED",
         "items" => [
@@ -32,7 +32,7 @@ defmodule Kaffebase.Orders.Commands.PlaceOrderTest do
       }
 
       assert {:ok, command} = PlaceOrder.new(payload)
-      assert command.customer_id == user.id
+      assert command.customer_id == to_string(user.id)
       assert command.missing_information
       assert command.state == :completed
 

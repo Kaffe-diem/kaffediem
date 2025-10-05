@@ -14,8 +14,6 @@ defmodule Kaffebase.Application do
        repos: Application.fetch_env!(:kaffebase, :ecto_repos), skip: skip_migrations?()},
       {DNSCluster, query: Application.get_env(:kaffebase, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Kaffebase.PubSub},
-      # Start the Finch HTTP client for sending emails
-      {Finch, name: Kaffebase.Finch},
       # Start a worker by calling: Kaffebase.Worker.start_link(arg)
       # {Kaffebase.Worker, arg},
       # Start to serve requests, typically the last entry

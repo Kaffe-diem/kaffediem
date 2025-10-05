@@ -11,9 +11,7 @@ defmodule KaffebaseWeb.SessionController do
     with {:ok, user} <- verify_credentials(email, password) do
       conn
       |> put_session(:user_id, user.id)
-      |> json(%{
-        "record" => serialize_user(user)
-      })
+      |> render(:show, user: user)
     end
   end
 
@@ -31,9 +29,7 @@ defmodule KaffebaseWeb.SessionController do
         send_resp(conn, :no_content, "")
 
       user ->
-        json(conn, %{
-          "record" => serialize_user(user)
-        })
+        render(conn, :show, user: user)
     end
   end
 
@@ -43,7 +39,7 @@ defmodule KaffebaseWeb.SessionController do
         {:error, :not_found}
 
       user ->
-        case Bcrypt.verify_pass(password, user.password) do
+        case Accounts.User.valid_password?(user, password) do
           true -> {:ok, user}
           false -> {:error, :unauthorized}
         end
@@ -51,8 +47,12 @@ defmodule KaffebaseWeb.SessionController do
   end
 
   defp current_user(conn) do
-    with user_id when is_binary(user_id) <- get_session(conn, :user_id) do
-      Accounts.get_user(user_id)
+    case get_session(conn, :user_id) do
+      user_id when is_integer(user_id) or is_binary(user_id) ->
+        Accounts.get_user(user_id)
+
+      _ ->
+        nil
     end
   end
 
@@ -85,11 +85,4 @@ defmodule KaffebaseWeb.SessionController do
     Application.get_env(:kaffebase, :dev_auto_login, false)
   end
 
-  defp serialize_user(user) do
-    %{
-      id: user.id,
-      name: user.name,
-      is_admin: user.is_admin
-    }
-  end
 end

@@ -2,15 +2,15 @@ import { PUBLIC_BACKEND_URL } from "$env/static/public";
 
 const backendBase = sanitizeBackendUrl(PUBLIC_BACKEND_URL);
 
-export type SessionRecord = {
-  record: {
+export type SessionResponse = {
+  data: {
     id: string;
     name?: string;
     is_admin?: boolean;
-  };
+  } | null;
 };
 
-export async function login(email: string, password: string): Promise<SessionRecord> {
+export async function login(email: string, password: string): Promise<SessionResponse> {
   const response = await fetch(buildBackendUrl("/api/session"), {
     method: "POST",
     headers: {
@@ -38,7 +38,7 @@ export async function logout(): Promise<void> {
   }
 }
 
-export async function fetchSession(): Promise<SessionRecord | null> {
+export async function fetchSession(): Promise<SessionResponse | null> {
   const response = await fetch(buildBackendUrl("/api/session"), {
     method: "GET",
     credentials: "include"
