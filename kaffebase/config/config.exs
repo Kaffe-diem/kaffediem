@@ -11,6 +11,8 @@ config :kaffebase,
   ecto_repos: [Kaffebase.Repo],
   generators: [timestamp_type: :utc_datetime]
 
+config :kaffebase, :dev_auto_login, false
+
 # Configures the endpoint
 config :kaffebase, KaffebaseWeb.Endpoint,
   url: [host: "localhost"],

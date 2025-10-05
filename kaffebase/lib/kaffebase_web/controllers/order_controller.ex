@@ -27,6 +27,7 @@ defmodule KaffebaseWeb.OrderController do
 
     with {:ok, order} <- Orders.create_order(attrs) do
       Logger.info("Order created via HTTP: #{order.id}")
+
       conn
       |> put_status(:created)
       |> json(PBSerializer.resource(order))

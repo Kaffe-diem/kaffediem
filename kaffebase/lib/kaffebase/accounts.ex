@@ -7,6 +7,7 @@ defmodule Kaffebase.Accounts do
 
   alias Kaffebase.Accounts.User
   alias Kaffebase.Repo
+  alias Ecto.UUID
 
   @spec list_users(keyword()) :: [User.t()]
   def list_users(_opts \\ []), do: Repo.all(User)
@@ -46,4 +47,30 @@ defmodule Kaffebase.Accounts do
 
   @spec change_user(User.t(), map()) :: Ecto.Changeset.t()
   def change_user(%User{} = user, attrs \\ %{}), do: User.changeset(user, attrs)
+
+  @spec ensure_admin_user() :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
+  def ensure_admin_user do
+    query = from u in User, where: u.is_admin, order_by: [asc: u.created], limit: 1
+
+    case Repo.one(query) do
+      %User{} = user ->
+        {:ok, user}
+
+      nil ->
+        create_user(default_dev_admin_attrs())
+    end
+  end
+
+  defp default_dev_admin_attrs do
+    %{
+      name: "Dev Admin",
+      username: "dev-admin",
+      email: "dev-admin@kaffediem.local",
+      password: "dev-admin",
+      is_admin: true,
+      email_visibility: false,
+      verified: true,
+      token_key: UUID.generate()
+    }
+  end
 end

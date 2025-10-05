@@ -102,9 +102,7 @@ defmodule KaffebaseWeb.CollectionChannel do
   defp load_collection("order", options) do
     filters = ParamParser.parse_order_filters(Map.get(options, "filter"))
 
-    Orders.list_orders(
-      Keyword.merge(filters, order_by: [asc: :day_id, asc: :created])
-    )
+    Orders.list_orders(Keyword.merge(filters, order_by: [asc: :day_id, asc: :created]))
   end
 
   defp load_collection(_other, _options), do: []

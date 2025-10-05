@@ -3,6 +3,8 @@ defmodule KaffebaseWeb.SessionController do
 
   alias Kaffebase.Accounts
 
+  require Logger
+
   action_fallback KaffebaseWeb.FallbackController
 
   def create(conn, %{"email" => email, "password" => password}) do
@@ -22,7 +24,9 @@ defmodule KaffebaseWeb.SessionController do
   end
 
   def show(conn, _params) do
-    case current_user(conn) do
+    {conn, user} = ensure_session(conn)
+
+    case user do
       nil ->
         send_resp(conn, :no_content, "")
 
@@ -50,6 +54,35 @@ defmodule KaffebaseWeb.SessionController do
     with user_id when is_binary(user_id) <- get_session(conn, :user_id) do
       Accounts.get_user(user_id)
     end
+  end
+
+  defp ensure_session(conn) do
+    case current_user(conn) do
+      %{} = user ->
+        {conn, user}
+
+      nil ->
+        maybe_bootstrap_dev_session(conn)
+    end
+  end
+
+  defp maybe_bootstrap_dev_session(conn) do
+    if dev_auto_login?() do
+      case Accounts.ensure_admin_user() do
+        {:ok, user} ->
+          {put_session(conn, :user_id, user.id), user}
+
+        {:error, changeset} ->
+          Logger.warning("Failed to provision development admin: #{inspect(changeset.errors)}")
+          {conn, nil}
+      end
+    else
+      {conn, nil}
+    end
+  end
+
+  defp dev_auto_login? do
+    Application.get_env(:kaffebase, :dev_auto_login, false)
   end
 
   defp serialize_user(user) do

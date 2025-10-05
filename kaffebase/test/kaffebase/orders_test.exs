@@ -167,7 +167,9 @@ defmodule Kaffebase.OrdersTest do
           items: [%{item: item.id}]
         })
         |> tap(fn {:ok, order} ->
-          Repo.update!(Ecto.Changeset.change(order, created: DateTime.add(DateTime.utc_now(), -2, :day)))
+          Repo.update!(
+            Ecto.Changeset.change(order, created: DateTime.add(DateTime.utc_now(), -2, :day))
+          )
         end)
 
       # Create order from today

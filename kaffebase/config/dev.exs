@@ -62,6 +62,8 @@ config :kaffebase, KaffebaseWeb.Endpoint,
 # Enable dev routes for dashboard and mailbox
 config :kaffebase, dev_routes: true
 
+config :kaffebase, :dev_auto_login, true
+
 # Include timestamps and metadata in development logs for better debugging
 config :logger, :console, format: "[$time] [$level] $message\n", metadata: [:request_id]
 
