@@ -1,14 +1,15 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
+
 declare global {
   namespace App {
-    // interface Error {}
     interface Locals {
-      pb: import("pocketbase").default;
+      user: {
+        id: string;
+        name?: string;
+        is_admin?: boolean;
+      } | null;
     }
-    // interface PageData {}
-    // interface PageState {}
-    // interface Platform {}
   }
 }
 

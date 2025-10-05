@@ -1,41 +1,31 @@
 services:
+  backend:
+    build:
+      context: ./kaffebase
+      dockerfile: Dockerfile
+    working_dir: /app
+    command: mix phx.server
+    volumes:
+      - backend_deps:/app/deps
+      - backend_build:/app/_build
+    ports:
+      - "4000:4000"
+
   app:
     build:
       context: .
       target: production
       args:
-        - PUBLIC_PB_HOST_PROD=${PUBLIC_PB_HOST_PROD}
-        - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL:-}
-        - PB_ADMIN_PASSWORD=${PB_ADMIN_PASSWORD:-}
+        - PUBLIC_BACKEND_URL=${PUBLIC_BACKEND_URL:-http://backend:4000}
+        - PUBLIC_BACKEND_WS=${PUBLIC_BACKEND_WS:-ws://backend:4000/socket}
     restart: unless-stopped
     environment:
       - NODE_ENV=production
-      - PUBLIC_PB_HOST=${PUBLIC_PB_HOST_PROD}
+      - PUBLIC_BACKEND_URL=${PUBLIC_BACKEND_URL:-http://backend:4000}
+      - PUBLIC_BACKEND_WS=${PUBLIC_BACKEND_WS:-ws://backend:4000/socket}
     depends_on:
-      pb:
-        condition: service_healthy
-
-  pb:
-    build:
-      context: .
-      dockerfile: pocketbase/Dockerfile
-    environment:
-      - PUBLIC_PB_HOST=${PUBLIC_PB_HOST}
-      - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL:-}
-      - PB_ADMIN_PASSWORD=${PB_ADMIN_PASSWORD:-}
-      - PB_TEST_USER_EMAIL=${PB_TEST_USER_EMAIL}
-      - PB_TEST_ADMIN_EMAIL=${PB_TEST_ADMIN_EMAIL}
-      - PB_TEST_PASSWORD=${PB_TEST_PASSWORD}
-    volumes:
-      - "./pb_data:/app/pb_data"
-      - "./pb_migrations:/app/pb_migrations"
-    restart: unless-stopped
-    healthcheck:
-      test: wget --tries=1 --spider http://127.0.0.1:8081/api/health || exit 1
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      start_period: 300s
+      backend:
+        condition: service_started
 
   tools:
     build:
@@ -43,12 +33,13 @@ services:
       dockerfile: tools.Dockerfile
     working_dir: /app
     environment:
-      - PUBLIC_PB_HOST_PROD=${PUBLIC_PB_HOST_PROD}
-      - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL:-}
-      - PB_ADMIN_PASSWORD=${PB_ADMIN_PASSWORD:-}
+      - PUBLIC_BACKEND_URL=${PUBLIC_BACKEND_URL:-http://backend:4000}
+      - PUBLIC_BACKEND_WS=${PUBLIC_BACKEND_WS:-ws://backend:4000/socket}
     volumes:
       - ./:/app
       - tools_node_modules:/app/node_modules
 
 volumes:
   tools_node_modules:
+  backend_deps:
+  backend_build:

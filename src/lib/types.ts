@@ -1,4 +1,4 @@
-import pb, {
+import {
   type RecordIdString,
   OrderStateOptions,
   type ItemResponse,
@@ -10,9 +10,14 @@ import pb, {
   type CustomizationKeyResponse,
   type CustomizationValueResponse,
   type ItemCustomizationResponse
-} from "$lib/pocketbase";
+} from "$lib/api/contracts";
 import { restrictedRoutes, adminRoutes } from "$lib/constants";
-import type { AuthModel } from "pocketbase";
+
+type AuthRecord = {
+  id?: RecordIdString;
+  name?: string;
+  is_admin?: boolean;
+};
 
 type NavItems = "/account" | "/admin";
 
@@ -32,6 +37,8 @@ export class NavItem {
 
 type State = OrderStateOptions;
 export { OrderStateOptions as State };
+export { OrderStateOptions, Collections } from "$lib/api/contracts";
+export type { RecordIdString } from "$lib/api/contracts";
 
 export interface RecordBase {
   id: RecordIdString;
@@ -47,16 +54,16 @@ export class User {
     public readonly isAdmin: boolean
   ) {}
 
-  static fromPb(data: AuthModel): User {
+  static fromPb(data: AuthRecord | null): User {
     if (!data) {
       return new User("", "", false);
     }
-    return new User(data?.id, data?.name, data?.is_admin);
+    return new User(data?.id ?? "", data?.name ?? "", data?.is_admin ?? false);
   }
 }
 
 export type ExpandedOrderRecord = OrderResponse & {
-  expand: { items: ExpandedOrderItemRecord[] };
+  expand?: { items?: ExpandedOrderItemRecord[] };
 };
 
 export class Order implements RecordBase {
@@ -79,10 +86,11 @@ export class Order implements RecordBase {
   }
 
   static fromPb(data: ExpandedOrderRecord): Order {
+    const items = data.expand?.items?.map(OrderItem.fromPb) ?? [];
     return new Order(
       data.id,
       data.state,
-      data.expand.items.map(OrderItem.fromPb),
+      items,
       data.missing_information,
       data.day_id
     );
@@ -90,8 +98,8 @@ export class Order implements RecordBase {
 }
 
 export type ExpandedOrderItemRecord = OrderItemResponse & {
-  expand: {
-    item: ItemResponse;
+  expand?: {
+    item?: ItemResponse;
     customization?: Array<ExpandedItemCustomizationRecord>;
   };
 };
@@ -126,10 +134,12 @@ export class OrderItem implements RecordBase {
       });
     });
 
+    const itemData = data.expand?.item;
+    
     return new OrderItem(
       data.id,
-      data.expand.item.name,
-      Item.fromPb(data.expand.item),
+      itemData?.name ?? "",
+      itemData ? Item.fromPb(itemData) : new Item("", "", 0, "", "", "", false, 0),
       customizations
     );
   }
@@ -171,7 +181,7 @@ export class Item implements RecordBase {
       data.price_nok,
       data.category,
       data.image,
-      pb.files.getURL(data, data.image),
+      resolveFileUrl(data.image),
       data.enable,
       data.sort_order
     );
@@ -179,7 +189,7 @@ export class Item implements RecordBase {
 }
 
 export type ExpandedCategoryRecord = CategoryResponse & {
-  expand: { item_via_category: ItemResponse[] };
+  expand?: { item_via_category?: ItemResponse[] };
 };
 
 export class Category implements RecordBase {
@@ -210,6 +220,12 @@ export class Category implements RecordBase {
     );
   }
 }
+
+const resolveFileUrl = (fileName?: string | null) => {
+  if (!fileName) return "";
+  if (fileName.startsWith("http")) return fileName;
+  return fileName;
+};
 
 export class Message implements RecordBase {
   constructor(
@@ -327,7 +343,7 @@ export class CustomizationValue implements RecordBase {
 }
 
 export type ExpandedItemCustomizationRecord = ItemCustomizationResponse & {
-  expand: {
+  expand?: {
     key?: CustomizationKeyResponse;
     value?: CustomizationValueResponse[];
   };
@@ -350,8 +366,8 @@ export class ItemCustomization implements RecordBase {
   static fromPb(data: ExpandedItemCustomizationRecord): ItemCustomization {
     return new ItemCustomization(
       data.id,
-      data.expand.key ? CustomizationKey.fromPb(data.expand.key) : undefined,
-      data.expand.value ? data.expand.value.map(CustomizationValue.fromPb) : undefined
+      data.expand?.key ? CustomizationKey.fromPb(data.expand.key) : undefined,
+      data.expand?.value ? data.expand.value.map(CustomizationValue.fromPb) : undefined
     );
   }
 }

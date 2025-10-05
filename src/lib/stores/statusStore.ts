@@ -1,69 +1,37 @@
-import { createGenericPbStore } from "$stores/pbStore";
-import pb, { Collections, type MessageResponse } from "$lib/pocketbase";
-import { Message, Status } from "$lib/types";
-import { writable } from "svelte/store";
-import { browser } from "$app/environment";
+import {
+  createCollectionCrud,
+  createCollectionStore,
+  sendCollectionRequest
+} from "$stores/websocketStore";
+import { Collections, Message, Status } from "$lib/types";
+import { get, writable } from "svelte/store";
 
-import { EventSource } from "eventsource";
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(global as any).EventSource = EventSource;
+export const messages = createCollectionCrud(Collections.Message, {
+  fromWire: Message.fromPb
+});
 
-export const messages = await createGenericPbStore(Collections.Message, Message);
-
-async function createStatusStore() {
-  const { subscribe, set, update } = writable(Status.baseValue);
-
-  async function reset() {
-    // Only use the first record. Assumes that PB already has this and only this record.
-    const initialActiveMessage = await pb.collection(Collections.Status).getFirstListItem("");
-    const initialMessages: MessageResponse[] = await pb
-      .collection(Collections.Message)
-      .getFullList();
-
-    const initialData = Status.fromPb(initialActiveMessage, initialMessages.map(Message.fromPb));
-    set(initialData);
+const statusSource = createCollectionStore(
+  Collections.Status,
+  {
+    fromWire: (data) => Status.fromPb(data, get(messages))
+  },
+  {
+    expand: "message"
   }
+);
 
-  if (browser) {
-    reset();
+const { subscribe, set } = writable(Status.baseValue);
 
-    await pb.collection(Collections.Status).subscribe("*", async (event) => {
-      update((state) => {
-        return Status.fromPb(event.record, state.messages);
-      });
-    });
-
-    await pb.collection(Collections.Message).subscribe("*", (event) => {
-      update((state) => {
-        const itemIndex = state.messages.findIndex((item) => item.id == event.record.id);
-        const item = Message.fromPb(event.record);
-
-        switch (event.action) {
-          case "create":
-            state.messages.push(item);
-            break;
-          case "update":
-            if (itemIndex !== -1) state.messages[itemIndex] = item;
-            break;
-          case "delete":
-            if (itemIndex !== -1) state.messages.splice(itemIndex, 1);
-            break;
-        }
-
-        return state;
-      });
-    });
-  }
-
-  return {
-    subscribe,
-    reset
-  };
-}
+statusSource.subscribe((records) => {
+  const [first] = records;
+  set(first ?? Status.baseValue);
+});
 
 export const status = {
-  ...(await createStatusStore()),
+  subscribe,
+  destroy: statusSource.destroy,
+  reset: () => undefined,
   update: async (status: Status) => {
-    await pb.collection(Collections.Status).update(status.id, status.toPb());
+    await sendCollectionRequest("PATCH", Collections.Status, status.id, status.toPb());
   }
 };

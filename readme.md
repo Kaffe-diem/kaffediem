@@ -17,9 +17,9 @@ Det er nyttig å enten ha Linux eller WSL.
 2. .env
 
 ```
-PUBLIC_PB_HOST_PROD=https://kodekafe-pocketbase.fly.dev
-PB_ADMIN_EMAIL=
-PB_ADMIN_PASSWORD=
+PUBLIC_BACKEND_URL=https://kaffebase.example
+PUBLIC_BACKEND_WS=wss://kaffebase.example/socket
+BACKEND_URL=https://kaffebase.example
 ```
 
 2. Bygg og kjør appen

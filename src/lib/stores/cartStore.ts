@@ -15,7 +15,7 @@ import {
 } from "./menuStore";
 import { sumBy, groupBy, updateAt } from "$lib/utils";
 import { finalPrice } from "$lib/pricing";
-import type { RecordIdString } from "$lib/pocketbase";
+import type { RecordIdString } from "$lib/types";
 
 export interface CartItem extends Item {
   customizations: CustomizationValue[];

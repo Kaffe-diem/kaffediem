@@ -1,9 +1,7 @@
 <script lang="ts">
-  import pb from "$lib/pocketbase";
-  import { Collections } from "$lib/pocketbase";
-  import type { ClientResponseError } from "pocketbase";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
+  import { login as loginUser } from "$stores/authStore";
 
   let email: string = "";
   let password: string = "";
@@ -11,19 +9,10 @@
 
   async function login() {
     try {
-      await pb.collection(Collections.User).authWithPassword(email, password);
-
-      document.cookie = pb.authStore.exportToCookie({
-        path: "/",
-        httpOnly: false,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 60 * 60 * 24 * 7 // 7 days
-      });
+      await loginUser(email, password);
       goto(resolve("/"));
-    } catch (e) {
-      const error = e as ClientResponseError;
-      errorMessage = error.message;
+    } catch (error) {
+      errorMessage = error instanceof Error ? error.message : "Kunne ikke logge inn";
     }
   }
 </script>

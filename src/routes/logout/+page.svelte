@@ -4,8 +4,8 @@
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
 
-  onMount(() => {
-    logout();
+  onMount(async () => {
+    await logout();
     goto(resolve("/"));
   });
 </script>

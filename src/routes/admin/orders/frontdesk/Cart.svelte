@@ -68,7 +68,12 @@
         </div>
       </label>
 
-      <button class="bold btn btn-lg {$cart.length > 0 ? '' : 'invisible'}" onclick={completeOrder}>
+      <button
+        class="bold btn btn-lg {$cart.length > 0 ? '' : 'invisible'}"
+        data-testid="complete-order-button"
+        data-next-order-number={currentOrderId + 1}
+        onclick={completeOrder}
+      >
         <CompleteOrder />{currentOrderId + 1}
       </button>
 

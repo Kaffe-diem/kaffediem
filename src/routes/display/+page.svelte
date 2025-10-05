@@ -2,7 +2,7 @@
   import OrderList from "./OrderList.svelte";
   import { crossfade } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
-  import { OrderStateOptions } from "$lib/pocketbase";
+  import { OrderStateOptions } from "$lib/types";
   const { received, production, completed } = OrderStateOptions;
 
   const [send, receive] = crossfade({

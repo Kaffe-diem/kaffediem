@@ -1,0 +1,51 @@
+# Development Dockerfile for Phoenix
+ARG ELIXIR_VERSION=1.18.4
+ARG OTP_VERSION=28.1
+ARG DEBIAN_VERSION=trixie-20250908-slim
+
+ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
+
+FROM ${BUILDER_IMAGE}
+
+# Install build dependencies and development tools
+RUN apt-get update -y && apt-get install -y \
+    build-essential \
+    git \
+    inotify-tools \
+    && apt-get clean && rm -f /var/lib/apt/lists/*_*
+
+# Set working directory
+WORKDIR /app
+
+# Install hex + rebar
+RUN mix local.hex --force && \
+    mix local.rebar --force
+
+# Set development environment
+ENV MIX_ENV=dev
+
+# Copy dependency files
+COPY mix.exs mix.lock ./
+
+# Install dependencies
+RUN mix deps.get
+
+# Copy config files
+COPY config ./config
+
+# Compile dependencies
+RUN mix deps.compile
+
+# Copy application code (volumes will override this in docker-compose)
+COPY priv ./priv
+COPY lib ./lib
+COPY assets ./assets
+
+# Setup and compile assets
+RUN mix assets.setup
+
+# Expose Phoenix dev server port
+EXPOSE 4000
+
+# Start Phoenix server
+CMD ["mix", "phx.server"]
