@@ -81,6 +81,35 @@ defmodule Kaffebase.OrdersTest do
       assert log =~ "Order creation failed"
     end
 
+    test "coalesces repeated customizations per key" do
+      user = AccountsFixtures.user_fixture()
+      item = CatalogFixtures.item_fixture()
+      key = CatalogFixtures.customization_key_fixture(%{multiple_choice: true})
+      value_a = CatalogFixtures.customization_value_fixture(%{key: key})
+      value_b = CatalogFixtures.customization_value_fixture(%{key: key, name: "Second"})
+
+      {:ok, order} =
+        Orders.create_order(%{
+          customer: to_string(user.id),
+          items: [
+            %{
+              item: item.id,
+              customizations: [
+                %{key: key.id, value: value_a.id},
+                %{key: key.id, value: value_b.id}
+              ]
+            }
+          ]
+        })
+
+      loaded = Orders.get_order!(order.id)
+      [item_row] = loaded.expand.items
+      [customization] = item_row.expand.customization
+
+      assert customization.key == key.id
+      assert Enum.sort(customization.value) == Enum.sort([value_a.id, value_b.id])
+    end
+
     test "allows referencing an existing order item" do
       existing_order = OrdersFixtures.order_fixture()
       [existing_item_id | _] = existing_order.items

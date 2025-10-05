@@ -24,10 +24,12 @@ defmodule Kaffebase.AccountsTest do
       assert result_id == user.id
     end
 
-
     test "update_profile/2 updates fields" do
       user = AccountsFixtures.user_fixture()
-      assert {:ok, updated} = Accounts.update_profile(user, %{name: "Updated", username: "updated-user"})
+
+      assert {:ok, updated} =
+               Accounts.update_profile(user, %{name: "Updated", username: "updated-user"})
+
       assert updated.name == "Updated"
       assert updated.username == "updated-user"
     end
@@ -206,7 +208,7 @@ defmodule Kaffebase.AccountsTest do
     end
 
     test "does not update email if token expired", %{user: user, token: token} do
-      {1, nil} = Repo.update_all(UserToken, set: [inserted_at: ~N[2020-01-01 00:00:00]])
+      {_count, nil} = Repo.update_all(UserToken, set: [inserted_at: ~N[2020-01-01 00:00:00]])
 
       assert Accounts.update_user_email(user, token) ==
                {:error, :transaction_aborted}
@@ -338,7 +340,7 @@ defmodule Kaffebase.AccountsTest do
 
     test "does not return user for expired token", %{token: token} do
       dt = ~N[2020-01-01 00:00:00]
-      {1, nil} = Repo.update_all(UserToken, set: [inserted_at: dt, authenticated_at: dt])
+      {_count, nil} = Repo.update_all(UserToken, set: [inserted_at: dt, authenticated_at: dt])
       refute Accounts.get_user_by_session_token(token)
     end
   end
@@ -360,7 +362,7 @@ defmodule Kaffebase.AccountsTest do
     end
 
     test "does not return user for expired token", %{token: token} do
-      {1, nil} = Repo.update_all(UserToken, set: [inserted_at: ~N[2020-01-01 00:00:00]])
+      {_count, nil} = Repo.update_all(UserToken, set: [inserted_at: ~N[2020-01-01 00:00:00]])
       refute Accounts.get_user_by_magic_link_token(token)
     end
   end
@@ -388,7 +390,7 @@ defmodule Kaffebase.AccountsTest do
 
     test "raises when unconfirmed user has password set" do
       user = unconfirmed_user_fixture()
-      {1, nil} = Repo.update_all(User, set: [hashed_password: "hashed"])
+      {_count, nil} = Repo.update_all(User, set: [hashed_password: "hashed"])
       {encoded_token, _hashed_token} = generate_user_magic_link_token(user)
 
       assert_raise RuntimeError, ~r/magic link log in is not allowed/, fn ->

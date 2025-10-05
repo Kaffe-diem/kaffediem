@@ -2,18 +2,13 @@ defmodule KaffebaseWeb.CategoryController do
   use KaffebaseWeb, :controller
 
   alias Kaffebase.Catalog
-  alias KaffebaseWeb.{ControllerHelpers, PBSerializer, ParamParser}
+  alias KaffebaseWeb.{ControllerHelpers, DomainJSON}
 
   action_fallback KaffebaseWeb.FallbackController
 
-  def index(conn, params) do
-    order = ParamParser.parse_sort(params["sort"])
-
-    categories = Catalog.list_categories(order_by: default_order(order))
-    meta = ParamParser.pagination(params, length(categories))
-
-    response = Map.put(meta, :items, PBSerializer.resource(categories))
-    json(conn, response)
+  def index(conn, _params) do
+    categories = Catalog.list_categories()
+    json(conn, DomainJSON.render(categories))
   end
 
   def create(conn, params) do
@@ -22,13 +17,13 @@ defmodule KaffebaseWeb.CategoryController do
     with {:ok, category} <- Catalog.create_category(attrs) do
       conn
       |> put_status(:created)
-      |> json(PBSerializer.resource(category))
+      |> json(DomainJSON.render(category))
     end
   end
 
   def show(conn, %{"id" => id}) do
     category = Catalog.get_category!(id)
-    json(conn, PBSerializer.resource(category))
+    json(conn, DomainJSON.render(category))
   end
 
   def update(conn, %{"id" => id} = params) do
@@ -36,7 +31,7 @@ defmodule KaffebaseWeb.CategoryController do
     attrs = ControllerHelpers.atomize_keys(Map.delete(params, "id"))
 
     with {:ok, category} <- Catalog.update_category(category, attrs) do
-      json(conn, PBSerializer.resource(category))
+      json(conn, DomainJSON.render(category))
     end
   end
 
@@ -47,7 +42,4 @@ defmodule KaffebaseWeb.CategoryController do
       send_resp(conn, :no_content, "")
     end
   end
-
-  defp default_order([]), do: [asc: :sort_order, asc: :name]
-  defp default_order(order), do: order
 end

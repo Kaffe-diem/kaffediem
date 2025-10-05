@@ -2,15 +2,13 @@ defmodule KaffebaseWeb.MessageController do
   use KaffebaseWeb, :controller
 
   alias Kaffebase.Content
-  alias KaffebaseWeb.{ControllerHelpers, PBSerializer, ParamParser}
+  alias KaffebaseWeb.{ControllerHelpers, DomainJSON}
 
   action_fallback KaffebaseWeb.FallbackController
 
-  def index(conn, params) do
+  def index(conn, _params) do
     messages = Content.list_messages()
-    meta = ParamParser.pagination(params, length(messages))
-    response = Map.put(meta, :items, PBSerializer.resource(messages))
-    json(conn, response)
+    json(conn, DomainJSON.render(messages))
   end
 
   def create(conn, params) do
@@ -19,13 +17,13 @@ defmodule KaffebaseWeb.MessageController do
     with {:ok, message} <- Content.create_message(attrs) do
       conn
       |> put_status(:created)
-      |> json(PBSerializer.resource(message))
+      |> json(DomainJSON.render(message))
     end
   end
 
   def show(conn, %{"id" => id}) do
     message = Content.get_message!(id)
-    json(conn, PBSerializer.resource(message))
+    json(conn, DomainJSON.render(message))
   end
 
   def update(conn, %{"id" => id} = params) do
@@ -33,7 +31,7 @@ defmodule KaffebaseWeb.MessageController do
     attrs = ControllerHelpers.atomize_keys(Map.delete(params, "id"))
 
     with {:ok, message} <- Content.update_message(message, attrs) do
-      json(conn, PBSerializer.resource(message))
+      json(conn, DomainJSON.render(message))
     end
   end
 

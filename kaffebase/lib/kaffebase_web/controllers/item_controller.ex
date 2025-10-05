@@ -2,23 +2,17 @@ defmodule KaffebaseWeb.ItemController do
   use KaffebaseWeb, :controller
 
   alias Kaffebase.Catalog
-  alias KaffebaseWeb.{ControllerHelpers, PBSerializer, ParamParser}
+  alias KaffebaseWeb.{ControllerHelpers, DomainJSON}
 
   action_fallback KaffebaseWeb.FallbackController
 
   def index(conn, params) do
-    order = ParamParser.parse_sort(params["sort"])
     category_id = params["category"] || params["category_id"]
 
     items =
-      Catalog.list_items(
-        order_by: default_order(order),
-        category: category_id
-      )
+      Catalog.list_items(category: category_id)
 
-    meta = ParamParser.pagination(params, length(items))
-    response = Map.put(meta, :items, PBSerializer.resource(items))
-    json(conn, response)
+    json(conn, DomainJSON.render(items))
   end
 
   def create(conn, params) do
@@ -27,13 +21,13 @@ defmodule KaffebaseWeb.ItemController do
     with {:ok, item} <- Catalog.create_item(attrs) do
       conn
       |> put_status(:created)
-      |> json(PBSerializer.resource(item))
+      |> json(DomainJSON.render(item))
     end
   end
 
   def show(conn, %{"id" => id}) do
     item = Catalog.get_item!(id)
-    json(conn, PBSerializer.resource(item))
+    json(conn, DomainJSON.render(item))
   end
 
   def update(conn, %{"id" => id} = params) do
@@ -41,7 +35,7 @@ defmodule KaffebaseWeb.ItemController do
     attrs = ControllerHelpers.atomize_keys(Map.delete(params, "id"))
 
     with {:ok, item} <- Catalog.update_item(item, attrs) do
-      json(conn, PBSerializer.resource(item))
+      json(conn, DomainJSON.render(item))
     end
   end
 
@@ -52,7 +46,4 @@ defmodule KaffebaseWeb.ItemController do
       send_resp(conn, :no_content, "")
     end
   end
-
-  defp default_order([]), do: [asc: :sort_order, asc: :name]
-  defp default_order(order), do: order
 end

@@ -12,7 +12,7 @@ defmodule Kaffebase.Orders do
   alias Kaffebase.CollectionNotifier
   alias Kaffebase.Orders.Commands.PlaceOrder
   alias Kaffebase.Orders.DayId
-  alias Kaffebase.Orders.Param
+  alias Kaffebase.Orders.Payload
   alias Kaffebase.Orders.{Order, OrderItem}
   alias Kaffebase.Repo
 
@@ -85,17 +85,10 @@ defmodule Kaffebase.Orders do
   @spec update_order(Order.t(), map()) :: {:ok, Order.t()} | {:error, Ecto.Changeset.t()}
   def update_order(%Order{} = order, attrs) do
     # Only include items if explicitly provided to avoid overwriting with empty list
-    items_value = Param.attr(attrs, :items, Param.attr(attrs, :item_ids))
-
-    prepared_attrs =
-      %{}
-      |> maybe_put(:customer, attrs |> Param.attr(:customer) |> Param.extract_record_id())
-      |> maybe_put(:missing_information, Param.attr(attrs, :missing_information))
-      |> maybe_put(:items, items_value && Param.normalize_id_list(items_value))
-      |> Map.put(:state, Param.cast_state(Param.attr(attrs, :state, order.state)))
+    sanitized = Payload.normalize_update(attrs, order.state)
 
     order
-    |> Order.changeset(prepared_attrs)
+    |> Order.changeset(sanitized)
     |> Repo.update()
     |> notify("order", "update")
   end
@@ -104,7 +97,7 @@ defmodule Kaffebase.Orders do
           {:ok, Order.t()} | {:error, Ecto.Changeset.t()}
   def update_order_state(%Order{} = order, state) do
     order
-    |> Order.changeset(%{state: Param.cast_state(state)})
+    |> Order.changeset(%{state: Payload.cast_state(state)})
     |> Repo.update()
     |> notify("order", "update")
   end
@@ -117,7 +110,7 @@ defmodule Kaffebase.Orders do
 
   @spec set_all_orders_state(Order.state()) :: {non_neg_integer(), nil | [term()]}
   def set_all_orders_state(state) do
-    new_state = Param.cast_state(state)
+    new_state = Payload.cast_state(state)
     {count, _} = Repo.update_all(Order, set: [state: new_state])
 
     Order
@@ -165,8 +158,6 @@ defmodule Kaffebase.Orders do
   # --------------------------------------------------------------------------
   # Internal helpers
 
-  defp maybe_put(map, _key, nil), do: map
-  defp maybe_put(map, key, value), do: Map.put(map, key, value)
   defp coerce_order_error({:error, %Changeset{} = changeset}), do: changeset
   defp coerce_order_error(%Changeset{} = changeset), do: changeset
 
@@ -210,6 +201,8 @@ defmodule Kaffebase.Orders do
       _ -> query
     end
   end
+
+  defp maybe_filter_from_date(query, _other), do: query
 
   defp maybe_apply_order(query, nil), do: query
   defp maybe_apply_order(query, []), do: query

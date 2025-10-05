@@ -9,7 +9,7 @@ defmodule Kaffebase.Orders.Commands.PlaceOrder do
   alias __MODULE__.Customization
   alias __MODULE__.Item
   alias Kaffebase.Orders.Order
-  alias Kaffebase.Orders.Param
+  alias Kaffebase.Orders.Payload
 
   @primary_key false
 
@@ -46,48 +46,16 @@ defmodule Kaffebase.Orders.Commands.PlaceOrder do
   end
 
   defp sanitize(attrs) do
-    %{
-      customer_id: Param.extract_record_id(Param.attr(attrs, :customer)),
-      missing_information: to_boolean(Param.attr(attrs, :missing_information, false)),
-      state: Param.cast_state(Param.attr(attrs, :state)),
-      items: sanitize_items(Param.attr(attrs, :items, []))
-    }
+    attrs
+    |> Payload.normalize_new()
+    |> Map.update!(:items, fn items ->
+      Enum.map(items, fn item ->
+        Map.update(item, :customizations, [], fn customizations ->
+          Enum.map(customizations, &Customization.from_map/1)
+        end)
+      end)
+    end)
   end
-
-  defp sanitize_items(items) do
-    items
-    |> List.wrap()
-    |> Enum.reject(&is_nil/1)
-    |> Enum.map(&sanitize_item/1)
-  end
-
-  defp sanitize_item(item) when is_binary(item) do
-    %{existing_order_item_id: item, customizations: []}
-  end
-
-  defp sanitize_item(%{} = attrs) do
-    %{
-      existing_order_item_id:
-        attrs
-        |> Param.attr(:order_item)
-        |> Param.extract_record_id(),
-      item_id:
-        attrs
-        |> Param.attr(:item)
-        |> Param.extract_record_id(),
-      customizations:
-        attrs
-        |> Param.attr(:customizations, [])
-        |> Param.normalize_customizations()
-        |> Enum.map(&Customization.from_map/1)
-    }
-  end
-
-  defp sanitize_item(_), do: %{}
-
-  defp to_boolean(value) when value in [true, 1, "1", "true", "TRUE"], do: true
-  defp to_boolean(value) when value in [false, 0, "0", "false", "FALSE", nil], do: false
-  defp to_boolean(_), do: false
 
   # --------------------------------------------------------------------------
   # Nested schemas
@@ -188,6 +156,13 @@ defmodule Kaffebase.Orders.Commands.PlaceOrder do
       |> update_change(:value_ids, &normalize_values/1)
       |> validate_required([:key_id])
       |> validate_length(:value_ids, min: 1)
+    end
+
+    def from_map(%{key_id: key_id, value_ids: value_ids}) do
+      %{
+        key_id: key_id,
+        value_ids: Enum.map(List.wrap(value_ids), &to_string/1)
+      }
     end
 
     def from_map(%{key: key, value: value}) do

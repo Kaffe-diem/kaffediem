@@ -2,17 +2,13 @@ defmodule KaffebaseWeb.CustomizationKeyController do
   use KaffebaseWeb, :controller
 
   alias Kaffebase.Catalog
-  alias KaffebaseWeb.{ControllerHelpers, PBSerializer, ParamParser}
+  alias KaffebaseWeb.{ControllerHelpers, DomainJSON}
 
   action_fallback KaffebaseWeb.FallbackController
 
-  def index(conn, params) do
-    order = ParamParser.parse_sort(params["sort"])
-
-    keys = Catalog.list_customization_keys(order_by: default_order(order))
-    meta = ParamParser.pagination(params, length(keys))
-    response = Map.put(meta, :items, PBSerializer.resource(keys))
-    json(conn, response)
+  def index(conn, _params) do
+    keys = Catalog.list_customization_keys()
+    json(conn, DomainJSON.render(keys))
   end
 
   def create(conn, params) do
@@ -21,13 +17,13 @@ defmodule KaffebaseWeb.CustomizationKeyController do
     with {:ok, key} <- Catalog.create_customization_key(attrs) do
       conn
       |> put_status(:created)
-      |> json(PBSerializer.resource(key))
+      |> json(DomainJSON.render(key))
     end
   end
 
   def show(conn, %{"id" => id}) do
     key = Catalog.get_customization_key!(id)
-    json(conn, PBSerializer.resource(key))
+    json(conn, DomainJSON.render(key))
   end
 
   def update(conn, %{"id" => id} = params) do
@@ -35,7 +31,7 @@ defmodule KaffebaseWeb.CustomizationKeyController do
     attrs = ControllerHelpers.atomize_keys(Map.delete(params, "id"))
 
     with {:ok, key} <- Catalog.update_customization_key(key, attrs) do
-      json(conn, PBSerializer.resource(key))
+      json(conn, DomainJSON.render(key))
     end
   end
 
@@ -46,7 +42,4 @@ defmodule KaffebaseWeb.CustomizationKeyController do
       send_resp(conn, :no_content, "")
     end
   end
-
-  defp default_order([]), do: [asc: :sort_order, asc: :name]
-  defp default_order(order), do: order
 end

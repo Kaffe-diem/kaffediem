@@ -2,31 +2,18 @@ defmodule KaffebaseWeb.ItemCustomizationController do
   use KaffebaseWeb, :controller
 
   alias Kaffebase.Catalog
-  alias KaffebaseWeb.{ControllerHelpers, PBSerializer, ParamParser}
+  alias KaffebaseWeb.{ControllerHelpers, DomainJSON}
 
   action_fallback KaffebaseWeb.FallbackController
 
-  @expand_mapping %{
-    "key" => :key,
-    "key_expand" => :key,
-    "value" => :values,
-    "values" => :values
-  }
-
-  def index(conn, params) do
-    expand = ParamParser.parse_expand(params["expand"], @expand_mapping)
-
-    customizations = Catalog.list_item_customizations(preload: expand)
-    meta = ParamParser.pagination(params, length(customizations))
-    response = Map.put(meta, :items, PBSerializer.resource(customizations))
-    json(conn, response)
+  def index(conn, _params) do
+    customizations = Catalog.list_item_customizations(preload: [:key, :values])
+    json(conn, DomainJSON.render(customizations))
   end
 
-  def show(conn, %{"id" => id} = params) do
-    expand = ParamParser.parse_expand(params["expand"], @expand_mapping)
-
-    customization = Catalog.get_item_customization!(id, preload: expand)
-    json(conn, PBSerializer.resource(customization))
+  def show(conn, %{"id" => id}) do
+    customization = Catalog.get_item_customization!(id, preload: [:key, :values])
+    json(conn, DomainJSON.render(customization))
   end
 
   def create(conn, params) do
@@ -35,7 +22,7 @@ defmodule KaffebaseWeb.ItemCustomizationController do
     with {:ok, customization} <- Catalog.create_item_customization(attrs) do
       conn
       |> put_status(:created)
-      |> json(PBSerializer.resource(customization))
+      |> json(DomainJSON.render(customization))
     end
   end
 
@@ -44,7 +31,7 @@ defmodule KaffebaseWeb.ItemCustomizationController do
     attrs = ControllerHelpers.atomize_keys(Map.delete(params, "id"))
 
     with {:ok, customization} <- Catalog.update_item_customization(customization, attrs) do
-      json(conn, PBSerializer.resource(customization))
+      json(conn, DomainJSON.render(customization))
     end
   end
 

@@ -6,7 +6,8 @@ config :kaffebase, Kaffebase.Repo,
   database: Path.expand("../kaffebase_dev.db", Path.dirname(__ENV__.file)),
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
-  pool_size: 10
+  pool_size: 10,
+  log: false
 
 config :kaffebase, dev_auto_login: true
 

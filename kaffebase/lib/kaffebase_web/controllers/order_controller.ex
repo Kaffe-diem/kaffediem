@@ -3,22 +3,19 @@ defmodule KaffebaseWeb.OrderController do
   require Logger
 
   alias Kaffebase.Orders
-  alias KaffebaseWeb.{ControllerHelpers, PBSerializer, ParamParser}
+  alias KaffebaseWeb.{ControllerHelpers, DomainJSON}
 
   action_fallback KaffebaseWeb.FallbackController
 
   def index(conn, params) do
-    sort = ParamParser.parse_sort(params["sort"])
-    filters = ParamParser.parse_order_filters(params["filter"])
-
     opts =
-      filters
-      |> Keyword.put(:order_by, default_order(sort))
+      []
+      |> maybe_put(:from_date, params["from"] || params["from_date"])
+      |> maybe_put(:customer, params["customer_id"] || params["customer"])
+      |> Keyword.put(:order_by, default_order())
 
     orders = Orders.list_orders(opts)
-    meta = ParamParser.pagination(params, length(orders))
-    response = Map.put(meta, :items, PBSerializer.resource(orders))
-    json(conn, response)
+    json(conn, DomainJSON.render(orders))
   end
 
   def create(conn, params) do
@@ -30,13 +27,13 @@ defmodule KaffebaseWeb.OrderController do
 
       conn
       |> put_status(:created)
-      |> json(PBSerializer.resource(order))
+      |> json(DomainJSON.render(order))
     end
   end
 
   def show(conn, %{"id" => id}) do
     order = Orders.get_order!(id)
-    json(conn, PBSerializer.resource(order))
+    json(conn, DomainJSON.render(order))
   end
 
   def update(conn, %{"id" => id} = params) do
@@ -44,7 +41,7 @@ defmodule KaffebaseWeb.OrderController do
     attrs = ControllerHelpers.atomize_keys(Map.delete(params, "id"))
 
     with {:ok, order} <- Orders.update_order(order, attrs) do
-      json(conn, PBSerializer.resource(order))
+      json(conn, DomainJSON.render(order))
     end
   end
 
@@ -56,6 +53,8 @@ defmodule KaffebaseWeb.OrderController do
     end
   end
 
-  defp default_order([]), do: [asc: :day_id, asc: :created]
-  defp default_order(order), do: order
+  defp default_order, do: [asc: :day_id, asc: :created]
+
+  defp maybe_put(opts, _key, nil), do: opts
+  defp maybe_put(opts, key, value), do: Keyword.put(opts, key, value)
 end

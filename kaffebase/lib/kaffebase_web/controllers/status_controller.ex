@@ -2,27 +2,19 @@ defmodule KaffebaseWeb.StatusController do
   use KaffebaseWeb, :controller
 
   alias Kaffebase.Content
-  alias KaffebaseWeb.{ControllerHelpers, PBSerializer, ParamParser}
+  alias KaffebaseWeb.{ControllerHelpers, DomainJSON}
 
   action_fallback KaffebaseWeb.FallbackController
 
-  @expand_mapping %{"message" => :message}
-
-  def index(conn, params) do
-    expand = ParamParser.parse_expand(params["expand"], @expand_mapping)
-
-    statuses = Content.list_statuses(preload: expand)
-    meta = ParamParser.pagination(params, length(statuses))
-    response = Map.put(meta, :items, PBSerializer.resource(statuses))
-    json(conn, response)
+  def index(conn, _params) do
+    statuses = Content.list_statuses(preload: [:message])
+    json(conn, DomainJSON.render(statuses))
   end
 
-  def first(conn, params) do
-    expand = ParamParser.parse_expand(params["expand"], @expand_mapping)
-
-    case Content.get_singleton_status(preload: expand) do
+  def first(conn, _params) do
+    case Content.get_singleton_status(preload: [:message]) do
       nil -> send_resp(conn, :not_found, "")
-      status -> json(conn, PBSerializer.resource(status))
+      status -> json(conn, DomainJSON.render(status))
     end
   end
 
@@ -32,15 +24,13 @@ defmodule KaffebaseWeb.StatusController do
     with {:ok, status} <- Content.create_status(attrs) do
       conn
       |> put_status(:created)
-      |> json(PBSerializer.resource(status))
+      |> json(DomainJSON.render(status))
     end
   end
 
-  def show(conn, %{"id" => id} = params) do
-    expand = ParamParser.parse_expand(params["expand"], @expand_mapping)
-
-    status = Content.get_status!(id, preload: expand)
-    json(conn, PBSerializer.resource(status))
+  def show(conn, %{"id" => id}) do
+    status = Content.get_status!(id, preload: [:message])
+    json(conn, DomainJSON.render(status))
   end
 
   def update(conn, %{"id" => id} = params) do
@@ -48,7 +38,7 @@ defmodule KaffebaseWeb.StatusController do
     attrs = ControllerHelpers.atomize_keys(Map.delete(params, "id"))
 
     with {:ok, status} <- Content.update_status(status, attrs) do
-      json(conn, PBSerializer.resource(status))
+      json(conn, DomainJSON.render(status))
     end
   end
 
