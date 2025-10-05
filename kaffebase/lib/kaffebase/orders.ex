@@ -6,10 +6,12 @@ defmodule Kaffebase.Orders do
   require Logger
   import Ecto.Query, warn: false
 
-  alias Ecto.Multi
+  alias Ecto.{Changeset, Multi}
   alias Kaffebase.Catalog
   alias Kaffebase.Catalog.{Item, ItemCustomization}
   alias Kaffebase.CollectionNotifier
+  alias Kaffebase.Orders.Commands.PlaceOrder
+  alias Kaffebase.Orders.Param
   alias Kaffebase.Orders.{Order, OrderItem}
   alias Kaffebase.Repo
 
@@ -34,52 +36,62 @@ defmodule Kaffebase.Orders do
 
   @spec create_order(map()) :: {:ok, Order.t()} | {:error, term()}
   def create_order(attrs) when is_map(attrs) do
-    Multi.new()
-    |> Multi.run(:order_items, fn repo, _ -> create_order_items(repo, attr(attrs, :items, [])) end)
-    |> Multi.run(:order, fn repo, %{order_items: order_items} ->
-      order_attrs =
-        attrs
-        |> Map.put(:items, Enum.map(order_items, & &1.id))
-        |> Map.put(:customer, attr(attrs, :customer) |> extract_record_id())
-        |> Map.put(:day_id, attr(attrs, :day_id, 0))
-        |> Map.put(:missing_information, attr(attrs, :missing_information, false))
-        |> Map.put(:state, cast_state(attr(attrs, :state)))
+    with {:ok, command} <- PlaceOrder.new(attrs) do
+      Multi.new()
+      |> Multi.run(:order_items, fn repo, _ -> create_order_items(repo, command.items) end)
+      |> Multi.run(:order, fn repo, %{order_items: order_items} ->
+        order_attrs = %{
+          customer: command.customer_id,
+          day_id: command.day_id,
+          missing_information: command.missing_information,
+          items: Enum.map(order_items, & &1.id),
+          state: command.state
+        }
 
-      %Order{}
-      |> Order.changeset(order_attrs)
-      |> repo.insert()
-    end)
-    |> Repo.transaction()
-    |> case do
-      {:ok, %{order: order}} ->
-        Logger.info("Order created: #{order.id}, day_id: #{order.day_id}")
-        complete_order = preload_all_items(order)
+        %Order{}
+        |> Order.changeset(order_attrs)
+        |> repo.insert()
+      end)
+      |> Repo.transaction()
+      |> case do
+        {:ok, %{order: order}} ->
+          Logger.info("Order created: #{order.id}, day_id: #{order.day_id}")
+          complete_order = preload_all_items(order)
 
-        items_count = complete_order |> Map.get(:expand, %{}) |> Map.get(:items, []) |> length()
-        Logger.info("Preloaded #{items_count} items for order #{order.id}")
+          items_count = complete_order |> Map.get(:expand, %{}) |> Map.get(:items, []) |> length()
+          Logger.info("Preloaded #{items_count} items for order #{order.id}")
 
-        broadcast_change("order", "create", complete_order)
-        Logger.info("Broadcast order create for #{order.id}")
-        {:ok, order}
+          broadcast_change("order", "create", complete_order)
+          Logger.info("Broadcast order create for #{order.id}")
+          {:ok, order}
 
-      {:error, _step, reason, _changes} ->
-        Logger.error("Order creation failed: #{inspect(reason)}")
-        {:error, reason}
+        {:error, _step, reason, _changes} ->
+          Logger.error("Order creation failed: #{inspect(reason)}")
+          {:error, coerce_order_error(reason)}
+      end
+    else
+      {:error, %Ecto.Changeset{} = changeset} = error ->
+        Logger.warning("Order payload invalid: #{inspect(changeset.errors)}")
+        error
+
+      {:error, reason} = error ->
+        Logger.error("Order creation failed before transaction: #{inspect(reason)}")
+        error
     end
   end
 
   @spec update_order(Order.t(), map()) :: {:ok, Order.t()} | {:error, Ecto.Changeset.t()}
   def update_order(%Order{} = order, attrs) do
     # Only include items if explicitly provided to avoid overwriting with empty list
-    items_value = attr(attrs, :items, attr(attrs, :item_ids))
+    items_value = Param.attr(attrs, :items, Param.attr(attrs, :item_ids))
 
     prepared_attrs =
       %{}
-      |> maybe_put(:customer, attr(attrs, :customer) |> extract_record_id())
-      |> maybe_put(:day_id, attr(attrs, :day_id))
-      |> maybe_put(:missing_information, attr(attrs, :missing_information))
-      |> maybe_put(:items, items_value && normalize_id_list(items_value))
-      |> Map.put(:state, cast_state(attr(attrs, :state, order.state)))
+      |> maybe_put(:customer, attrs |> Param.attr(:customer) |> Param.extract_record_id())
+      |> maybe_put(:day_id, Param.attr(attrs, :day_id))
+      |> maybe_put(:missing_information, Param.attr(attrs, :missing_information))
+      |> maybe_put(:items, items_value && Param.normalize_id_list(items_value))
+      |> Map.put(:state, Param.cast_state(Param.attr(attrs, :state, order.state)))
 
     order
     |> Order.changeset(prepared_attrs)
@@ -91,7 +103,7 @@ defmodule Kaffebase.Orders do
           {:ok, Order.t()} | {:error, Ecto.Changeset.t()}
   def update_order_state(%Order{} = order, state) do
     order
-    |> Order.changeset(%{state: cast_state(state)})
+    |> Order.changeset(%{state: Param.cast_state(state)})
     |> Repo.update()
     |> notify("order", "update")
   end
@@ -104,7 +116,7 @@ defmodule Kaffebase.Orders do
 
   @spec set_all_orders_state(Order.state()) :: {non_neg_integer(), nil | [term()]}
   def set_all_orders_state(state) do
-    new_state = cast_state(state)
+    new_state = Param.cast_state(state)
     {count, _} = Repo.update_all(Order, set: [state: new_state])
 
     Order
@@ -152,121 +164,21 @@ defmodule Kaffebase.Orders do
   # --------------------------------------------------------------------------
   # Internal helpers
 
-  defp attr(attrs, key, default \\ nil) do
-    keys_for(key)
-    |> Enum.find_value(fn candidate -> value_for(attrs, candidate) end)
-    |> case do
-      nil -> default
-      value -> value
-    end
-  end
-
   defp maybe_put(map, _key, nil), do: map
   defp maybe_put(map, key, value), do: Map.put(map, key, value)
+  defp coerce_order_error({:error, %Changeset{} = changeset}), do: changeset
+  defp coerce_order_error(%Changeset{} = changeset), do: changeset
 
-  defp extract_value_id(%{id: id}) when is_binary(id), do: id
-  defp extract_value_id(%{"id" => id}) when is_binary(id), do: id
-  defp extract_value_id(value) when is_binary(value), do: value
-  defp extract_value_id(_), do: nil
-
-  defp extract_record_id(value) when is_binary(value), do: value
-  defp extract_record_id(%{id: id}) when is_binary(id), do: id
-  defp extract_record_id(%{"id" => id}) when is_binary(id), do: id
-  defp extract_record_id(_), do: nil
-
-  defp normalize_id_list(value) do
-    value
-    |> List.wrap()
-    |> Enum.map(&extract_record_id/1)
-    |> Enum.reject(&is_nil/1)
+  defp coerce_order_error(reason) do
+    %Order{}
+    |> Changeset.change()
+    |> Changeset.add_error(:items, error_message(reason))
   end
 
-  defp normalize_customizations(customizations) do
-    normalized =
-      customizations
-      |> List.wrap()
-      |> Enum.reject(&is_nil/1)
-
-    cond do
-      normalized == [] ->
-        []
-
-      Enum.all?(normalized, &group_shape?/1) ->
-        normalized
-        |> Enum.map(&normalize_group_customization/1)
-        |> Enum.reject(&(is_nil(&1.key) || Enum.empty?(&1.value)))
-
-      true ->
-        normalized
-        |> Enum.group_by(&extract_record_id(attr(&1, :key)))
-        |> Enum.reject(fn {key, _} -> is_nil(key) end)
-        |> Enum.map(fn {key, values} ->
-          %{
-            key: key,
-            value:
-              values
-              |> Enum.map(&extract_value_id/1)
-              |> Enum.reject(&is_nil/1)
-          }
-        end)
-    end
-  end
-
-  defp normalize_group_customization(customization) do
-    %{
-      key: attr(customization, :key) |> extract_record_id(),
-      value:
-        customization
-        |> attr(:value, [])
-        |> List.wrap()
-        |> Enum.map(&extract_value_id/1)
-        |> Enum.reject(&is_nil/1)
-    }
-  end
-
-  defp group_shape?(customization) do
-    !is_nil(attr(customization, :value))
-  end
-
-  defp value_for(nil, _candidate), do: nil
-  defp value_for(attrs, candidate) when is_atom(candidate), do: Map.get(attrs, candidate)
-  defp value_for(attrs, candidate) when is_binary(candidate), do: Map.get(attrs, candidate)
-
-  defp keys_for(:customer), do: [:customer, "customer", :customer_id, "customer_id"]
-  defp keys_for(:day_id), do: [:day_id, "day_id"]
-  defp keys_for(:missing_information), do: [:missing_information, "missing_information"]
-  defp keys_for(:state), do: [:state, "state"]
-  defp keys_for(:items), do: [:items, "items", :item_ids, "item_ids"]
-  defp keys_for(:item), do: [:item, "item", :item_id, "item_id"]
-
-  defp keys_for(:customizations),
-    do: [:customization, "customization", :customizations, "customizations"]
-
-  defp keys_for(:key), do: [:key, "key", :belongs_to, "belongs_to", :key_id, "key_id"]
-  defp keys_for(:value), do: [:value, "value", :value_ids, "value_ids"]
-  defp keys_for(key), do: [key, to_string(key)]
-
-  defp cast_state(nil), do: :received
-  defp cast_state(""), do: :received
-
-  defp cast_state(state) when is_atom(state) do
-    case state do
-      s when s in [:received, :production, :completed, :dispatched] -> s
-      _ -> :received
-    end
-  end
-
-  defp cast_state(state) when is_binary(state) do
-    case String.downcase(state) do
-      "received" -> :received
-      "production" -> :production
-      "completed" -> :completed
-      "dispatched" -> :dispatched
-      _ -> :received
-    end
-  end
-
-  defp cast_state(_), do: :received
+  defp error_message(:invalid_order_item_reference), do: "references unknown order item"
+  defp error_message(:invalid_order_item), do: "contains an invalid order item"
+  defp error_message(reason) when is_atom(reason), do: to_string(reason)
+  defp error_message(reason), do: inspect(reason)
 
   defp maybe_filter(query, _field, nil), do: query
 
@@ -413,21 +325,29 @@ defmodule Kaffebase.Orders do
 
   defp create_order_items(repo, items) when is_list(items) do
     items
-    |> Enum.reduce_while({:ok, []}, fn item_attrs, {:ok, acc} ->
-      cond do
-        is_binary(item_attrs) ->
-          {:cont, {:ok, [%OrderItem{id: item_attrs} | acc]}}
+    |> Enum.reduce_while({:ok, []}, fn
+      %PlaceOrder.Item{} = item, {:ok, acc} ->
+        cond do
+          PlaceOrder.Item.existing?(item) ->
+            case Repo.get(OrderItem, item.existing_order_item_id) do
+              %OrderItem{} = order_item -> {:cont, {:ok, [order_item | acc]}}
+              nil -> {:halt, {:error, :invalid_order_item_reference}}
+            end
 
-        is_map(item_attrs) ->
-          with {:ok, order_item} <- insert_order_item(repo, item_attrs) do
-            {:cont, {:ok, [order_item | acc]}}
-          else
-            {:error, reason} -> {:halt, {:error, reason}}
-          end
+          PlaceOrder.Item.new?(item) ->
+            with {:ok, order_item} <- insert_order_item(repo, item) do
+              {:cont, {:ok, [order_item | acc]}}
+            else
+              {:error, reason} -> {:halt, {:error, reason}}
+            end
 
-        true ->
-          {:halt, {:error, :invalid_order_item}}
-      end
+          true ->
+            {:halt, {:error, :invalid_order_item}}
+        end
+
+      other, {:ok, _acc} ->
+        Logger.warning("Discarding unexpected order item payload: #{inspect(other)}")
+        {:halt, {:error, :invalid_order_item}}
     end)
     |> case do
       {:ok, order_items} -> {:ok, Enum.reverse(order_items)}
@@ -435,21 +355,16 @@ defmodule Kaffebase.Orders do
     end
   end
 
-  defp insert_order_item(repo, attrs) do
-    customization_attrs =
-      attrs
-      |> attr(:customizations, [])
-      |> normalize_customizations()
-
+  defp insert_order_item(repo, %PlaceOrder.Item{} = item) do
     %OrderItem{}
-    |> OrderItem.changeset(%{item: attr(attrs, :item) |> extract_record_id()})
+    |> OrderItem.changeset(%{item: item.item_id})
     |> repo.insert()
     |> case do
       {:ok, order_item} ->
         broadcast_change("order_item", "create", order_item)
 
         with {:ok, customization_ids} <-
-               maybe_create_item_customizations(repo, customization_attrs) do
+               maybe_create_item_customizations(repo, item.customizations) do
           update_with_customizations(repo, order_item, customization_ids)
         end
 
@@ -463,17 +378,7 @@ defmodule Kaffebase.Orders do
   defp maybe_create_item_customizations(repo, customizations) do
     customizations
     |> Enum.reduce_while({:ok, []}, fn customization, {:ok, acc} ->
-      value_ids =
-        customization
-        |> attr(:value, [])
-        |> List.wrap()
-        |> Enum.map(&extract_value_id/1)
-        |> Enum.reject(&is_nil/1)
-
-      attrs = %{
-        key: attr(customization, :key) |> extract_record_id(),
-        value: value_ids
-      }
+      attrs = %{key: customization.key_id, value: customization.value_ids}
 
       %ItemCustomization{}
       |> ItemCustomization.changeset(attrs)

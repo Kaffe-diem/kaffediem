@@ -66,6 +66,60 @@ defmodule Kaffebase.OrdersTest do
                         Orders.create_order(%{customer: user.id, items: [%{item: nil}]})
              end) =~ ""
     end
+
+    test "returns error when referencing unknown existing order item" do
+      user = AccountsFixtures.user_fixture()
+
+      log =
+        capture_log(fn ->
+          assert {:error, changeset} =
+                   Orders.create_order(%{customer: user.id, items: ["missing-order-item"]})
+
+          assert %{items: messages} = errors_on(changeset)
+          assert "references unknown order item" in messages
+        end)
+
+      assert log =~ "Order creation failed"
+    end
+
+    test "allows referencing an existing order item" do
+      existing_order = OrdersFixtures.order_fixture()
+      [existing_item_id | _] = existing_order.items
+      user = AccountsFixtures.user_fixture()
+
+      assert {:ok, order} = Orders.create_order(%{customer: user.id, items: [existing_item_id]})
+      assert order.items == [existing_item_id]
+    end
+
+    test "rejects customizations for existing order item references" do
+      existing_order = OrdersFixtures.order_fixture()
+      [existing_item_id | _] = existing_order.items
+      user = AccountsFixtures.user_fixture()
+      customization_key = CatalogFixtures.customization_key_fixture()
+
+      customization_value =
+        CatalogFixtures.customization_value_fixture(%{key: customization_key})
+
+      payload = %{
+        customer: user.id,
+        items: [
+          %{
+            order_item: existing_item_id,
+            customizations: [%{key: customization_key.id, value: [customization_value.id]}]
+          }
+        ]
+      }
+
+      log =
+        capture_log(fn ->
+          assert {:error, changeset} = Orders.create_order(payload)
+          assert %{items: [item_errors | _]} = errors_on(changeset)
+          assert %{customizations: [message]} = item_errors
+          assert String.contains?(message, "customizations")
+        end)
+
+      assert log =~ "Order payload invalid"
+    end
   end
 
   describe "update_order/2" do

@@ -5,6 +5,7 @@ defmodule Kaffebase.Orders.Order do
   alias Kaffebase.EctoTypes.StringList
   alias Kaffebase.Ids
 
+  @states [:received, :production, :completed, :dispatched]
   @primary_key {:id, :string, autogenerate: false}
   @timestamps_opts [type: :utc_datetime_usec, inserted_at: :created, updated_at: :updated]
 
@@ -14,9 +15,7 @@ defmodule Kaffebase.Orders.Order do
     field :items, StringList, default: []
     field :missing_information, :boolean, source: :missing_information
 
-    field :state, Ecto.Enum,
-      values: [:received, :production, :completed, :dispatched],
-      source: :state
+    field :state, Ecto.Enum, values: @states, source: :state
 
     timestamps()
   end
@@ -28,6 +27,8 @@ defmodule Kaffebase.Orders.Order do
     |> maybe_put_id()
     |> validate_required([:items, :state])
   end
+
+  def states, do: @states
 
   defp maybe_put_id(changeset) do
     case fetch_field(changeset, :id) do
