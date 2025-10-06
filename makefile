@@ -5,14 +5,23 @@ export
 
 default: dev
 
-dev: .env.development kaffebase/kaffebase_dev.db
-	docker compose watch
+dev: .env.development migrate-up
+	docker compose watch app backend
 
-build:
-	PUBLIC_BACKEND_URL=$(PUBLIC_BACKEND_URL) npx vite build
+logs:
+	docker-compose logs -f backend app
 
+
+migrate-up: kaffebase/kaffebase_dev.db
+	@docker compose run --rm backend mix ecto.migrate
+
+migrate-down:
+	@docker compose run --rm backend mix ecto.rollback
+
+
+# sync the database from github release
 kaffebase/kaffebase_dev.db:
-	docker compose run --rm tools sh -lc ' \
+	@docker compose run --rm tools sh -lc ' \
 		REPO=$${GITHUB_REPO:-Kaffe-diem/kaffediem}; \
 		TAG=$${GITHUB_RELEASE_TAG:-latest}; \
 		echo "📦 Fetching release from $$REPO @ $$TAG..."; \
@@ -30,7 +39,7 @@ kaffebase/kaffebase_dev.db:
 		wget -q -O /tmp/backup.zip "$$ZIP_URL"; \
 		echo "📦 Extracting..."; \
 		unzip -o /tmp/backup.zip -d /tmp/backup_extract; \
-		DB_FILE=$$(find /tmp/backup_extract -name "*.db" -o -name "data.db" | head -1); \
+		DB_FILE=$$(find /tmp/backup_extract -name "data.db" | head -1); \
 		if [ -z "$$DB_FILE" ]; then \
 			echo "❌ No .db file found in archive"; \
 			rm -rf /tmp/backup.zip /tmp/backup_extract; \
@@ -42,14 +51,12 @@ kaffebase/kaffebase_dev.db:
 		echo "✅ Database sync complete!"; \
 	'
 
+
 # ordinarily run as part of NPM pipeline.
 # Run manually, since we're not relying on that
 # https://svelte.dev/docs/kit/cli
 svelte_types:
 	@docker compose run --rm tools bunx svelte-kit sync
-
-logs-be:
-	   docker-compose logs -f backend
 
 .env.development: .env.development.example
 	@cp .env.development.example .env.development
@@ -70,13 +77,6 @@ clean:
 	-rm -rf ./kaffebase/priv/log
 	-rm -rf ./kaffebase/priv/test
 	-rm -rf ./kaffebase/priv/test_coverage
-
-_hooks: .git/.hooks_installed
-
-.git/.hooks_installed:
-	@git config core.hooksPath .githooks
-	@chmod +x .githooks/* || true
-	@touch $@
-
-backend_migrate:
-	docker compose run --rm backend mix ecto.migrate
+	-rm -rf ./kaffebase/kaffebase_dev.db
+	-rm -rf ./kaffebase/kaffebase_dev.db-shm
+	-rm -rf ./kaffebase/kaffebase_dev.db-wal
