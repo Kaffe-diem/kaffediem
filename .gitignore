@@ -25,9 +25,6 @@ vite.config.ts.timestamp-*
 # Schema
 src/lib/pocketbase/index.d.ts
 
-# Pocketbase
-pb_data
-
 # Playwright
 /test-results/
 /playwright-report/
