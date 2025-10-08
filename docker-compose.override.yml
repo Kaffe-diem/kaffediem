@@ -31,11 +31,11 @@ services:
         - action: sync
           path: ./kaffebase/priv
           target: /app/priv
-        
+
         - action: sync+restart
           path: ./kaffebase/config
           target: /app/config
-        
+
         - action: rebuild
           path: ./kaffebase/mix.exs
 

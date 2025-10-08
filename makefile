@@ -5,11 +5,14 @@ export
 
 default: dev
 
-dev: .env.development migrate-up
+dev: .env.development migrate-up deps svelte_types
 	docker compose watch app backend
 
 logs:
-	docker-compose logs -f backend app
+	docker compose logs -f backend app
+
+deps:
+	docker compose run --rm tools bun install --frozen-lockfile
 
 
 migrate-up: kaffebase/kaffebase_dev.db
@@ -55,16 +58,16 @@ kaffebase/kaffebase_dev.db:
 # ordinarily run as part of NPM pipeline.
 # Run manually, since we're not relying on that
 # https://svelte.dev/docs/kit/cli
-svelte_types:
+svelte_types: deps
 	@docker compose run --rm tools bunx svelte-kit sync
 
 .env.development: .env.development.example
 	@cp .env.development.example .env.development
 
-format:
+format: deps
 	@docker compose run --rm tools bunx prettier --write .
 
-lint:
+lint: deps
 	docker compose run --rm tools sh -c "bunx svelte-kit sync && bunx svelte-check --tsconfig ./tsconfig.json && bunx eslint src && bunx prettier --check ."
 
 clean:

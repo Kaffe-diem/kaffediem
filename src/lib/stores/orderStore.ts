@@ -10,15 +10,19 @@ const actionHistory: {
 }[] = [];
 
 const getTodayISO = () => {
-  const [date] = new Date().toISOString().split('T');
-  return date || '';
+  const [date] = new Date().toISOString().split("T");
+  return date || "";
 };
 
-const ordersStore = createCollectionCrud(Collections.Order, {
-  fromWire: Order.fromApi
-}, {
-  from_date: getTodayISO()
-});
+const ordersStore = createCollectionCrud(
+  Collections.Order,
+  {
+    fromWire: Order.fromApi
+  },
+  {
+    from_date: getTodayISO()
+  }
+);
 
 export const raw_orders = ordersStore;
 

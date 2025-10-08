@@ -9,23 +9,17 @@ import {
   ItemCustomization
 } from "$lib/types";
 
-export const categories = createCollectionCrud(
-  Collections.Category,
-  {
-    fromWire: Category.fromApi
-  }
-);
+export const categories = createCollectionCrud(Collections.Category, {
+  fromWire: Category.fromApi
+});
 
 export const getCategoryById = (categoryId: string): Category | undefined => {
   return get(categories).find((value) => value.id === categoryId);
 };
 
-export const items = createCollectionCrud(
-  Collections.Item,
-  {
-    fromWire: Item.fromApi
-  }
-);
+export const items = createCollectionCrud(Collections.Item, {
+  fromWire: Item.fromApi
+});
 
 export const itemsByCategory = derived(items, ($items) =>
   $items.reduce((acc: Record<string, Item[]>, item: Item) => {
@@ -35,19 +29,13 @@ export const itemsByCategory = derived(items, ($items) =>
   }, {})
 );
 
-export const customizationKeys = createCollectionCrud(
-  Collections.CustomizationKey,
-  {
-    fromWire: CustomizationKey.fromApi
-  }
-);
+export const customizationKeys = createCollectionCrud(Collections.CustomizationKey, {
+  fromWire: CustomizationKey.fromApi
+});
 
-export const customizationValues = createCollectionCrud(
-  Collections.CustomizationValue,
-  {
-    fromWire: CustomizationValue.fromApi
-  }
-);
+export const customizationValues = createCollectionCrud(Collections.CustomizationValue, {
+  fromWire: CustomizationValue.fromApi
+});
 
 export const customizationsByKey = derived(customizationValues, ($customizationValues) =>
   $customizationValues.reduce((acc: Record<string, CustomizationValue[]>, item) => {
@@ -57,9 +45,6 @@ export const customizationsByKey = derived(customizationValues, ($customizationV
   }, {})
 );
 
-export const itemCustomizations = createCollectionCrud(
-  Collections.ItemCustomization,
-  {
-    fromWire: ItemCustomization.fromApi
-  }
-);
+export const itemCustomizations = createCollectionCrud(Collections.ItemCustomization, {
+  fromWire: ItemCustomization.fromApi
+});

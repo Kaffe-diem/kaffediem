@@ -34,7 +34,7 @@ export default auth;
 export async function login(email: string, password: string) {
   try {
     const session = await apiLogin(email, password);
-    
+
     if (!session?.data) {
       throw new Error("Ugyldig påloggingsinformasjon");
     }

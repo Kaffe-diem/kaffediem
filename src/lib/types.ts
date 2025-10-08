@@ -1,5 +1,4 @@
 import {
-  Collections,
   OrderStateOptions,
   type RecordIdString,
   type CategoryDTO,
@@ -262,9 +261,10 @@ export class Status implements RecordBase {
     const lookupId = status.message_id ?? inlineMessage?.id ?? "";
     const resolved = messages.find((m) => m.id === lookupId) ?? inlineMessage ?? Message.baseValue;
 
-    const mergedMessages = inlineMessage && !messages.find((m) => m.id === inlineMessage.id)
-      ? [...messages, inlineMessage]
-      : messages;
+    const mergedMessages =
+      inlineMessage && !messages.find((m) => m.id === inlineMessage.id)
+        ? [...messages, inlineMessage]
+        : messages;
 
     return new Status(status.id, resolved, mergedMessages, status.open, status.show_message);
   }

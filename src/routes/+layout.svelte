@@ -10,6 +10,7 @@
   import { hideNavbar, hideFooter } from "$lib/constants";
 
   import { writable, get } from "svelte/store";
+  import { onMount } from "svelte";
 
   const isOnline = writable(true);
 
@@ -21,9 +22,12 @@
     isOnline.set(navigator.onLine);
   }
 
+  onMount(updateOnlineStatus);
 
   let { children } = $props();
 </script>
+
+<svelte:window on:online={updateOnlineStatus} on:offline={updateOnlineStatus} />
 
 <RouteGuard>
   {#if !$isOnline}

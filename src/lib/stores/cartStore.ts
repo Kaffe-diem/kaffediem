@@ -1,5 +1,5 @@
 /**
- * This module is the only store that does not map to a PocketBase collection,
+ * This module is the only store that does not map to a database table,
  * making the naming slightly misleading, even though it is a proper Svelte store.
  * TODO: Rename to reflect its purpose more clearly.
  */

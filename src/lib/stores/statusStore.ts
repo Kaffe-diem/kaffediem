@@ -10,12 +10,9 @@ export const messages = createCollectionCrud(Collections.Message, {
   fromWire: Message.fromApi
 });
 
-const statusSource = createCollectionStore(
-  Collections.Status,
-  {
-    fromWire: (data) => Status.fromApi(data, get(messages))
-  }
-);
+const statusSource = createCollectionStore(Collections.Status, {
+  fromWire: (data) => Status.fromApi(data, get(messages))
+});
 
 const { subscribe, set } = writable(Status.baseValue);
 

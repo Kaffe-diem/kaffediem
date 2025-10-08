@@ -3,6 +3,7 @@
   import { page } from "$app/stores";
   import auth from "$stores/authStore";
   import { restrictedRoutes, adminRoutes } from "$lib/constants";
+  import { resolve } from "$app/paths";
 
   let { children }: { children?: import("svelte").Snippet } = $props();
 
@@ -14,9 +15,9 @@
     const requiresAdmin = adminRoutes.some((route) => currentPath.startsWith(route));
 
     if (isRestricted && !$auth.isAuthenticated) {
-      goto("/login");
+      goto(resolve("/login"));
     } else if (requiresAdmin && !$auth.user.isAdmin) {
-      goto("/");
+      goto(resolve("/"));
     }
   });
 </script>

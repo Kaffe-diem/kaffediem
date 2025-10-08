@@ -11,13 +11,14 @@
   async function login() {
     isSubmitting = true;
     errorMessage = "";
-    
+
     try {
       await loginUser(email, password);
       goto(resolve("/"));
     } catch (error) {
       console.error("Login error:", error);
-      errorMessage = error instanceof Error ? error.message : "Kunne ikke logge inn. Sjekk e-post og passord.";
+      errorMessage =
+        error instanceof Error ? error.message : "Kunne ikke logge inn. Sjekk e-post og passord.";
     } finally {
       isSubmitting = false;
     }
@@ -26,15 +27,15 @@
 
 <div class="flex justify-center">
   <form on:submit|preventDefault={login} method="post" class="flex w-lg flex-col gap-4">
-    <h1 class="text-2xl font-bold text-center mb-4">Logg inn</h1>
-    
+    <h1 class="mb-4 text-center text-2xl font-bold">Logg inn</h1>
+
     <label class="input w-full">
       <span class="label">E-post</span>
-      <input 
-        bind:value={email} 
-        name="email" 
-        type="email" 
-        placeholder="mail@example.com" 
+      <input
+        bind:value={email}
+        name="email"
+        type="email"
+        placeholder="mail@example.com"
         required
         disabled={isSubmitting}
       />
@@ -42,11 +43,11 @@
 
     <label class="input w-full">
       <span class="label">Passord</span>
-      <input 
-        bind:value={password} 
-        name="password" 
-        type="password" 
-        placeholder="Passord" 
+      <input
+        bind:value={password}
+        name="password"
+        type="password"
+        placeholder="Passord"
         required
         disabled={isSubmitting}
       />

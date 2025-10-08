@@ -9,11 +9,11 @@
 
   let { children, class: className = "" }: Props = $props();
 
-  const destination = $derived($auth.isAuthenticated ? resolve("/logout") : resolve("/login"));
+  const destination = $derived($auth.isAuthenticated ? "/logout" : "/login");
   const defaultLabel = $derived($auth.isAuthenticated ? "Logg ut" : "Logg inn");
 </script>
 
-<a href={destination} class={className}>
+<a href={resolve(destination)} class={className}>
   {#if children}
     {@render children()}
   {:else}

@@ -5,4 +5,3 @@ RUN apk add --no-cache \
     ca-certificates \
     wget \
     sqlite
-
