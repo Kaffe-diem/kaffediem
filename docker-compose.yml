@@ -4,7 +4,6 @@ services:
       context: ./kaffebase
       dockerfile: Dockerfile
     working_dir: /app
-    command: mix phx.server
     volumes:
       - backend_deps:/app/deps
       - backend_build:/app/_build
