@@ -14,13 +14,17 @@ logs:
 deps:
 	docker compose run --rm tools bun install --frozen-lockfile
 
-
 migrate-up: kaffebase/kaffebase_dev.db
 	@docker compose run --rm backend mix ecto.migrate
 
 migrate-down:
 	@docker compose run --rm backend mix ecto.rollback
 
+# run the prod configuration locally
+# Make sure to run with the correct docker-compose file
+prod: migrate-up deps svelte_types
+	@docker-compose -f docker-compose.yml up -d backend app
+	@docker-compose -f docker-compose.yml logs -f backend app
 
 # sync the database from github release
 kaffebase/kaffebase_dev.db:
