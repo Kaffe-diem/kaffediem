@@ -103,10 +103,9 @@ export const applyDefaults = () => {
 
   for (const key of keys) {
     const current = selected[key.id] ?? [];
+    const defaultValue = values.find((val) => val.id === key.defaultValue);
 
-    const defaultValue = values.find((val) => val.id === key.defaultValue)!;
-
-    if (current.length === 0 && key.defaultValue && defaultValue.enabled) {
+    if (current.length === 0 && key.defaultValue && defaultValue?.enabled) {
       selected[key.id] = [defaultValue];
     }
   }
