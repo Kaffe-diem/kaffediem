@@ -20,16 +20,29 @@ type ChangeEvent = {
   record: any;
 };
 
+type CollectionChange<RecordClass extends RecordBase> = {
+  event: ChangeEvent;
+  record: RecordClass;
+};
+
+type CollectionStoreConfig<RecordClass extends RecordBase> = {
+  options?: Record<string, string>;
+  onChange?: (change: CollectionChange<RecordClass>) => void;
+};
+
 export function createCollectionStore<
   Collection extends Collections,
   RecordClass extends RecordBase
 >(
   collection: Collection,
   handlers: CollectionHandlers<RecordClass>,
-  options: Record<string, string> = {}
+  config: CollectionStoreConfig<RecordClass> = {}
 ) {
   const { subscribe, set, update } = writable<RecordClass[]>([]);
   let subscription: Subscription | null = null;
+
+  const options = config.options ?? {};
+  const onChange = config.onChange;
 
   if (browser) {
     const socket = getSocket();
@@ -58,7 +71,16 @@ export function createCollectionStore<
       const listener = (event: ChangeEvent) => {
         if (!event || !event.record) return;
 
-        update((items) => applyChange(items, event, handlers));
+        const mapped = event.action === "delete" ? null : handlers.fromWire(event.record);
+
+        if (mapped) {
+          onChange?.({
+            event,
+            record: mapped
+          });
+        }
+
+        update((items) => applyChange(items, event, handlers, mapped ?? undefined));
       };
 
       const changeRef = channel.on("change", listener);
@@ -85,9 +107,9 @@ export function createCollectionCrud<
 >(
   collection: Collection,
   handlers: CollectionHandlers<RecordClass>,
-  options: Record<string, string> = {}
+  config: CollectionStoreConfig<RecordClass> = {}
 ) {
-  const store = createCollectionStore(collection, handlers, options);
+  const store = createCollectionStore(collection, handlers, config);
 
   return {
     ...store,
@@ -107,11 +129,12 @@ export function createCollectionCrud<
 function applyChange<RecordClass extends RecordBase>(
   items: RecordClass[],
   event: ChangeEvent,
-  handlers: CollectionHandlers<RecordClass>
+  handlers: CollectionHandlers<RecordClass>,
+  mappedRecord?: RecordClass
 ) {
   const next = [...items];
-  const index = next.findIndex((item) => item.id === event.record.id);
-  const mapped = handlers.fromWire(event.record);
+  const recordId = event.record?.id ?? mappedRecord?.id;
+  const index = recordId ? next.findIndex((item) => item.id === recordId) : -1;
 
   switch (event.action) {
     case "delete":
@@ -120,6 +143,7 @@ function applyChange<RecordClass extends RecordBase>(
 
     case "create":
     case "update":
+      const mapped = mappedRecord ?? handlers.fromWire(event.record);
       if (index !== -1) {
         next[index] = mapped;
       } else {

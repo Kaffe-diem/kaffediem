@@ -2,6 +2,7 @@ import { createCollectionCrud, sendCollectionRequest } from "$stores/websocketSt
 import { Collections, type RecordIdString, State, Order } from "$lib/types";
 import { get } from "svelte/store";
 import { type CartItem } from "$stores/cartStore";
+import { toasts } from "$stores/toastStore";
 
 const actionHistory: {
   action: "updateState";
@@ -20,7 +21,15 @@ const ordersStore = createCollectionCrud(
     fromWire: Order.fromApi
   },
   {
-    from_date: getTodayISO()
+    options: {
+      from_date: getTodayISO()
+    },
+    onChange: ({ event, record }) => {
+      if (event.action !== "create") return;
+      const orderNumber = record.dayId ?? record.id;
+      const suffix = orderNumber ? ` #${orderNumber}` : "";
+      toasts.success(`${suffix}`);
+    }
   }
 );
 
