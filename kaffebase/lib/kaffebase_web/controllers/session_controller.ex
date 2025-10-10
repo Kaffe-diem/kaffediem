@@ -84,5 +84,4 @@ defmodule KaffebaseWeb.SessionController do
   defp dev_auto_login? do
     Application.get_env(:kaffebase, :dev_auto_login, false)
   end
-
 end

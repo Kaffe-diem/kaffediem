@@ -4,6 +4,17 @@ defmodule KaffebaseWeb.Router do
   import Backpex.Router
   import KaffebaseWeb.UserAuth
 
+  @admin_pipe_through if Application.compile_env(:kaffebase, :dev_auto_login, false),
+                        do: [:browser],
+                        else: [:browser, :admin_auth]
+
+  @admin_on_mount_hooks if Application.compile_env(:kaffebase, :dev_auto_login, false),
+                          do: [Backpex.InitAssigns],
+                          else: [
+                            {KaffebaseWeb.UserAuth, :require_authenticated},
+                            Backpex.InitAssigns
+                          ]
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -12,6 +23,7 @@ defmodule KaffebaseWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :fetch_current_scope_for_user
+    plug Backpex.ThemeSelectorPlug
   end
 
   pipeline :api do
@@ -19,9 +31,27 @@ defmodule KaffebaseWeb.Router do
     plug :fetch_session
   end
 
-  scope "/", KaffebaseWeb do
-    pipe_through :browser
+  pipeline :admin_auth do
+    plug :require_authenticated_user
+  end
+
+  scope "/admin", KaffebaseWeb do
+    pipe_through @admin_pipe_through
+
     backpex_routes()
+
+    get "/", AdminRedirectController, :redirect_to_items
+
+    live_session :admin, on_mount: @admin_on_mount_hooks do
+      live_resources "/items", Backpex.ItemLive
+      live_resources "/categories", Backpex.CategoryLive
+      live_resources "/customization-keys", Backpex.CustomizationKeyLive
+      live_resources "/customization-values", Backpex.CustomizationValueLive
+      live_resources "/item-customizations", Backpex.ItemCustomizationLive
+      live_resources "/orders", Backpex.OrderLive
+      live_resources "/messages", Backpex.MessageLive
+      live_resources "/statuses", Backpex.StatusLive
+    end
   end
 
   scope "/", KaffebaseWeb do

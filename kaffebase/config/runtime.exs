@@ -21,14 +21,13 @@ if System.get_env("PHX_SERVER") do
 end
 
 if config_env() == :prod do
-
   # we have the database in docker volume since we use sqlite
   # database_url =
-    # System.get_env("DATABASE_URL") ||
-    #   raise """
-    #   environment variable DATABASE_URL is missing.
-    #   For example: ecto://USER:PASS@HOST/DATABASE
-    #   """
+  # System.get_env("DATABASE_URL") ||
+  #   raise """
+  #   environment variable DATABASE_URL is missing.
+  #   For example: ecto://USER:PASS@HOST/DATABASE
+  #   """
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 

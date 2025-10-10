@@ -7,7 +7,10 @@
 # General application configuration
 import Config
 
-config :backpex, pubsub_server: Kaffebase.PubSub
+config :backpex,
+  pubsub_server: Kaffebase.PubSub,
+  translator_function: {KaffebaseWeb.CoreComponents, :translate_backpex},
+  error_translator_function: {KaffebaseWeb.CoreComponents, :translate_error}
 
 config :kaffebase,
   ecto_repos: [Kaffebase.Repo],

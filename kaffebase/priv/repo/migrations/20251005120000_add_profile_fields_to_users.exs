@@ -9,7 +9,10 @@ defmodule Kaffebase.Repo.Migrations.AddProfileFieldsToUsers do
     end
 
     execute("UPDATE users SET name = COALESCE(name, 'User')")
-    execute("UPDATE users SET username = 'user-' || substr(hex(randomblob(8)), 1, 8) WHERE username IS NULL")
+
+    execute(
+      "UPDATE users SET username = 'user-' || substr(hex(randomblob(8)), 1, 8) WHERE username IS NULL"
+    )
 
     create unique_index(:users, [:username])
   end

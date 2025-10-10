@@ -30,5 +30,4 @@ defmodule Kaffebase.Orders.DayId do
     next_day_start = DateTime.add(day_start, 86_400, :second)
     {:ok, {day_start, next_day_start}}
   end
-
 end

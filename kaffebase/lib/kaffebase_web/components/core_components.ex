@@ -1,4 +1,4 @@
-  defmodule KaffebaseWeb.CoreComponents do
+defmodule KaffebaseWeb.CoreComponents do
   @moduledoc """
   Provides core UI components.
 
@@ -469,4 +469,10 @@
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
+
+  def translate_backpex({msg, opts}),
+    do: Gettext.dgettext(KaffebaseWeb.Gettext, "backpex", msg, opts)
+
+  def translate_backpex(msg) when is_binary(msg),
+    do: Gettext.dgettext(KaffebaseWeb.Gettext, "backpex", msg)
 end

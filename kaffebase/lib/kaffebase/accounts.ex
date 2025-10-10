@@ -54,6 +54,7 @@ defmodule Kaffebase.Accounts do
 
       nil ->
         attrs = default_dev_admin_attrs()
+
         with {:ok, user} <- register_user(attrs),
              {:ok, {user, _}} <- update_user_password(user, %{password: attrs.password}) do
           # Mark as confirmed and admin

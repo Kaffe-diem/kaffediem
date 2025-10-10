@@ -7,6 +7,7 @@ defmodule Kaffebase.Catalog do
 
   alias Kaffebase.Repo
   alias Kaffebase.CollectionNotifier
+  require Logger
 
   alias Kaffebase.Catalog.{
     Category,
@@ -61,10 +62,30 @@ defmodule Kaffebase.Catalog do
 
   @spec list_items(keyword()) :: [Item.t()]
   def list_items(opts \\ []) do
-    Item
-    |> maybe_filter(:category, opts[:category] || opts[:category_id])
-    |> maybe_apply_order(opts[:order_by] || [asc: :sort_order, asc: :name])
-    |> Repo.all()
+    category_filter = opts[:category] || opts[:category_id]
+    order = opts[:order_by] || [asc: :sort_order, asc: :name]
+
+    query =
+      Item
+      |> maybe_filter(:category, category_filter)
+      |> maybe_apply_order(order)
+
+    Logger.debug("catalog.list_items.query",
+      collection: "item",
+      category: category_filter,
+      order: order
+    )
+
+    items = Repo.all(query)
+
+    Logger.debug("catalog.list_items.result",
+      collection: "item",
+      category: category_filter,
+      order: order,
+      count: length(items)
+    )
+
+    items
   end
 
   @spec get_item!(String.t()) :: Item.t()

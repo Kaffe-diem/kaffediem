@@ -8,13 +8,17 @@ defmodule KaffebaseWeb.CollectionChannel do
   @impl true
   def join("collection:" <> collection, payload, socket) do
     options = Map.get(payload, "options", %{})
-    Logger.info("Client joining collection:#{collection} with options: #{inspect(options)}")
+    Logger.info("collection.join.start", collection: collection, options: options)
 
     items = load_collection(collection, options)
-    Logger.info("Loaded #{length(items)} items for collection:#{collection}")
+    item_count = length(items)
+    Logger.info("collection.join.loaded", collection: collection, count: item_count)
 
     serialized_items = DomainJSON.render(items)
-    Logger.info("Serialized #{length(serialized_items)} items for collection:#{collection}")
+    Logger.debug("collection.join.serialized",
+      collection: collection,
+      count: length(serialized_items)
+    )
 
     response = %{
       "items" => serialized_items,
@@ -41,7 +45,11 @@ defmodule KaffebaseWeb.CollectionChannel do
     }
 
     topic = "collection:" <> collection
-    Logger.info("Broadcasting #{action} to #{topic}")
+    Logger.info("collection.broadcast_change",
+      collection: collection,
+      action: action,
+      topic: topic
+    )
 
     KaffebaseWeb.Endpoint.broadcast(topic, "change", payload)
   end
