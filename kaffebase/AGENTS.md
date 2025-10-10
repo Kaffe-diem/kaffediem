@@ -1,5 +1,11 @@
 This is a web application written using the Phoenix web framework.
 
+## Logging guidelines
+
+- Prefer structured, low-noise messages. Use the pattern `<context>.<event>` (for example, `catalog.list_items.result`) and attach rich details via Logger metadata, e.g. `Logger.info("catalog.list_items.result", collection: "item", count: count)`.
+- Pick the appropriate log level (`debug` for noisy diagnostics, `info` for high-level lifecycle events, `warn` for recoverable issues) so observability tools and OpenTelemetry spans stay actionable.
+- Avoid string interpolation in messages; rely on metadata instead so downstream log processors can parse fields consistently.
+
 ## Elixir guidelines
 
 - Elixir lists **do not support index based access via the access syntax**
