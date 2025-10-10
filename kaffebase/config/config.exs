@@ -7,6 +7,8 @@
 # General application configuration
 import Config
 
+config :backpex, pubsub_server: Kaffebase.PubSub
+
 config :kaffebase,
   ecto_repos: [Kaffebase.Repo],
   generators: [timestamp_type: :utc_datetime]

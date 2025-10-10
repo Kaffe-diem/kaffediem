@@ -54,7 +54,7 @@ config :kaffebase, KaffebaseWeb.Endpoint,
 # different ports.
 
 # Watch static and templates for browser reloading.
-  config :kaffebase, KaffebaseWeb.Endpoint,
+config :kaffebase, KaffebaseWeb.Endpoint,
   live_reload: [
     web_console_logger: true,
     patterns: [

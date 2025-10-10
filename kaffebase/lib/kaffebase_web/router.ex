@@ -1,6 +1,7 @@
 defmodule KaffebaseWeb.Router do
   use KaffebaseWeb, :router
 
+  import Backpex.Router
   import KaffebaseWeb.UserAuth
 
   pipeline :browser do
@@ -16,6 +17,11 @@ defmodule KaffebaseWeb.Router do
   pipeline :api do
     plug :accepts, ["json"]
     plug :fetch_session
+  end
+
+  scope "/", KaffebaseWeb do
+    pipe_through :browser
+    backpex_routes()
   end
 
   scope "/", KaffebaseWeb do
