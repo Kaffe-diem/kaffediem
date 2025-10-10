@@ -5,16 +5,24 @@ export
 
 default: dev
 
-dev: .env.development migrate-up deps svelte_types
+DB_FILE := kaffebase/kaffebase_dev.db
+
+dev: .env.development deps migrate-up svelte_types
+	docker compose watch app backend
+
+dev-no-cache: .env.development clean deps migrate-up svelte_types
+	@docker compose build --pull --no-cache backend app tools
+	@echo "🚀 Starting dev stack (no cache)..."
 	docker compose watch app backend
 
 logs:
 	docker compose logs -f backend app
 
-deps:
+deps: ensure-dev-db
+	docker compose run --rm backend mix deps.get
 	docker compose run --rm tools bun install --frozen-lockfile
 
-migrate-up: kaffebase/kaffebase_dev.db
+migrate-up: ensure-dev-db
 	@docker compose run --rm backend mix ecto.migrate
 
 migrate-down:
@@ -27,8 +35,13 @@ prod: migrate-up deps svelte_types
 	@docker-compose -f docker-compose.yml logs -f backend app
 
 # sync the database from github release
-kaffebase/kaffebase_dev.db:
-	@docker compose run --rm tools sh -lc ' \
+ensure-dev-db:
+	@if [ -d "$(DB_FILE)" ]; then \
+		echo "⚠️  Removing directory placeholder at $(DB_FILE)"; \
+		rm -rf "$(DB_FILE)"; \
+	fi
+	@if [ ! -f "$(DB_FILE)" ]; then \
+		docker compose run --rm tools sh -lc ' \
 		REPO=$${GITHUB_REPO:-Kaffe-diem/kaffediem}; \
 		TAG=$${GITHUB_RELEASE_TAG:-latest}; \
 		echo "📦 Fetching release from $$REPO @ $$TAG..."; \
@@ -56,7 +69,10 @@ kaffebase/kaffebase_dev.db:
 		cp "$$DB_FILE" kaffebase/kaffebase_dev.db; \
 		rm -rf /tmp/backup.zip /tmp/backup_extract; \
 		echo "✅ Database sync complete!"; \
-	'
+	'; \
+	else \
+		echo "ℹ️  Using existing dev database at $(DB_FILE)"; \
+	fi
 
 
 # ordinarily run as part of NPM pipeline.
@@ -69,21 +85,25 @@ svelte_types: deps
 	@cp .env.development.example .env.development
 
 format: deps
-	@docker compose run --rm tools bunx prettier --write .
+	@docker compose run --rm tools bunx prettier --write . & \
+	docker compose run --rm backend mix format & \
+	wait
 
 lint: deps
 	docker compose run --rm tools sh -c "bunx svelte-kit sync && bunx svelte-check --tsconfig ./tsconfig.json && bunx eslint src && bunx prettier --check ."
 
 clean:
-	-docker volume rm kaffediem_backend_build kaffediem_backend_deps
-	-docker compose down -v --remove-orphans
-	-rm -rf ./kaffebase/_build
-	-rm -rf ./kaffebase/deps
-	-rm -rf ./kaffebase/priv/static
-	-rm -rf ./kaffebase/priv/cache
-	-rm -rf ./kaffebase/priv/log
-	-rm -rf ./kaffebase/priv/test
-	-rm -rf ./kaffebase/priv/test_coverage
-	-rm -rf ./kaffebase/kaffebase_dev.db
-	-rm -rf ./kaffebase/kaffebase_dev.db-shm
-	-rm -rf ./kaffebase/kaffebase_dev.db-wal
+	@echo "🧹 Stopping containers and clearing build artifacts..."
+	-@docker compose down -v --remove-orphans
+	-@docker compose rm -sfv
+	-@rm -rf node_modules
+	-@rm -rf .svelte-kit
+	-@rm -rf ./kaffebase/_build
+	-@rm -rf ./kaffebase/deps
+	-@rm -rf ./kaffebase/priv/static
+	-@rm -rf ./kaffebase/priv/cache
+	-@rm -rf ./kaffebase/priv/log
+	-@rm -rf ./kaffebase/priv/test
+	-@rm -rf ./kaffebase/priv/test_coverage
+	-@rm -rf ./kaffebase/kaffebase_dev.db*
+	@echo "✅ Clean slate ready."
