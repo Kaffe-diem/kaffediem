@@ -27,8 +27,7 @@ const ordersStore = createCollectionCrud(
     onChange: ({ event, record }) => {
       if (event.action !== "create") return;
       const orderNumber = record.dayId ?? record.id;
-      const suffix = orderNumber ? ` #${orderNumber}` : "";
-      toasts.success(`${suffix}`);
+      toasts.success(`${orderNumber || ""}`);
     }
   }
 );
