@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { OrderStateOptions } from "$lib/pocketbase";
+  import { OrderStateOptions } from "$lib/types";
   import OrderList from "../OrderList.svelte";
   import orders from "$stores/orderStore";
 

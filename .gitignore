@@ -16,6 +16,7 @@ Thumbs.db
 !.env.example
 !.env.test
 !.env.development.example
+!*.db
 
 # Vite
 vite.config.js.timestamp-*
@@ -24,5 +25,9 @@ vite.config.ts.timestamp-*
 # Schema
 src/lib/pocketbase/index.d.ts
 
-# Pocketbase
-pb_data
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/

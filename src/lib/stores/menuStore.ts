@@ -1,6 +1,6 @@
 import { derived, get } from "svelte/store";
-import { createGenericPbStore } from "$stores/pbStore";
-import { Collections } from "$lib/pocketbase";
+import { createCollectionCrud } from "$stores/websocketStore";
+import { Collections } from "$lib/types";
 import {
   Item,
   Category,
@@ -9,16 +9,16 @@ import {
   ItemCustomization
 } from "$lib/types";
 
-export const categories = await createGenericPbStore(Collections.Category, Category, {
-  sort: "sort_order, name"
+export const categories = createCollectionCrud(Collections.Category, {
+  fromWire: Category.fromApi
 });
 
 export const getCategoryById = (categoryId: string): Category | undefined => {
   return get(categories).find((value) => value.id === categoryId);
 };
 
-export const items = await createGenericPbStore(Collections.Item, Item, {
-  sort: "sort_order, name"
+export const items = createCollectionCrud(Collections.Item, {
+  fromWire: Item.fromApi
 });
 
 export const itemsByCategory = derived(items, ($items) =>
@@ -29,18 +29,14 @@ export const itemsByCategory = derived(items, ($items) =>
   }, {})
 );
 
-export const customizationKeys = await createGenericPbStore(
-  Collections.CustomizationKey,
-  CustomizationKey,
-  { sort: "sort_order, name" }
-);
-export const customizationValues = await createGenericPbStore(
-  Collections.CustomizationValue,
-  CustomizationValue,
-  {
-    sort: "sort_order, name"
-  }
-);
+export const customizationKeys = createCollectionCrud(Collections.CustomizationKey, {
+  fromWire: CustomizationKey.fromApi
+});
+
+export const customizationValues = createCollectionCrud(Collections.CustomizationValue, {
+  fromWire: CustomizationValue.fromApi
+});
+
 export const customizationsByKey = derived(customizationValues, ($customizationValues) =>
   $customizationValues.reduce((acc: Record<string, CustomizationValue[]>, item) => {
     acc[item.belongsTo] ||= [];
@@ -49,10 +45,6 @@ export const customizationsByKey = derived(customizationValues, ($customizationV
   }, {})
 );
 
-export const itemCustomizations = await createGenericPbStore(
-  Collections.ItemCustomization,
-  ItemCustomization,
-  {
-    expand: "key,value"
-  }
-);
+export const itemCustomizations = createCollectionCrud(Collections.ItemCustomization, {
+  fromWire: ItemCustomization.fromApi
+});

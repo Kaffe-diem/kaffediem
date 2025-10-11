@@ -2,6 +2,22 @@
   import { categories, itemsByCategory } from "$stores/menuStore";
   import type { Item, Category } from "$lib/types";
   import { handleSelectedItemChange, selectedItemId } from "$stores/cartStore";
+
+  $effect(() => {
+    if ($selectedItemId) return;
+
+    for (const category of $categories) {
+      if (category.enabled) {
+        const items = $itemsByCategory[category.id] ?? [];
+        const firstItem = items.find((item) => item.enabled);
+        if (firstItem) {
+          selectedItemId.set(firstItem.id);
+          handleSelectedItemChange();
+          break;
+        }
+      }
+    }
+  });
 </script>
 
 <div class="flex h-full flex-col overflow-x-hidden overflow-y-auto">

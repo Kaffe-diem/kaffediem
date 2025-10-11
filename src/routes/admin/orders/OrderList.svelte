@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { OrderStateOptions } from "$lib/pocketbase";
+  import type { OrderStateOptions } from "$lib/types";
   import orders from "$stores/orderStore";
   import { customizationKeys } from "$lib/stores/menuStore";
   import type { CustomizationKey, CustomizationValue, Order, OrderItem } from "$lib/types";
@@ -66,6 +66,8 @@
       : 'bg-base-200 cursor-pointer'}  {order.missingInformation && detailed
       ? 'bg-warning ring-warning'
       : ''} mb-6 block rounded shadow-md transition-colors"
+    data-testid="order-row"
+    data-order-number={orderNumber}
     onclick={() => onclick && orders.updateState(order.id, onclick)}
     role="button"
     tabindex="0"

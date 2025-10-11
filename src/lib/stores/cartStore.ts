@@ -1,5 +1,5 @@
 /**
- * This module is the only store that does not map to a PocketBase collection,
+ * This module is the only store that does not map to a database table,
  * making the naming slightly misleading, even though it is a proper Svelte store.
  * TODO: Rename to reflect its purpose more clearly.
  */
@@ -15,7 +15,7 @@ import {
 } from "./menuStore";
 import { sumBy, groupBy, updateAt } from "$lib/utils";
 import { finalPrice } from "$lib/pricing";
-import type { RecordIdString } from "$lib/pocketbase";
+import type { RecordIdString } from "$lib/types";
 
 export interface CartItem extends Item {
   customizations: CustomizationValue[];
@@ -103,10 +103,9 @@ export const applyDefaults = () => {
 
   for (const key of keys) {
     const current = selected[key.id] ?? [];
+    const defaultValue = values.find((val) => val.id === key.defaultValue);
 
-    const defaultValue = values.find((val) => val.id === key.defaultValue)!;
-
-    if (current.length === 0 && key.defaultValue && defaultValue.enabled) {
+    if (current.length === 0 && key.defaultValue && defaultValue?.enabled) {
       selected[key.id] = [defaultValue];
     }
   }

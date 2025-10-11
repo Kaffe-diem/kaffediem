@@ -1,18 +1,23 @@
-import pb, {
-  type RecordIdString,
+import {
   OrderStateOptions,
-  type ItemResponse,
-  type MessageResponse,
-  type OrderResponse,
-  type OrderItemResponse,
-  type CategoryResponse,
-  type StatusResponse,
-  type CustomizationKeyResponse,
-  type CustomizationValueResponse,
-  type ItemCustomizationResponse
-} from "$lib/pocketbase";
+  type RecordIdString,
+  type CategoryDTO,
+  type CustomizationKeyDTO,
+  type CustomizationValueDTO,
+  type ItemCustomizationDTO,
+  type ItemDTO,
+  type MessageDTO,
+  type OrderDTO,
+  type OrderItemDTO,
+  type StatusDTO
+} from "$lib/api/contracts";
 import { restrictedRoutes, adminRoutes } from "$lib/constants";
-import type { AuthModel } from "pocketbase";
+
+type BackendUserRecord = {
+  id?: RecordIdString;
+  name?: string;
+  is_admin?: boolean;
+};
 
 type NavItems = "/account" | "/admin";
 
@@ -32,12 +37,13 @@ export class NavItem {
 
 type State = OrderStateOptions;
 export { OrderStateOptions as State };
+export { OrderStateOptions, Collections } from "$lib/api/contracts";
+export type { RecordIdString } from "$lib/api/contracts";
 
 export interface RecordBase {
   id: RecordIdString;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  toPb(): any;
-  // fromPb(data: any): RecordClass; // can't have static methods in interface https://github.com/microsoft/TypeScript/issues/13462
+  toApi(): any;
 }
 
 export class User {
@@ -47,17 +53,13 @@ export class User {
     public readonly isAdmin: boolean
   ) {}
 
-  static fromPb(data: AuthModel): User {
+  static fromBackend(data: BackendUserRecord | null): User {
     if (!data) {
       return new User("", "", false);
     }
-    return new User(data?.id, data?.name, data?.is_admin);
+    return new User(data?.id ?? "", data?.name ?? "", data?.is_admin ?? false);
   }
 }
-
-export type ExpandedOrderRecord = OrderResponse & {
-  expand: { items: ExpandedOrderItemRecord[] };
-};
 
 export class Order implements RecordBase {
   constructor(
@@ -65,73 +67,77 @@ export class Order implements RecordBase {
     public readonly state: State,
     public readonly items: Array<OrderItem>,
     public readonly missingInformation: boolean,
-    public readonly dayId: number
+    public readonly dayId: number,
+    public readonly customerId: RecordIdString | null,
+    public readonly createdAt?: string,
+    public readonly updatedAt?: string
   ) {}
 
-  // FIXME: implement correctly
-  toPb() {
+  toApi() {
     return {
       state: this.state,
-      items: this.items,
       missing_information: this.missingInformation,
-      day_id: this.dayId
+      items: this.items.map((item) => item.toApi())
     };
   }
 
-  static fromPb(data: ExpandedOrderRecord): Order {
+  static fromApi(data: OrderDTO): Order {
+    const items = data.items?.map(OrderItem.fromApi) ?? [];
     return new Order(
       data.id,
       data.state,
-      data.expand.items.map(OrderItem.fromPb),
+      items,
       data.missing_information,
-      data.day_id
+      data.day_id,
+      data.customer_id ?? null,
+      data.created,
+      data.updated
     );
   }
 }
 
-export type ExpandedOrderItemRecord = OrderItemResponse & {
-  expand: {
-    item: ItemResponse;
-    customization?: Array<ExpandedItemCustomizationRecord>;
-  };
-};
-
 export class OrderItem implements RecordBase {
   constructor(
     public readonly id: RecordIdString,
-    public readonly name: string,
     public readonly item: Item,
-    public readonly customizations: CustomizationValue[] = []
+    public readonly customizations: CustomizationValue[] = [],
+    public readonly customizationIds: RecordIdString[] = []
   ) {}
 
-  toPb() {
-    const customizationIds =
-      this.customizations && this.customizations.length > 0
-        ? this.customizations.map((c) => c.id)
-        : undefined;
-
+  toApi() {
     return {
-      name: this.name,
-      item: this.item.id,
-      customization: customizationIds
+      item_id: this.item.id,
+      customizations: this.customizations
+        .filter((customization) => Boolean(customization.belongsTo))
+        .map((customization) => ({
+          key_id: customization.belongsTo!,
+          value: customization.id
+        }))
     };
   }
 
-  static fromPb(data: ExpandedOrderItemRecord): OrderItem {
-    const customizations: CustomizationValue[] = [];
+  static fromApi(data: OrderItemDTO): OrderItem {
+    const item = data.item ? Item.fromApi(data.item) : Item.empty();
 
-    data.expand?.customization?.forEach((customizationRecord) => {
-      customizationRecord.expand?.value?.forEach((valueRecord) => {
-        customizations.push(CustomizationValue.fromPb(valueRecord));
+    const customizations = (data.customizations ?? []).flatMap((customization) => {
+      const values = customization.values ?? [];
+      return values.map((value) => {
+        const mapped = CustomizationValue.fromApi(value);
+
+        // Ensure the value is linked to the correct key id even if the payload omits it.
+        return new CustomizationValue(
+          mapped.id,
+          mapped.name,
+          mapped.priceChange,
+          mapped.constantPrice,
+          customization.key_id ?? mapped.belongsTo,
+          mapped.enabled,
+          mapped.sortOrder
+        );
       });
     });
 
-    return new OrderItem(
-      data.id,
-      data.expand.item.name,
-      Item.fromPb(data.expand.item),
-      customizations
-    );
+    return new OrderItem(data.id, item, customizations, data.customization_ids ?? []);
   }
 }
 
@@ -148,7 +154,7 @@ export class Item implements RecordBase {
     public readonly imageFile: File | null = null // file with uploaded image contents
   ) {}
 
-  toPb() {
+  toApi() {
     // Looks like FormData is necessary when dealing with files.
     const formData = new FormData();
     formData.append("name", this.name);
@@ -164,23 +170,23 @@ export class Item implements RecordBase {
     return formData;
   }
 
-  static fromPb(data: ItemResponse): Item {
+  static fromApi(data: ItemDTO): Item {
     return new Item(
       data.id,
       data.name,
       data.price_nok,
       data.category,
-      data.image,
-      pb.files.getURL(data, data.image),
+      data.image ?? "",
+      resolveFileUrl(data.image),
       data.enable,
       data.sort_order
     );
   }
-}
 
-export type ExpandedCategoryRecord = CategoryResponse & {
-  expand: { item_via_category: ItemResponse[] };
-};
+  static empty(): Item {
+    return new Item("", "", 0, "", "", "", false, 0);
+  }
+}
 
 export class Category implements RecordBase {
   constructor(
@@ -191,7 +197,7 @@ export class Category implements RecordBase {
     public readonly validCustomizations: string[]
   ) {}
 
-  toPb() {
+  toApi() {
     return {
       name: this.name,
       sort_order: this.sortOrder,
@@ -200,7 +206,7 @@ export class Category implements RecordBase {
     };
   }
 
-  static fromPb(data: ExpandedCategoryRecord): Category {
+  static fromApi(data: CategoryDTO): Category {
     return new Category(
       data.id,
       data.name,
@@ -211,6 +217,12 @@ export class Category implements RecordBase {
   }
 }
 
+const resolveFileUrl = (fileName?: string | null) => {
+  if (!fileName) return "";
+  if (fileName.startsWith("http")) return fileName;
+  return fileName;
+};
+
 export class Message implements RecordBase {
   constructor(
     public readonly id: RecordIdString,
@@ -220,12 +232,12 @@ export class Message implements RecordBase {
 
   static baseValue = new Message("", "", "");
 
-  toPb() {
+  toApi() {
     return { title: this.title, subtitle: this.subtitle };
   }
 
-  static fromPb(data: MessageResponse): Message {
-    return new Message(data.id, data.title, data.subtitle);
+  static fromApi(data: MessageDTO): Message {
+    return new Message(data.id, data.title ?? "", data.subtitle ?? "");
   }
 }
 
@@ -240,18 +252,21 @@ export class Status implements RecordBase {
 
   static baseValue = new Status("", Message.baseValue, [Message.baseValue], false, false);
 
-  toPb() {
-    return { message: this.message.id, open: this.open, show_message: this.showMessage };
+  toApi() {
+    return { message_id: this.message.id, open: this.open, show_message: this.showMessage };
   }
 
-  static fromPb(status: StatusResponse, messages: Message[]): Status {
-    return new Status(
-      status.id,
-      messages.filter((m) => m.id == status.message)[0] || Message.baseValue,
-      messages,
-      status.open,
-      status.show_message
-    );
+  static fromApi(status: StatusDTO, messages: Message[]): Status {
+    const inlineMessage = status.message ? Message.fromApi(status.message) : null;
+    const lookupId = status.message_id ?? inlineMessage?.id ?? "";
+    const resolved = messages.find((m) => m.id === lookupId) ?? inlineMessage ?? Message.baseValue;
+
+    const mergedMessages =
+      inlineMessage && !messages.find((m) => m.id === inlineMessage.id)
+        ? [...messages, inlineMessage]
+        : messages;
+
+    return new Status(status.id, resolved, mergedMessages, status.open, status.show_message);
   }
 }
 
@@ -266,7 +281,7 @@ export class CustomizationKey implements RecordBase {
     public readonly sortOrder: number
   ) {}
 
-  toPb() {
+  toApi() {
     return {
       name: this.name,
       enable: this.enabled,
@@ -277,13 +292,13 @@ export class CustomizationKey implements RecordBase {
     };
   }
 
-  static fromPb(data: CustomizationKeyResponse): CustomizationKey {
+  static fromApi(data: CustomizationKeyDTO): CustomizationKey {
     return new CustomizationKey(
       data.id,
       data.name || "",
       data.enable,
-      data.label_color,
-      data.default_value,
+      data.label_color ?? "",
+      data.default_value ?? "",
       data.multiple_choice,
       data.sort_order
     );
@@ -301,7 +316,7 @@ export class CustomizationValue implements RecordBase {
     public readonly sortOrder: number
   ) {}
 
-  toPb() {
+  toApi() {
     return {
       name: this.name,
       // TODO: rename in db:
@@ -313,7 +328,7 @@ export class CustomizationValue implements RecordBase {
     };
   }
 
-  static fromPb(data: CustomizationValueResponse): CustomizationValue {
+  static fromApi(data: CustomizationValueDTO): CustomizationValue {
     return new CustomizationValue(
       data.id,
       data.name,
@@ -326,32 +341,29 @@ export class CustomizationValue implements RecordBase {
   }
 }
 
-export type ExpandedItemCustomizationRecord = ItemCustomizationResponse & {
-  expand: {
-    key?: CustomizationKeyResponse;
-    value?: CustomizationValueResponse[];
-  };
-};
-
 export class ItemCustomization implements RecordBase {
   constructor(
     public readonly id: RecordIdString,
+    public readonly keyId: RecordIdString,
+    public readonly valueIds: RecordIdString[],
     public readonly key?: CustomizationKey,
     public readonly values?: CustomizationValue[]
   ) {}
 
-  toPb() {
+  toApi() {
     return {
-      key: this.key?.id,
-      value: this.values?.map((v) => v.id)
+      key_id: this.keyId,
+      value_ids: this.valueIds
     };
   }
 
-  static fromPb(data: ExpandedItemCustomizationRecord): ItemCustomization {
+  static fromApi(data: ItemCustomizationDTO): ItemCustomization {
     return new ItemCustomization(
       data.id,
-      data.expand.key ? CustomizationKey.fromPb(data.expand.key) : undefined,
-      data.expand.value ? data.expand.value.map(CustomizationValue.fromPb) : undefined
+      data.key_id,
+      data.value_ids ?? [],
+      data.key ? CustomizationKey.fromApi(data.key) : undefined,
+      data.values ? data.values.map(CustomizationValue.fromApi) : undefined
     );
   }
 }
