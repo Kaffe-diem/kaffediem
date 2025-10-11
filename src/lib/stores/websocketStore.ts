@@ -142,7 +142,7 @@ function applyChange<RecordClass extends RecordBase>(
       break;
 
     case "create":
-    case "update":
+    case "update": {
       const mapped = mappedRecord ?? handlers.fromWire(event.record);
       if (index !== -1) {
         next[index] = mapped;
@@ -150,6 +150,7 @@ function applyChange<RecordClass extends RecordBase>(
         next.push(mapped);
       }
       break;
+    }
   }
 
   return next;
