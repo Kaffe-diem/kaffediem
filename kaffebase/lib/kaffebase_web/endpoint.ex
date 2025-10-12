@@ -57,8 +57,10 @@ defmodule KaffebaseWeb.Endpoint do
 
   plug CORSPlug,
     origin: [
-      # production
+      # production, frontend
       "https://kaffediem.okpl.us",
+      # production, backend + admin system
+      "https://kaffebase.okpl.us",
       # internal docker names
       "http://app:3000",
       "http://app:5173",
