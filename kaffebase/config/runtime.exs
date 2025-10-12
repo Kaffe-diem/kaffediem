@@ -30,11 +30,13 @@ if config_env() == :prod do
     #   For example: ecto://USER:PASS@HOST/DATABASE
     #   """
 
+  database_path = System.get_env("DATABASE_PATH") || "/app/data/kaffebase_prod.db"
+
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
   config :kaffebase, Kaffebase.Repo,
     # ssl: true,
-    database: Path.expand("../kaffebase_prod.db", Path.dirname(__ENV__.file)),
+    database: database_path,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     # For machines with several cores, consider starting multiple pools of `pool_size`
     # pool_count: 4,
