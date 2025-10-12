@@ -7,6 +7,7 @@ services:
     volumes:
       - backend_deps:/app/deps
       - backend_build:/app/_build
+      - backend_data:/app/data
     ports:
       - "4000:4000"
 
@@ -42,3 +43,4 @@ volumes:
   tools_node_modules:
   backend_deps:
   backend_build:
+  backend_data:
