@@ -6,7 +6,7 @@ primary_region = "arn"
   PHX_SERVER = "true"
   PHX_HOST = "https://kaffediem-kaffebase.fly.dev"
   PORT = "4000"
-  DATABASE_PATH = "/app/data/remote.db"
+  DATABASE_PATH = "/app/data/kaffebase_prod.db"
   PHX_ALLOWED_ORIGINS = "https://kaffebase.okpl.us,https://kaffediem.okpl.us,https://kaffediem-kaffebase.fly.dev"
 
 [deploy]
