@@ -9,8 +9,8 @@ services:
       - backend_deps:/app/deps
       - backend_build:/app/_build
       - ./kaffebase/kaffebase_dev.db:/app/kaffebase_dev.db
-      - ./kaffebase/kaffebase_dev.db.db-shm:/app/kaffebase_dev.db.db-shm
-      - ./kaffebase/kaffebase_dev.db.db-wal:/app/kaffebase_dev.db.db-wal
+      - ./kaffebase/kaffebase_dev.db-shm:/app/kaffebase_dev.db-shm
+      - ./kaffebase/kaffebase_dev.db-wal:/app/kaffebase_dev.db-wal
     environment:
       - MIX_ENV=dev
     stdin_open: true
