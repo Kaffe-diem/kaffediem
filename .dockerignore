@@ -1,2 +1,6 @@
+.git
 node_modules
-npm-debug.log
+frontend/node_modules
+frontend/.svelte-kit
+frontend/playwright-report
+frontend/test-results
