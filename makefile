@@ -65,8 +65,9 @@ kaffebase/kaffebase_dev.db:
 svelte_types: deps
 	@docker compose run --rm tools bunx svelte-kit sync
 
+# copy, remove the comment lines of the example file
 .env.development: .env.development.example
-	@cp .env.development.example .env.development
+	@tail -n +4 .env.development.example > .env.development	
 
 format: deps
 	@docker compose run --rm tools bunx prettier --write .
@@ -76,14 +77,16 @@ lint: deps
 
 clean:
 	-docker volume rm kaffediem_backend_build kaffediem_backend_deps
+	-docker compose run --rm tools sh -c '\
+	  rm -rf ./kaffebase/_build && \
+	  rm -rf ./kaffebase/deps && \
+	  rm -rf ./kaffebase/priv/static && \
+	  rm -rf ./kaffebase/priv/cache && \
+	  rm -rf ./kaffebase/priv/log && \
+	  rm -rf ./kaffebase/priv/test && \
+	  rm -rf ./kaffebase/priv/test_coverage && \
+	  rm -rf ./kaffebase/kaffebase_dev.db && \
+	  rm -rf ./kaffebase/kaffebase_dev.db-shm && \
+	  rm -rf ./kaffebase/kaffebase_dev.db-wal \
+	'
 	-docker compose down -v --remove-orphans
-	-rm -rf ./kaffebase/_build
-	-rm -rf ./kaffebase/deps
-	-rm -rf ./kaffebase/priv/static
-	-rm -rf ./kaffebase/priv/cache
-	-rm -rf ./kaffebase/priv/log
-	-rm -rf ./kaffebase/priv/test
-	-rm -rf ./kaffebase/priv/test_coverage
-	-rm -rf ./kaffebase/kaffebase_dev.db
-	-rm -rf ./kaffebase/kaffebase_dev.db-shm
-	-rm -rf ./kaffebase/kaffebase_dev.db-wal
