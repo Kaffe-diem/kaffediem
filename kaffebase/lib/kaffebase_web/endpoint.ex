@@ -8,7 +8,8 @@ defmodule KaffebaseWeb.Endpoint do
     store: :cookie,
     key: "_kaffebase_key",
     signing_salt: "zOysi0w2",
-    same_site: "Lax"
+    same_site: "None",
+    secure: true
   ]
 
   socket "/live", Phoenix.LiveView.Socket,
