@@ -1,4 +1,4 @@
-# Kaffediem på Svelte 🧨
+# Kaffe-elixir med Svelte 🧨
 
 Dette er kaffe-diem sitt system for å selge kaffe. Bygget med kjærlighet av elever fra [Amalie Skram](https://www.amalieskram.vgs.no).
 
@@ -10,17 +10,10 @@ Dette prosjektet har blitt utviklet på kodekafe. [Bli med på Discord!](https:/
 
 ## Kjøre lokalt
 
-Det er nyttig å enten ha Linux eller WSL.
+Du bør ha WSL eller Linux, systemet kjører i Docker.
 
 1. Last ned [docker](https://www.docker.com/)
 
-2. .env
-
-```
-PUBLIC_BACKEND_URL=https://kaffebase.example
-PUBLIC_BACKEND_WS=wss://kaffebase.example/socket
-BACKEND_URL=https://kaffebase.example
-```
 
 2. Bygg og kjør appen
 
