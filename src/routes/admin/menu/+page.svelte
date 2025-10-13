@@ -35,20 +35,22 @@
       </div>
     </div>
     <ul class="list-none">
-      {#each $itemsByCategory[category.id] ?? [] as item (item.id)}
-        {@render ItemCard({ item })}
+      {#each $itemsByCategory[category.id] ?? [] as item, index (item.id)}
+        {@render ItemCard({ item, index, total: $itemsByCategory[category.id].length })}
       {/each}
     </ul>
   </div>
 {/snippet}
 
-{#snippet ItemCard({ item }: { item: Item })}
+{#snippet ItemCard({ item, index, total }: { item: Item, index: number, total: number })}
   <li class="m-2 flex flex-row justify-between">
     <span class="text-xl">{item.name}</span>
-    <div class="flex flex-row items-center gap-4">
+    <div class="flex flex-row items-center gap-2">
       {#if !item.enabled}
         <span class="badge badge-xl badge-soft badge-neutral">Deaktivert</span>
       {/if}
+      <button class="btn btn-ghost text-xl" disabled={index == total - 1}>↓</button>
+      <button class="btn btn-ghost text-xl" disabled={index == 0}>↑</button>
       <a href={resolve(`/admin/menu/item/${item.id}`)} class="btn btn-lg">Rediger</a>
     </div>
   </li>
