@@ -14,7 +14,6 @@ Du bør ha WSL eller Linux, systemet kjører i Docker.
 
 1. Last ned [docker](https://www.docker.com/)
 
-
 2. Bygg og kjør appen
 
 ```bash
