@@ -4,12 +4,14 @@ defmodule KaffebaseWeb.Endpoint do
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
+  @max_cookie_age_in_days 14
   @session_options [
     store: :cookie,
     key: "_kaffebase_key",
     signing_salt: "zOysi0w2",
     same_site: "None",
-    secure: true
+    secure: true,
+    max_age: @max_cookie_age_in_days * 24 * 60 * 60,
   ]
 
   socket "/live", Phoenix.LiveView.Socket,
