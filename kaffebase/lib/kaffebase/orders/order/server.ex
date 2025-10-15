@@ -1,4 +1,4 @@
-defmodule Kaffebase.Orders.Process.Server do
+defmodule Kaffebase.Orders.Order.Server do
   @moduledoc """
   GenServer that manages a single order's state and lifecycle.
   """
