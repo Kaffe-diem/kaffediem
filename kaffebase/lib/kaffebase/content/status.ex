@@ -39,3 +39,19 @@ defmodule Kaffebase.Content.Status do
     end
   end
 end
+
+defimpl Jason.Encoder, for: Kaffebase.Content.Status do
+  def encode(status, opts) do
+    Jason.Encode.map(
+      %{
+        id: status.id,
+        open: status.open,
+        show_message: status.show_message,
+        message_id: status.message,
+        created: status.created,
+        updated: status.updated
+      },
+      opts
+    )
+  end
+end

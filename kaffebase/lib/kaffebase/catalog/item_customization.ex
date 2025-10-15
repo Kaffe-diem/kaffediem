@@ -31,3 +31,18 @@ defmodule Kaffebase.Catalog.ItemCustomization do
     end
   end
 end
+
+defimpl Jason.Encoder, for: Kaffebase.Catalog.ItemCustomization do
+  def encode(customization, opts) do
+    Jason.Encode.map(
+      %{
+        id: customization.id,
+        key_id: customization.key,
+        value_ids: customization.value || [],
+        created: customization.created,
+        updated: customization.updated
+      },
+      opts
+    )
+  end
+end
