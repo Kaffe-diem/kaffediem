@@ -2,31 +2,29 @@ defmodule KaffebaseWeb.OrderItemController do
   use KaffebaseWeb, :controller
 
   alias Kaffebase.Orders
-  alias KaffebaseWeb.{ControllerHelpers, DomainJSON}
 
   action_fallback KaffebaseWeb.FallbackController
 
   def create(conn, params) do
-    attrs = ControllerHelpers.atomize_keys(params)
 
-    with {:ok, order_item} <- Orders.create_order_item(attrs) do
+    with {:ok, order_item} <- Orders.create_order_item(params) do
       conn
       |> put_status(:created)
-      |> json(DomainJSON.render(order_item))
+      |> json(order_item)
     end
   end
 
   def show(conn, %{"id" => id}) do
     order_item = Orders.get_order_item!(id)
-    json(conn, DomainJSON.render(order_item))
+    json(conn, order_item)
   end
 
   def update(conn, %{"id" => id} = params) do
     order_item = Orders.get_order_item!(id)
-    attrs = ControllerHelpers.atomize_keys(Map.delete(params, "id"))
+    attrs = Map.delete(params, "id")
 
     with {:ok, order_item} <- Orders.update_order_item(order_item, attrs) do
-      json(conn, DomainJSON.render(order_item))
+      json(conn, order_item)
     end
   end
 

@@ -2,36 +2,33 @@ defmodule KaffebaseWeb.CategoryController do
   use KaffebaseWeb, :controller
 
   alias Kaffebase.Catalog
-  alias KaffebaseWeb.{ControllerHelpers, DomainJSON}
 
   action_fallback KaffebaseWeb.FallbackController
 
   def index(conn, _params) do
     categories = Catalog.list_categories()
-    json(conn, DomainJSON.render(categories))
+    json(conn, categories)
   end
 
   def create(conn, params) do
-    attrs = ControllerHelpers.atomize_keys(params)
-
-    with {:ok, category} <- Catalog.create_category(attrs) do
+    with {:ok, category} <- Catalog.create_category(params) do
       conn
       |> put_status(:created)
-      |> json(DomainJSON.render(category))
+      |> json(category)
     end
   end
 
   def show(conn, %{"id" => id}) do
     category = Catalog.get_category!(id)
-    json(conn, DomainJSON.render(category))
+    json(conn, category)
   end
 
   def update(conn, %{"id" => id} = params) do
     category = Catalog.get_category!(id)
-    attrs = ControllerHelpers.atomize_keys(Map.delete(params, "id"))
+    attrs = Map.delete(params, "id")
 
     with {:ok, category} <- Catalog.update_category(category, attrs) do
-      json(conn, DomainJSON.render(category))
+      json(conn, category)
     end
   end
 

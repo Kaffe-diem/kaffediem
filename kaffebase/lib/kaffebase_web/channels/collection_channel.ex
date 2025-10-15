@@ -3,7 +3,6 @@ defmodule KaffebaseWeb.CollectionChannel do
   require Logger
 
   alias Kaffebase.{Catalog, Content, Orders}
-  alias KaffebaseWeb.DomainJSON
 
   @impl true
   def join("collection:" <> collection, payload, socket) do
@@ -13,11 +12,8 @@ defmodule KaffebaseWeb.CollectionChannel do
     items = load_collection(collection, options)
     Logger.info("Loaded #{length(items)} items for collection:#{collection}")
 
-    serialized_items = DomainJSON.render(items)
-    Logger.info("Serialized #{length(serialized_items)} items for collection:#{collection}")
-
     response = %{
-      "items" => serialized_items,
+      "items" => items,
       "page" => 1,
       "perPage" => length(items),
       "totalItems" => length(items),
@@ -33,11 +29,9 @@ defmodule KaffebaseWeb.CollectionChannel do
   end
 
   def broadcast_change(collection, action, record) do
-    serialized = DomainJSON.render(record)
-
     payload = %{
       "action" => action,
-      "record" => serialized
+      "record" => record
     }
 
     topic = "collection:" <> collection

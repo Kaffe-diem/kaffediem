@@ -2,7 +2,6 @@ defmodule KaffebaseWeb.CustomizationValueController do
   use KaffebaseWeb, :controller
 
   alias Kaffebase.Catalog
-  alias KaffebaseWeb.{ControllerHelpers, DomainJSON}
 
   action_fallback KaffebaseWeb.FallbackController
 
@@ -12,30 +11,29 @@ defmodule KaffebaseWeb.CustomizationValueController do
     values =
       Catalog.list_customization_values(belongs_to: belongs_to)
 
-    json(conn, DomainJSON.render(values))
+    json(conn, values)
   end
 
   def create(conn, params) do
-    attrs = ControllerHelpers.atomize_keys(params)
 
-    with {:ok, value} <- Catalog.create_customization_value(attrs) do
+    with {:ok, value} <- Catalog.create_customization_value(params) do
       conn
       |> put_status(:created)
-      |> json(DomainJSON.render(value))
+      |> json(value)
     end
   end
 
   def show(conn, %{"id" => id}) do
     value = Catalog.get_customization_value!(id)
-    json(conn, DomainJSON.render(value))
+    json(conn, value)
   end
 
   def update(conn, %{"id" => id} = params) do
     value = Catalog.get_customization_value!(id)
-    attrs = ControllerHelpers.atomize_keys(Map.delete(params, "id"))
+    attrs = Map.delete(params, "id")
 
     with {:ok, value} <- Catalog.update_customization_value(value, attrs) do
-      json(conn, DomainJSON.render(value))
+      json(conn, value)
     end
   end
 
