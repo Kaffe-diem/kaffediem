@@ -67,6 +67,9 @@ defmodule Kaffebase.Catalog do
     |> Repo.all()
   end
 
+  @spec get_item(String.t()) :: Item.t() | nil
+  def get_item(id), do: Repo.get(Item, id)
+
   @spec get_item!(String.t()) :: Item.t()
   def get_item!(id), do: Repo.get!(Item, id)
 
@@ -104,6 +107,9 @@ defmodule Kaffebase.Catalog do
     |> maybe_apply_order(opts[:order_by] || [asc: :sort_order, asc: :name])
     |> Repo.all()
   end
+
+  @spec get_customization_key(String.t()) :: CustomizationKey.t() | nil
+  def get_customization_key(id), do: Repo.get(CustomizationKey, id)
 
   @spec get_customization_key!(String.t()) :: CustomizationKey.t()
   def get_customization_key!(id), do: Repo.get!(CustomizationKey, id)
@@ -147,6 +153,9 @@ defmodule Kaffebase.Catalog do
     |> maybe_apply_order(opts[:order_by] || [asc: :sort_order, asc: :name])
     |> Repo.all()
   end
+
+  @spec get_customization_value(String.t()) :: CustomizationValue.t() | nil
+  def get_customization_value(id), do: Repo.get(CustomizationValue, id)
 
   @spec get_customization_value!(String.t()) :: CustomizationValue.t()
   def get_customization_value!(id), do: Repo.get!(CustomizationValue, id)
