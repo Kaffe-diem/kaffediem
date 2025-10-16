@@ -6,7 +6,13 @@ defmodule Kaffebase.Orders.PlaceOrder do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Kaffebase.Catalog
+  alias Kaffebase.Catalog.{
+    Crud,
+    CustomizationKey,
+    CustomizationValue
+  }
+
+  alias Kaffebase.Catalog.Item, as: CatalogItem
   alias Kaffebase.Orders.Order
 
   @states Order.states()
@@ -90,7 +96,7 @@ defmodule Kaffebase.Orders.PlaceOrder do
         add_error(changeset, :item, "is required")
 
       item_id ->
-        case Catalog.get_item(item_id) do
+        case Crud.get(CatalogItem, item_id) do
           nil ->
             add_error(changeset, :item, "not found")
 
@@ -131,9 +137,9 @@ defmodule Kaffebase.Orders.PlaceOrder do
   defp build_customizations_snapshot(_), do: []
 
   defp snapshot_customization(%ItemCustomization{key: key_id, value: value_ids}) do
-    with %{} = key <- Catalog.get_customization_key(key_id) do
+    with %{} = key <- Crud.get(CustomizationKey, key_id) do
       for value_id <- value_ids,
-          value = Catalog.get_customization_value(value_id),
+          value = Crud.get(CustomizationValue, value_id),
           not is_nil(value) do
         snapshot_customization_value(key, value)
       end

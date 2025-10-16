@@ -28,7 +28,9 @@ defmodule Kaffebase.Catalog.Crud do
   def get(schema, id) when is_atom(schema), do: Repo.get(schema, id)
   def get!(schema, id) when is_atom(schema), do: Repo.get!(schema, id)
 
-  def create(schema, attrs, collection) when is_atom(schema) do
+  def create(schema, attrs, collection \\ nil) when is_atom(schema) do
+    collection = collection || schema_source(schema)
+
     schema
     |> struct()
     |> schema.changeset(attrs)
@@ -36,14 +38,18 @@ defmodule Kaffebase.Catalog.Crud do
     |> notify_change(collection, "create")
   end
 
-  def update(schema, record, attrs, collection) when is_atom(schema) do
+  def update(schema, record, attrs, collection \\ nil) when is_atom(schema) do
+    collection = collection || schema_source(schema)
+
     record
     |> schema.changeset(attrs)
     |> Repo.update()
     |> notify_change(collection, "update")
   end
 
-  def delete(_schema, record, collection) do
+  def delete(schema, record, collection \\ nil) when is_atom(schema) do
+    collection = collection || schema_source(schema)
+
     record
     |> Repo.delete()
     |> notify_delete(collection)
@@ -94,4 +100,8 @@ defmodule Kaffebase.Catalog.Crud do
   end
 
   defp notify_delete(result, _collection), do: result
+
+  defp schema_source(schema) do
+    schema.__schema__(:source)
+  end
 end

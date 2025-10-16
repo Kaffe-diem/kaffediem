@@ -2,7 +2,16 @@ defmodule KaffebaseWeb.CollectionChannel do
   use Phoenix.Channel
   require Logger
 
-  alias Kaffebase.{Catalog, Content, Orders}
+  alias Kaffebase.Catalog.{
+    Category,
+    CustomizationKey,
+    CustomizationValue,
+    Item,
+    ItemCustomization,
+    Crud
+  }
+
+  alias Kaffebase.{Content, Orders}
 
   @impl true
   def join("collection:" <> collection, payload, socket) do
@@ -51,28 +60,31 @@ defmodule KaffebaseWeb.CollectionChannel do
   end
 
   defp load_collection("category", _options) do
-    Catalog.list_categories()
+    Crud.list(Category)
   end
 
   defp load_collection("item", options) do
-    Catalog.list_items(category: option(options, "category") || option(options, "category_id"))
+    category_id = option(options, "category") || option(options, "category_id")
+    opts = build_filter_opts(:category, category_id)
+    Crud.list(Item, opts)
   end
 
   defp load_collection("customization_key", _options) do
-    Catalog.list_customization_keys()
+    Crud.list(CustomizationKey)
   end
 
   defp load_collection("customization_value", options) do
-    Catalog.list_customization_values(
-      belongs_to:
-        option(options, "belongs_to") ||
-          option(options, "key") ||
-          option(options, "key_id")
-    )
+    belongs_to =
+      option(options, "belongs_to") ||
+        option(options, "key") ||
+        option(options, "key_id")
+
+    opts = build_filter_opts(:belongs_to, belongs_to)
+    Crud.list(CustomizationValue, opts)
   end
 
   defp load_collection("item_customization", _options) do
-    Catalog.list_item_customizations()
+    Crud.list(ItemCustomization, [order_by: []], [])
   end
 
   defp load_collection("message", _options) do
@@ -116,4 +128,7 @@ defmodule KaffebaseWeb.CollectionChannel do
 
   defp maybe_put(opts, _key, nil), do: opts
   defp maybe_put(opts, key, value), do: Keyword.put(opts, key, value)
+
+  defp build_filter_opts(_field, nil), do: []
+  defp build_filter_opts(field, value), do: [filter: {field, value}]
 end
