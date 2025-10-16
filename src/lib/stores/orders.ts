@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import { createCollection, apiPost, apiPatch } from "./collection";
-import { orderFromApi, type OrderState, type RecordIdString } from "$lib/types";
+import { orderFromApi, type OrderState } from "$lib/types";
 import { toasts } from "$stores/toastStore";
 
 type CreateOrderPayload = {
@@ -34,7 +34,7 @@ const undoStack: { orderId: string; previousState: OrderState }[] = [];
 
 // Order operations
 export async function createOrder(
-  customerId: RecordIdString | number,
+  customerId: string | number,
   items: { id: string; customizations?: { id: string; belongsTo?: string }[] }[],
   missingInfo: boolean
 ): Promise<void> {
