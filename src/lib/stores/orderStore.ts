@@ -49,9 +49,13 @@ export default {
   ...ordersStore,
   reset: ordersStore.reset,
 
-  create: async (userId: RecordIdString | number, items: CartItem[], missingInformation: boolean) => {
+  create: async (
+    userId: RecordIdString | number,
+    items: CartItem[],
+    missingInformation: boolean
+  ) => {
     const payload = {
-      customer_id: userId,
+      customer_id: typeof userId === "number" ? userId : parseInt(userId, 10),
       items: serializeCartItems(items),
       state: State.received,
       missing_information: missingInformation
