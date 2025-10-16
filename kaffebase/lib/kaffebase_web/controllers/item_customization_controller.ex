@@ -6,12 +6,12 @@ defmodule KaffebaseWeb.ItemCustomizationController do
   action_fallback KaffebaseWeb.FallbackController
 
   def index(conn, _params) do
-    customizations = Catalog.list_item_customizations(preload: [:key, :values])
+    customizations = Catalog.list_item_customizations()
     json(conn, customizations)
   end
 
   def show(conn, %{"id" => id}) do
-    customization = Catalog.get_item_customization!(id, preload: [:key, :values])
+    customization = Catalog.get_item_customization!(id)
     json(conn, customization)
   end
 

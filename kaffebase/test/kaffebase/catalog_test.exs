@@ -58,35 +58,17 @@ defmodule Kaffebase.CatalogTest do
   end
 
   describe "item customizations" do
-    test "list_item_customizations/1 with preloads populates expand" do
-      key = CatalogFixtures.customization_key_fixture()
-      value = CatalogFixtures.customization_value_fixture(%{key: key})
-      customization = CatalogFixtures.item_customization_fixture(%{key: key, values: [value]})
-
-      [loaded] = Catalog.list_item_customizations(preload: [:key, :values])
-      assert loaded.id == customization.id
-      assert %CustomizationKey{id: key_id} = loaded.expand.key
-      assert key_id == key.id
-
-      assert [%CustomizationValue{id: value_id}] = loaded.expand.value
-      assert value_id == value.id
-    end
-
-    test "list_item_customizations_by_ids/2 filters and preloads" do
+    test "list_item_customizations_by_ids/2 filters by ids" do
       key = CatalogFixtures.customization_key_fixture()
       value = CatalogFixtures.customization_value_fixture(%{key: key})
       customization = CatalogFixtures.item_customization_fixture(%{key: key, values: [value]})
       _other = CatalogFixtures.item_customization_fixture()
 
-      [loaded] =
-        Catalog.list_item_customizations_by_ids([customization.id], preload: [:key, :values])
+      [loaded] = Catalog.list_item_customizations_by_ids([customization.id])
 
       assert loaded.id == customization.id
-      assert %CustomizationKey{id: key_id} = loaded.expand.key
-      assert key_id == key.id
-
-      assert [%CustomizationValue{id: value_id}] = loaded.expand.value
-      assert value_id == value.id
+      assert loaded.key == key.id
+      assert loaded.value == [value.id]
     end
   end
 end

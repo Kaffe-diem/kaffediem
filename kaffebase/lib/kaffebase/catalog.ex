@@ -192,29 +192,21 @@ defmodule Kaffebase.Catalog do
 
   # Item customizations -------------------------------------------------------
 
-  @spec list_item_customizations(keyword()) :: [ItemCustomization.t()]
-  def list_item_customizations(opts \\ []) do
-    ItemCustomization
-    |> Repo.all()
-    |> maybe_attach(:key, opts)
-    |> maybe_attach(:values, opts)
+  @spec list_item_customizations() :: [ItemCustomization.t()]
+  def list_item_customizations do
+    Repo.all(ItemCustomization)
   end
 
-  @spec list_item_customizations_by_ids([String.t()], keyword()) :: [ItemCustomization.t()]
-  def list_item_customizations_by_ids(ids, opts \\ []) when is_list(ids) do
+  @spec list_item_customizations_by_ids([String.t()]) :: [ItemCustomization.t()]
+  def list_item_customizations_by_ids(ids) when is_list(ids) do
     ItemCustomization
     |> where([ic], ic.id in ^ids)
     |> Repo.all()
-    |> maybe_attach(:key, opts)
-    |> maybe_attach(:values, opts)
   end
 
-  @spec get_item_customization!(String.t(), keyword()) :: ItemCustomization.t()
-  def get_item_customization!(id, opts \\ []) do
-    ItemCustomization
-    |> Repo.get!(id)
-    |> maybe_attach_single(:key, opts)
-    |> maybe_attach_single(:values, opts)
+  @spec get_item_customization!(String.t()) :: ItemCustomization.t()
+  def get_item_customization!(id) do
+    Repo.get!(ItemCustomization, id)
   end
 
   @spec create_item_customization(map()) ::
@@ -260,58 +252,6 @@ defmodule Kaffebase.Catalog do
 
   defp maybe_apply_order(query, orderings) when is_list(orderings) do
     order_by(query, ^orderings)
-  end
-
-  defp maybe_attach(records, _what, _opts) when records == [], do: records
-
-  defp maybe_attach(records, what, opts) do
-    if preload?(opts, what) do
-      do_attach(records, what)
-    else
-      records
-    end
-  end
-
-  defp maybe_attach_single(record, what, opts) do
-    if preload?(opts, what) do
-      hd(do_attach([record], what))
-    else
-      record
-    end
-  end
-
-  defp preload?(opts, what) do
-    preloads = Keyword.get(opts, :preload, []) |> List.wrap()
-    Enum.member?(preloads, what)
-  end
-
-  defp do_attach(records, :key) do
-    key_map = fetch_map(CustomizationKey, Enum.map(records, & &1.key))
-
-    Enum.map(records, fn record ->
-      expand = Map.get(record, :expand, %{}) |> Map.put(:key, Map.get(key_map, record.key))
-      Map.put(record, :expand, expand)
-    end)
-  end
-
-  defp do_attach(records, :values) do
-    value_ids = records |> Enum.flat_map(& &1.value) |> Enum.uniq()
-    value_map = fetch_map(CustomizationValue, value_ids)
-
-    Enum.map(records, fn record ->
-      values = Enum.map(record.value || [], &Map.get(value_map, &1)) |> Enum.reject(&is_nil/1)
-      expand = Map.get(record, :expand, %{}) |> Map.put(:value, values)
-      Map.put(record, :expand, expand)
-    end)
-  end
-
-  defp fetch_map(_module, []), do: %{}
-
-  defp fetch_map(module, ids) do
-    module
-    |> where([m], m.id in ^ids)
-    |> Repo.all()
-    |> Map.new(&{&1.id, &1})
   end
 
   defp notify({:ok, record} = result, collection, action) do

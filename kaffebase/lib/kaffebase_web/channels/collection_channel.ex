@@ -72,7 +72,7 @@ defmodule KaffebaseWeb.CollectionChannel do
   end
 
   defp load_collection("item_customization", _options) do
-    Catalog.list_item_customizations(preload: [:key, :values])
+    Catalog.list_item_customizations()
   end
 
   defp load_collection("message", _options) do
@@ -80,7 +80,7 @@ defmodule KaffebaseWeb.CollectionChannel do
   end
 
   defp load_collection("status", _options) do
-    Content.list_statuses(preload: [:message])
+    Content.list_statuses()
   end
 
   defp load_collection("order", options) do

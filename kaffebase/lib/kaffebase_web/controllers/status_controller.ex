@@ -6,12 +6,12 @@ defmodule KaffebaseWeb.StatusController do
   action_fallback KaffebaseWeb.FallbackController
 
   def index(conn, _params) do
-    statuses = Content.list_statuses(preload: [:message])
+    statuses = Content.list_statuses()
     json(conn, statuses)
   end
 
   def first(conn, _params) do
-    case Content.get_singleton_status(preload: [:message]) do
+    case Content.get_singleton_status() do
       nil -> send_resp(conn, :not_found, "")
       status -> json(conn, status)
     end
@@ -27,7 +27,7 @@ defmodule KaffebaseWeb.StatusController do
   end
 
   def show(conn, %{"id" => id}) do
-    status = Content.get_status!(id, preload: [:message])
+    status = Content.get_status!(id)
     json(conn, status)
   end
 
