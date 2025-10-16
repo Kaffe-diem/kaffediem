@@ -14,26 +14,21 @@ defmodule Kaffebase.Orders do
   alias Kaffebase.Orders.Events
   alias Kaffebase.Orders.Process
   alias Kaffebase.Orders.OrderSupervisor
-  alias Kaffebase.Orders.{Order, OrderItem}
+  alias Kaffebase.Orders.Order
   alias Kaffebase.Repo
-
-  @type preload_option :: :items | :item_records | :customizations
 
   @spec list_orders(keyword()) :: [Order.t()]
   def list_orders(opts \\ []) do
     Order
     |> maybe_filter_from_date(opts[:from_date])
-    |> maybe_filter(:customer, opts[:customer_id] || opts[:customer])
+    |> maybe_filter(:customer_id, opts[:customer_id] || opts[:customer])
     |> maybe_apply_order(opts[:order_by] || [asc: :day_id, asc: :created])
     |> Repo.all()
-    |> Enum.map(&add_expanded_items/1)
   end
 
   @spec get_order!(String.t(), keyword()) :: Order.t()
   def get_order!(id, _opts \\ []) do
-    Order
-    |> Repo.get!(id)
-    |> add_expanded_items()
+    Repo.get!(Order, id)
   end
 
   @spec create_order(map()) :: {:ok, Order.t()} | {:error, term()}
@@ -42,14 +37,11 @@ defmodule Kaffebase.Orders do
       Multi.new()
       |> Multi.run(:day_id, fn repo, _ -> next_day_id(repo) end)
       |> Multi.run(:order, fn repo, %{day_id: day_id} ->
-        items_data = Jason.encode!(command.items)
-
         order_attrs = %{
-          customer: command.customer_id,
+          customer_id: command.customer_id,
           day_id: day_id,
           missing_information: command.missing_information,
-          items_data: items_data,
-          items: [],
+          items: command.items,
           state: command.state
         }
 
@@ -60,10 +52,9 @@ defmodule Kaffebase.Orders do
       |> Multi.run(:event, fn _repo, %{order: order} ->
         event = %Events.OrderPlaced{
           order_id: order.id,
-          customer: order.customer,
+          customer: order.customer_id,
           day_id: order.day_id,
           missing_information: order.missing_information,
-          item_ids: [],
           timestamp: DateTime.utc_now()
         }
 
@@ -76,12 +67,10 @@ defmodule Kaffebase.Orders do
 
           {:ok, _pid} = OrderSupervisor.start_order(order.id)
 
-          enriched_order = add_expanded_items(order)
-
-          items_count = length(enriched_order.items)
+          items_count = length(order.items)
           Logger.info("Order has #{items_count} items")
 
-          broadcast_change("order", "create", enriched_order)
+          broadcast_change("order", "create", order)
           Logger.info("Broadcast order create for #{order.id}")
           {:ok, order}
 
@@ -117,9 +106,7 @@ defmodule Kaffebase.Orders do
   def update_order_state(order_id, state) when is_binary(order_id) do
     OrderSupervisor.start_order(order_id)
 
-    new_state = PlaceOrder.cast_state(state)
-
-    with {:ok, _state} <- Process.change_state(order_id, new_state) do
+    with {:ok, _state} <- Process.change_state(order_id, state) do
       order = Repo.get!(Order, order_id)
       {:ok, order}
     end
@@ -127,12 +114,10 @@ defmodule Kaffebase.Orders do
 
   @spec set_all_orders_state(Order.state()) :: {non_neg_integer(), nil | [term()]}
   def set_all_orders_state(state) do
-    new_state = PlaceOrder.cast_state(state)
-    {count, _} = Repo.update_all(Order, set: [state: new_state])
+    {count, _} = Repo.update_all(Order, set: [state: state])
 
     Order
     |> Repo.all()
-    |> Enum.map(&add_expanded_items/1)
     |> Enum.each(&broadcast_change("order", "update", &1))
 
     {count, nil}
@@ -145,33 +130,6 @@ defmodule Kaffebase.Orders do
     with {:ok, _state} <- Process.delete_order(order.id) do
       {:ok, order}
     end
-  end
-
-  @spec get_order_item!(String.t()) :: OrderItem.t()
-  def get_order_item!(id), do: Repo.get!(OrderItem, id)
-
-  @spec create_order_item(map()) :: {:ok, OrderItem.t()} | {:error, Ecto.Changeset.t()}
-  def create_order_item(attrs) do
-    %OrderItem{}
-    |> OrderItem.changeset(attrs)
-    |> Repo.insert()
-    |> notify("order_item", "create")
-  end
-
-  @spec update_order_item(OrderItem.t(), map()) ::
-          {:ok, OrderItem.t()} | {:error, Ecto.Changeset.t()}
-  def update_order_item(%OrderItem{} = order_item, attrs) do
-    order_item
-    |> OrderItem.changeset(attrs)
-    |> Repo.update()
-    |> notify("order_item", "update")
-  end
-
-  @spec delete_order_item(OrderItem.t()) :: {:ok, OrderItem.t()} | {:error, Ecto.Changeset.t()}
-  def delete_order_item(%OrderItem{} = order_item) do
-    order_item
-    |> Repo.delete()
-    |> notify_delete("order_item")
   end
 
   # --------------------------------------------------------------------------
@@ -230,29 +188,11 @@ defmodule Kaffebase.Orders do
     order_by(query, ^orderings)
   end
 
-  defp add_expanded_items(%Order{items_data: items_data} = order) when is_binary(items_data) do
-    items =
-      case Jason.decode(items_data, keys: :atoms) do
-        {:ok, decoded} -> decoded
-        _ -> []
-      end
-
-    Map.put(order, :items, items)
-  end
-
-  defp add_expanded_items(%Order{} = order) do
-    Map.put(order, :items, [])
-  end
-
   defp notify({:ok, record} = result, "order", action) do
-    Logger.info("Order #{action}: #{record.id}")
-    enriched = add_expanded_items(record)
+    items_count = length(record.items)
+    Logger.info("Order #{action}: #{record.id} (#{items_count} items)")
 
-    items_count = length(enriched.items)
-    Logger.info("Order has #{items_count} items: #{record.id}")
-
-    broadcast_change("order", action, enriched)
-    Logger.info("Broadcast order #{action} for #{record.id}")
+    broadcast_change("order", action, record)
     result
   end
 
@@ -263,20 +203,9 @@ defmodule Kaffebase.Orders do
 
   defp notify(result, _collection, _action), do: result
 
-  defp notify_delete({:ok, record} = result, collection) do
-    broadcast_delete(collection, record.id)
-    result
-  end
-
-  defp notify_delete(result, _collection), do: result
-
   defp broadcast_change(collection, action, record) do
     Logger.debug("Broadcasting #{collection} #{action} to collection notifier")
     CollectionNotifier.broadcast_change(collection, action, record)
-  end
-
-  defp broadcast_delete(collection, id) do
-    CollectionNotifier.broadcast_delete(collection, id)
   end
 
   defp next_day_id(repo) do

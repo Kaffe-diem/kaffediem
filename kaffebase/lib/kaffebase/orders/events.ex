@@ -7,14 +7,13 @@ defmodule Kaffebase.Orders.Events do
 
   defmodule OrderPlaced do
     @moduledoc "Order was created"
-    defstruct [:order_id, :customer, :day_id, :missing_information, :item_ids, :timestamp]
+    defstruct [:order_id, :customer, :day_id, :missing_information, :timestamp]
 
     @type t :: %__MODULE__{
             order_id: String.t(),
             customer: String.t() | nil,
             day_id: integer(),
             missing_information: boolean(),
-            item_ids: [String.t()],
             timestamp: DateTime.t()
           }
   end
@@ -38,18 +37,6 @@ defmodule Kaffebase.Orders.Events do
     @type t :: %__MODULE__{
             order_id: String.t(),
             changes: map(),
-            timestamp: DateTime.t()
-          }
-  end
-
-  defmodule OrderItemCreated do
-    @moduledoc "New order item was created"
-    defstruct [:order_item_id, :item_id, :customization_ids, :timestamp]
-
-    @type t :: %__MODULE__{
-            order_item_id: String.t(),
-            item_id: String.t(),
-            customization_ids: [String.t()],
             timestamp: DateTime.t()
           }
   end

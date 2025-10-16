@@ -32,7 +32,7 @@ defmodule Kaffebase.Orders.PlaceOrderTest do
       }
 
       assert {:ok, command} = PlaceOrder.new(payload)
-      assert command.customer_id == to_string(user.id)
+      assert command.customer_id == user.id
       assert command.missing_information
       assert command.state == :completed
 

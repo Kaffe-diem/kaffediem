@@ -7,11 +7,10 @@ defmodule Kaffebase.OrdersTest do
   alias Kaffebase.CatalogFixtures
   alias Kaffebase.Orders
   alias Kaffebase.OrdersFixtures
-  alias Kaffebase.Orders.{Order, OrderItem}
+  alias Kaffebase.Orders.Order
   alias Kaffebase.Repo
 
   setup do
-    Repo.delete_all(OrderItem)
     Repo.delete_all(Order)
     :ok
   end
@@ -26,7 +25,7 @@ defmodule Kaffebase.OrdersTest do
 
       {:ok, order} =
         Orders.create_order(%{
-          customer: to_string(user.id),
+          customer_id: user.id,
           missing_information: true,
           items: [
             %{
@@ -36,7 +35,7 @@ defmodule Kaffebase.OrdersTest do
           ]
         })
 
-      assert order.customer == to_string(user.id)
+      assert order.customer_id == user.id
       assert order.day_id == 101
       assert order.missing_information
 

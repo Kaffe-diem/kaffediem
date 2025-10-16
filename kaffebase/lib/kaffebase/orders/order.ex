@@ -2,7 +2,7 @@ defmodule Kaffebase.Orders.Order do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Kaffebase.EctoTypes.StringList
+  alias Kaffebase.EctoTypes.JsonbItems
   alias Kaffebase.Ids
 
   @states [:received, :production, :completed, :dispatched]
@@ -10,13 +10,12 @@ defmodule Kaffebase.Orders.Order do
   @timestamps_opts [type: :utc_datetime_usec, inserted_at: :created, updated_at: :updated]
 
   schema "order" do
-    field :customer, :string
-    field :day_id, :integer, source: :day_id
-    field :items, StringList, default: []
-    field :items_data, :string
-    field :missing_information, :boolean, source: :missing_information
+    field :customer_id, :integer
+    field :day_id, :integer
+    field :items, JsonbItems, source: :items_data
+    field :missing_information, :boolean
 
-    field :state, Ecto.Enum, values: @states, source: :state
+    field :state, Ecto.Enum, values: @states
 
     timestamps()
   end
@@ -24,7 +23,7 @@ defmodule Kaffebase.Orders.Order do
   @doc false
   def changeset(order, attrs) do
     order
-    |> cast(attrs, [:id, :customer, :day_id, :items, :items_data, :missing_information, :state])
+    |> cast(attrs, [:id, :customer_id, :day_id, :items, :missing_information, :state])
     |> maybe_put_id()
     |> validate_required([:state])
   end
