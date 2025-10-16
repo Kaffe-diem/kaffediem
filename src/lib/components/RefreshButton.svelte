@@ -1,6 +1,6 @@
 <script lang="ts">
   import RefreshIcon from "$assets/RefreshIcon.svelte";
-  import { resetStores } from "$stores/util";
+  import { resetStores } from "$lib/stores/util";
 
   function reset() {
     resetStores();

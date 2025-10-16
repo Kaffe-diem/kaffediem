@@ -1,4 +1,4 @@
-import { get, writable } from "svelte/store";
+import { writable } from "svelte/store";
 import { createCollection, apiPost, apiPatch, apiDelete } from "./collection";
 import {
   messageFromApi,

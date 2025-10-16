@@ -6,15 +6,19 @@ import { getSocket } from "$lib/realtime/socket";
 import { writable, type Writable } from "svelte/store";
 import type { Channel } from "phoenix";
 
-type ChangeEvent = {
+type ChangeEvent<Api> = {
   action: "create" | "update" | "delete";
-  record: unknown;
+  record: Api | { id?: string } | null;
+};
+
+type CollectionPayload<Api> = {
+  items?: Api[];
 };
 
 // Create generic stores
-export function createCollection<T extends { id: string }>(
+export function createCollection<Api, T extends { id: string }>(
   collectionName: string,
-  fromApi: (data: any) => T,
+  fromApi: (data: Api) => T,
   options?: {
     queryParams?: Record<string, string>;
     onCreate?: (item: T) => void;
@@ -32,24 +36,24 @@ export function createCollection<T extends { id: string }>(
 
       channel
         .join()
-        .receive("ok", (payload) => {
+        .receive("ok", (payload: CollectionPayload<Api> | undefined) => {
           const items = Array.isArray(payload?.items) ? payload.items : [];
-          set(items.map(fromApi));
+          set(items.map((item) => fromApi(item)));
         })
-        .receive("error", (error) => {
+        .receive("error", (error: unknown) => {
           console.error(`Failed to join ${collectionName}:`, error);
           set([]);
         });
 
-      channel.on("change", (event: ChangeEvent) => {
+      channel.on("change", (event: ChangeEvent<Api>) => {
         if (!event?.record) return;
 
         if (event.action === "create") {
-          const item = fromApi(event.record);
+          const item = fromApi(event.record as Api);
           options?.onCreate?.(item);
           update((items) => [...items, item]);
         } else if (event.action === "update") {
-          const item = fromApi(event.record);
+          const item = fromApi(event.record as Api);
           update((items) => {
             const index = items.findIndex((i) => i.id === item.id);
             if (index === -1) return [...items, item];
