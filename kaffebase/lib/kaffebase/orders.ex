@@ -10,10 +10,6 @@ defmodule Kaffebase.Orders do
   alias Kaffebase.CollectionNotifier
   alias Kaffebase.Orders.PlaceOrder
   alias Kaffebase.Orders.DayId
-  alias Kaffebase.Orders.Event
-  alias Kaffebase.Orders.Events
-  alias Kaffebase.Orders.Process
-  alias Kaffebase.Orders.OrderSupervisor
   alias Kaffebase.Orders.Order
   alias Kaffebase.Repo
 
@@ -49,29 +45,11 @@ defmodule Kaffebase.Orders do
         |> Order.changeset(order_attrs)
         |> repo.insert()
       end)
-      |> Multi.run(:event, fn _repo, %{order: order} ->
-        event = %Events.OrderPlaced{
-          order_id: order.id,
-          customer: order.customer_id,
-          day_id: order.day_id,
-          missing_information: order.missing_information,
-          timestamp: DateTime.utc_now()
-        }
-
-        Event.append(order.id, event)
-      end)
       |> Repo.transaction()
       |> case do
         {:ok, %{order: order}} ->
           Logger.info("Order created: #{order.id}, day_id: #{order.day_id}")
-
-          {:ok, _pid} = OrderSupervisor.start_order(order.id)
-
-          items_count = length(order.items)
-          Logger.info("Order has #{items_count} items")
-
           broadcast_change("order", "create", order)
-          Logger.info("Broadcast order create for #{order.id}")
           {:ok, order}
 
         {:error, _step, reason, _changes} ->
@@ -100,16 +78,13 @@ defmodule Kaffebase.Orders do
   @spec update_order_state(Order.t() | String.t(), Order.state()) ::
           {:ok, Order.t()} | {:error, Ecto.Changeset.t()}
   def update_order_state(%Order{} = order, state) do
-    update_order_state(order.id, state)
+    update_order(order, %{state: state})
   end
 
-  def update_order_state(order_id, state) do
-    OrderSupervisor.start_order(order_id)
-
-    with {:ok, _state} <- Process.change_state(order_id, state) do
-      order = Repo.get!(Order, order_id)
-      {:ok, order}
-    end
+  def update_order_state(order_id, state) when is_binary(order_id) do
+    order_id
+    |> get_order!()
+    |> update_order_state(state)
   end
 
   @spec set_all_orders_state(Order.state()) :: {non_neg_integer(), nil | [term()]}
@@ -125,11 +100,9 @@ defmodule Kaffebase.Orders do
 
   @spec delete_order(Order.t()) :: {:ok, Order.t()} | {:error, Ecto.Changeset.t()}
   def delete_order(%Order{} = order) do
-    OrderSupervisor.start_order(order.id)
-
-    with {:ok, _state} <- Process.delete_order(order.id) do
-      {:ok, order}
-    end
+    order
+    |> Repo.delete()
+    |> notify("order", "delete")
   end
 
   # --------------------------------------------------------------------------

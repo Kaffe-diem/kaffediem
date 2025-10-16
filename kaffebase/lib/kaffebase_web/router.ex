@@ -114,7 +114,7 @@ defmodule KaffebaseWeb.Router do
     scope "/dev" do
       pipe_through :browser
 
-      live_dashboard "/dashboard", metrics: KaffebaseWeb.Telemetry
+      live_dashboard "/dashboard", metrics: KaffebaseWeb.Telemetry, ecto_repos: [Kaffebase.Repo]
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
   end
