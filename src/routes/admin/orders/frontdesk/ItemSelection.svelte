@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { categories, itemsByCategory } from "$stores/menuStore";
+  import { categories, itemsByCategory } from "$stores/menu";
   import type { Item, Category } from "$lib/types";
-  import { handleSelectedItemChange, selectedItemId } from "$stores/cartStore";
+  import { handleSelectedItemChange, selectedItemId } from "$stores/cart";
 
   $effect(() => {
     if ($selectedItemId) return;

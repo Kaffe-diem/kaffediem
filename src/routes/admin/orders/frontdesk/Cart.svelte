@@ -10,12 +10,11 @@
     deleteEditingItem,
     stopEditing,
     selectedItem
-  } from "$stores/cartStore";
-  import auth from "$stores/authStore";
-  import orderStore from "$stores/orderStore";
-  import { customizationKeys } from "$stores/menuStore";
-  import { type CustomizationValue } from "$lib/types";
-  import orders from "$stores/orderStore";
+  } from "$stores/cart";
+  import auth from "$stores/auth";
+  import { orders, createOrder } from "$stores/orders";
+  import { customizationKeys } from "$stores/menu";
+  import type { CustomizationValue } from "$lib/types";
   import CommentIcon from "$assets/CommentIcon.svelte";
   import CompleteOrder from "$assets/CompleteOrder.svelte";
   import TrashIcon from "$assets/TrashIcon.svelte";
@@ -39,8 +38,8 @@
   );
 
   let missing_information = $state(false);
-  function completeOrder() {
-    orderStore.create($auth.user.id, $cart, missing_information);
+  async function completeOrder() {
+    await createOrder($auth.user.id, $cart, missing_information);
     clearCart();
     missing_information = false;
     stopEditing();

@@ -1,8 +1,7 @@
 <script lang="ts">
-  import { categories } from "$stores/menuStore";
-  import { Category } from "$lib/types";
+  import { categories, customizationKeys, createCategory, updateCategory } from "$stores/menu";
+  import type { Category } from "$lib/types";
   import { goto } from "$app/navigation";
-  import { customizationKeys } from "$stores/menuStore";
 
   import StateToggle from "$components/menu/StateToggle.svelte";
   import Input from "$components/menu/Input.svelte";
@@ -16,7 +15,7 @@
   let categoryName: string | undefined = $state();
   let categorySort: number | undefined = $state();
   let categoryEnabled: boolean = $state(true);
-  let categoryValidCustomizations: string[] | undefined = $state();
+  let categoryValidCustomizations: string[] = $state([]);
 
   let exists: boolean = $state(false);
 
@@ -31,27 +30,23 @@
     }
   });
 
-  function updateCategory() {
+  async function handleSubmit(event: SubmitEvent) {
+    event.preventDefault();
+
+    if (!categoryName || categorySort === undefined) return;
+
+    const payload: Category = {
+      id: create ? "" : id,
+      name: categoryName,
+      sortOrder: categorySort,
+      enabled: categoryEnabled,
+      validCustomizations: categoryValidCustomizations
+    };
+
     if (create) {
-      categories.create(
-        new Category(
-          id,
-          categoryName!,
-          categorySort!,
-          categoryEnabled,
-          categoryValidCustomizations!
-        )
-      );
+      await createCategory(payload);
     } else {
-      categories.update(
-        new Category(
-          id,
-          categoryName!,
-          categorySort!,
-          categoryEnabled,
-          categoryValidCustomizations!
-        )
-      );
+      await updateCategory({ ...payload, id });
     }
     goto(resolve("/admin/menu"));
   }
@@ -62,7 +57,7 @@
 </h1>
 <div class="divider"></div>
 {#if exists || create}
-  <form onsubmit={updateCategory} class="grid w-full grid-cols-2 gap-2">
+  <form onsubmit={handleSubmit} class="grid w-full grid-cols-2 gap-2">
     <div class="col-span-2">
       <Input
         label="Navn"
@@ -93,19 +88,16 @@
               <span class="text-xl">{customizationKey.name}</span>
               <input
                 type="checkbox"
-                checked={categoryValidCustomizations?.includes(customizationKey.id)}
+                checked={categoryValidCustomizations.includes(customizationKey.id)}
                 class="checkbox checkbox-xl"
                 onchange={(event) => {
                   if (event.currentTarget.checked) {
-                    if (!categoryValidCustomizations?.includes(customizationKey.id)) {
-                      categoryValidCustomizations = [
-                        ...(categoryValidCustomizations ?? []),
-                        customizationKey.id
-                      ];
+                    if (!categoryValidCustomizations.includes(customizationKey.id)) {
+                      categoryValidCustomizations = [...categoryValidCustomizations, customizationKey.id];
                     }
                   } else {
-                    categoryValidCustomizations = categoryValidCustomizations?.filter(
-                      (id) => id !== customizationKey.id
+                    categoryValidCustomizations = categoryValidCustomizations.filter(
+                      (selectedId) => selectedId !== customizationKey.id
                     );
                   }
                 }}

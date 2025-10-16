@@ -12,17 +12,16 @@ import {
   categories,
   getCategoryById,
   items
-} from "./menuStore";
+} from "./menu";
 import { sumBy, groupBy, updateAt } from "$lib/utils";
 import { finalPrice } from "$lib/pricing";
-import type { RecordIdString } from "$lib/types";
 
 export interface CartItem extends Item {
   customizations: CustomizationValue[];
   basePrice: number;
 }
 
-export const selectedItemId = writable<RecordIdString | undefined>(undefined);
+export const selectedItemId = writable<string | undefined>(undefined);
 export const selectedItem = derived(selectedItemId, ($selectedItemId) =>
   get(items).find((i) => i.id === $selectedItemId)
 );

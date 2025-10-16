@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { CustomizationKey, CustomizationValue } from "$lib/types";
-  import { customizationKeys, customizationsByKey } from "$stores/menuStore";
+  import type { CustomizationKey, CustomizationValue } from "$lib/types";
+  import { customizationKeys, customizationsByKey } from "$stores/menu";
   import {
     selectedCustomizations,
     initializeCustomizations,
     toggleCustomization,
     selectedCategory
-  } from "$stores/cartStore";
+  } from "$stores/cart";
   import { onMount } from "svelte";
 
   onMount(() => {

@@ -4,19 +4,11 @@ import {
   customizationKeys,
   customizationValues,
   itemCustomizations
-} from "$stores/menuStore";
+} from "$stores/menu";
 
-import { raw_orders } from "$stores/orderStore";
-import orders from "$stores/orderStore";
-import { status } from "$stores/statusStore";
+import { orders } from "$stores/orders";
+import { status, messages } from "$stores/status";
 
 export function resetStores() {
-  categories.reset();
-  items.reset();
-  customizationKeys.reset();
-  customizationValues.reset();
-  itemCustomizations.reset();
-  raw_orders.reset();
-  orders.reset();
-  status.reset();
+  // New stores don't need reset() - they auto-sync via websocket
 }

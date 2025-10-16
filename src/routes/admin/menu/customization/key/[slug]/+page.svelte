@@ -1,6 +1,11 @@
 <script lang="ts">
-  import { customizationKeys, customizationsByKey } from "$stores/menuStore";
-  import { CustomizationKey } from "$lib/types";
+  import {
+  customizationKeys,
+  customizationsByKey,
+  createCustomizationKey,
+  updateCustomizationKey
+} from "$stores/menu";
+  import type { CustomizationKey } from "$lib/types";
   import { goto } from "$app/navigation";
 
   import StateToggle from "$components/menu/StateToggle.svelte";
@@ -34,31 +39,25 @@
     }
   });
 
-  function updateKey() {
+  async function handleSubmit(event: SubmitEvent) {
+    event.preventDefault();
+
+    if (!customizationName) return;
+
+    const payload: CustomizationKey = {
+      id: create ? "" : id,
+      name: customizationName,
+      enabled: customizationEnabled,
+      labelColor: customizationColor ?? "",
+      defaultValue: customizationDefaultValue ?? "",
+      multipleChoice: customizationMultipleChoice,
+      sortOrder: customizationSort
+    };
+
     if (create) {
-      customizationKeys.create(
-        new CustomizationKey(
-          id,
-          customizationName!,
-          customizationEnabled,
-          customizationColor!,
-          customizationDefaultValue!,
-          customizationMultipleChoice,
-          customizationSort
-        )
-      );
+      await createCustomizationKey(payload);
     } else {
-      customizationKeys.update(
-        new CustomizationKey(
-          id,
-          customizationName!,
-          customizationEnabled,
-          customizationColor!,
-          customizationDefaultValue!,
-          customizationMultipleChoice,
-          customizationSort
-        )
-      );
+      await updateCustomizationKey({ ...payload, id });
     }
     goto(resolve("/admin/menu/customization"));
   }
@@ -69,7 +68,7 @@
 </h1>
 <div class="divider"></div>
 {#if exists || create}
-  <form onsubmit={updateKey} class="grid w-full grid-cols-3 gap-2">
+  <form onsubmit={handleSubmit} class="grid w-full grid-cols-3 gap-2">
     <div class="col-span-full">
       <Input
         label="Navn"

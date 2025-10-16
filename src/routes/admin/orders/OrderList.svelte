@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { OrderStateOptions } from "$lib/types";
-  import orders from "$stores/orderStore";
-  import { customizationKeys } from "$lib/stores/menuStore";
+  import { orders, updateOrderState } from "$stores/orders";
+  import { customizationKeys } from "$stores/menu";
   import type { CustomizationKey, Order, OrderItemSnapshot } from "$lib/types";
   import CommentIcon from "$assets/CommentIcon.svelte";
   import { getCharacters } from "$lib/utils";
@@ -68,10 +68,10 @@
       : ''} mb-6 block rounded shadow-md transition-colors"
     data-testid="order-row"
     data-order-number={orderNumber}
-    onclick={() => onclick && orders.updateState(order.id, onclick)}
+    onclick={() => onclick && updateOrderState(order.id, onclick)}
     role="button"
     tabindex="0"
-    onkeydown={(e) => e.key === "Enter" && orders.updateState(order.id, onclick)}
+    onkeydown={(e) => e.key === "Enter" && updateOrderState(order.id, onclick)}
     aria-label={`Order ${orderNumber} with ${order.items.length} items`}
   >
     <td class="{!detailed ? 'flex justify-center' : ''} text-4xl font-bold"

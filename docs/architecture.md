@@ -8,7 +8,7 @@ Bestillinger (orders) er hoveddelen av programvaren. De har fire states, som rep
 
 Tjenester kommuniserer ikke direkte med hverandre. De sender en melding til backend. Andre tjenester lytter til visse kanaler hos backend. Når det er en oppdatering de er interessert i får de den. Generelt sett vil ikke andre tjenester lytte direkte til backend, vi isolerer mye av den logikken under `$lib/stores`. I prinsipp er dette relativt enkel implementasjon av en [event-drevet arkitektur](https://en.wikipedia.org/wiki/Event-driven_architecture).
 
-For eksempel vil den store skjermen med hvilke bestillinger som er på vei ikke ha noe logikk selv. Den henter alt fra `$lib/orderStore`.
+For eksempel vil den store skjermen med hvilke bestillinger som er på vei ikke ha noe logikk selv. Den henter alt fra `$stores/orders`.
 
 ![display](./display.excalidraw.svg)
 

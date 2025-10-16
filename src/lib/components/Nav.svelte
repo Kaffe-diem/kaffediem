@@ -1,5 +1,5 @@
 <script lang="ts">
-  import auth from "$stores/authStore";
+  import auth from "$stores/auth";
   import MenuIcon from "$assets/MenuIcon.svelte";
   import NavItems from "$components/NavItems.svelte";
   import { NavItem } from "$lib/types";
