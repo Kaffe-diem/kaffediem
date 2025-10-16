@@ -2,7 +2,6 @@ defmodule Kaffebase.Content.Status do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Kaffebase.Content.Message
   alias Kaffebase.Ids
 
   @primary_key {:id, :string, autogenerate: false}
@@ -10,13 +9,7 @@ defmodule Kaffebase.Content.Status do
   @timestamps_opts [type: :utc_datetime_usec, inserted_at: :created, updated_at: :updated]
 
   schema "status" do
-    field :message, :string
-
-    belongs_to :message_record, Message,
-      define_field: false,
-      foreign_key: :message,
-      references: :id
-
+    field :message, :string, source: :message_id
     field :open, :boolean
     field :show_message, :boolean, source: :show_message
 

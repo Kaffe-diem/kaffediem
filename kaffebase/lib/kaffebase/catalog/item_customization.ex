@@ -2,15 +2,15 @@ defmodule Kaffebase.Catalog.ItemCustomization do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Kaffebase.EctoTypes.StringList
   alias Kaffebase.Ids
+  alias Kaffebase.EctoTypes.JsonbList
 
   @primary_key {:id, :string, autogenerate: false}
   @timestamps_opts [type: :utc_datetime_usec, inserted_at: :created, updated_at: :updated]
 
   schema "item_customization" do
     field :key, :string
-    field :value, StringList, default: []
+    field :value, JsonbList
 
     timestamps()
   end
