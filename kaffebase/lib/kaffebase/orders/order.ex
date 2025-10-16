@@ -44,7 +44,7 @@ defimpl Jason.Encoder, for: Kaffebase.Orders.Order do
     Jason.Encode.map(
       %{
         id: order.id,
-        customer_id: order.customer,
+        customer_id: order.customer_id,
         day_id: order.day_id,
         state: order.state,
         missing_information: order.missing_information,
