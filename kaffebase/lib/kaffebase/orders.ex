@@ -103,7 +103,7 @@ defmodule Kaffebase.Orders do
     update_order_state(order.id, state)
   end
 
-  def update_order_state(order_id, state) when is_binary(order_id) do
+  def update_order_state(order_id, state) do
     OrderSupervisor.start_order(order_id)
 
     with {:ok, _state} <- Process.change_state(order_id, state) do
@@ -172,14 +172,13 @@ defmodule Kaffebase.Orders do
   end
 
   defp maybe_filter_from_date(query, date_string) when is_binary(date_string) do
-    with {:ok, date} <- Date.from_iso8601(date_string) do
-      maybe_filter_from_date(query, date)
-    else
-      _ -> query
+    case Date.from_iso8601(date_string) do
+      {:ok, date} -> maybe_filter_from_date(query, date)
+      {:error, _} -> query
     end
   end
 
-  defp maybe_filter_from_date(query, _other), do: query
+  defp maybe_filter_from_date(query, _), do: query
 
   defp maybe_apply_order(query, nil), do: query
   defp maybe_apply_order(query, []), do: query
