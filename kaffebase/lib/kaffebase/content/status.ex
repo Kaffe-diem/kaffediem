@@ -9,7 +9,7 @@ defmodule Kaffebase.Content.Status do
   @timestamps_opts [type: :utc_datetime_usec, inserted_at: :created, updated_at: :updated]
 
   schema "status" do
-    field :message, :string, source: :message_id
+    field :message, :string, source: :message
     field :open, :boolean
     field :show_message, :boolean, source: :show_message
 
@@ -40,7 +40,7 @@ defimpl Jason.Encoder, for: Kaffebase.Content.Status do
         id: status.id,
         open: status.open,
         show_message: status.show_message,
-        message_id: status.message,
+        message: status.message,
         created: status.created,
         updated: status.updated
       },
