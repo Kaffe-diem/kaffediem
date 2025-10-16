@@ -1,8 +1,8 @@
 import { writable } from "svelte/store";
 import { fetchSession, login as apiLogin, logout as apiLogout } from "$lib/api/session";
-import { User } from "$lib/types";
+import { userFromBackend, type User } from "$lib/types";
 
-const anonymousUser = new User("", "", false);
+const anonymousUser: User = { id: "", name: "", isAdmin: false };
 
 const auth = writable({
   isAuthenticated: false,
@@ -15,7 +15,7 @@ async function initialise() {
     const session = await fetchSession();
 
     if (session?.data) {
-      auth.set({ isAuthenticated: true, user: User.fromBackend(session.data), isLoading: false });
+      auth.set({ isAuthenticated: true, user: userFromBackend(session.data), isLoading: false });
     } else {
       auth.set({ isAuthenticated: false, user: anonymousUser, isLoading: false });
     }
@@ -39,7 +39,7 @@ export async function login(email: string, password: string) {
       throw new Error("Ugyldig påloggingsinformasjon");
     }
 
-    auth.set({ isAuthenticated: true, user: User.fromBackend(session.data), isLoading: false });
+    auth.set({ isAuthenticated: true, user: userFromBackend(session.data), isLoading: false });
   } catch (error) {
     console.error("Login failed:", error);
     throw new Error("Kunne ikke logge inn. Sjekk e-post og passord.");

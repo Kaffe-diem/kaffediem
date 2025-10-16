@@ -1,7 +1,7 @@
 <script lang="ts">
-  import auth from "$stores/authStore";
-  import { addToCart } from "$stores/cartStore";
-  import { Item } from "$lib/types";
+  import auth from "$stores/auth";
+  import { addToCart } from "$stores/cart";
+  import type { Item } from "$lib/types";
 
   interface Props {
     item: Item;

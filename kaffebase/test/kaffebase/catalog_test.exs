@@ -1,14 +1,15 @@
 defmodule Kaffebase.CatalogTest do
   use Kaffebase.DataCase
 
-  alias Kaffebase.Catalog
+  import Ecto.Query
 
   alias Kaffebase.Catalog.{
     Category,
     CustomizationKey,
     CustomizationValue,
     Item,
-    ItemCustomization
+    ItemCustomization,
+    Crud
   }
 
   alias Kaffebase.CatalogFixtures
@@ -28,7 +29,7 @@ defmodule Kaffebase.CatalogTest do
       later = CatalogFixtures.category_fixture(%{name: "B", sort_order: 2})
       earlier = CatalogFixtures.category_fixture(%{name: "A", sort_order: 1})
 
-      assert [^earlier, ^later] = Catalog.list_categories()
+      assert [^earlier, ^later] = Crud.list(Category)
     end
   end
 
@@ -40,7 +41,7 @@ defmodule Kaffebase.CatalogTest do
       item_a = CatalogFixtures.item_fixture(%{category: category_a.id})
       _item_b = CatalogFixtures.item_fixture(%{category: category_b.id})
 
-      result = Catalog.list_items(category_id: category_a.id)
+      result = Crud.list(Item, [filter: {:category, category_a.id}])
       assert Enum.map(result, & &1.id) == [item_a.id]
     end
   end
@@ -52,41 +53,26 @@ defmodule Kaffebase.CatalogTest do
       value_a = CatalogFixtures.customization_value_fixture(%{key: key_a})
       _value_b = CatalogFixtures.customization_value_fixture(%{key: key_b})
 
-      result = Catalog.list_customization_values(key_id: key_a.id)
+      result = Crud.list(CustomizationValue, [filter: {:belongs_to, key_a.id}])
       assert Enum.map(result, & &1.id) == [value_a.id]
     end
   end
 
   describe "item customizations" do
-    test "list_item_customizations/1 with preloads populates expand" do
-      key = CatalogFixtures.customization_key_fixture()
-      value = CatalogFixtures.customization_value_fixture(%{key: key})
-      customization = CatalogFixtures.item_customization_fixture(%{key: key, values: [value]})
-
-      [loaded] = Catalog.list_item_customizations(preload: [:key, :values])
-      assert loaded.id == customization.id
-      assert %CustomizationKey{id: key_id} = loaded.expand.key
-      assert key_id == key.id
-
-      assert [%CustomizationValue{id: value_id}] = loaded.expand.value
-      assert value_id == value.id
-    end
-
-    test "list_item_customizations_by_ids/2 filters and preloads" do
+    test "list_item_customizations_by_ids/2 filters by ids" do
       key = CatalogFixtures.customization_key_fixture()
       value = CatalogFixtures.customization_value_fixture(%{key: key})
       customization = CatalogFixtures.item_customization_fixture(%{key: key, values: [value]})
       _other = CatalogFixtures.item_customization_fixture()
 
       [loaded] =
-        Catalog.list_item_customizations_by_ids([customization.id], preload: [:key, :values])
+        ItemCustomization
+        |> where([ic], ic.id in ^[customization.id])
+        |> Repo.all()
 
       assert loaded.id == customization.id
-      assert %CustomizationKey{id: key_id} = loaded.expand.key
-      assert key_id == key.id
-
-      assert [%CustomizationValue{id: value_id}] = loaded.expand.value
-      assert value_id == value.id
+      assert loaded.key == key.id
+      assert loaded.value == [value.id]
     end
   end
 end

@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { OrderStateOptions } from "$lib/types";
-  import orders from "$stores/orderStore";
-  import { customizationKeys } from "$lib/stores/menuStore";
-  import type { CustomizationKey, CustomizationValue, Order, OrderItem } from "$lib/types";
+  import { orders, updateOrderState } from "$stores/orders";
+  import { customizationKeys } from "$stores/menu";
+  import type { CustomizationKey, Order, OrderItemSnapshot } from "$lib/types";
   import CommentIcon from "$assets/CommentIcon.svelte";
   import { getCharacters } from "$lib/utils";
 
@@ -68,10 +68,10 @@
       : ''} mb-6 block rounded shadow-md transition-colors"
     data-testid="order-row"
     data-order-number={orderNumber}
-    onclick={() => onclick && orders.updateState(order.id, onclick)}
+    onclick={() => onclick && updateOrderState(order.id, onclick)}
     role="button"
     tabindex="0"
-    onkeydown={(e) => e.key === "Enter" && orders.updateState(order.id, onclick)}
+    onkeydown={(e) => e.key === "Enter" && updateOrderState(order.id, onclick)}
     aria-label={`Order ${orderNumber} with ${order.items.length} items`}
   >
     <td class="{!detailed ? 'flex justify-center' : ''} text-4xl font-bold"
@@ -80,7 +80,7 @@
     {#if detailed}
       <td class="w-full">
         <ul class="space-y-2">
-          {#each order.items as orderItem, index (orderItem.id)}
+          {#each order.items as orderItem, index (index)}
             {@render OrderItem({ orderItem, index, showIndex: order.items.length > 1 })}
           {/each}
         </ul>
@@ -94,7 +94,7 @@
   index,
   showIndex
 }: {
-  orderItem: OrderItem;
+  orderItem: OrderItemSnapshot;
   index: number;
   showIndex: boolean;
 })}
@@ -107,14 +107,14 @@
           </span>
         {/if}
         <span class="flex items-center text-xl">
-          {orderItem.item.name}
+          {orderItem.name}
         </span>
       </div>
 
       {#if orderItem.customizations && orderItem.customizations.length > 0}
         <ul class="mt-1 flex flex-wrap gap-1" aria-label="Customizations">
-          {#each orderItem.customizations as customization (customization.id)}
-            {#if customization.name}
+          {#each orderItem.customizations as customization, custIdx (custIdx)}
+            {#if customization.valueName}
               {@render CustomizationBadge({ customization })}
             {/if}
           {/each}
@@ -124,18 +124,26 @@
   </li>
 {/snippet}
 
-{#snippet CustomizationBadge({ customization }: { customization: CustomizationValue })}
-  {@const keyId = customization.belongsTo || ""}
-  {@const key = getKeyById(keyId)}
+{#snippet CustomizationBadge({
+  customization
+}: {
+  customization: {
+    keyId: string;
+    keyName: string;
+    valueId: string;
+    valueName: string;
+    priceChange: number;
+  };
+})}
+  {@const key = getKeyById(customization.keyId)}
   {@const keyColor = key?.labelColor}
-  {@const keyName = key?.name || "Option"}
   <li>
     <span
       class="badge badge-lg px-2 py-1 text-xl"
       style={keyColor ? `background-color: ${keyColor}; color: white;` : ""}
-      aria-label={`${keyName}: ${customization.name}`}
+      aria-label={`${customization.keyName}: ${customization.valueName}`}
     >
-      {customization.name}
+      {customization.valueName}
     </span>
   </li>
 {/snippet}

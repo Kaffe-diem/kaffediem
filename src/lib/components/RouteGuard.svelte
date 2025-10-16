@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { page } from "$app/stores";
-  import auth from "$stores/authStore";
+  import auth from "$stores/auth";
   import { restrictedRoutes, adminRoutes } from "$lib/constants";
   import { resolve } from "$app/paths";
 

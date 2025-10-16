@@ -30,3 +30,18 @@ defmodule Kaffebase.Content.Message do
     end
   end
 end
+
+defimpl Jason.Encoder, for: Kaffebase.Content.Message do
+  def encode(message, opts) do
+    Jason.Encode.map(
+      %{
+        id: message.id,
+        title: message.title,
+        subtitle: message.subtitle,
+        created: message.created,
+        updated: message.updated
+      },
+      opts
+    )
+  end
+end

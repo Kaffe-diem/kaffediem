@@ -2,8 +2,8 @@ defmodule Kaffebase.Catalog.Category do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Kaffebase.EctoTypes.StringList
   alias Kaffebase.Ids
+  alias Kaffebase.EctoTypes.JsonbList
 
   @primary_key {:id, :string, autogenerate: false}
   @timestamps_opts [type: :utc_datetime_usec, inserted_at: :created, updated_at: :updated]
@@ -12,7 +12,7 @@ defmodule Kaffebase.Catalog.Category do
     field :enable, :boolean
     field :name, :string
     field :sort_order, :integer
-    field :valid_customizations, StringList, default: []
+    field :valid_customizations, JsonbList
 
     timestamps()
   end
@@ -31,5 +31,22 @@ defmodule Kaffebase.Catalog.Category do
       {:changes, nil} -> put_change(changeset, :id, Ids.generate())
       _ -> changeset
     end
+  end
+end
+
+defimpl Jason.Encoder, for: Kaffebase.Catalog.Category do
+  def encode(category, opts) do
+    Jason.Encode.map(
+      %{
+        id: category.id,
+        name: category.name,
+        sort_order: category.sort_order,
+        enable: category.enable,
+        valid_customizations: category.valid_customizations || [],
+        created: category.created,
+        updated: category.updated
+      },
+      opts
+    )
   end
 end

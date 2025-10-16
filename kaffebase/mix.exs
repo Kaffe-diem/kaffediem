@@ -43,6 +43,7 @@
       {:phoenix, "~> 1.8.1"},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.13"},
+      {:ecto_sqlite3_extras, "~> 1.2.0"},
       {:phoenix_html, "~> 4.1"},
       {:bcrypt_elixir, "~> 3.3"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},

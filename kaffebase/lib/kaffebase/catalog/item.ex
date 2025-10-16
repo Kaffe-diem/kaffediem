@@ -34,3 +34,22 @@ defmodule Kaffebase.Catalog.Item do
     end
   end
 end
+
+defimpl Jason.Encoder, for: Kaffebase.Catalog.Item do
+  def encode(item, opts) do
+    Jason.Encode.map(
+      %{
+        id: item.id,
+        name: item.name,
+        price_nok: item.price_nok,
+        category: item.category,
+        image: item.image,
+        enable: item.enable,
+        sort_order: item.sort_order,
+        created: item.created,
+        updated: item.updated
+      },
+      opts
+    )
+  end
+end

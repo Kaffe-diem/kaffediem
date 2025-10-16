@@ -1,22 +1,3 @@
-import {
-  categories,
-  items,
-  customizationKeys,
-  customizationValues,
-  itemCustomizations
-} from "$stores/menuStore";
-
-import { raw_orders } from "$stores/orderStore";
-import orders from "$stores/orderStore";
-import { status } from "$stores/statusStore";
-
-export function resetStores() {
-  categories.reset();
-  items.reset();
-  customizationKeys.reset();
-  customizationValues.reset();
-  itemCustomizations.reset();
-  raw_orders.reset();
-  orders.reset();
-  status.reset();
+export function resetStores(): void {
+  // Websocket-backed stores resync automatically when connectivity returns.
 }

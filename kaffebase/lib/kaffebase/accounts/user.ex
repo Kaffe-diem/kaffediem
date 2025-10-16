@@ -149,3 +149,21 @@ defmodule Kaffebase.Accounts.User do
     false
   end
 end
+
+defimpl Jason.Encoder, for: Kaffebase.Accounts.User do
+  def encode(user, opts) do
+    Jason.Encode.map(
+      %{
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        username: user.username,
+        is_admin: user.is_admin,
+        confirmed_at: user.confirmed_at,
+        created: user.inserted_at,
+        updated: user.updated_at
+      },
+      opts
+    )
+  end
+end

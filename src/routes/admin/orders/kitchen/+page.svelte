@@ -1,7 +1,7 @@
 <script lang="ts">
   import { OrderStateOptions } from "$lib/types";
   import OrderList from "../OrderList.svelte";
-  import orders from "$stores/orderStore";
+  import { undoLastStateChange } from "$stores/orders";
 
   const { received, production, completed } = OrderStateOptions;
 </script>
@@ -15,5 +15,5 @@
     <OrderList show={[production]} onclick={completed} label="Lages" />
   </div>
 
-  <button class="btn btn-lg btn-error mt-4" onclick={() => orders.undoLastAction()}>oops</button>
+  <button class="btn btn-lg btn-error mt-4" onclick={() => undoLastStateChange()}>oops</button>
 </div>

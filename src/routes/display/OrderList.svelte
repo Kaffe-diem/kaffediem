@@ -1,5 +1,5 @@
 <script lang="ts">
-  import orders from "$stores/orderStore";
+  import { orders } from "$stores/orders";
   import { flip } from "svelte/animate";
   import { cubicOut } from "svelte/easing";
   import type { CrossfadeParams, TransitionConfig } from "svelte/transition";

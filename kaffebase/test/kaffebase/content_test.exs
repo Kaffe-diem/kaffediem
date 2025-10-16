@@ -21,26 +21,26 @@ defmodule Kaffebase.ContentTest do
   end
 
   describe "status" do
-    test "get_status!/2 with preload inserts expand message" do
+    test "get_status!/1 retrieves status by id" do
       message = ContentFixtures.message_fixture()
       status = ContentFixtures.status_fixture(%{message: message})
 
-      loaded = Content.get_status!(status.id, preload: [:message])
+      loaded = Content.get_status!(status.id)
       assert loaded.id == status.id
-      assert loaded.expand.message.id == message.id
+      assert loaded.message == message.id
     end
 
-    test "get_singleton_status/1 returns nil when none" do
+    test "get_singleton_status/0 returns nil when none" do
       assert Content.get_singleton_status() == nil
     end
 
-    test "get_singleton_status/1 returns first status" do
+    test "get_singleton_status/0 returns first status" do
       message = ContentFixtures.message_fixture()
       status = ContentFixtures.status_fixture(%{message: message})
 
-      loaded = Content.get_singleton_status(preload: [:message])
+      loaded = Content.get_singleton_status()
       assert loaded.id == status.id
-      assert loaded.expand.message.id == message.id
+      assert loaded.message == message.id
     end
   end
 end

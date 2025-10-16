@@ -1,14 +1,18 @@
 <script lang="ts">
-  import { status } from "$stores/statusStore";
-  import { Status } from "$lib/types";
+  import { status, updateStatus } from "$stores/status";
   import { type Snippet } from "svelte";
   import { resolve } from "$app/paths";
+  import { get } from "svelte/store";
 
   interface Props {
     children: Snippet;
   }
 
   let { children }: Props = $props();
+  const openOrders = async () => {
+    const current = get(status);
+    await updateStatus({ ...current, open: true });
+  };
 </script>
 
 {#if $status.open}
@@ -21,10 +25,7 @@
     <button
       class="btn relative m-4 flex h-24 w-1/2 flex-col items-center justify-center text-3xl lg:text-5xl
 "
-      onclick={() =>
-        status.update(
-          new Status($status.id, $status.message, $status.messages, true, $status.showMessage)
-        )}>Åpne</button
+      onclick={openOrders}>Åpne</button
     >
     <a
       href={resolve("/admin/message")}

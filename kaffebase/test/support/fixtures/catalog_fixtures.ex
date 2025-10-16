@@ -1,7 +1,14 @@
 defmodule Kaffebase.CatalogFixtures do
   @moduledoc false
 
-  alias Kaffebase.Catalog
+  alias Kaffebase.Catalog.{
+    Category,
+    Crud,
+    CustomizationKey,
+    CustomizationValue,
+    Item,
+    ItemCustomization
+  }
 
   def unique_string(prefix) do
     unique = System.unique_integer([:positive, :monotonic])
@@ -16,10 +23,9 @@ defmodule Kaffebase.CatalogFixtures do
       valid_customizations: []
     }
 
-    {:ok, category} =
-      attrs
-      |> Enum.into(defaults)
-      |> Catalog.create_category()
+    params = Enum.into(attrs, defaults)
+
+    {:ok, category} = Crud.create(Category, params)
 
     category
   end
@@ -37,11 +43,12 @@ defmodule Kaffebase.CatalogFixtures do
       image: ""
     }
 
-    {:ok, item} =
+    params =
       attrs
       |> Map.delete(:category)
       |> Enum.into(defaults)
-      |> Catalog.create_item()
+
+    {:ok, item} = Crud.create(Item, params)
 
     item
   end
@@ -56,10 +63,9 @@ defmodule Kaffebase.CatalogFixtures do
       default_value: nil
     }
 
-    {:ok, key} =
-      attrs
-      |> Enum.into(defaults)
-      |> Catalog.create_customization_key()
+    params = Enum.into(attrs, defaults)
+
+    {:ok, key} = Crud.create(CustomizationKey, params)
 
     key
   end
@@ -77,11 +83,12 @@ defmodule Kaffebase.CatalogFixtures do
       sort_order: 1
     }
 
-    {:ok, value} =
+    params =
       attrs
       |> Map.delete(:key)
       |> Enum.into(defaults)
-      |> Catalog.create_customization_value()
+
+    {:ok, value} = Crud.create(CustomizationValue, params)
 
     value
   end
@@ -103,11 +110,12 @@ defmodule Kaffebase.CatalogFixtures do
       value: value_ids
     }
 
-    {:ok, item_customization} =
+    params =
       attrs
       |> Map.drop([:key, :values])
       |> Enum.into(defaults)
-      |> Catalog.create_item_customization()
+
+    {:ok, item_customization} = Crud.create(ItemCustomization, params)
 
     item_customization
   end

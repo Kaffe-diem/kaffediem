@@ -49,26 +49,21 @@ defmodule Kaffebase.Content do
 
   # Status -------------------------------------------------------------------
 
-  @spec list_statuses(keyword()) :: [Status.t()]
-  def list_statuses(opts \\ []) do
-    Status
-    |> Repo.all()
-    |> maybe_preload(opts)
+  @spec list_statuses() :: [Status.t()]
+  def list_statuses do
+    Repo.all(Status)
   end
 
-  @spec get_status!(String.t(), keyword()) :: Status.t()
-  def get_status!(id, opts \\ []) do
-    Status
-    |> Repo.get!(id)
-    |> maybe_preload(opts)
+  @spec get_status!(String.t()) :: Status.t()
+  def get_status!(id) do
+    Repo.get!(Status, id)
   end
 
-  @spec get_singleton_status(keyword()) :: Status.t() | nil
-  def get_singleton_status(opts \\ []) do
+  @spec get_singleton_status() :: Status.t() | nil
+  def get_singleton_status do
     Status
     |> limit(1)
     |> Repo.one()
-    |> maybe_preload(opts)
   end
 
   @spec create_status(map()) :: {:ok, Status.t()} | {:error, Ecto.Changeset.t()}
@@ -103,56 +98,6 @@ defmodule Kaffebase.Content do
   defp maybe_apply_order(query, []), do: query
 
   defp maybe_apply_order(query, orderings), do: order_by(query, ^orderings)
-
-  defp maybe_preload(nil, _opts), do: nil
-
-  defp maybe_preload(status_or_list, opts) do
-    if preload_message?(opts) do
-      preload_message(status_or_list)
-    else
-      status_or_list
-    end
-  end
-
-  defp preload_message?(opts) do
-    opts
-    |> Keyword.get(:preload, [])
-    |> List.wrap()
-    |> Enum.member?(:message)
-  end
-
-  defp preload_message(statuses) when is_list(statuses) do
-    message_map = fetch_messages(statuses)
-
-    Enum.map(statuses, fn status ->
-      expand =
-        Map.get(status, :expand, %{}) |> Map.put(:message, Map.get(message_map, status.message))
-
-      Map.put(status, :expand, expand)
-    end)
-  end
-
-  defp preload_message(%Status{} = status) do
-    message_map = fetch_messages([status])
-
-    expand =
-      Map.get(status, :expand, %{}) |> Map.put(:message, Map.get(message_map, status.message))
-
-    Map.put(status, :expand, expand)
-  end
-
-  defp fetch_messages(statuses) do
-    ids =
-      statuses
-      |> Enum.map(& &1.message)
-      |> Enum.reject(&is_nil/1)
-      |> Enum.uniq()
-
-    Message
-    |> where([m], m.id in ^ids)
-    |> Repo.all()
-    |> Map.new(&{&1.id, &1})
-  end
 
   defp notify({:ok, record} = result, collection, action) do
     CollectionNotifier.broadcast_change(collection, action, record)

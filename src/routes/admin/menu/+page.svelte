@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { categories, itemsByCategory } from "$stores/menuStore";
+  import { categories, itemsByCategory } from "$stores/menu";
   import type { Category, Item } from "$lib/types";
   import { resolve } from "$app/paths";
 </script>

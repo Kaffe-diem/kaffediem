@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
-  import { login as loginUser } from "$stores/authStore";
+  import { login as loginUser } from "$stores/auth";
 
   let email: string = "";
   let password: string = "";

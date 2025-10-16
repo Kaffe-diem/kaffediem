@@ -1,6 +1,11 @@
 <script lang="ts">
-  import { customizationKeys, customizationValues } from "$stores/menuStore";
-  import { CustomizationValue } from "$lib/types";
+  import {
+    customizationKeys,
+    customizationValues,
+    createCustomizationValue,
+    updateCustomizationValue
+  } from "$stores/menu";
+  import type { CustomizationValue } from "$lib/types";
   import { goto } from "$app/navigation";
 
   import StateToggle from "$components/menu/StateToggle.svelte";
@@ -34,31 +39,25 @@
     }
   });
 
-  function updateValue() {
+  async function handleSubmit(event: SubmitEvent) {
+    event.preventDefault();
+
+    if (!customizationName || customizationKey === undefined) return;
+
+    const payload: CustomizationValue = {
+      id: create ? "" : id,
+      name: customizationName,
+      priceChange: customizationPrice,
+      constantPrice: customizationConstantPrice,
+      belongsTo: customizationKey,
+      enabled: customizationEnabled,
+      sortOrder: customizationSort
+    };
+
     if (create) {
-      customizationValues.create(
-        new CustomizationValue(
-          id,
-          customizationName!,
-          customizationPrice!,
-          customizationConstantPrice!,
-          customizationKey!,
-          customizationEnabled,
-          customizationSort
-        )
-      );
+      await createCustomizationValue(payload);
     } else {
-      customizationValues.update(
-        new CustomizationValue(
-          id,
-          customizationName!,
-          customizationPrice!,
-          customizationConstantPrice!,
-          customizationKey!,
-          customizationEnabled,
-          customizationSort
-        )
-      );
+      await updateCustomizationValue({ ...payload, id });
     }
     goto(resolve("/admin/menu/customization"));
   }
@@ -73,7 +72,7 @@
 </h1>
 <div class="divider"></div>
 {#if exists || create}
-  <form onsubmit={updateValue} class="grid w-full grid-cols-3 gap-2">
+  <form onsubmit={handleSubmit} class="grid w-full grid-cols-3 gap-2">
     <div class="col-span-full">
       <Input
         label="Navn"

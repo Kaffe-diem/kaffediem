@@ -42,3 +42,22 @@ defmodule Kaffebase.Catalog.CustomizationValue do
     end
   end
 end
+
+defimpl Jason.Encoder, for: Kaffebase.Catalog.CustomizationValue do
+  def encode(value, opts) do
+    Jason.Encode.map(
+      %{
+        id: value.id,
+        name: value.name,
+        price_increment_nok: value.price_increment_nok,
+        constant_price: value.constant_price,
+        belongs_to: value.belongs_to,
+        enable: value.enable,
+        sort_order: value.sort_order,
+        created: value.created,
+        updated: value.updated
+      },
+      opts
+    )
+  end
+end

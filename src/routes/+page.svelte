@@ -1,10 +1,18 @@
 <script>
-  import auth from "$stores/authStore";
+  import auth from "$stores/auth";
   import Logo from "$assets/logo.avif";
   import AuthButton from "$components/AuthButton.svelte";
   import Menu from "./Menu.svelte";
-  import { status } from "$stores/statusStore";
+  import { status, messages } from "$stores/status";
   import { resolve } from "$app/paths";
+
+  const activeMessage = $derived(
+    $messages.find((message) => message.id === $status.messageId) ?? {
+      id: "",
+      title: "",
+      subtitle: ""
+    }
+  );
 </script>
 
 <img
@@ -22,12 +30,12 @@
       <li>Vi er åpen!</li>
       {#if $status.showMessage}
         <br />
-        <li class="font-bold">{$status.message.title}</li>
-        <li>{$status.message.subtitle}</li>
+        <li class="font-bold">{activeMessage.title}</li>
+        <li>{activeMessage.subtitle}</li>
       {/if}
     {:else}
-      <li class="font-bold">{$status.message.title}</li>
-      <li>{$status.message.subtitle}</li>
+      <li class="font-bold">{activeMessage.title}</li>
+      <li>{activeMessage.subtitle}</li>
     {/if}
   </ul>
 </div>

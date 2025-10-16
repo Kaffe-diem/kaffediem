@@ -1,12 +1,12 @@
-defmodule Kaffebase.Orders.Commands.PlaceOrderTest do
+defmodule Kaffebase.Orders.PlaceOrderTest do
   use Kaffebase.DataCase
 
   alias Kaffebase.AccountsFixtures
   alias Kaffebase.CatalogFixtures
-  alias Kaffebase.Orders.Commands.PlaceOrder
+  alias Kaffebase.Orders.PlaceOrder
 
   describe "new/1" do
-    test "normalizes nested payload" do
+    test "builds JSONB snapshot from catalog" do
       user = AccountsFixtures.user_fixture()
       item = CatalogFixtures.item_fixture()
       customization_key = CatalogFixtures.customization_key_fixture()
@@ -15,16 +15,16 @@ defmodule Kaffebase.Orders.Commands.PlaceOrderTest do
         CatalogFixtures.customization_value_fixture(%{key: customization_key})
 
       payload = %{
-        "customer" => %{"id" => to_string(user.id)},
-        "missing_information" => "true",
-        "state" => "COMPLETED",
-        "items" => [
+        customer_id: user.id,
+        missing_information: true,
+        state: :completed,
+        items: [
           %{
-            "item" => item.id,
-            "customizations" => [
+            item: item.id,
+            customizations: [
               %{
-                "key" => customization_key.id,
-                "value" => [customization_value.id]
+                key: customization_key.id,
+                value: [customization_value.id]
               }
             ]
           }
@@ -32,38 +32,39 @@ defmodule Kaffebase.Orders.Commands.PlaceOrderTest do
       }
 
       assert {:ok, command} = PlaceOrder.new(payload)
-      assert command.customer_id == to_string(user.id)
+      assert command.customer_id == user.id
       assert command.missing_information
       assert command.state == :completed
 
-      [entry] = command.items
-      assert entry.item_id == item.id
-      refute entry.existing_order_item_id
+      [snapshot] = command.items
+      assert snapshot[:item_id] == item.id
+      assert snapshot[:name] == item.name
+      assert snapshot[:price] == Decimal.to_string(item.price_nok)
 
-      [selection] = entry.customizations
-      assert selection.key_id == customization_key.id
-      assert selection.value_ids == [customization_value.id]
+      [customization] = snapshot[:customizations]
+      assert customization[:key_id] == customization_key.id
+      assert customization[:value_id] == customization_value.id
     end
 
     test "rejects payload without items" do
-      assert {:error, changeset} = PlaceOrder.new(%{"items" => []})
+      assert {:error, changeset} = PlaceOrder.new(%{items: []})
       refute changeset.valid?
       assert %{items: messages} = errors_on(changeset)
-      assert Enum.any?(messages, &String.contains?(&1, "blank"))
+      assert "can't be blank" in messages
     end
 
-    test "rejects payload mixing existing reference and new item" do
-      item = CatalogFixtures.item_fixture()
-
+    test "rejects invalid items" do
       payload = %{
-        "items" => [
-          %{"item" => item.id, "order_item" => "existing"}
+        items: [
+          %{item: nil}
         ]
       }
 
       assert {:error, changeset} = PlaceOrder.new(payload)
       refute changeset.valid?
-      assert %{items: [_ | _]} = errors_on(changeset)
+      assert %{items: [item_errors]} = errors_on(changeset)
+      assert %{item: messages} = item_errors
+      assert "is required" in messages or "can't be blank" in messages
     end
   end
 end

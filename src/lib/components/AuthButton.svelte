@@ -1,5 +1,5 @@
 <script lang="ts">
-  import auth from "$stores/authStore";
+  import auth from "$stores/auth";
   import { resolve } from "$app/paths";
 
   interface Props {
