@@ -6,7 +6,6 @@ export enum Collections {
   ItemCustomization = "item_customization",
   Message = "message",
   Order = "order",
-  OrderItem = "order_item",
   Status = "status",
   User = "user"
 }
@@ -71,8 +70,6 @@ export type ItemCustomizationDTO = {
   id: RecordIdString;
   key_id: RecordIdString;
   value_ids: RecordIdString[];
-  key?: CustomizationKeyDTO | null;
-  values?: CustomizationValueDTO[];
   created?: IsoDateString;
   updated?: IsoDateString;
 };
@@ -95,24 +92,29 @@ export type StatusDTO = {
   updated?: IsoDateString;
 };
 
-export type OrderItemDTO = {
-  id: RecordIdString;
+export type OrderItemSnapshotCustomizationDTO = {
+  key_id: RecordIdString;
+  key_name: string;
+  value_id: RecordIdString;
+  value_name: string;
+  price_change: string;
+};
+
+export type OrderItemSnapshotDTO = {
   item_id: RecordIdString;
-  customization_ids: RecordIdString[];
-  item?: ItemDTO | null;
-  customizations: ItemCustomizationDTO[];
-  created?: IsoDateString;
-  updated?: IsoDateString;
+  name: string;
+  price: string;
+  category: RecordIdString;
+  customizations: OrderItemSnapshotCustomizationDTO[];
 };
 
 export type OrderDTO = {
   id: RecordIdString;
-  customer_id: RecordIdString | null;
+  customer_id: number | null;
   day_id: number;
   state: OrderStateOptions;
   missing_information: boolean;
-  order_item_ids: RecordIdString[];
-  items: OrderItemDTO[];
+  items: OrderItemSnapshotDTO[];
   created?: IsoDateString;
   updated?: IsoDateString;
 };

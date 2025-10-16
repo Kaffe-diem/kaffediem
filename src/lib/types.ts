@@ -8,7 +8,7 @@ import {
   type ItemDTO,
   type MessageDTO,
   type OrderDTO,
-  type OrderItemDTO,
+  type OrderItemSnapshotDTO,
   type StatusDTO
 } from "$lib/api/contracts";
 import { restrictedRoutes, adminRoutes } from "$lib/constants";
@@ -61,14 +61,46 @@ export class User {
   }
 }
 
+export class OrderItemSnapshot {
+  constructor(
+    public readonly itemId: RecordIdString,
+    public readonly name: string,
+    public readonly price: number,
+    public readonly category: RecordIdString,
+    public readonly customizations: Array<{
+      keyId: RecordIdString;
+      keyName: string;
+      valueId: RecordIdString;
+      valueName: string;
+      priceChange: number;
+    }>
+  ) {}
+
+  static fromApi(data: OrderItemSnapshotDTO): OrderItemSnapshot {
+    return new OrderItemSnapshot(
+      data.item_id,
+      data.name,
+      parseFloat(data.price),
+      data.category,
+      data.customizations.map((c) => ({
+        keyId: c.key_id,
+        keyName: c.key_name,
+        valueId: c.value_id,
+        valueName: c.value_name,
+        priceChange: parseFloat(c.price_change)
+      }))
+    );
+  }
+}
+
 export class Order implements RecordBase {
   constructor(
     public readonly id: RecordIdString,
     public readonly state: State,
-    public readonly items: Array<OrderItem>,
+    public readonly items: Array<OrderItemSnapshot>,
     public readonly missingInformation: boolean,
     public readonly dayId: number,
-    public readonly customerId: RecordIdString | null,
+    public readonly customerId: number | null,
     public readonly createdAt?: string,
     public readonly updatedAt?: string
   ) {}
@@ -76,13 +108,12 @@ export class Order implements RecordBase {
   toApi() {
     return {
       state: this.state,
-      missing_information: this.missingInformation,
-      items: this.items.map((item) => item.toApi())
+      missing_information: this.missingInformation
     };
   }
 
   static fromApi(data: OrderDTO): Order {
-    const items = data.items?.map(OrderItem.fromApi) ?? [];
+    const items = data.items?.map(OrderItemSnapshot.fromApi) ?? [];
     return new Order(
       data.id,
       data.state,
@@ -93,51 +124,6 @@ export class Order implements RecordBase {
       data.created,
       data.updated
     );
-  }
-}
-
-export class OrderItem implements RecordBase {
-  constructor(
-    public readonly id: RecordIdString,
-    public readonly item: Item,
-    public readonly customizations: CustomizationValue[] = [],
-    public readonly customizationIds: RecordIdString[] = []
-  ) {}
-
-  toApi() {
-    return {
-      item_id: this.item.id,
-      customizations: this.customizations
-        .filter((customization) => Boolean(customization.belongsTo))
-        .map((customization) => ({
-          key_id: customization.belongsTo!,
-          value: customization.id
-        }))
-    };
-  }
-
-  static fromApi(data: OrderItemDTO): OrderItem {
-    const item = data.item ? Item.fromApi(data.item) : Item.empty();
-
-    const customizations = (data.customizations ?? []).flatMap((customization) => {
-      const values = customization.values ?? [];
-      return values.map((value) => {
-        const mapped = CustomizationValue.fromApi(value);
-
-        // Ensure the value is linked to the correct key id even if the payload omits it.
-        return new CustomizationValue(
-          mapped.id,
-          mapped.name,
-          mapped.priceChange,
-          mapped.constantPrice,
-          customization.key_id ?? mapped.belongsTo,
-          mapped.enabled,
-          mapped.sortOrder
-        );
-      });
-    });
-
-    return new OrderItem(data.id, item, customizations, data.customization_ids ?? []);
   }
 }
 
@@ -345,9 +331,7 @@ export class ItemCustomization implements RecordBase {
   constructor(
     public readonly id: RecordIdString,
     public readonly keyId: RecordIdString,
-    public readonly valueIds: RecordIdString[],
-    public readonly key?: CustomizationKey,
-    public readonly values?: CustomizationValue[]
+    public readonly valueIds: RecordIdString[]
   ) {}
 
   toApi() {
@@ -358,12 +342,6 @@ export class ItemCustomization implements RecordBase {
   }
 
   static fromApi(data: ItemCustomizationDTO): ItemCustomization {
-    return new ItemCustomization(
-      data.id,
-      data.key_id,
-      data.value_ids ?? [],
-      data.key ? CustomizationKey.fromApi(data.key) : undefined,
-      data.values ? data.values.map(CustomizationValue.fromApi) : undefined
-    );
+    return new ItemCustomization(data.id, data.key_id, data.value_ids ?? []);
   }
 }
