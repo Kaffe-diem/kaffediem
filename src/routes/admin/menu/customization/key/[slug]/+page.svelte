@@ -1,10 +1,10 @@
 <script lang="ts">
   import {
-  customizationKeys,
-  customizationsByKey,
-  createCustomizationKey,
-  updateCustomizationKey
-} from "$stores/menu";
+    customizationKeys,
+    customizationsByKey,
+    createCustomizationKey,
+    updateCustomizationKey
+  } from "$stores/menu";
   import type { CustomizationKey } from "$lib/types";
   import { goto } from "$app/navigation";
 

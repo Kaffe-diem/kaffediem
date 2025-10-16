@@ -1,12 +1,12 @@
 <script lang="ts">
   import {
-  messages,
-  status,
-  createMessage,
-  updateMessage,
-  deleteMessage,
-  updateStatus
-} from "$stores/status";
+    messages,
+    status,
+    createMessage,
+    updateMessage,
+    deleteMessage,
+    updateStatus
+  } from "$stores/status";
   import type { Message, Status } from "$lib/types";
   import Visible from "$assets/Visible.svelte";
   import Hidden from "$assets/Hidden.svelte";

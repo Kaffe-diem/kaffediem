@@ -93,7 +93,10 @@
                 onchange={(event) => {
                   if (event.currentTarget.checked) {
                     if (!categoryValidCustomizations.includes(customizationKey.id)) {
-                      categoryValidCustomizations = [...categoryValidCustomizations, customizationKey.id];
+                      categoryValidCustomizations = [
+                        ...categoryValidCustomizations,
+                        customizationKey.id
+                      ];
                     }
                   } else {
                     categoryValidCustomizations = categoryValidCustomizations.filter(

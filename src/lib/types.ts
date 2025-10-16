@@ -219,7 +219,7 @@ export type User = {
   id: string;
   name: string;
   isAdmin: boolean;
-}
+};
 
 type NavRoutes = "/account" | "/admin";
 
@@ -410,7 +410,9 @@ export function statusToApi(status: Status): Partial<StatusDTO> {
 }
 
 // User helper for auth - handle null/partial data
-export function userFromBackend(data: { id?: string; name?: string; is_admin?: boolean } | null): User {
+export function userFromBackend(
+  data: { id?: string; name?: string; is_admin?: boolean } | null
+): User {
   if (!data) {
     return { id: "", name: "", isAdmin: false };
   }

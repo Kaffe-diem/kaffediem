@@ -22,7 +22,10 @@ import {
 export const categories = createCollection("category", categoryFromApi);
 export const items = createCollection("item", itemFromApi);
 export const customizationKeys = createCollection("customization_key", customizationKeyFromApi);
-export const customizationValues = createCollection("customization_value", customizationValueFromApi);
+export const customizationValues = createCollection(
+  "customization_value",
+  customizationValueFromApi
+);
 export const itemCustomizations = createCollection("item_customization", itemCustomizationFromApi);
 
 // Derived store - group items by category
