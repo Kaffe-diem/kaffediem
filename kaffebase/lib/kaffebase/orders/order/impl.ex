@@ -17,7 +17,6 @@ defmodule Kaffebase.Orders.Process.Impl do
           day_id: integer(),
           state: atom(),
           missing_information: boolean(),
-          item_ids: [String.t()],
           events: [struct()]
         }
 
@@ -73,8 +72,7 @@ defmodule Kaffebase.Orders.Process.Impl do
 
   @doc "Get full order representation for broadcast"
   def get_order_for_broadcast(state) do
-    order = Repo.get!(Order, state.order_id)
-    add_expanded_items(order)
+    Repo.get!(Order, state.order_id)
   end
 
   # Event Replay
@@ -86,7 +84,6 @@ defmodule Kaffebase.Orders.Process.Impl do
       day_id: nil,
       state: nil,
       missing_information: false,
-      item_ids: [],
       events: []
     }
 
@@ -100,7 +97,6 @@ defmodule Kaffebase.Orders.Process.Impl do
         day_id: event.day_id,
         state: :received,
         missing_information: event.missing_information,
-        item_ids: event.item_ids,
         events: [event | state.events]
     }
   end
@@ -145,21 +141,5 @@ defmodule Kaffebase.Orders.Process.Impl do
   defp delete_from_db(order_id) do
     order = Repo.get!(Order, order_id)
     Repo.delete(order)
-  end
-
-  # JSONB Expansion
-
-  defp add_expanded_items(%Order{items_data: items_data} = order) when is_binary(items_data) do
-    items =
-      case Jason.decode(items_data, keys: :atoms) do
-        {:ok, decoded} -> decoded
-        _ -> []
-      end
-
-    Map.put(order, :items, items)
-  end
-
-  defp add_expanded_items(%Order{} = order) do
-    Map.put(order, :items, [])
   end
 end
