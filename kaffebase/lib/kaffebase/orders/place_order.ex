@@ -70,11 +70,22 @@ defmodule Kaffebase.Orders.PlaceOrder do
   defp normalize_items(items) when is_list(items), do: items
   defp normalize_items(_), do: []
 
+  defp build_item_snapshot(%{"item" => item_id, "customizations" => customizations}) when is_binary(item_id) do
+    case Catalog.get_item(item_id) do
+      nil -> :error
+      item -> snapshot_item(item, customizations)
+    end
+  end
+
   defp build_item_snapshot(%{item: item_id, customizations: customizations}) when is_binary(item_id) do
     case Catalog.get_item(item_id) do
       nil -> :error
       item -> snapshot_item(item, customizations)
     end
+  end
+
+  defp build_item_snapshot(%{"item" => item_id}) when is_binary(item_id) do
+    build_item_snapshot(%{"item" => item_id, "customizations" => []})
   end
 
   defp build_item_snapshot(%{item: item_id}) when is_binary(item_id) do
@@ -95,6 +106,9 @@ defmodule Kaffebase.Orders.PlaceOrder do
 
   defp build_customizations_snapshot(customizations) when is_list(customizations) do
     Enum.flat_map(customizations, fn
+      %{"key" => key_id, "value" => value_ids} ->
+        snapshot_customization(key_id, List.wrap(value_ids))
+
       %{key: key_id, value: value_ids} ->
         snapshot_customization(key_id, List.wrap(value_ids))
 
