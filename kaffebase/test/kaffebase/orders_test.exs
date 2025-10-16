@@ -79,8 +79,8 @@ defmodule Kaffebase.OrdersTest do
             %{
               item: item.id,
               customizations: [
-                %{key: key.id, value: value_a.id},
-                %{key: key.id, value: value_b.id}
+                %{key: key.id, value: [value_a.id]},
+                %{key: key.id, value: [value_b.id]}
               ]
             }
           ]

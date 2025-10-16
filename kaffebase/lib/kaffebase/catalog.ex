@@ -3,268 +3,149 @@ defmodule Kaffebase.Catalog do
   Catalog context that replaces the PocketBase collections for menu configuration.
   """
 
-  import Ecto.Query, warn: false
-
-  alias Kaffebase.Repo
-  alias Kaffebase.CollectionNotifier
+  import Ecto.Query, only: [where: 3]
 
   alias Kaffebase.Catalog.{
     Category,
     CustomizationKey,
     CustomizationValue,
     Item,
-    ItemCustomization
+    ItemCustomization,
+    Crud
   }
 
-  @type order_option :: {:asc | :desc, atom()}
+  alias Kaffebase.Repo
+
+  @default_order [asc: :sort_order, asc: :name]
+  @category_collection "category"
+  @item_collection "item"
+  @customization_key_collection "customization_key"
+  @customization_value_collection "customization_value"
+  @item_customization_collection "item_customization"
 
   # Category -----------------------------------------------------------------
 
-  @spec list_categories(keyword()) :: [Category.t()]
-  def list_categories(opts \\ []) do
-    Category
-    |> maybe_apply_order(opts[:order_by] || [asc: :sort_order, asc: :name])
-    |> Repo.all()
-  end
+  def list_categories(opts \\ []), do: Crud.list(Category, opts, @default_order)
+  def get_category!(id), do: Crud.get!(Category, id)
+  def create_category(attrs \\ %{}), do: Crud.create(Category, attrs, @category_collection)
 
-  @spec get_category!(String.t()) :: Category.t()
-  def get_category!(id), do: Repo.get!(Category, id)
+  def update_category(%Category{} = category, attrs),
+    do: Crud.update(Category, category, attrs, @category_collection)
 
-  @spec create_category(map()) :: {:ok, Category.t()} | {:error, Ecto.Changeset.t()}
-  def create_category(attrs \\ %{}) do
-    %Category{}
-    |> Category.changeset(attrs)
-    |> Repo.insert()
-    |> notify("category", "create")
-  end
+  def delete_category(%Category{} = category),
+    do: Crud.delete(Category, category, @category_collection)
 
-  @spec update_category(Category.t(), map()) :: {:ok, Category.t()} | {:error, Ecto.Changeset.t()}
-  def update_category(%Category{} = category, attrs) do
-    category
-    |> Category.changeset(attrs)
-    |> Repo.update()
-    |> notify("category", "update")
-  end
-
-  @spec delete_category(Category.t()) :: {:ok, Category.t()} | {:error, Ecto.Changeset.t()}
-  def delete_category(%Category{} = category) do
-    category
-    |> Repo.delete()
-    |> notify_delete("category")
-  end
-
-  @spec change_category(Category.t(), map()) :: Ecto.Changeset.t()
   def change_category(%Category{} = category, attrs \\ %{}),
-    do: Category.changeset(category, attrs)
+    do: Crud.change(Category, category, attrs)
 
   # Item ----------------------------------------------------------------------
 
-  @spec list_items(keyword()) :: [Item.t()]
-  def list_items(opts \\ []) do
-    Item
-    |> maybe_filter(:category, opts[:category] || opts[:category_id])
-    |> maybe_apply_order(opts[:order_by] || [asc: :sort_order, asc: :name])
-    |> Repo.all()
-  end
+  def list_items(opts \\ []),
+    do: Crud.list(Item, normalize_category_filter(opts), @default_order)
 
-  @spec get_item(String.t()) :: Item.t() | nil
-  def get_item(id), do: Repo.get(Item, id)
+  def get_item(id), do: Crud.get(Item, id)
+  def get_item!(id), do: Crud.get!(Item, id)
+  def create_item(attrs \\ %{}), do: Crud.create(Item, attrs, @item_collection)
 
-  @spec get_item!(String.t()) :: Item.t()
-  def get_item!(id), do: Repo.get!(Item, id)
+  def update_item(%Item{} = item, attrs),
+    do: Crud.update(Item, item, attrs, @item_collection)
 
-  @spec create_item(map()) :: {:ok, Item.t()} | {:error, Ecto.Changeset.t()}
-  def create_item(attrs \\ %{}) do
-    %Item{}
-    |> Item.changeset(attrs)
-    |> Repo.insert()
-    |> notify("item", "create")
-  end
+  def delete_item(%Item{} = item),
+    do: Crud.delete(Item, item, @item_collection)
 
-  @spec update_item(Item.t(), map()) :: {:ok, Item.t()} | {:error, Ecto.Changeset.t()}
-  def update_item(%Item{} = item, attrs) do
-    item
-    |> Item.changeset(attrs)
-    |> Repo.update()
-    |> notify("item", "update")
-  end
-
-  @spec delete_item(Item.t()) :: {:ok, Item.t()} | {:error, Ecto.Changeset.t()}
-  def delete_item(%Item{} = item) do
-    item
-    |> Repo.delete()
-    |> notify_delete("item")
-  end
-
-  @spec change_item(Item.t(), map()) :: Ecto.Changeset.t()
-  def change_item(%Item{} = item, attrs \\ %{}), do: Item.changeset(item, attrs)
+  def change_item(%Item{} = item, attrs \\ %{}),
+    do: Crud.change(Item, item, attrs)
 
   # Customization keys --------------------------------------------------------
 
-  @spec list_customization_keys(keyword()) :: [CustomizationKey.t()]
-  def list_customization_keys(opts \\ []) do
-    CustomizationKey
-    |> maybe_apply_order(opts[:order_by] || [asc: :sort_order, asc: :name])
-    |> Repo.all()
-  end
+  def list_customization_keys(opts \\ []),
+    do: Crud.list(CustomizationKey, opts, @default_order)
 
-  @spec get_customization_key(String.t()) :: CustomizationKey.t() | nil
-  def get_customization_key(id), do: Repo.get(CustomizationKey, id)
+  def get_customization_key(id), do: Crud.get(CustomizationKey, id)
+  def get_customization_key!(id), do: Crud.get!(CustomizationKey, id)
 
-  @spec get_customization_key!(String.t()) :: CustomizationKey.t()
-  def get_customization_key!(id), do: Repo.get!(CustomizationKey, id)
+  def create_customization_key(attrs \\ %{}),
+    do: Crud.create(CustomizationKey, attrs, @customization_key_collection)
 
-  @spec create_customization_key(map()) ::
-          {:ok, CustomizationKey.t()} | {:error, Ecto.Changeset.t()}
-  def create_customization_key(attrs \\ %{}) do
-    %CustomizationKey{}
-    |> CustomizationKey.changeset(attrs)
-    |> Repo.insert()
-    |> notify("customization_key", "create")
-  end
+  def update_customization_key(%CustomizationKey{} = key, attrs),
+    do: Crud.update(CustomizationKey, key, attrs, @customization_key_collection)
 
-  @spec update_customization_key(CustomizationKey.t(), map()) ::
-          {:ok, CustomizationKey.t()} | {:error, Ecto.Changeset.t()}
-  def update_customization_key(%CustomizationKey{} = key, attrs) do
-    key
-    |> CustomizationKey.changeset(attrs)
-    |> Repo.update()
-    |> notify("customization_key", "update")
-  end
+  def delete_customization_key(%CustomizationKey{} = key),
+    do: Crud.delete(CustomizationKey, key, @customization_key_collection)
 
-  @spec delete_customization_key(CustomizationKey.t()) ::
-          {:ok, CustomizationKey.t()} | {:error, Ecto.Changeset.t()}
-  def delete_customization_key(%CustomizationKey{} = key) do
-    key
-    |> Repo.delete()
-    |> notify_delete("customization_key")
-  end
-
-  @spec change_customization_key(CustomizationKey.t(), map()) :: Ecto.Changeset.t()
   def change_customization_key(%CustomizationKey{} = key, attrs \\ %{}),
-    do: CustomizationKey.changeset(key, attrs)
+    do: Crud.change(CustomizationKey, key, attrs)
 
   # Customization values ------------------------------------------------------
 
-  @spec list_customization_values(keyword()) :: [CustomizationValue.t()]
-  def list_customization_values(opts \\ []) do
-    CustomizationValue
-    |> maybe_filter(:belongs_to, opts[:belongs_to] || opts[:key_id])
-    |> maybe_apply_order(opts[:order_by] || [asc: :sort_order, asc: :name])
-    |> Repo.all()
-  end
+  def list_customization_values(opts \\ []),
+    do: Crud.list(CustomizationValue, normalize_customization_value_filter(opts), @default_order)
 
-  @spec get_customization_value(String.t()) :: CustomizationValue.t() | nil
-  def get_customization_value(id), do: Repo.get(CustomizationValue, id)
+  def get_customization_value(id), do: Crud.get(CustomizationValue, id)
+  def get_customization_value!(id), do: Crud.get!(CustomizationValue, id)
 
-  @spec get_customization_value!(String.t()) :: CustomizationValue.t()
-  def get_customization_value!(id), do: Repo.get!(CustomizationValue, id)
+  def create_customization_value(attrs \\ %{}),
+    do: Crud.create(CustomizationValue, attrs, @customization_value_collection)
 
-  @spec create_customization_value(map()) ::
-          {:ok, CustomizationValue.t()} | {:error, Ecto.Changeset.t()}
-  def create_customization_value(attrs \\ %{}) do
-    %CustomizationValue{}
-    |> CustomizationValue.changeset(attrs)
-    |> Repo.insert()
-    |> notify("customization_value", "create")
-  end
+  def update_customization_value(%CustomizationValue{} = value, attrs),
+    do: Crud.update(CustomizationValue, value, attrs, @customization_value_collection)
 
-  @spec update_customization_value(CustomizationValue.t(), map()) ::
-          {:ok, CustomizationValue.t()} | {:error, Ecto.Changeset.t()}
-  def update_customization_value(%CustomizationValue{} = value, attrs) do
-    value
-    |> CustomizationValue.changeset(attrs)
-    |> Repo.update()
-    |> notify("customization_value", "update")
-  end
+  def delete_customization_value(%CustomizationValue{} = value),
+    do: Crud.delete(CustomizationValue, value, @customization_value_collection)
 
-  @spec delete_customization_value(CustomizationValue.t()) ::
-          {:ok, CustomizationValue.t()} | {:error, Ecto.Changeset.t()}
-  def delete_customization_value(%CustomizationValue{} = value) do
-    value
-    |> Repo.delete()
-    |> notify_delete("customization_value")
-  end
-
-  @spec change_customization_value(CustomizationValue.t(), map()) :: Ecto.Changeset.t()
   def change_customization_value(%CustomizationValue{} = value, attrs \\ %{}),
-    do: CustomizationValue.changeset(value, attrs)
+    do: Crud.change(CustomizationValue, value, attrs)
 
   # Item customizations -------------------------------------------------------
 
-  @spec list_item_customizations() :: [ItemCustomization.t()]
-  def list_item_customizations do
-    Repo.all(ItemCustomization)
-  end
+  def list_item_customizations,
+    do: Crud.list(ItemCustomization, [order_by: []], [])
 
-  @spec list_item_customizations_by_ids([String.t()]) :: [ItemCustomization.t()]
   def list_item_customizations_by_ids(ids) when is_list(ids) do
     ItemCustomization
     |> where([ic], ic.id in ^ids)
     |> Repo.all()
   end
 
-  @spec get_item_customization!(String.t()) :: ItemCustomization.t()
-  def get_item_customization!(id) do
-    Repo.get!(ItemCustomization, id)
-  end
+  def get_item_customization!(id), do: Crud.get!(ItemCustomization, id)
 
-  @spec create_item_customization(map()) ::
-          {:ok, ItemCustomization.t()} | {:error, Ecto.Changeset.t()}
-  def create_item_customization(attrs \\ %{}) do
-    %ItemCustomization{}
-    |> ItemCustomization.changeset(attrs)
-    |> Repo.insert()
-    |> notify("item_customization", "create")
-  end
+  def create_item_customization(attrs \\ %{}),
+    do: Crud.create(ItemCustomization, attrs, @item_customization_collection)
 
-  @spec update_item_customization(ItemCustomization.t(), map()) ::
-          {:ok, ItemCustomization.t()} | {:error, Ecto.Changeset.t()}
-  def update_item_customization(%ItemCustomization{} = customization, attrs) do
-    customization
-    |> ItemCustomization.changeset(attrs)
-    |> Repo.update()
-    |> notify("item_customization", "update")
-  end
+  def update_item_customization(%ItemCustomization{} = customization, attrs),
+    do: Crud.update(ItemCustomization, customization, attrs, @item_customization_collection)
 
-  @spec delete_item_customization(ItemCustomization.t()) ::
-          {:ok, ItemCustomization.t()} | {:error, Ecto.Changeset.t()}
-  def delete_item_customization(%ItemCustomization{} = customization) do
-    customization
-    |> Repo.delete()
-    |> notify_delete("item_customization")
-  end
+  def delete_item_customization(%ItemCustomization{} = customization),
+    do: Crud.delete(ItemCustomization, customization, @item_customization_collection)
 
-  @spec change_item_customization(ItemCustomization.t(), map()) :: Ecto.Changeset.t()
   def change_item_customization(%ItemCustomization{} = customization, attrs \\ %{}),
-    do: ItemCustomization.changeset(customization, attrs)
+    do: Crud.change(ItemCustomization, customization, attrs)
 
   # Helpers ------------------------------------------------------------------
 
-  defp maybe_filter(query, _field, nil), do: query
+  defp normalize_category_filter(opts) do
+    category = opts[:category] || opts[:category_id]
 
-  defp maybe_filter(query, field, value) do
-    where(query, [..., q], field(q, ^field) == ^value)
+    opts
+    |> Keyword.drop([:category, :category_id])
+    |> put_filter(:category, category)
   end
 
-  defp maybe_apply_order(query, nil), do: query
-  defp maybe_apply_order(query, []), do: query
+  defp normalize_customization_value_filter(opts) do
+    belongs_to = opts[:belongs_to] || opts[:key_id]
 
-  defp maybe_apply_order(query, orderings) when is_list(orderings) do
-    order_by(query, ^orderings)
+    opts
+    |> Keyword.drop([:belongs_to, :key_id])
+    |> put_filter(:belongs_to, belongs_to)
   end
 
-  defp notify({:ok, record} = result, collection, action) do
-    CollectionNotifier.broadcast_change(collection, action, record)
-    result
+  defp put_filter(opts, _field, nil), do: opts
+
+  defp put_filter(opts, field, value) do
+    Keyword.update(opts, :filter, {field, value}, fn
+      {_, _} = existing -> [existing, {field, value}]
+      list when is_list(list) -> [{field, value} | list]
+      other -> [other, {field, value}]
+    end)
   end
-
-  defp notify(result, _collection, _action), do: result
-
-  defp notify_delete({:ok, record} = result, collection) do
-    CollectionNotifier.broadcast_delete(collection, record.id)
-    result
-  end
-
-  defp notify_delete(result, _collection), do: result
 end

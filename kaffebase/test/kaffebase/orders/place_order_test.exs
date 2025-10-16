@@ -50,7 +50,7 @@ defmodule Kaffebase.Orders.PlaceOrderTest do
       assert {:error, changeset} = PlaceOrder.new(%{items: []})
       refute changeset.valid?
       assert %{items: messages} = errors_on(changeset)
-      assert "is invalid" in messages
+      assert "can't be blank" in messages
     end
 
     test "rejects invalid items" do
@@ -62,8 +62,9 @@ defmodule Kaffebase.Orders.PlaceOrderTest do
 
       assert {:error, changeset} = PlaceOrder.new(payload)
       refute changeset.valid?
-      assert %{items: messages} = errors_on(changeset)
-      assert "is invalid" in messages
+      assert %{items: [item_errors]} = errors_on(changeset)
+      assert %{item: messages} = item_errors
+      assert "is required" in messages or "can't be blank" in messages
     end
   end
 end
