@@ -40,8 +40,8 @@ const serializeCartItems = (items: CartItem[]) =>
     customizations: (item.customizations ?? [])
       .filter((customization) => Boolean(customization.belongsTo))
       .map((customization) => ({
-        key_id: customization.belongsTo!,
-        value: customization.id
+        key: customization.belongsTo!,
+        value: [customization.id]
       }))
   }));
 
@@ -49,9 +49,9 @@ export default {
   ...ordersStore,
   reset: ordersStore.reset,
 
-  create: async (userId: RecordIdString, items: CartItem[], missingInformation: boolean) => {
+  create: async (userId: RecordIdString | number, items: CartItem[], missingInformation: boolean) => {
     const payload = {
-      customer: userId,
+      customer_id: userId,
       items: serializeCartItems(items),
       state: State.received,
       missing_information: missingInformation
