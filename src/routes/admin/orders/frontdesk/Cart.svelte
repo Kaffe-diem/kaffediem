@@ -12,13 +12,21 @@
     selectedItem
   } from "$stores/cart";
   import auth from "$stores/auth";
-  import { createOrder } from "$stores/orders";
+  import { createOrder, orders } from "$stores/orders";
   import { customizationKeys } from "$stores/menu";
   import type { CustomizationValue } from "$lib/types";
   import CommentIcon from "$assets/CommentIcon.svelte";
   import CompleteOrder from "$assets/CompleteOrder.svelte";
   import TrashIcon from "$assets/TrashIcon.svelte";
   import { getCharacters } from "$lib/utils";
+
+  const mostRecentOrderId = $derived(
+    $orders.length > 0
+      ? $orders
+          .sort((a, b) => new Date(a.createdAt!).getTime() - new Date(b.createdAt!).getTime())
+          .at(-1)!.dayId
+      : undefined
+  );
 
   const colors = $derived(
     Object.fromEntries($customizationKeys.map((key) => [key.id, key.labelColor]))
@@ -48,24 +56,28 @@
   {/if}
 
   <div class="flex flex-row justify-center gap-2">
-    <label class={$cart.length > 0 ? "" : "invisible"}>
-      <input type="checkbox" name="item" class="peer hidden" bind:checked={missing_information} />
-      <div
-        class="btn btn-lg {missing_information
-          ? 'ring-lg ring-warning bg-warning shadow-xl ring'
-          : ''} flex hover:brightness-90 focus:outline-none"
-      >
-        <span class="text-2xl"><CommentIcon /></span>
-      </div>
-    </label>
+    {#if $cart.length > 0}
+      <label class={$cart.length > 0 ? "" : "invisible"}>
+        <input type="checkbox" name="item" class="peer hidden" bind:checked={missing_information} />
+        <div
+          class="btn btn-lg {missing_information
+            ? 'ring-lg ring-warning bg-warning shadow-xl ring'
+            : ''} flex hover:brightness-90 focus:outline-none"
+        >
+          <span class="text-2xl"><CommentIcon /></span>
+        </div>
+      </label>
 
-    <button
-      class="bold btn btn-lg {$cart.length > 0 ? '' : 'invisible'}"
-      data-testid="complete-order-button"
-      onclick={completeOrder}
-    >
-      <CompleteOrder />
-    </button>
+      <button
+        class="bold btn btn-lg {$cart.length > 0 ? '' : 'invisible'}"
+        data-testid="complete-order-button"
+        onclick={completeOrder}
+      >
+        <CompleteOrder />
+      </button>
+    {:else if mostRecentOrderId}
+      <span class="flex items-center px-6 text-lg font-bold">Forrige: {mostRecentOrderId}</span>
+    {/if}
 
     <button class="bold btn btn-lg btn-primary text-3xl" onclick={handleAddToCart}
       >{$editingIndex !== null ? "OK" : "+"}</button
