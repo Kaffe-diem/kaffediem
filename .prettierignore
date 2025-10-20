@@ -7,4 +7,3 @@ kaffebase/_build/
 kaffebase/_test/
 kaffebase/_priv/
 # Generated files
-src/lib/pocketbase/index.d.ts
