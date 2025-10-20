@@ -73,3 +73,29 @@ export function getCharacters(index: number): string {
 
   return result;
 }
+
+/**
+ * Debounces a function call by the specified delay in milliseconds.
+ * Subsequent calls within the delay period will cancel and restart the timer.
+ *
+ * @param fn The function to debounce
+ * @param delay Delay in milliseconds (default: 300ms)
+ * @returns A debounced version of the function
+ */
+export function debounce<T extends (...args: unknown[]) => unknown>(
+  fn: T,
+  delay = 300
+): (...args: Parameters<T>) => void {
+  let timeoutId: number | undefined;
+
+  return (...args: Parameters<T>) => {
+    if (timeoutId !== undefined) {
+      clearTimeout(timeoutId);
+    }
+
+    timeoutId = setTimeout(() => {
+      fn(...args);
+      timeoutId = undefined;
+    }, delay) as unknown as number;
+  };
+}

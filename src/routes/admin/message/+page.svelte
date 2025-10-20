@@ -11,6 +11,10 @@
   import Visible from "$assets/Visible.svelte";
   import Hidden from "$assets/Hidden.svelte";
   import { get } from "svelte/store";
+  import { debounce } from "$lib/utils";
+  import { fade } from "svelte/transition";
+
+  let saveState = $state<"saving" | "saved">("saved");
 
   const selectedMessage = $derived(
     $messages.find((message) => message.id === $status.messageId) ?? {
@@ -19,6 +23,16 @@
       subtitle: ""
     }
   );
+
+  const debouncedUpdate = debounce(async (message: Message, field: "title" | "subtitle", value: string) => {
+    await updateMessage({ ...message, [field]: value });
+    saveState = "saved";
+  });
+
+  const handleUpdate = (message: Message, field: "title" | "subtitle", value: string) => {
+    saveState = "saving";
+    debouncedUpdate(message, field, value);
+  };
 
   const patchStatus = async (changes: Partial<Status>) => {
     const current = get(status);
@@ -31,19 +45,11 @@
   };
 
   const handleTitleChange = (event: Event, message: Message) => {
-    const updated: Message = {
-      ...message,
-      title: (event.target as HTMLInputElement).value
-    };
-    void updateMessage(updated);
+    handleUpdate(message, "title", (event.target as HTMLInputElement).value);
   };
 
   const handleSubtitleChange = (event: Event, message: Message) => {
-    const updated: Message = {
-      ...message,
-      subtitle: (event.target as HTMLInputElement).value
-    };
-    void updateMessage(updated);
+    handleUpdate(message, "subtitle", (event.target as HTMLInputElement).value);
   };
 
   const toggleOpen = () => {
@@ -64,6 +70,26 @@
   let lastMessage = $derived($messages.at(-1));
   let disableAdd = $derived(!(lastMessage?.title || lastMessage?.subtitle));
 </script>
+
+<div class="fixed top-4 right-4 z-50">
+  <div class="flex items-center gap-3">
+    <span class="relative inline-block h-6 w-16 text-right text-base-content/70">
+      {#if saveState === "saving"}
+        <span class="absolute right-0" in:fade={{ duration: 50 }} out:fade={{ duration: 50 }}>lagrer...</span>
+      {:else}
+        <span class="absolute right-0" in:fade={{ duration: 50 }} out:fade={{ duration: 50 }}>lagret!</span>
+      {/if}
+    </span>
+    <span class="relative flex h-3 w-3">
+      {#if saveState === "saving"}
+        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-500 opacity-75"></span>
+        <span class="relative inline-flex h-3 w-3 rounded-full bg-orange-500"></span>
+      {:else}
+        <span class="relative inline-flex h-3 w-3 rounded-full bg-green-500"></span>
+      {/if}
+    </span>
+  </div>
+</div>
 
 <form>
   <ul class="list-none">
