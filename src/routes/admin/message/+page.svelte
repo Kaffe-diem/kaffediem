@@ -89,11 +89,11 @@
     <span class="relative flex h-3 w-3">
       {#if saveState === "saving"}
         <span
-          class="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-500 opacity-75"
+          class="bg-warning absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
         ></span>
-        <span class="relative inline-flex h-3 w-3 rounded-full bg-orange-500"></span>
+        <span class="bg-warning relative inline-flex h-3 w-3 rounded-full"></span>
       {:else}
-        <span class="relative inline-flex h-3 w-3 rounded-full bg-green-500"></span>
+        <span class="bg-primary relative inline-flex h-3 w-3 rounded-full"></span>
       {/if}
     </span>
   </div>
