@@ -130,6 +130,10 @@ defmodule Kaffebase.Orders do
 
   defp maybe_filter_from_date(query, nil), do: query
 
+  defp maybe_filter_from_date(query, "today") do
+    maybe_filter_from_date(query, Date.utc_today())
+  end
+
   defp maybe_filter_from_date(query, %Date{} = date) do
     {:ok, datetime} = DateTime.new(date, ~T[00:00:00], "Etc/UTC")
     where(query, [q], q.created >= ^datetime)

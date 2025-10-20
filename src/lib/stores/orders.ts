@@ -13,15 +13,11 @@ type CreateOrderPayload = {
   missing_information: boolean;
 };
 
-// Get today's date for filtering
-function getTodayISO(): string {
-  return new Date().toISOString().split("T")[0] || "";
-}
-
 // The orders store - automatically syncs with backend
+// "today" is dynamically interpreted by the server
 export const orders = createCollection("order", orderFromApi, {
   queryParams: {
-    from_date: getTodayISO()
+    from_date: "today"
   },
   onCreate: (order) => {
     const orderNum = order.dayId || order.id;

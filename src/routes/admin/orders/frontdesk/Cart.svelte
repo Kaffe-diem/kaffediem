@@ -33,10 +33,6 @@
     addToCart($selectedItem!);
   };
 
-  const currentOrderId = $derived(
-    $orders.length > 0 ? $orders.sort((a, b) => a.dayId - b.dayId).at(-1)!.dayId : 100
-  );
-
   let missing_information = $state(false);
   async function completeOrder() {
     await createOrder($auth.user.id, $cart, missing_information);
@@ -52,37 +48,24 @@
   {/if}
 
   <div class="flex flex-row justify-center gap-2">
-    <div class="relative inline-flex items-center gap-2">
-      <label class={$cart.length > 0 ? "" : "invisible"}>
-        <input type="checkbox" name="item" class="peer hidden" bind:checked={missing_information} />
-        <div
-          class="btn btn-lg {missing_information
-            ? 'ring-lg ring-warning bg-warning shadow-xl ring'
-            : ''} flex hover:brightness-90 focus:outline-none"
-        >
-          <span class="text-2xl"><CommentIcon /></span>
-        </div>
-      </label>
-
-      <button
-        class="bold btn btn-lg {$cart.length > 0 ? '' : 'invisible'}"
-        data-testid="complete-order-button"
-        data-next-order-number={currentOrderId + 1}
-        onclick={completeOrder}
+    <label class={$cart.length > 0 ? "" : "invisible"}>
+      <input type="checkbox" name="item" class="peer hidden" bind:checked={missing_information} />
+      <div
+        class="btn btn-lg {missing_information
+          ? 'ring-lg ring-warning bg-warning shadow-xl ring'
+          : ''} flex hover:brightness-90 focus:outline-none"
       >
-        <CompleteOrder />{currentOrderId + 1}
-      </button>
+        <span class="text-2xl"><CommentIcon /></span>
+      </div>
+    </label>
 
-      {#if $orders.length > 0}
-        <span
-          class="{$cart.length > 0
-            ? 'hidden'
-            : ''} pointer-events-none absolute inset-0 flex items-center justify-center text-lg font-bold"
-        >
-          Forrige: {currentOrderId}
-        </span>
-      {/if}
-    </div>
+    <button
+      class="bold btn btn-lg {$cart.length > 0 ? '' : 'invisible'}"
+      data-testid="complete-order-button"
+      onclick={completeOrder}
+    >
+      <CompleteOrder />
+    </button>
 
     <button class="bold btn btn-lg btn-primary text-3xl" onclick={handleAddToCart}
       >{$editingIndex !== null ? "OK" : "+"}</button
