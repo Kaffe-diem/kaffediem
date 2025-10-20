@@ -18,7 +18,7 @@
   );
 </script>
 
-{#if $status.showMessage && (activeMessage.title || activeMessage.subtitle)}
+{#if ($status.showMessage && (activeMessage.title || activeMessage.subtitle)) || !$status.open}
   <div
     class="flex {$status.open
       ? 'h-1/2 justify-start'
