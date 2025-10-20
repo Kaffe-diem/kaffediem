@@ -49,7 +49,7 @@ defimpl Jason.Encoder, for: Kaffebase.Catalog.CustomizationValue do
       %{
         id: value.id,
         name: value.name,
-        price_increment_nok: value.price_increment_nok,
+        price_increment_nok: if(value.price_increment_nok, do: Decimal.to_float(value.price_increment_nok), else: nil),
         constant_price: value.constant_price,
         belongs_to: value.belongs_to,
         enable: value.enable,

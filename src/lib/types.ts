@@ -36,14 +36,14 @@ export type OrderDTO = {
   items: {
     item_id: string;
     name: string;
-    price: string; // todo: should not be a string
+    price: number;
     category: string;
     customizations: {
       key_id: string;
       key_name: string;
       value_id: string;
       value_name: string;
-      price_change: string;
+      price_change: number;
     }[];
   }[];
   created?: string;
@@ -248,14 +248,14 @@ export function orderFromApi(dto: OrderDTO): Order {
     items: dto.items.map((item) => ({
       itemId: item.item_id,
       name: item.name,
-      price: parseFloat(item.price),
+      price: item.price,
       category: item.category,
       customizations: item.customizations.map((c) => ({
         keyId: c.key_id,
         keyName: c.key_name,
         valueId: c.value_id,
         valueName: c.value_name,
-        priceChange: parseFloat(c.price_change)
+        priceChange: c.price_change
       }))
     })),
     createdAt: dto.created,

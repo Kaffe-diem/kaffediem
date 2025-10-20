@@ -41,7 +41,7 @@ defimpl Jason.Encoder, for: Kaffebase.Catalog.Item do
       %{
         id: item.id,
         name: item.name,
-        price_nok: item.price_nok,
+        price_nok: if(item.price_nok, do: Decimal.to_float(item.price_nok), else: nil),
         category: item.category,
         image: item.image,
         enable: item.enable,
