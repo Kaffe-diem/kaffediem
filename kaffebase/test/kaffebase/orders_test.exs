@@ -114,7 +114,7 @@ defmodule Kaffebase.OrdersTest do
       {:ok, first} = Orders.create_order(%{customer: user.id, items: [%{item: item.id}]})
 
       Repo.update!(
-        Ecto.Changeset.change(first, created: DateTime.add(DateTime.utc_now(), -1, :day))
+        Ecto.Changeset.change(first, inserted_at: DateTime.add(DateTime.utc_now(), -1, :day) |> DateTime.to_naive() |> NaiveDateTime.truncate(:second))
       )
 
       {:ok, second} = Orders.create_order(%{customer: user.id, items: [%{item: item.id}]})
@@ -221,7 +221,7 @@ defmodule Kaffebase.OrdersTest do
         })
         |> tap(fn {:ok, order} ->
           Repo.update!(
-            Ecto.Changeset.change(order, created: DateTime.add(DateTime.utc_now(), -2, :day))
+            Ecto.Changeset.change(order, inserted_at: DateTime.add(DateTime.utc_now(), -2, :day) |> DateTime.to_naive() |> NaiveDateTime.truncate(:second))
           )
         end)
 

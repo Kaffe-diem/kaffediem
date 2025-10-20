@@ -100,7 +100,7 @@ defmodule KaffebaseWeb.CollectionChannel do
       []
       |> maybe_put(:from_date, option(options, "from") || option(options, "from_date"))
       |> maybe_put(:customer, option(options, "customer_id") || option(options, "customer"))
-      |> Keyword.put(:order_by, asc: :day_id, asc: :created)
+      |> Keyword.put(:order_by, asc: :day_id, asc: :inserted_at)
 
     Orders.list_orders(opts)
   end

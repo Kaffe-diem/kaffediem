@@ -6,7 +6,6 @@ defmodule Kaffebase.Content.Status do
 
   @primary_key {:id, :string, autogenerate: false}
   @foreign_key_type :string
-  @timestamps_opts [type: :utc_datetime_usec, inserted_at: :created, updated_at: :updated]
 
   schema "status" do
     field :message, :string, source: :message
@@ -41,8 +40,8 @@ defimpl Jason.Encoder, for: Kaffebase.Content.Status do
         open: status.open,
         show_message: status.show_message,
         message: status.message,
-        created: status.created,
-        updated: status.updated
+        inserted_at: status.inserted_at,
+        updated_at: status.updated_at
       },
       opts
     )

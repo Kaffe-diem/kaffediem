@@ -46,8 +46,8 @@ export type OrderDTO = {
       price_change: number;
     }[];
   }[];
-  created?: string;
-  updated?: string;
+  inserted_at?: string;
+  updated_at?: string;
 };
 
 export type CategoryDTO = {
@@ -56,8 +56,8 @@ export type CategoryDTO = {
   sort_order: number;
   enable: boolean;
   valid_customizations: string[];
-  created?: string;
-  updated?: string;
+  inserted_at?: string;
+  updated_at?: string;
 };
 
 export type ItemDTO = {
@@ -68,8 +68,8 @@ export type ItemDTO = {
   image: string | null;
   enable: boolean;
   sort_order: number;
-  created?: string;
-  updated?: string;
+  inserted_at?: string;
+  updated_at?: string;
 };
 
 export type CustomizationKeyDTO = {
@@ -80,8 +80,8 @@ export type CustomizationKeyDTO = {
   default_value: string | null;
   multiple_choice: boolean;
   sort_order: number;
-  created?: string;
-  updated?: string;
+  inserted_at?: string;
+  updated_at?: string;
 };
 
 export type CustomizationValueDTO = {
@@ -92,24 +92,24 @@ export type CustomizationValueDTO = {
   belongs_to: string;
   enable: boolean;
   sort_order: number;
-  created?: string;
-  updated?: string;
+  inserted_at?: string;
+  updated_at?: string;
 };
 
 export type ItemCustomizationDTO = {
   id: string;
   key_id: string;
   value_ids: string[];
-  created?: string;
-  updated?: string;
+  inserted_at?: string;
+  updated_at?: string;
 };
 
 export type MessageDTO = {
   id: string;
   title: string;
   subtitle: string | null;
-  created?: string;
-  updated?: string;
+  inserted_at?: string;
+  updated_at?: string;
 };
 
 export type StatusDTO = {
@@ -117,8 +117,8 @@ export type StatusDTO = {
   open: boolean;
   show_message: boolean;
   message: string | null;
-  created?: string;
-  updated?: string;
+  inserted_at?: string;
+  updated_at?: string;
 };
 
 export type UserDTO = {
@@ -127,8 +127,8 @@ export type UserDTO = {
   name: string | null;
   username: string | null;
   is_admin: boolean;
-  created?: string;
-  updated?: string;
+  inserted_at?: string;
+  updated_at?: string;
 };
 
 // Frontend types
@@ -151,7 +151,7 @@ export type Order = {
       priceChange: number;
     }[];
   }[];
-  createdAt?: string;
+  insertedAt?: string;
   updatedAt?: string;
 };
 
@@ -258,8 +258,8 @@ export function orderFromApi(dto: OrderDTO): Order {
         priceChange: c.price_change
       }))
     })),
-    createdAt: dto.created,
-    updatedAt: dto.updated
+    insertedAt: dto.inserted_at,
+    updatedAt: dto.updated_at
   };
 }
 

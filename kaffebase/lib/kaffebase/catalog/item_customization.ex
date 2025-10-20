@@ -6,7 +6,6 @@ defmodule Kaffebase.Catalog.ItemCustomization do
   alias Kaffebase.EctoTypes.JsonbList
 
   @primary_key {:id, :string, autogenerate: false}
-  @timestamps_opts [type: :utc_datetime_usec, inserted_at: :created, updated_at: :updated]
 
   schema "item_customization" do
     field :key, :string
@@ -39,8 +38,8 @@ defimpl Jason.Encoder, for: Kaffebase.Catalog.ItemCustomization do
         id: customization.id,
         key_id: customization.key,
         value_ids: customization.value || [],
-        created: customization.created,
-        updated: customization.updated
+        inserted_at: customization.inserted_at,
+        updated_at: customization.updated_at
       },
       opts
     )

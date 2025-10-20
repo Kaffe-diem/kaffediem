@@ -51,7 +51,7 @@ defmodule KaffebaseWeb.OrderController do
     end
   end
 
-  defp default_order, do: [asc: :day_id, asc: :created]
+  defp default_order, do: [asc: :day_id, asc: :inserted_at]
 
   defp maybe_put(opts, _key, nil), do: opts
   defp maybe_put(opts, key, value), do: Keyword.put(opts, key, value)
