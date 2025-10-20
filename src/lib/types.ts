@@ -107,7 +107,7 @@ export type ItemCustomizationDTO = {
 export type MessageDTO = {
   id: string;
   title: string;
-  subtitle: string;
+  subtitle: string | null;
   created?: string;
   updated?: string;
 };
@@ -205,7 +205,7 @@ export type ItemCustomization = {
 export type Message = {
   id: string;
   title: string;
-  subtitle: string;
+  subtitle: string | null;
 };
 
 export type Status = {
@@ -388,7 +388,7 @@ export function messageFromApi(dto: MessageDTO): Message {
 export function messageToApi(msg: Message): Partial<MessageDTO> {
   return {
     title: msg.title,
-    subtitle: msg.subtitle
+    subtitle: msg.subtitle || null
   };
 }
 

@@ -20,7 +20,7 @@
     $messages.find((message) => message.id === $status.messageId) ?? {
       id: "",
       title: "",
-      subtitle: ""
+      subtitle: null
     }
   );
 
@@ -63,7 +63,7 @@
   };
 
   const addMessage = () => {
-    const baseMessage: Message = { id: "", title: "", subtitle: "" };
+    const baseMessage: Message = { id: "", title: "", subtitle: null };
     void createMessage(baseMessage);
   };
 
@@ -114,7 +114,7 @@
           <input
             type="text"
             class="input input-xl w-full"
-            value={message.subtitle}
+            value={message.subtitle ?? ""}
             placeholder="Beskrivelse"
             oninput={(event) => handleSubtitleChange(event, message)}
           />
