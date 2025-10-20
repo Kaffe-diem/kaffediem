@@ -78,11 +78,11 @@
     <span class="text-base-content/70 relative inline-block h-6 w-16 text-right">
       {#if saveState === "saving"}
         <span class="absolute right-0" in:fade={{ duration: 50 }} out:fade={{ duration: 50 }}
-          >lagrer...</span
+          >Lagrer...</span
         >
       {:else}
         <span class="absolute right-0" in:fade={{ duration: 50 }} out:fade={{ duration: 50 }}
-          >lagret!</span
+          >Lagret!</span
         >
       {/if}
     </span>
