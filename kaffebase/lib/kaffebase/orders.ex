@@ -139,23 +139,7 @@ defmodule Kaffebase.Orders do
     where(query, [q], q.created >= ^datetime)
   end
 
-  defp maybe_filter_from_date(query, %NaiveDateTime{} = naive) do
-    datetime = DateTime.from_naive!(naive, "Etc/UTC")
-    where(query, [q], q.created >= ^datetime)
-  end
-
-  defp maybe_filter_from_date(query, %DateTime{} = datetime) do
-    where(query, [q], q.created >= ^datetime)
-  end
-
-  defp maybe_filter_from_date(query, date_string) when is_binary(date_string) do
-    case Date.from_iso8601(date_string) do
-      {:ok, date} -> maybe_filter_from_date(query, date)
-      {:error, _} -> query
-    end
-  end
-
-  defp maybe_filter_from_date(query, _), do: query
+  defp maybe_filter_from_date(query, _invalid), do: query
 
   defp maybe_apply_order(query, nil), do: query
   defp maybe_apply_order(query, []), do: query
