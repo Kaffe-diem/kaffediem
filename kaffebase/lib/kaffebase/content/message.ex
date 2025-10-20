@@ -19,7 +19,6 @@ defmodule Kaffebase.Content.Message do
     message
     |> cast(attrs, [:id, :subtitle, :title])
     |> maybe_put_id()
-    |> validate_required([:title])
   end
 
   defp maybe_put_id(changeset) do
