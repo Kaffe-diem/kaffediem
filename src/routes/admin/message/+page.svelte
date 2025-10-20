@@ -24,14 +24,16 @@
     }
   );
 
-  const debouncedUpdate = debounce(async (message: Message, field: "title" | "subtitle", value: string) => {
-    await updateMessage({ ...message, [field]: value });
-    saveState = "saved";
-  });
+  const debouncedSave = debounce(
+    async (message: Message, field: "title" | "subtitle", value: string) => {
+      await updateMessage({ ...message, [field]: value });
+      saveState = "saved";
+    }
+  );
 
   const handleUpdate = (message: Message, field: "title" | "subtitle", value: string) => {
     saveState = "saving";
-    debouncedUpdate(message, field, value);
+    debouncedSave(message, field, value);
   };
 
   const patchStatus = async (changes: Partial<Status>) => {
@@ -73,16 +75,22 @@
 
 <div class="fixed top-4 right-4 z-50">
   <div class="flex items-center gap-3">
-    <span class="relative inline-block h-6 w-16 text-right text-base-content/70">
+    <span class="text-base-content/70 relative inline-block h-6 w-16 text-right">
       {#if saveState === "saving"}
-        <span class="absolute right-0" in:fade={{ duration: 50 }} out:fade={{ duration: 50 }}>lagrer...</span>
+        <span class="absolute right-0" in:fade={{ duration: 50 }} out:fade={{ duration: 50 }}
+          >lagrer...</span
+        >
       {:else}
-        <span class="absolute right-0" in:fade={{ duration: 50 }} out:fade={{ duration: 50 }}>lagret!</span>
+        <span class="absolute right-0" in:fade={{ duration: 50 }} out:fade={{ duration: 50 }}
+          >lagret!</span
+        >
       {/if}
     </span>
     <span class="relative flex h-3 w-3">
       {#if saveState === "saving"}
-        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-500 opacity-75"></span>
+        <span
+          class="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-500 opacity-75"
+        ></span>
         <span class="relative inline-flex h-3 w-3 rounded-full bg-orange-500"></span>
       {:else}
         <span class="relative inline-flex h-3 w-3 rounded-full bg-green-500"></span>

@@ -82,13 +82,13 @@ export function getCharacters(index: number): string {
  * @param delay Delay in milliseconds (default: 300ms)
  * @returns A debounced version of the function
  */
-export function debounce<T extends (...args: unknown[]) => unknown>(
-  fn: T,
+export function debounce<Args extends unknown[], R>(
+  fn: (...args: Args) => R,
   delay = 300
-): (...args: Parameters<T>) => void {
+): (...args: Args) => void {
   let timeoutId: number | undefined;
 
-  return (...args: Parameters<T>) => {
+  return (...args: Args) => {
     if (timeoutId !== undefined) {
       clearTimeout(timeoutId);
     }

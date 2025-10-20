@@ -12,7 +12,7 @@
     selectedItem
   } from "$stores/cart";
   import auth from "$stores/auth";
-  import { orders, createOrder } from "$stores/orders";
+  import { createOrder } from "$stores/orders";
   import { customizationKeys } from "$stores/menu";
   import type { CustomizationValue } from "$lib/types";
   import CommentIcon from "$assets/CommentIcon.svelte";
