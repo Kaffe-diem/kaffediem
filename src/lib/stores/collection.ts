@@ -27,9 +27,9 @@ export function createCollection<Api, T extends { id: string }>(
   const { subscribe, set, update } = writable<T[]>([]);
   let channel: Channel | null = null;
 
+  if (browser) {
     const socket = getSocket();
-    if !(socket) { // print error
-    // resten av koden
+    if (socket) {
       channel = socket.channel(`collection:${collectionName}`, {
         options: options?.queryParams ?? {}
       });
