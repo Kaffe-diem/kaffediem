@@ -18,10 +18,10 @@ defmodule KaffebaseWeb.OrderController do
   end
 
   def create(conn, params) do
-    Logger.info("Creating order via HTTP: #{inspect(Map.keys(params))}")
+    Logger.info("HTTP API: Creating order with params: #{inspect(Map.keys(params))}")
 
     with {:ok, order} <- Orders.create_order(params) do
-      Logger.info("Order created via HTTP: #{order.id}")
+      Logger.info("HTTP API: Order created successfully: #{order.id}")
 
       conn
       |> put_status(:created)

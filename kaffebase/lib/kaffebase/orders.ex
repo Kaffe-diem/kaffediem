@@ -164,7 +164,7 @@ defmodule Kaffebase.Orders do
   defp notify(result, _collection, _action), do: result
 
   defp broadcast_change(collection, action, record) do
-    Logger.debug("Broadcasting #{collection} #{action} to collection notifier")
+    Logger.debug("Queueing real-time broadcast: #{collection} #{action} → #{record.id}")
     CollectionNotifier.broadcast_change(collection, action, record)
   end
 

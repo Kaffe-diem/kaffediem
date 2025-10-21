@@ -6,6 +6,7 @@ defmodule Kaffebase.Catalog.Crud do
   relying on macros so that each ops module stays explicit and easy to override.
   """
 
+  require Logger
   import Ecto.Query, warn: false
 
   alias Kaffebase.CollectionNotifier
@@ -88,14 +89,26 @@ defmodule Kaffebase.Catalog.Crud do
   end
 
   defp notify_change({:ok, record} = result, collection, action) do
+    Logger.info("#{String.capitalize(collection)} #{action}: #{record.id}")
     CollectionNotifier.broadcast_change(collection, action, record)
+    result
+  end
+
+  defp notify_change({:error, %Ecto.Changeset{} = changeset} = result, collection, action) do
+    Logger.warning("#{String.capitalize(collection)} #{action} failed: #{inspect(changeset.errors)}")
     result
   end
 
   defp notify_change(result, _collection, _action), do: result
 
   defp notify_delete({:ok, record} = result, collection) do
+    Logger.info("#{String.capitalize(collection)} delete: #{record.id}")
     CollectionNotifier.broadcast_delete(collection, record.id)
+    result
+  end
+
+  defp notify_delete({:error, %Ecto.Changeset{} = changeset} = result, collection) do
+    Logger.warning("#{String.capitalize(collection)} delete failed: #{inspect(changeset.errors)}")
     result
   end
 

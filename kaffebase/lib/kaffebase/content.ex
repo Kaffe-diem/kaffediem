@@ -3,6 +3,7 @@ defmodule Kaffebase.Content do
   Content context replacing PocketBase message and status collections.
   """
 
+  require Logger
   import Ecto.Query, warn: false
 
   alias Kaffebase.CollectionNotifier
@@ -100,14 +101,26 @@ defmodule Kaffebase.Content do
   defp maybe_apply_order(query, orderings), do: order_by(query, ^orderings)
 
   defp notify({:ok, record} = result, collection, action) do
+    Logger.info("#{String.capitalize(collection)} #{action}: #{record.id}")
     CollectionNotifier.broadcast_change(collection, action, record)
+    result
+  end
+
+  defp notify({:error, %Ecto.Changeset{} = changeset} = result, collection, action) do
+    Logger.warning("#{String.capitalize(collection)} #{action} failed: #{inspect(changeset.errors)}")
     result
   end
 
   defp notify(result, _collection, _action), do: result
 
   defp notify_delete({:ok, record} = result, collection) do
+    Logger.info("#{String.capitalize(collection)} delete: #{record.id}")
     CollectionNotifier.broadcast_delete(collection, record.id)
+    result
+  end
+
+  defp notify_delete({:error, %Ecto.Changeset{} = changeset} = result, collection) do
+    Logger.warning("#{String.capitalize(collection)} delete failed: #{inspect(changeset.errors)}")
     result
   end
 
