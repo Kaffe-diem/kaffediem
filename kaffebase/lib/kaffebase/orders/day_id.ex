@@ -12,7 +12,7 @@ defmodule Kaffebase.Orders.DayId do
     with {:ok, {day_start, next_day_start}} <- day_bounds(Date.utc_today()) do
       query =
         from(o in Order,
-          where: o.created >= ^day_start and o.created < ^next_day_start,
+          where: o.inserted_at >= ^day_start and o.inserted_at < ^next_day_start,
           order_by: [desc: o.day_id],
           limit: 1,
           select: o.day_id

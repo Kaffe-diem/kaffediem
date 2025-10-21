@@ -5,7 +5,6 @@ defmodule Kaffebase.Content.Message do
   alias Kaffebase.Ids
 
   @primary_key {:id, :string, autogenerate: false}
-  @timestamps_opts [type: :utc_datetime_usec, inserted_at: :created, updated_at: :updated]
 
   schema "message" do
     field :subtitle, :string
@@ -37,8 +36,8 @@ defimpl Jason.Encoder, for: Kaffebase.Content.Message do
         id: message.id,
         title: message.title,
         subtitle: message.subtitle,
-        created: message.created,
-        updated: message.updated
+        inserted_at: message.inserted_at,
+        updated_at: message.updated_at
       },
       opts
     )

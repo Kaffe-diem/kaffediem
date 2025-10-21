@@ -5,7 +5,6 @@ defmodule Kaffebase.Catalog.Item do
   alias Kaffebase.Ids
 
   @primary_key {:id, :string, autogenerate: false}
-  @timestamps_opts [type: :utc_datetime_usec, inserted_at: :created, updated_at: :updated]
 
   schema "item" do
     field :category, :string
@@ -46,8 +45,8 @@ defimpl Jason.Encoder, for: Kaffebase.Catalog.Item do
         image: item.image,
         enable: item.enable,
         sort_order: item.sort_order,
-        created: item.created,
-        updated: item.updated
+        inserted_at: item.inserted_at,
+        updated_at: item.updated_at
       },
       opts
     )

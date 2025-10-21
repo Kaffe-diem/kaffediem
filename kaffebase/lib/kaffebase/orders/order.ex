@@ -7,7 +7,6 @@ defmodule Kaffebase.Orders.Order do
 
   @states [:received, :production, :completed, :dispatched]
   @primary_key {:id, :string, autogenerate: false}
-  @timestamps_opts [type: :utc_datetime_usec, inserted_at: :created, updated_at: :updated]
 
   schema "order" do
     field :customer_id, :integer
@@ -49,8 +48,8 @@ defimpl Jason.Encoder, for: Kaffebase.Orders.Order do
         state: order.state,
         missing_information: order.missing_information,
         items: order.items || [],
-        created: order.created,
-        updated: order.updated
+        inserted_at: order.inserted_at,
+        updated_at: order.updated_at
       },
       opts
     )

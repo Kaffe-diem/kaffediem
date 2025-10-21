@@ -5,7 +5,6 @@ defmodule Kaffebase.Catalog.CustomizationValue do
   alias Kaffebase.Ids
 
   @primary_key {:id, :string, autogenerate: false}
-  @timestamps_opts [type: :utc_datetime_usec, inserted_at: :created, updated_at: :updated]
 
   schema "customization_value" do
     field :constant_price, :boolean, source: :constant_price
@@ -54,8 +53,8 @@ defimpl Jason.Encoder, for: Kaffebase.Catalog.CustomizationValue do
         belongs_to: value.belongs_to,
         enable: value.enable,
         sort_order: value.sort_order,
-        created: value.created,
-        updated: value.updated
+        inserted_at: value.inserted_at,
+        updated_at: value.updated_at
       },
       opts
     )

@@ -6,7 +6,6 @@ defmodule Kaffebase.Catalog.Category do
   alias Kaffebase.EctoTypes.JsonbList
 
   @primary_key {:id, :string, autogenerate: false}
-  @timestamps_opts [type: :utc_datetime_usec, inserted_at: :created, updated_at: :updated]
 
   schema "category" do
     field :enable, :boolean
@@ -43,8 +42,8 @@ defimpl Jason.Encoder, for: Kaffebase.Catalog.Category do
         sort_order: category.sort_order,
         enable: category.enable,
         valid_customizations: category.valid_customizations || [],
-        created: category.created,
-        updated: category.updated
+        inserted_at: category.inserted_at,
+        updated_at: category.updated_at
       },
       opts
     )
