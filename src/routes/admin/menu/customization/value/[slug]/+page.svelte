@@ -20,11 +20,21 @@
 
   let exists: boolean = $state(true);
 
+  // Helper functions for percentage conversion
+  function convertToNegativePercentage(value: number): number {
+    return value - 100;
+  }
+
+  function convertFromNegativePercentage(value: number): number {
+    return value + 100;
+  }
+
   $effect(() => {
     const value = $customizationValues.find((value) => value.id === id);
     if (value) {
       customizationName = value.name;
-      customizationPrice = value.priceChange;
+      // Convert percentage to negative display format
+      customizationPrice = value.constantPrice ? value.priceChange : convertToNegativePercentage(value.priceChange);
       customizationConstantPrice = value.constantPrice;
       customizationKey = value.belongsTo;
       customizationEnabled = value.enabled;
@@ -35,12 +45,15 @@
   });
 
   function updateValue() {
+    // Convert negative percentage back to original format for database storage
+    const priceForDatabase = customizationConstantPrice ? customizationPrice! : convertFromNegativePercentage(customizationPrice!);
+    
     if (create) {
       customizationValues.create(
         new CustomizationValue(
           id,
           customizationName!,
-          customizationPrice!,
+          priceForDatabase,
           customizationConstantPrice!,
           customizationKey!,
           customizationEnabled,
@@ -52,7 +65,7 @@
         new CustomizationValue(
           id,
           customizationName!,
-          customizationPrice!,
+          priceForDatabase,
           customizationConstantPrice!,
           customizationKey!,
           customizationEnabled,
@@ -64,6 +77,15 @@
   }
 
   function handlePriceChangeType() {
+    if (customizationConstantPrice) {
+      // Switching from constant price to percentage
+      // Convert current value to negative percentage format
+      customizationPrice = convertToNegativePercentage(customizationPrice);
+    } else {
+      // Switching from percentage to constant price
+      // Convert from negative percentage back to normal value
+      customizationPrice = convertFromNegativePercentage(customizationPrice);
+    }
     customizationConstantPrice = !customizationConstantPrice;
   }
 </script>
@@ -96,6 +118,7 @@
             type="number"
             class="input input-xl peer grow"
             required
+            min={customizationConstantPrice ? 0 : -100}
             bind:value={customizationPrice}
             placeholder="Prisendring"
           />
