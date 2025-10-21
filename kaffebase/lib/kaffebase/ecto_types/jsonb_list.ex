@@ -1,11 +1,21 @@
 defmodule Kaffebase.EctoTypes.JsonbList do
   @moduledoc """
-  Custom Ecto type for storing lists as JSON in SQLite.
-  Handles automatic encoding/decoding of string arrays.
+  Custom Ecto type for storing lists of strings as JSON in SQLite.
+
+  ## Examples
+
+      # category.valid_customizations
+      ["customization_key_id_1", "customization_key_id_2"]
+
+      # item_customization.value
+      ["customization_value_id_1", "customization_value_id_2"]
   """
 
   use Ecto.Type
 
+  @type t :: [String.t()]
+
+  @impl true
   def type, do: :string
 
   def cast(list) when is_list(list), do: {:ok, list}

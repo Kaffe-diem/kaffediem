@@ -1,12 +1,42 @@
 defmodule Kaffebase.EctoTypes.JsonbItems do
   @moduledoc """
-  Custom Ecto type for JSONB-stored item snapshots.
+  Custom Ecto type for JSONB-stored item snapshots in orders.
 
-  Automatically encodes/decodes between Elixir lists and JSON strings.
-  Each item is a map with keys: item_id, name, price, category, customizations.
+  Stores immutable snapshots of ordered items with their customizations.
+  Keys are decoded as atoms for pattern matching.
+
+  ## Example
+
+      [
+        %{
+          item_id: "item_123",
+          name: "Latte",
+          price: 450,
+          category: "beverage",
+          customizations: [
+            %{key: "size", value: ["large"]},
+            %{key: "milk", value: ["oat"]}
+          ]
+        }
+      ]
   """
 
   use Ecto.Type
+
+  @type item :: %{
+          item_id: String.t(),
+          name: String.t(),
+          price: integer(),
+          category: String.t(),
+          customizations: [customization()]
+        }
+
+  @type customization :: %{
+          key: String.t(),
+          value: [String.t()]
+        }
+
+  @type t :: [item()]
 
   @impl true
   def type, do: :string
