@@ -1,7 +1,5 @@
 <script>
   import BackButton from "$components/BackButton.svelte";
-  import RefreshButton from "$components/RefreshButton.svelte";
-
   let { children } = $props();
 </script>
 
@@ -10,6 +8,5 @@
 </main>
 
 <div class="fixed right-0 bottom-0 m-4 flex flex-row gap-2">
-  <RefreshButton />
   <BackButton />
 </div>
