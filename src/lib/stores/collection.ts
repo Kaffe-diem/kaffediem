@@ -1,6 +1,3 @@
-// Simplified collection store
-
-import { browser } from "$app/environment";
 import { PUBLIC_BACKEND_URL } from "$env/static/public";
 import { getSocket } from "$lib/realtime/socket";
 import { writable, type Writable } from "svelte/store";
@@ -15,7 +12,6 @@ type CollectionPayload<Api> = {
   items?: Api[];
 };
 
-// Create generic stores
 export function createCollection<Api, T extends { id: string }>(
   collectionName: string,
   fromApi: (data: Api) => T,
@@ -27,32 +23,34 @@ export function createCollection<Api, T extends { id: string }>(
   const { subscribe, set, update } = writable<T[]>([]);
   let channel: Channel | null = null;
 
-  if (browser) {
-    const socket = getSocket();
-    if (socket) {
-      channel = socket.channel(`collection:${collectionName}`, {
-        options: options?.queryParams ?? {}
+  const socket = getSocket();
+  if (socket) {
+    channel = socket.channel(`collection:${collectionName}`, {
+      options: options?.queryParams ?? {}
+    });
+
+    channel
+      .join()
+      .receive("ok", (payload: CollectionPayload<Api> | undefined) => {
+        const items = Array.isArray(payload?.items) ? payload.items : [];
+        set(items.map((item) => fromApi(item)));
+      })
+      .receive("error", (error: unknown) => {
+        console.error(`Failed to join ${collectionName}:`, error);
+        set([]);
       });
 
-      channel
-        .join()
-        .receive("ok", (payload: CollectionPayload<Api> | undefined) => {
-          const items = Array.isArray(payload?.items) ? payload.items : [];
-          set(items.map((item) => fromApi(item)));
-        })
-        .receive("error", (error: unknown) => {
-          console.error(`Failed to join ${collectionName}:`, error);
-          set([]);
-        });
+    channel.on("change", (event: ChangeEvent<Api>) => {
+      if (!event?.record) return;
 
-      channel.on("change", (event: ChangeEvent<Api>) => {
-        if (!event?.record) return;
-
-        if (event.action === "create") {
+      switch (event.action) {
+        case "create": {
           const item = fromApi(event.record as Api);
           options?.onCreate?.(item);
           update((items) => [...items, item]);
-        } else if (event.action === "update") {
+          break;
+        }
+        case "update": {
           const item = fromApi(event.record as Api);
           update((items) => {
             const index = items.findIndex((i) => i.id === item.id);
@@ -61,14 +59,19 @@ export function createCollection<Api, T extends { id: string }>(
             next[index] = item;
             return next;
           });
-        } else if (event.action === "delete") {
+          break;
+        }
+        case "delete": {
           const id = (event.record as { id?: string })?.id;
           if (id) {
             update((items) => items.filter((i) => i.id !== id));
           }
+          break;
         }
-      });
-    }
+        default:
+          break;
+      }
+    });
   }
 
   return {
