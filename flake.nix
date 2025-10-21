@@ -35,6 +35,9 @@
               prettierd
               tailwindcss-language-server
               svelte-language-server
+              # DB
+              elixir
+              elixir-ls
             ];
           };
         }

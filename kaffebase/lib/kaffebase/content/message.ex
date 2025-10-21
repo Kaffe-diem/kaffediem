@@ -19,7 +19,6 @@ defmodule Kaffebase.Content.Message do
     message
     |> cast(attrs, [:id, :subtitle, :title])
     |> maybe_put_id()
-    |> validate_required([:title])
   end
 
   defp maybe_put_id(changeset) do
@@ -28,5 +27,20 @@ defmodule Kaffebase.Content.Message do
       {:changes, nil} -> put_change(changeset, :id, Ids.generate())
       _ -> changeset
     end
+  end
+end
+
+defimpl Jason.Encoder, for: Kaffebase.Content.Message do
+  def encode(message, opts) do
+    Jason.Encode.map(
+      %{
+        id: message.id,
+        title: message.title,
+        subtitle: message.subtitle,
+        created: message.created,
+        updated: message.updated
+      },
+      opts
+    )
   end
 end

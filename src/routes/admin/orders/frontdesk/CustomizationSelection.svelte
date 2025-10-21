@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { CustomizationKey, CustomizationValue } from "$lib/types";
-  import { customizationKeys, customizationsByKey } from "$stores/menuStore";
+  import type { CustomizationKey, CustomizationValue } from "$lib/types";
+  import { customizationKeys, customizationsByKey } from "$stores/menu";
   import {
     selectedCustomizations,
     initializeCustomizations,
     toggleCustomization,
     selectedCategory
-  } from "$stores/cartStore";
+  } from "$stores/cart";
   import { onMount } from "svelte";
 
   onMount(() => {
@@ -34,12 +34,13 @@
 </div>
 
 {#snippet CustomizationCategory({ key }: { key: CustomizationKey })}
-  {#if $customizationsByKey[key.id]!.filter((value) => value.enabled).length > 0}
+  {@const values = $customizationsByKey[key.id] ?? []}
+  {#if values.filter((value) => value.enabled).length > 0}
     <div class="inline-grid w-full grid-cols-1 gap-y-2 p-2">
       <div class="text-primary font-bold xl:text-xl">
         {key.name}
       </div>
-      {#each $customizationsByKey[key.id]! as value (value.id)}
+      {#each values as value (value.id)}
         {#if value.enabled}
           {@render CustomizationOption({ key, value })}
         {/if}

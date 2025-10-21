@@ -1,5 +1,5 @@
 <script lang="ts">
-  import orders from "$stores/orderStore";
+  import { setAllOrdersState } from "$stores/orders";
   import { State } from "$lib/types";
   import { resolve } from "$app/paths";
 
@@ -37,7 +37,7 @@
       class="btn btn-error relative m-4 flex h-24 w-full flex-col items-center justify-center text-3xl lg:text-5xl"
       onclick={() => {
         if (window.confirm(`Er du sikker på at du vil sette alle bestillinger som utlevert?`)) {
-          orders.setAll(State.dispatched);
+          setAllOrdersState(State.dispatched);
         }
       }}
       >Nullstill bestillinger
