@@ -18,10 +18,12 @@ defmodule Kaffebase.EctoTypes.JsonbList do
   @impl true
   def type, do: :string
 
+  @impl true
   def cast(list) when is_list(list), do: {:ok, list}
   def cast(nil), do: {:ok, []}
   def cast(_), do: :error
 
+  @impl true
   def load(data) when is_binary(data) do
     case Jason.decode(data) do
       {:ok, decoded} when is_list(decoded) -> {:ok, decoded}
@@ -33,6 +35,7 @@ defmodule Kaffebase.EctoTypes.JsonbList do
   def load(nil), do: {:ok, []}
   def load(_), do: :error
 
+  @impl true
   def dump(list) when is_list(list), do: {:ok, Jason.encode!(list)}
   def dump(nil), do: {:ok, Jason.encode!([])}
   def dump(_), do: :error
