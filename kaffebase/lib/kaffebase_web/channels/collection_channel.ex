@@ -7,7 +7,6 @@ defmodule KaffebaseWeb.CollectionChannel do
     CustomizationKey,
     CustomizationValue,
     Item,
-    ItemCustomization,
     Crud
   }
 
@@ -81,10 +80,6 @@ defmodule KaffebaseWeb.CollectionChannel do
 
     opts = build_filter_opts(:belongs_to, belongs_to)
     Crud.list(CustomizationValue, opts)
-  end
-
-  defp load_collection("item_customization", _options) do
-    Crud.list(ItemCustomization, [order_by: []], [])
   end
 
   defp load_collection("message", _options) do

@@ -9,13 +9,10 @@ import {
   customizationKeyToApi,
   customizationValueFromApi,
   customizationValueToApi,
-  itemCustomizationFromApi,
-  itemCustomizationToApi,
   type Category,
   type Item,
   type CustomizationKey,
-  type CustomizationValue,
-  type ItemCustomization
+  type CustomizationValue
 } from "$lib/types";
 
 // Collections
@@ -26,7 +23,6 @@ export const customizationValues = createCollection(
   "customization_value",
   customizationValueFromApi
 );
-export const itemCustomizations = createCollection("item_customization", itemCustomizationFromApi);
 
 // Derived store - group items by category
 export const itemsByCategory = derived(items, ($items) =>
@@ -98,16 +94,4 @@ export async function updateCustomizationValue(val: CustomizationValue): Promise
 
 export async function deleteCustomizationValue(id: string): Promise<void> {
   await apiDelete("customization_value", id);
-}
-
-export async function createItemCustomization(ic: ItemCustomization): Promise<void> {
-  await apiPost("item_customization", itemCustomizationToApi(ic));
-}
-
-export async function updateItemCustomization(ic: ItemCustomization): Promise<void> {
-  await apiPatch("item_customization", ic.id, itemCustomizationToApi(ic));
-}
-
-export async function deleteItemCustomization(id: string): Promise<void> {
-  await apiDelete("item_customization", id);
 }

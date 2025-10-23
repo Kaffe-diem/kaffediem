@@ -96,13 +96,6 @@ export type CustomizationValueDTO = {
   updated?: string;
 };
 
-export type ItemCustomizationDTO = {
-  id: string;
-  key_id: string;
-  value_ids: string[];
-  created?: string;
-  updated?: string;
-};
 
 export type MessageDTO = {
   id: string;
@@ -196,11 +189,6 @@ export type CustomizationValue = {
   sortOrder: number;
 };
 
-export type ItemCustomization = {
-  id: string;
-  keyId: string;
-  valueIds: string[];
-};
 
 export type Message = {
   id: string;
@@ -362,20 +350,6 @@ export function customizationValueToApi(val: CustomizationValue): Partial<Custom
   };
 }
 
-export function itemCustomizationFromApi(dto: ItemCustomizationDTO): ItemCustomization {
-  return {
-    id: dto.id,
-    keyId: dto.key_id,
-    valueIds: dto.value_ids ?? []
-  };
-}
-
-export function itemCustomizationToApi(ic: ItemCustomization): Partial<ItemCustomizationDTO> {
-  return {
-    key_id: ic.keyId,
-    value_ids: ic.valueIds
-  };
-}
 
 export function messageFromApi(dto: MessageDTO): Message {
   return {
