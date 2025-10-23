@@ -1,8 +1,7 @@
 <script lang="ts">
   import type { OrderStateOptions } from "$lib/types";
   import { orders, updateOrderState } from "$stores/orders";
-  import { customizationKeys } from "$stores/menu";
-  import type { CustomizationKey, Order, OrderItemSnapshot } from "$lib/types";
+  import type { Order, OrderItemSnapshot } from "$lib/types";
   import CommentIcon from "$assets/CommentIcon.svelte";
   import { getCharacters } from "$lib/utils";
 
@@ -17,12 +16,6 @@
     label: string;
     detailed?: boolean;
   }>();
-
-  function getKeyById(keyId: string): CustomizationKey | undefined {
-    const keys = $customizationKeys as CustomizationKey[];
-
-    return keys.find((key: CustomizationKey) => key.id === keyId);
-  }
 
   function amount() {
     return $orders.filter((order) => show.includes(order.state)).length;
@@ -133,14 +126,13 @@
     valueId: string;
     valueName: string;
     priceChange: number;
+    labelColor?: string | null;
   };
 })}
-  {@const key = getKeyById(customization.keyId)}
-  {@const keyColor = key?.labelColor}
   <li>
     <span
       class="badge badge-lg px-2 py-1 text-xl"
-      style={keyColor ? `background-color: ${keyColor}; color: white;` : ""}
+      style={customization.labelColor ? `background-color: ${customization.labelColor}; color: white;` : ""}
       aria-label={`${customization.keyName}: ${customization.valueName}`}
     >
       {customization.valueName}

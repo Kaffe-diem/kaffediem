@@ -6,8 +6,7 @@ defmodule Kaffebase.CatalogFixtures do
     Crud,
     CustomizationKey,
     CustomizationValue,
-    Item,
-    ItemCustomization
+    Item
   }
 
   def unique_string(prefix) do
@@ -91,33 +90,6 @@ defmodule Kaffebase.CatalogFixtures do
     {:ok, value} = Crud.create(CustomizationValue, params)
 
     value
-  end
-
-  def item_customization_fixture(attrs \\ %{}) do
-    key_ref = Map.get_lazy(attrs, :key, fn -> customization_key_fixture() end)
-    key_id = id_of(key_ref)
-
-    values_ref =
-      Map.get_lazy(attrs, :values, fn -> [customization_value_fixture(%{key: key_id})] end)
-
-    value_ids =
-      values_ref
-      |> List.wrap()
-      |> Enum.map(&id_of/1)
-
-    defaults = %{
-      key: key_id,
-      value: value_ids
-    }
-
-    params =
-      attrs
-      |> Map.drop([:key, :values])
-      |> Enum.into(defaults)
-
-    {:ok, item_customization} = Crud.create(ItemCustomization, params)
-
-    item_customization
   end
 
   defp id_of(%{id: id}) when is_binary(id), do: id
