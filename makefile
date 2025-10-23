@@ -28,8 +28,8 @@ migrate-down:
 # run the prod configuration locally
 # Make sure to run with the correct docker-compose file
 prod: migrate-up deps svelte_types
-	@docker-compose -f docker-compose.yml up -d frontend backend
-	@docker-compose -f docker-compose.yml logs -f frontend backend
+	@docker compose -f docker-compose.yml up -d frontend backend
+	@docker compose -f docker-compose.yml logs -f frontend backend
 
 # sync the database from github release
 kaffebase/kaffebase_dev.db:
