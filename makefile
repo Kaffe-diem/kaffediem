@@ -6,7 +6,7 @@ export
 # These targets do not produce output.
 # If missing and make sees a file named the same as the target
 # then make will not run the target.
-.PHONY: default dev logs deps migrate-up migrate-down prod svelte_types format lint clean test
+.PHONY: default dev logs deps migrate-up migrate-down prod svelte_types format lint clean test ensure-db-files
 
 default: dev
 
@@ -14,13 +14,17 @@ dev: .env.development migrate-up deps svelte_types
 	docker compose watch app backend
 
 logs:
-	docker compose logs -f backend app
+	docker compose logs -f backend app	
 
 deps:
 	docker compose run --rm tools bun install --frozen-lockfile
 
-migrate-up: kaffebase/kaffebase_dev.db
+migrate-up: kaffebase/kaffebase_dev.db ensure-db-files
 	@docker compose run --rm backend mix ecto.migrate
+
+ensure-db-files:
+	@mkdir -p kaffebase
+	@touch kaffebase/kaffebase_dev.db-wal kaffebase/kaffebase_dev.db-shm
 
 migrate-down:
 	@docker compose run --rm backend mix ecto.rollback
