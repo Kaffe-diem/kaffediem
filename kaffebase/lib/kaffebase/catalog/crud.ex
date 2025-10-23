@@ -91,6 +91,10 @@ defmodule Kaffebase.Catalog.Crud do
   defp notify_change({:ok, record} = result, collection, action) do
     Logger.info("#{String.capitalize(collection)} #{action}: #{record.id}")
     CollectionNotifier.broadcast_change(collection, action, record)
+
+    # Also broadcast to semantic channels
+    broadcast_to_semantic_channel(collection, action, record)
+
     result
   end
 
@@ -104,6 +108,10 @@ defmodule Kaffebase.Catalog.Crud do
   defp notify_delete({:ok, record} = result, collection) do
     Logger.info("#{String.capitalize(collection)} delete: #{record.id}")
     CollectionNotifier.broadcast_delete(collection, record.id)
+
+    # Also broadcast to semantic channels
+    broadcast_to_semantic_channel(collection, "delete", record)
+
     result
   end
 
@@ -117,4 +125,13 @@ defmodule Kaffebase.Catalog.Crud do
   defp schema_source(schema) do
     schema.__schema__(:source)
   end
+
+  # Map collection changes to semantic channels
+  defp broadcast_to_semantic_channel(collection, _action, _record)
+       when collection in ["category", "item", "customization_key", "customization_value"] do
+    # Reload and broadcast the entire menu
+    CollectionNotifier.broadcast_change("menu", "reload", %{})
+  end
+
+  defp broadcast_to_semantic_channel(_collection, _action, _record), do: :ok
 end

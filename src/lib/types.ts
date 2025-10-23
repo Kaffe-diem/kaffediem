@@ -13,19 +13,6 @@ export type OrderStateOptions = (typeof OrderStateOptions)[keyof typeof OrderSta
 export const State = OrderStateOptions;
 export type State = OrderState;
 
-// Collection names enum
-export enum Collections {
-  Category = "category",
-  CustomizationKey = "customization_key",
-  CustomizationValue = "customization_value",
-  Item = "item",
-  ItemCustomization = "item_customization",
-  Message = "message",
-  Order = "order",
-  Status = "status",
-  User = "user"
-}
-
 // data transfer objects for backend communication
 export type OrderDTO = {
   id: string;
@@ -44,6 +31,7 @@ export type OrderDTO = {
       value_id: string;
       value_name: string;
       price_change: number;
+      label_color?: string | null;
     }[];
   }[];
   created?: string;
@@ -96,7 +84,6 @@ export type CustomizationValueDTO = {
   updated?: string;
 };
 
-
 export type MessageDTO = {
   id: string;
   title: string;
@@ -142,6 +129,7 @@ export type Order = {
       valueId: string;
       valueName: string;
       priceChange: number;
+      labelColor?: string | null;
     }[];
   }[];
   createdAt?: string;
@@ -188,7 +176,6 @@ export type CustomizationValue = {
   enabled: boolean;
   sortOrder: number;
 };
-
 
 export type Message = {
   id: string;
@@ -243,7 +230,8 @@ export function orderFromApi(dto: OrderDTO): Order {
         keyName: c.key_name,
         valueId: c.value_id,
         valueName: c.value_name,
-        priceChange: c.price_change
+        priceChange: c.price_change,
+        labelColor: c.label_color
       }))
     })),
     createdAt: dto.created,
@@ -349,7 +337,6 @@ export function customizationValueToApi(val: CustomizationValue): Partial<Custom
     sort_order: val.sortOrder
   };
 }
-
 
 export function messageFromApi(dto: MessageDTO): Message {
   return {

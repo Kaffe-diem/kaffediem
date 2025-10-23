@@ -1,5 +1,6 @@
-import { derived, get } from "svelte/store";
-import { createCollection, apiPost, apiPatch, apiDelete } from "./collection";
+import { derived, get, writable } from "svelte/store";
+import { getSocket } from "$lib/realtime/socket";
+import { apiPost, apiPatch, apiDelete } from "./collection";
 import {
   categoryFromApi,
   categoryToApi,
@@ -15,16 +16,87 @@ import {
   type CustomizationValue
 } from "$lib/types";
 
-// Collections
-export const categories = createCollection("category", categoryFromApi);
-export const items = createCollection("item", itemFromApi);
-export const customizationKeys = createCollection("customization_key", customizationKeyFromApi);
-export const customizationValues = createCollection(
-  "customization_value",
-  customizationValueFromApi
-);
+// Writable stores for menu data
+export const categories = writable<Category[]>([]);
+export const items = writable<Item[]>([]);
+export const customizationKeys = writable<CustomizationKey[]>([]);
+export const customizationValues = writable<CustomizationValue[]>([]);
 
-// Derived store - group items by category
+// Subscribe to semantic menu channel
+let channel: any | null = null;
+const socket = getSocket();
+
+if (socket) {
+  channel = socket.channel("collection:menu", {});
+
+  channel
+    .join()
+    .receive("ok", (payload: any) => {
+      parseMenuData(payload?.items || []);
+    })
+    .receive("error", (error: unknown) => {
+      console.error("Failed to join menu channel:", error);
+      categories.set([]);
+      items.set([]);
+      customizationKeys.set([]);
+      customizationValues.set([]);
+    });
+
+  channel.on("change", (event: any) => {
+    // Menu changed - reload everything
+    if (event?.action === "reload") {
+      // Backend will send full menu on next join, or we can fetch
+      // For now, the individual collection broadcasts still work
+    }
+  });
+}
+
+// Parse nested menu structure into flat stores
+function parseMenuData(menuCategories: any[]) {
+  const allCategories: Category[] = [];
+  const allItems: Item[] = [];
+  const allKeys: CustomizationKey[] = [];
+  const allValues: CustomizationValue[] = [];
+  const seenKeys = new Set<string>();
+  const seenValues = new Set<string>();
+
+  for (const cat of menuCategories) {
+    // Parse category
+    allCategories.push(categoryFromApi(cat));
+
+    // Parse items in this category
+    for (const item of cat.items || []) {
+      // Extract customizations before parsing item
+      const customizations = item.customizations || [];
+
+      // Parse item (without customizations field)
+      const { customizations: _, ...itemWithoutCustomizations } = item;
+      allItems.push(itemFromApi(itemWithoutCustomizations));
+
+      // Parse customization keys and values
+      for (const cust of customizations) {
+        if (cust.key && !seenKeys.has(cust.key.id)) {
+          allKeys.push(customizationKeyFromApi(cust.key));
+          seenKeys.add(cust.key.id);
+        }
+
+        for (const val of cust.values || []) {
+          if (!seenValues.has(val.id)) {
+            allValues.push(customizationValueFromApi(val));
+            seenValues.add(val.id);
+          }
+        }
+      }
+    }
+  }
+
+  categories.set(allCategories);
+  items.set(allItems);
+  customizationKeys.set(allKeys);
+  customizationValues.set(allValues);
+}
+
+// Derived stores - group items by category
 export const itemsByCategory = derived(items, ($items) =>
   $items.reduce((acc: Record<string, Item[]>, item) => {
     acc[item.category] ||= [];
@@ -94,4 +166,12 @@ export async function updateCustomizationValue(val: CustomizationValue): Promise
 
 export async function deleteCustomizationValue(id: string): Promise<void> {
   await apiDelete("customization_value", id);
+}
+
+// Cleanup on module unload
+export function destroyMenuChannel() {
+  if (channel) {
+    channel.leave();
+    channel = null;
+  }
 }

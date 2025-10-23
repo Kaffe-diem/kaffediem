@@ -103,6 +103,10 @@ defmodule Kaffebase.Content do
   defp notify({:ok, record} = result, collection, action) do
     Logger.info("#{String.capitalize(collection)} #{action}: #{record.id}")
     CollectionNotifier.broadcast_change(collection, action, record)
+
+    # Also broadcast to semantic channels
+    broadcast_to_semantic_channel(collection, action, record)
+
     result
   end
 
@@ -116,6 +120,10 @@ defmodule Kaffebase.Content do
   defp notify_delete({:ok, record} = result, collection) do
     Logger.info("#{String.capitalize(collection)} delete: #{record.id}")
     CollectionNotifier.broadcast_delete(collection, record.id)
+
+    # Also broadcast to semantic channels
+    broadcast_to_semantic_channel(collection, "delete", record)
+
     result
   end
 
@@ -125,4 +133,13 @@ defmodule Kaffebase.Content do
   end
 
   defp notify_delete(result, _collection), do: result
+
+  # Map collection changes to semantic channels
+  defp broadcast_to_semantic_channel(collection, _action, _record)
+       when collection in ["message", "status"] do
+    # Reload and broadcast the entire status
+    CollectionNotifier.broadcast_change("status", "reload", %{})
+  end
+
+  defp broadcast_to_semantic_channel(_collection, _action, _record), do: :ok
 end
