@@ -2,21 +2,13 @@ defmodule Kaffebase.Content.Status do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Kaffebase.Content.Message
   alias Kaffebase.Ids
 
   @primary_key {:id, :string, autogenerate: false}
   @foreign_key_type :string
-  @timestamps_opts [type: :utc_datetime_usec, inserted_at: :created, updated_at: :updated]
 
   schema "status" do
-    field :message, :string
-
-    belongs_to :message_record, Message,
-      define_field: false,
-      foreign_key: :message,
-      references: :id
-
+    field :message, :string, source: :message
     field :open, :boolean
     field :show_message, :boolean, source: :show_message
 
@@ -37,5 +29,21 @@ defmodule Kaffebase.Content.Status do
       {:changes, nil} -> put_change(changeset, :id, Ids.generate())
       _ -> changeset
     end
+  end
+end
+
+defimpl Jason.Encoder, for: Kaffebase.Content.Status do
+  def encode(status, opts) do
+    Jason.Encode.map(
+      %{
+        id: status.id,
+        open: status.open,
+        show_message: status.show_message,
+        message: status.message,
+        inserted_at: status.inserted_at,
+        updated_at: status.updated_at
+      },
+      opts
+    )
   end
 end

@@ -5,7 +5,6 @@ defmodule Kaffebase.Catalog.CustomizationValue do
   alias Kaffebase.Ids
 
   @primary_key {:id, :string, autogenerate: false}
-  @timestamps_opts [type: :utc_datetime_usec, inserted_at: :created, updated_at: :updated]
 
   schema "customization_value" do
     field :constant_price, :boolean, source: :constant_price
@@ -40,5 +39,24 @@ defmodule Kaffebase.Catalog.CustomizationValue do
       {:changes, nil} -> put_change(changeset, :id, Ids.generate())
       _ -> changeset
     end
+  end
+end
+
+defimpl Jason.Encoder, for: Kaffebase.Catalog.CustomizationValue do
+  def encode(value, opts) do
+    Jason.Encode.map(
+      %{
+        id: value.id,
+        name: value.name,
+        price_increment_nok: if(value.price_increment_nok, do: Decimal.to_float(value.price_increment_nok), else: nil),
+        constant_price: value.constant_price,
+        belongs_to: value.belongs_to,
+        enable: value.enable,
+        sort_order: value.sort_order,
+        inserted_at: value.inserted_at,
+        updated_at: value.updated_at
+      },
+      opts
+    )
   end
 end

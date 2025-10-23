@@ -3,6 +3,11 @@ export
 -include .env.development
 -include .env
 
+# These targets do not produce output.
+# If missing and make sees a file named the same as the target
+# then make will not run the target.
+.PHONY: default dev logs deps migrate-up migrate-down prod svelte_types format lint clean test
+
 default: dev
 
 dev: .env.development migrate-up deps svelte_types
@@ -76,6 +81,10 @@ format: deps
 
 lint: deps
 	docker compose run --rm tools sh -c "bunx svelte-kit sync && bunx svelte-check --tsconfig ./tsconfig.json && bunx eslint src && bunx prettier --check ."
+
+#  this kind of works, but right now we're copying dev db, so some tests will fail as base data changes
+test:
+	docker compose run --rm -e MIX_ENV=test backend sh -lc "mix ecto.create && cp -f /app/kaffebase_dev.db /app/kaffebase_test.db && mix test"
 
 clean:
 	-docker volume rm kaffediem_backend_build kaffediem_backend_deps

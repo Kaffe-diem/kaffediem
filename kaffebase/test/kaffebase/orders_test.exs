@@ -7,11 +7,10 @@ defmodule Kaffebase.OrdersTest do
   alias Kaffebase.CatalogFixtures
   alias Kaffebase.Orders
   alias Kaffebase.OrdersFixtures
-  alias Kaffebase.Orders.{Order, OrderItem}
+  alias Kaffebase.Orders.Order
   alias Kaffebase.Repo
 
   setup do
-    Repo.delete_all(OrderItem)
     Repo.delete_all(Order)
     :ok
   end
@@ -26,7 +25,7 @@ defmodule Kaffebase.OrdersTest do
 
       {:ok, order} =
         Orders.create_order(%{
-          customer: to_string(user.id),
+          customer_id: user.id,
           missing_information: true,
           items: [
             %{
@@ -36,25 +35,25 @@ defmodule Kaffebase.OrdersTest do
           ]
         })
 
-      assert order.customer == to_string(user.id)
+      assert order.customer_id == user.id
       assert order.day_id == 101
       assert order.missing_information
-      assert length(order.items) == 1
 
       [loaded] =
-        Orders.list_orders(preload: [:items, :item_records, :customizations])
+        Orders.list_orders()
         |> Enum.filter(&(&1.id == order.id))
 
-      [order_item] = loaded.expand.items
-      assert order_item.item == item.id
-      assert order_item.expand.item.id == item.id
-      [customization] = order_item.expand.customization
-      assert customization.key == key.id
-      assert Enum.sort(customization.value) == Enum.sort([value_a.id, value_b.id])
-      assert customization.expand.key.id == key.id
+      [order_item] = loaded.items
+      assert order_item[:item_id] == item.id
+      assert order_item[:name] == item.name
+      assert order_item[:price] == Decimal.to_string(item.price_nok)
 
-      assert Enum.map(customization.expand.value, & &1.id) |> Enum.sort() ==
-               Enum.sort([value_a.id, value_b.id])
+      customizations = order_item[:customizations]
+      assert length(customizations) == 2
+
+      assert Enum.all?(customizations, fn c ->
+               c[:key_id] == key.id and c[:value_id] in [value_a.id, value_b.id]
+             end)
     end
 
     test "returns error when nested order item invalid" do
@@ -66,22 +65,7 @@ defmodule Kaffebase.OrdersTest do
              end) =~ ""
     end
 
-    test "returns error when referencing unknown existing order item" do
-      user = AccountsFixtures.user_fixture()
-
-      log =
-        capture_log(fn ->
-          assert {:error, changeset} =
-                   Orders.create_order(%{customer: user.id, items: ["missing-order-item"]})
-
-          assert %{items: messages} = errors_on(changeset)
-          assert "references unknown order item" in messages
-        end)
-
-      assert log =~ "Order creation failed"
-    end
-
-    test "coalesces repeated customizations per key" do
+    test "stores customizations as JSONB snapshots" do
       user = AccountsFixtures.user_fixture()
       item = CatalogFixtures.item_fixture()
       key = CatalogFixtures.customization_key_fixture(%{multiple_choice: true})
@@ -95,58 +79,21 @@ defmodule Kaffebase.OrdersTest do
             %{
               item: item.id,
               customizations: [
-                %{key: key.id, value: value_a.id},
-                %{key: key.id, value: value_b.id}
+                %{key: key.id, value: [value_a.id]},
+                %{key: key.id, value: [value_b.id]}
               ]
             }
           ]
         })
 
       loaded = Orders.get_order!(order.id)
-      [item_row] = loaded.expand.items
-      [customization] = item_row.expand.customization
+      [item_row] = loaded.items
 
-      assert customization.key == key.id
-      assert Enum.sort(customization.value) == Enum.sort([value_a.id, value_b.id])
-    end
+      customizations = item_row[:customizations]
+      assert length(customizations) == 2
 
-    test "allows referencing an existing order item" do
-      existing_order = OrdersFixtures.order_fixture()
-      [existing_item_id | _] = existing_order.items
-      user = AccountsFixtures.user_fixture()
-
-      assert {:ok, order} = Orders.create_order(%{customer: user.id, items: [existing_item_id]})
-      assert order.items == [existing_item_id]
-    end
-
-    test "rejects customizations for existing order item references" do
-      existing_order = OrdersFixtures.order_fixture()
-      [existing_item_id | _] = existing_order.items
-      user = AccountsFixtures.user_fixture()
-      customization_key = CatalogFixtures.customization_key_fixture()
-
-      customization_value =
-        CatalogFixtures.customization_value_fixture(%{key: customization_key})
-
-      payload = %{
-        customer: user.id,
-        items: [
-          %{
-            order_item: existing_item_id,
-            customizations: [%{key: customization_key.id, value: [customization_value.id]}]
-          }
-        ]
-      }
-
-      log =
-        capture_log(fn ->
-          assert {:error, changeset} = Orders.create_order(payload)
-          assert %{items: [item_errors | _]} = errors_on(changeset)
-          assert %{customizations: [message]} = item_errors
-          assert String.contains?(message, "customizations")
-        end)
-
-      assert log =~ "Order payload invalid"
+      value_ids = Enum.map(customizations, & &1[:value_id]) |> Enum.sort()
+      assert value_ids == Enum.sort([value_a.id, value_b.id])
     end
 
     test "auto-increments day_id for each order created on the same day" do
@@ -207,19 +154,18 @@ defmodule Kaffebase.OrdersTest do
         })
 
       # Verify order was created with items
-      assert length(order.items) == 1
+      loaded = Orders.get_order!(order.id)
+      assert length(loaded.items) == 1
 
       # Update state without providing items
       {:ok, updated} = Orders.update_order_state(order, :production)
 
       # Items should still be present
       assert updated.state == :production
-      assert length(updated.items) == 1
 
       # Verify items persist after reload
       reloaded = Orders.get_order!(updated.id)
       assert length(reloaded.items) == 1
-      assert length(reloaded.expand.items) == 1
     end
 
     test "update_order preserves items when not provided" do
@@ -237,7 +183,9 @@ defmodule Kaffebase.OrdersTest do
 
       # Items should still be present
       assert updated.state == :completed
-      assert length(updated.items) == 1
+
+      loaded = Orders.get_order!(updated.id)
+      assert length(loaded.items) == 1
     end
 
     test "set_all_orders_state/1 updates all rows" do
@@ -293,7 +241,7 @@ defmodule Kaffebase.OrdersTest do
       refute Enum.any?(result_ids, &(&1 != new_order.id))
     end
 
-    test "always preloads items without explicit option" do
+    test "always returns items from JSONB" do
       user = AccountsFixtures.user_fixture()
       item = CatalogFixtures.item_fixture()
 
@@ -303,14 +251,16 @@ defmodule Kaffebase.OrdersTest do
           items: [%{item: item.id}]
         })
 
-      # list_orders should automatically preload items
+      # list_orders should automatically expand items
       [loaded] = Orders.list_orders() |> Enum.filter(&(&1.id == order.id))
 
-      assert [%OrderItem{}] = loaded.expand.items
-      assert loaded.expand.items |> hd() |> Map.get(:expand) |> Map.get(:item)
+      assert length(loaded.items) == 1
+      [item_data] = loaded.items
+      assert item_data[:item_id] == item.id
+      assert item_data[:name] == item.name
     end
 
-    test "get_order! always preloads items" do
+    test "get_order! returns items from JSONB" do
       user = AccountsFixtures.user_fixture()
       item = CatalogFixtures.item_fixture()
 
@@ -322,30 +272,30 @@ defmodule Kaffebase.OrdersTest do
 
       loaded = Orders.get_order!(order.id)
 
-      assert [%OrderItem{}] = loaded.expand.items
-      assert loaded.expand.items |> hd() |> Map.get(:expand) |> Map.get(:item)
+      assert length(loaded.items) == 1
+      [item_data] = loaded.items
+      assert item_data[:item_id] == item.id
+      assert item_data[:name] == item.name
     end
   end
 
   describe "create_order/1 broadcasts" do
-    test "broadcasts order with preloaded items" do
+    test "broadcasts order with items in JSONB" do
       user = AccountsFixtures.user_fixture()
       item = CatalogFixtures.item_fixture()
 
-      # create_order should broadcast the order with items preloaded
+      # create_order should broadcast the order with items
       {:ok, order} =
         Orders.create_order(%{
           customer: user.id,
           items: [%{item: item.id}]
         })
 
-      # The broadcast happens internally, but we can verify the order
-      # returned from create_order has the structure expected for broadcast
-      assert length(order.items) == 1
-
-      # Verify that fetching the order also has items
+      # Verify that fetching the order has items from JSONB
       fetched = Orders.get_order!(order.id)
-      assert length(fetched.expand.items) == 1
+      assert length(fetched.items) == 1
+      [item_data] = fetched.items
+      assert item_data[:item_id] == item.id
     end
   end
 end

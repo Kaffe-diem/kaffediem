@@ -87,12 +87,6 @@ defmodule KaffebaseWeb.Router do
     patch "/order/records/:id", OrderController, :update
     put "/order/records/:id", OrderController, :update
     delete "/order/records/:id", OrderController, :delete
-
-    post "/order_item/records", OrderItemController, :create
-    get "/order_item/records/:id", OrderItemController, :show
-    patch "/order_item/records/:id", OrderItemController, :update
-    put "/order_item/records/:id", OrderItemController, :update
-    delete "/order_item/records/:id", OrderItemController, :delete
   end
 
   scope "/api", KaffebaseWeb do
@@ -120,7 +114,7 @@ defmodule KaffebaseWeb.Router do
     scope "/dev" do
       pipe_through :browser
 
-      live_dashboard "/dashboard", metrics: KaffebaseWeb.Telemetry
+      live_dashboard "/dashboard", metrics: KaffebaseWeb.Telemetry, ecto_repos: [Kaffebase.Repo]
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
   end

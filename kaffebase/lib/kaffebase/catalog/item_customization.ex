@@ -2,15 +2,14 @@ defmodule Kaffebase.Catalog.ItemCustomization do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Kaffebase.EctoTypes.StringList
   alias Kaffebase.Ids
+  alias Kaffebase.EctoTypes.JsonbList
 
   @primary_key {:id, :string, autogenerate: false}
-  @timestamps_opts [type: :utc_datetime_usec, inserted_at: :created, updated_at: :updated]
 
   schema "item_customization" do
     field :key, :string
-    field :value, StringList, default: []
+    field :value, JsonbList
 
     timestamps()
   end
@@ -29,5 +28,20 @@ defmodule Kaffebase.Catalog.ItemCustomization do
       {:changes, nil} -> put_change(changeset, :id, Ids.generate())
       _ -> changeset
     end
+  end
+end
+
+defimpl Jason.Encoder, for: Kaffebase.Catalog.ItemCustomization do
+  def encode(customization, opts) do
+    Jason.Encode.map(
+      %{
+        id: customization.id,
+        key_id: customization.key,
+        value_ids: customization.value || [],
+        inserted_at: customization.inserted_at,
+        updated_at: customization.updated_at
+      },
+      opts
+    )
   end
 end

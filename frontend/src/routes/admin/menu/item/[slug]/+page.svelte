@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { items, categories } from "$stores/menuStore";
-  import { Item } from "$lib/types";
+  import { items, categories, createItem, updateItem } from "$stores/menu";
+  import type { Item } from "$lib/types";
   import { goto } from "$app/navigation";
 
   import StateToggle from "$components/menu/StateToggle.svelte";
@@ -15,7 +15,6 @@
   let itemPrice: number | undefined = $state();
   let itemCategory: string | undefined = $state();
   let itemImage: string | undefined = $state();
-  let itemImageName: string | undefined = $state("");
   let itemEnabled: boolean = $state(true);
   let itemSort: number = $state(0);
 
@@ -28,7 +27,6 @@
       itemPrice = item.price;
       itemCategory = item.category;
       itemImage = item.image;
-      itemImageName = item.imageName;
       itemEnabled = item.enabled;
       itemSort = item.sortOrder;
 
@@ -52,40 +50,33 @@
   function deleteImage() {
     if (window.confirm("Er du sikker på at du vil slette bildet?")) {
       itemImage = undefined;
-      itemImageName = "";
       imageFile = null;
     }
   }
 
-  function updateItem() {
+  async function handleSubmit(event: SubmitEvent) {
+    event.preventDefault();
+
+    if (!itemName || itemPrice === undefined || !itemCategory) return;
+
+    const payload: Item = {
+      id: create ? "" : id,
+      name: itemName,
+      price: itemPrice,
+      category: itemCategory,
+      image: itemImage ?? "",
+      enabled: itemEnabled,
+      sortOrder: itemSort
+    };
+
+    if (imageFile) {
+      payload.imageFile = imageFile;
+    }
+
     if (create) {
-      items.create(
-        new Item(
-          id,
-          itemName!,
-          itemPrice!,
-          itemCategory!,
-          itemImageName!,
-          itemImage!,
-          itemEnabled,
-          itemSort,
-          imageFile
-        )
-      );
+      await createItem(payload);
     } else {
-      items.update(
-        new Item(
-          id,
-          itemName!,
-          itemPrice!,
-          itemCategory!,
-          itemImageName!,
-          itemImage!,
-          itemEnabled,
-          itemSort,
-          imageFile
-        )
-      );
+      await updateItem({ ...payload, id });
     }
     goto(resolve("/admin/menu"));
   }
@@ -96,7 +87,7 @@
 </h1>
 <div class="divider"></div>
 {#if exists || create}
-  <form onsubmit={updateItem} class="grid w-full grid-cols-3 gap-2">
+  <form onsubmit={handleSubmit} class="grid w-full grid-cols-3 gap-2">
     <div class="col-span-full">
       <Input label="Navn" type="text" required placeholder="Produktnavn" bind:value={itemName!} />
     </div>

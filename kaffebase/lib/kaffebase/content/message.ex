@@ -5,7 +5,6 @@ defmodule Kaffebase.Content.Message do
   alias Kaffebase.Ids
 
   @primary_key {:id, :string, autogenerate: false}
-  @timestamps_opts [type: :utc_datetime_usec, inserted_at: :created, updated_at: :updated]
 
   schema "message" do
     field :subtitle, :string
@@ -19,7 +18,6 @@ defmodule Kaffebase.Content.Message do
     message
     |> cast(attrs, [:id, :subtitle, :title])
     |> maybe_put_id()
-    |> validate_required([:title])
   end
 
   defp maybe_put_id(changeset) do
@@ -28,5 +26,20 @@ defmodule Kaffebase.Content.Message do
       {:changes, nil} -> put_change(changeset, :id, Ids.generate())
       _ -> changeset
     end
+  end
+end
+
+defimpl Jason.Encoder, for: Kaffebase.Content.Message do
+  def encode(message, opts) do
+    Jason.Encode.map(
+      %{
+        id: message.id,
+        title: message.title,
+        subtitle: message.subtitle,
+        inserted_at: message.inserted_at,
+        updated_at: message.updated_at
+      },
+      opts
+    )
   end
 end

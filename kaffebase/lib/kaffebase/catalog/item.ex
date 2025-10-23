@@ -5,7 +5,6 @@ defmodule Kaffebase.Catalog.Item do
   alias Kaffebase.Ids
 
   @primary_key {:id, :string, autogenerate: false}
-  @timestamps_opts [type: :utc_datetime_usec, inserted_at: :created, updated_at: :updated]
 
   schema "item" do
     field :category, :string
@@ -32,5 +31,24 @@ defmodule Kaffebase.Catalog.Item do
       {:changes, nil} -> put_change(changeset, :id, Ids.generate())
       _ -> changeset
     end
+  end
+end
+
+defimpl Jason.Encoder, for: Kaffebase.Catalog.Item do
+  def encode(item, opts) do
+    Jason.Encode.map(
+      %{
+        id: item.id,
+        name: item.name,
+        price_nok: if(item.price_nok, do: Decimal.to_float(item.price_nok), else: nil),
+        category: item.category,
+        image: item.image,
+        enable: item.enable,
+        sort_order: item.sort_order,
+        inserted_at: item.inserted_at,
+        updated_at: item.updated_at
+      },
+      opts
+    )
   end
 end

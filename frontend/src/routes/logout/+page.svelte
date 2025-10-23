@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { logout } from "$stores/authStore";
+  import { logout } from "$stores/auth";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
 

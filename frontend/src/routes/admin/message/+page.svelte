@@ -1,48 +1,103 @@
 <script lang="ts">
-  import { messages, status } from "$stores/statusStore";
-  import { Message, Status } from "$lib/types";
+  import {
+    messages,
+    status,
+    createMessage,
+    updateMessage,
+    deleteMessage,
+    updateStatus
+  } from "$stores/status";
+  import type { Message, Status } from "$lib/types";
   import Visible from "$assets/Visible.svelte";
   import Hidden from "$assets/Hidden.svelte";
+  import { get } from "svelte/store";
+  import { debounce } from "$lib/utils";
+  import { fade } from "svelte/transition";
+
+  let saveState = $state<"saving" | "saved">("saved");
+
+  const selectedMessage = $derived(
+    $messages.find((message) => message.id === $status.messageId) ?? {
+      id: "",
+      title: "",
+      subtitle: null
+    }
+  );
+
+  const debouncedSave = debounce(
+    async (message: Message, field: "title" | "subtitle", value: string) => {
+      await updateMessage({ ...message, [field]: value });
+      saveState = "saved";
+    }
+  );
+
+  const handleUpdate = (message: Message, field: "title" | "subtitle", value: string) => {
+    saveState = "saving";
+    debouncedSave(message, field, value);
+  };
+
+  const patchStatus = async (changes: Partial<Status>) => {
+    const current = get(status);
+    if (!current.id) return;
+    await updateStatus({ ...current, ...changes });
+  };
 
   const handleStatusChange = (message: Message) => {
-    status.update(
-      new Status($status.id, message, $status.messages, $status.open, $status.showMessage)
-    );
+    void patchStatus({ messageId: message.id });
   };
 
   const handleTitleChange = (event: Event, message: Message) => {
-    messages.update(
-      new Message(message.id, (event.target as HTMLInputElement).value, message.subtitle)
-    );
-    handleStatusChange(message);
+    handleUpdate(message, "title", (event.target as HTMLInputElement).value);
   };
 
   const handleSubtitleChange = (event: Event, message: Message) => {
-    messages.update(
-      new Message(message.id, message.title, (event.target as HTMLInputElement).value)
-    );
-    handleStatusChange(message);
+    handleUpdate(message, "subtitle", (event.target as HTMLInputElement).value);
   };
 
   const toggleOpen = () => {
-    status.update(
-      new Status($status.id, $status.message, $status.messages, !$status.open, $status.open)
-    );
+    const current = get(status);
+    void patchStatus({ open: !current.open });
   };
 
   const toggleShowMessage = () => {
-    status.update(
-      new Status($status.id, $status.message, $status.messages, $status.open, !$status.showMessage)
-    );
+    const current = get(status);
+    void patchStatus({ showMessage: !current.showMessage });
   };
 
   const addMessage = () => {
-    messages.create(Message.baseValue);
+    const baseMessage: Message = { id: "", title: "", subtitle: null };
+    void createMessage(baseMessage);
   };
 
   let lastMessage = $derived($messages.at(-1));
   let disableAdd = $derived(!(lastMessage?.title || lastMessage?.subtitle));
 </script>
+
+<div class="fixed top-4 right-4 z-50">
+  <div class="flex items-center gap-3">
+    <span class="text-base-content/70 relative inline-block h-6 w-16 text-right">
+      {#if saveState === "saving"}
+        <span class="absolute right-0" in:fade={{ duration: 50 }} out:fade={{ duration: 50 }}
+          >Lagrer...</span
+        >
+      {:else}
+        <span class="absolute right-0" in:fade={{ duration: 50 }} out:fade={{ duration: 50 }}
+          >Lagret!</span
+        >
+      {/if}
+    </span>
+    <span class="relative flex h-3 w-3">
+      {#if saveState === "saving"}
+        <span
+          class="bg-warning absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
+        ></span>
+        <span class="bg-warning relative inline-flex h-3 w-3 rounded-full"></span>
+      {:else}
+        <span class="bg-primary relative inline-flex h-3 w-3 rounded-full"></span>
+      {/if}
+    </span>
+  </div>
+</div>
 
 <form>
   <ul class="list-none">
@@ -53,7 +108,7 @@
             type="radio"
             class="radio radio-xl"
             name="selected"
-            checked={message.id == $status.message.id}
+            checked={message.id === selectedMessage.id}
             value={message}
             onchange={() => handleStatusChange(message)}
           />
@@ -67,7 +122,7 @@
           <input
             type="text"
             class="input input-xl w-full"
-            value={message.subtitle}
+            value={message.subtitle ?? ""}
             placeholder="Beskrivelse"
             oninput={(event) => handleSubtitleChange(event, message)}
           />
@@ -76,7 +131,7 @@
             class="btn btn-secondary btn-xl w-16"
             onclick={() => {
               if (window.confirm(`Er du sikker på at du vil slette "${message.title}"?`)) {
-                messages.delete(message.id);
+                void deleteMessage(message.id);
               }
             }}>-</button
           >

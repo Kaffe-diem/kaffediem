@@ -3,7 +3,6 @@ defmodule KaffebaseWeb.OrderController do
   require Logger
 
   alias Kaffebase.Orders
-  alias KaffebaseWeb.{ControllerHelpers, DomainJSON}
 
   action_fallback KaffebaseWeb.FallbackController
 
@@ -15,33 +14,32 @@ defmodule KaffebaseWeb.OrderController do
       |> Keyword.put(:order_by, default_order())
 
     orders = Orders.list_orders(opts)
-    json(conn, DomainJSON.render(orders))
+    json(conn, orders)
   end
 
   def create(conn, params) do
-    attrs = ControllerHelpers.atomize_keys(params)
-    Logger.info("Creating order via HTTP: #{inspect(Map.keys(attrs))}")
+    Logger.info("HTTP API: Creating order with params: #{inspect(Map.keys(params))}")
 
-    with {:ok, order} <- Orders.create_order(attrs) do
-      Logger.info("Order created via HTTP: #{order.id}")
+    with {:ok, order} <- Orders.create_order(params) do
+      Logger.info("HTTP API: Order created successfully: #{order.id}")
 
       conn
       |> put_status(:created)
-      |> json(DomainJSON.render(order))
+      |> json(order)
     end
   end
 
   def show(conn, %{"id" => id}) do
     order = Orders.get_order!(id)
-    json(conn, DomainJSON.render(order))
+    json(conn, order)
   end
 
   def update(conn, %{"id" => id} = params) do
     order = Orders.get_order!(id)
-    attrs = ControllerHelpers.atomize_keys(Map.delete(params, "id"))
+    attrs = Map.delete(params, "id")
 
     with {:ok, order} <- Orders.update_order(order, attrs) do
-      json(conn, DomainJSON.render(order))
+      json(conn, order)
     end
   end
 
@@ -53,7 +51,7 @@ defmodule KaffebaseWeb.OrderController do
     end
   end
 
-  defp default_order, do: [asc: :day_id, asc: :created]
+  defp default_order, do: [asc: :day_id, asc: :inserted_at]
 
   defp maybe_put(opts, _key, nil), do: opts
   defp maybe_put(opts, key, value), do: Keyword.put(opts, key, value)

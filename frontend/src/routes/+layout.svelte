@@ -5,20 +5,15 @@
   import Footer from "$components/Footer.svelte";
   import Toast from "$components/Toast.svelte";
   import RouteGuard from "$components/RouteGuard.svelte";
-  import { resetStores } from "$stores/util";
 
   import { hideNavbar, hideFooter } from "$lib/constants";
 
-  import { writable, get } from "svelte/store";
+  import { writable } from "svelte/store";
   import { onMount } from "svelte";
 
   const isOnline = writable(true);
 
   function updateOnlineStatus() {
-    const status = navigator.onLine;
-    if (status && !get(isOnline)) {
-      resetStores();
-    }
     isOnline.set(navigator.onLine);
   }
 

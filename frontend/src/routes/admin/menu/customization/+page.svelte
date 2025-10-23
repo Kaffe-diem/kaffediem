@@ -1,6 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import { customizationKeys, customizationsByKey } from "$stores/menuStore";
+  import { customizationKeys, customizationsByKey } from "$stores/menu";
 </script>
 
 <h1 class="mb-8 text-3xl">Tilpasninger</h1>

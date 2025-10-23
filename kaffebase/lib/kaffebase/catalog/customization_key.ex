@@ -5,7 +5,6 @@ defmodule Kaffebase.Catalog.CustomizationKey do
   alias Kaffebase.Ids
 
   @primary_key {:id, :string, autogenerate: false}
-  @timestamps_opts [type: :utc_datetime_usec, inserted_at: :created, updated_at: :updated]
 
   schema "customization_key" do
     field :default_value, :string
@@ -40,5 +39,24 @@ defmodule Kaffebase.Catalog.CustomizationKey do
       {:changes, nil} -> put_change(changeset, :id, Ids.generate())
       _ -> changeset
     end
+  end
+end
+
+defimpl Jason.Encoder, for: Kaffebase.Catalog.CustomizationKey do
+  def encode(key, opts) do
+    Jason.Encode.map(
+      %{
+        id: key.id,
+        name: key.name,
+        enable: key.enable,
+        label_color: key.label_color,
+        default_value: key.default_value,
+        multiple_choice: key.multiple_choice,
+        sort_order: key.sort_order,
+        inserted_at: key.inserted_at,
+        updated_at: key.updated_at
+      },
+      opts
+    )
   end
 end

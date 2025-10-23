@@ -16,7 +16,7 @@ defmodule Kaffebase.OrdersFixtures do
     }
 
     payload = %{
-      customer: to_string(user.id),
+      customer_id: user.id,
       missing_information: Map.get(attrs, :missing_information, false),
       items: [Map.merge(default_item_payload, Map.get(attrs, :item_attrs, %{}))]
     }
