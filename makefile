@@ -14,7 +14,7 @@ dev: .env.development migrate-up deps svelte_types
 	docker compose watch app backend
 
 logs:
-	docker compose logs -f backend app	
+	docker compose logs -f backend app
 
 deps:
 	docker compose run --rm tools bun install --frozen-lockfile
