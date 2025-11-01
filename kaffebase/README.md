@@ -2,7 +2,6 @@
 
 Dette er backenden til Kaffediem. Den er skrevet i Elixir og bruker SQLite som database på samme maskin.
 
-
 Vil du lese mer?
 
 - Official website: https://www.phoenixframework.org/
