@@ -8,11 +8,11 @@ defmodule Kaffebase.Orders do
 
   alias Ecto.{Changeset, Multi}
   alias Kaffebase.Catalog.{Crud, CustomizationKey}
-  alias Kaffebase.CollectionNotifier
   alias Kaffebase.Orders.PlaceOrder
   alias Kaffebase.Orders.DayId
   alias Kaffebase.Orders.Order
   alias Kaffebase.Repo
+  alias KaffebaseWeb.CollectionChannel
 
   @spec list_orders(keyword()) :: [Order.t()]
   def list_orders(opts \\ []) do
@@ -196,7 +196,7 @@ defmodule Kaffebase.Orders do
   defp notify(result, _collection, _action), do: result
 
   defp broadcast_change(collection, action, record) do
-    CollectionNotifier.broadcast_change(collection, action, record)
+    CollectionChannel.broadcast_change(collection, action, record)
   end
 
   defp next_day_id(repo) do
