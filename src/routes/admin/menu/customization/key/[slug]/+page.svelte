@@ -1,10 +1,5 @@
 <script lang="ts">
-  import {
-    customizationKeys,
-    customizationsByKey,
-    createCustomizationKey,
-    updateCustomizationKey
-  } from "$stores/menu";
+  import { menuIndexes, createCustomizationKey, updateCustomizationKey } from "$stores/menu";
   import type { CustomizationKey } from "$lib/types";
   import { goto } from "$app/navigation";
 
@@ -15,7 +10,6 @@
   let { data } = $props();
   const id = data.id;
   const create = id == "new";
-
   let customizationName: string | undefined = $state();
   let customizationEnabled: boolean = $state(true);
   let customizationColor: string | undefined = $state("#CCCCCC");
@@ -26,14 +20,14 @@
   let exists: boolean = $state(false);
 
   $effect(() => {
-    const key = $customizationKeys.find((key) => key.id === id);
+    const key = $menuIndexes.customization_keys.find((key) => key.id === id);
     if (key) {
       customizationName = key.name;
-      customizationEnabled = key.enabled;
-      customizationColor = key.labelColor;
-      customizationDefaultValue = key.defaultValue;
-      customizationMultipleChoice = key.multipleChoice;
-      customizationSort = key.sortOrder;
+      customizationEnabled = key.enable;
+      customizationColor = key.label_color ?? "#CCCCCC";
+      customizationDefaultValue = key.default_value ?? "";
+      customizationMultipleChoice = key.multiple_choice;
+      customizationSort = key.sort_order;
 
       exists = true;
     }
@@ -47,11 +41,11 @@
     const payload: CustomizationKey = {
       id: create ? "" : id,
       name: customizationName,
-      enabled: customizationEnabled,
-      labelColor: customizationColor ?? "",
-      defaultValue: customizationDefaultValue ?? "",
-      multipleChoice: customizationMultipleChoice,
-      sortOrder: customizationSort
+      enable: customizationEnabled,
+      label_color: customizationColor ?? "",
+      default_value: customizationDefaultValue ?? "",
+      multiple_choice: customizationMultipleChoice,
+      sort_order: customizationSort
     };
 
     if (create) {
@@ -98,7 +92,7 @@
         <legend class="fieldset-legend text-xl">Standard</legend>
         <select class="select select-xl w-full" bind:value={customizationDefaultValue}>
           <option value="">Ingen</option>
-          {#each $customizationsByKey[id] ?? [] as customization (customization.id)}
+          {#each $menuIndexes.customizations_by_key[id] ?? [] as customization (customization.id)}
             <option value={customization.id}>
               {customization.name}
             </option>

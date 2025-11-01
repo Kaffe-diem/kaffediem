@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { categories, customizationKeys, createCategory, updateCategory } from "$stores/menu";
+  import { menuIndexes, createCategory, updateCategory } from "$stores/menu";
   import type { Category } from "$lib/types";
   import { goto } from "$app/navigation";
 
@@ -10,7 +10,7 @@
   let { data } = $props();
   const id = data.id;
   const create = id == "new";
-  const category = $categories.find((category) => category.id === id);
+  const category = $derived($menuIndexes.categories.find((category) => category.id === id));
 
   let categoryName: string | undefined = $state();
   let categorySort: number | undefined = $state();
@@ -22,9 +22,9 @@
   $effect(() => {
     if (category) {
       categoryName = category.name;
-      categorySort = category.sortOrder;
-      categoryEnabled = category.enabled;
-      categoryValidCustomizations = category.validCustomizations;
+      categorySort = category.sort_order;
+      categoryEnabled = category.enable;
+      categoryValidCustomizations = category.valid_customizations;
 
       exists = true;
     }
@@ -38,9 +38,9 @@
     const payload: Category = {
       id: create ? "" : id,
       name: categoryName,
-      sortOrder: categorySort,
-      enabled: categoryEnabled,
-      validCustomizations: categoryValidCustomizations
+      sort_order: categorySort,
+      enable: categoryEnabled,
+      valid_customizations: categoryValidCustomizations
     };
 
     if (create) {
@@ -82,7 +82,7 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend text-xl">Tilpasninger</legend>
       <ul class="list-none">
-        {#each $customizationKeys as customizationKey (customizationKey.id)}
+        {#each $menuIndexes.customization_keys as customizationKey (customizationKey.id)}
           <li class="my-6">
             <label class="grid grid-cols-[1fr_1fr]">
               <span class="text-xl">{customizationKey.name}</span>

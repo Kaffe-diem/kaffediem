@@ -40,11 +40,11 @@
       {#if amount() == 0}
         <tr><td class="text-center italic">ingenting</td></tr>
       {/if}
-      {#each $orders.sort((a, b) => b.dayId - a.dayId) as order (order.id)}
+      {#each $orders.sort((a, b) => b.day_id - a.day_id) as order (order.id)}
         {#if show.includes(order.state)}
           {@render OrderRow({
             order,
-            orderNumber: order.dayId
+            orderNumber: order.day_id
           })}
         {/if}
       {/each}
@@ -56,7 +56,7 @@
   <tr
     class="{!detailed
       ? 'btn btn-xl ml-4 h-16'
-      : 'bg-base-200 cursor-pointer'}  {order.missingInformation && detailed
+      : 'bg-base-200 cursor-pointer'}  {order.missing_information && detailed
       ? 'bg-warning ring-warning'
       : ''} mb-6 block rounded shadow-md transition-colors"
     data-testid="order-row"
@@ -68,7 +68,7 @@
     aria-label={`Order ${orderNumber} with ${order.items.length} items`}
   >
     <td class="{!detailed ? 'flex justify-center' : ''} text-4xl font-bold"
-      >{orderNumber}{#if order.missingInformation && detailed}<CommentIcon />{/if}</td
+      >{orderNumber}{#if order.missing_information && detailed}<CommentIcon />{/if}</td
     >
     {#if detailed}
       <td class="w-full">
@@ -107,7 +107,7 @@
       {#if orderItem.customizations && orderItem.customizations.length > 0}
         <ul class="mt-1 flex flex-wrap gap-1" aria-label="Customizations">
           {#each orderItem.customizations as customization, custIdx (custIdx)}
-            {#if customization.valueName}
+            {#if customization.value_name}
               {@render CustomizationBadge({ customization })}
             {/if}
           {/each}
@@ -121,21 +121,23 @@
   customization
 }: {
   customization: {
-    keyId: string;
-    keyName: string;
-    valueId: string;
-    valueName: string;
-    priceChange: number;
-    labelColor?: string | null;
+    key_id: string;
+    key_name: string;
+    value_id: string;
+    value_name: string;
+    price_change: number;
+    label_color?: string | null;
   };
 })}
   <li>
     <span
       class="badge badge-lg px-2 py-1 text-xl"
-      style={customization.labelColor ? `background-color: ${customization.labelColor}; color: white;` : ""}
-      aria-label={`${customization.keyName}: ${customization.valueName}`}
+      style={customization.label_color
+        ? `background-color: ${customization.label_color}; color: white;`
+        : ""}
+      aria-label={`${customization.key_name}: ${customization.value_name}`}
     >
-      {customization.valueName}
+      {customization.value_name}
     </span>
   </li>
 {/snippet}

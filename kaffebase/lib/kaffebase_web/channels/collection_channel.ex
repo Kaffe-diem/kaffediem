@@ -17,14 +17,22 @@ defmodule KaffebaseWeb.CollectionChannel do
     options = Map.get(payload, "options", %{})
     Logger.info("Client joining collection:#{collection} with options: #{inspect(options)}")
 
-    items = load_collection(collection, options)
-    Logger.info("Loaded #{length(items)} items for collection:#{collection}")
+    data = load_collection(collection, options)
+
+    {items_payload, count} =
+      case data do
+        %{tree: tree} = map when is_list(tree) -> {map, length(tree)}
+        list when is_list(list) -> {list, length(list)}
+        other -> {other, 1}
+      end
+
+    Logger.info("Loaded #{count} items for collection:#{collection}")
 
     response = %{
-      "items" => items,
+      "items" => items_payload,
       "page" => 1,
-      "perPage" => length(items),
-      "totalItems" => length(items),
+      "perPage" => count,
+      "totalItems" => count,
       "totalPages" => 1
     }
 
@@ -95,7 +103,7 @@ defmodule KaffebaseWeb.CollectionChannel do
     values_by_key = Enum.group_by(values, & &1.belongs_to)
 
     # Build category → items → customizations hierarchy
-    Enum.map(categories, fn category ->
+    tree = Enum.map(categories, fn category ->
       category_items =
         items_by_category
         |> Map.get(category.id, [])
@@ -117,6 +125,22 @@ defmodule KaffebaseWeb.CollectionChannel do
 
       Map.merge(category, %{items: category_items})
     end)
+    customizations_by_key =
+      Enum.into(keys, %{}, fn key ->
+        {key.id, Map.get(values_by_key, key.id, [])}
+      end)
+
+    %{
+      tree: tree,
+      indexes: %{
+        categories: categories,
+        items: items,
+        items_by_category: items_by_category,
+        customization_keys: keys,
+        customization_values: values,
+        customizations_by_key: customizations_by_key
+      }
+    }
   end
 
   defp load_collection("status", _options) do

@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import { createCollection, apiPost, apiPatch } from "./collection";
-import { orderFromApi, type OrderState } from "$lib/types";
+import type { Order, OrderState } from "$lib/types";
 import { toasts } from "$stores/toastStore";
 
 type CreateOrderPayload = {
@@ -13,14 +13,12 @@ type CreateOrderPayload = {
   missing_information: boolean;
 };
 
-// The orders store - automatically syncs with backend
-// "today" is dynamically interpreted by the server
-export const orders = createCollection("order", orderFromApi, {
+export const orders = createCollection<Order, Order>("order", (order) => order, {
   queryParams: {
     from_date: "today"
   },
   onCreate: (order) => {
-    const orderNum = order.dayId || order.id;
+    const orderNum = order.day_id || order.id;
     toasts.success(`${orderNum}`);
   }
 });
@@ -31,7 +29,7 @@ const undoStack: { orderId: string; previousState: OrderState }[] = [];
 // Order operations
 export async function createOrder(
   customerId: string | number,
-  items: { id: string; customizations?: { id: string; belongsTo?: string }[] }[],
+  items: { id: string; customizations?: { id: string; belongs_to?: string }[] }[],
   missingInfo: boolean
 ): Promise<void> {
   const customerIdNumber =
@@ -46,9 +44,9 @@ export async function createOrder(
     items: items.map((item) => ({
       item: item.id,
       customizations: (item.customizations ?? [])
-        .filter((c) => c.belongsTo)
+        .filter((c) => c.belongs_to)
         .map((c) => ({
-          key: c.belongsTo!,
+          key: c.belongs_to!,
           value: [c.id]
         }))
     })),
