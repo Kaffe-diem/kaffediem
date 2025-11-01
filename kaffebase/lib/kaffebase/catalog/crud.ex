@@ -9,8 +9,8 @@ defmodule Kaffebase.Catalog.Crud do
   require Logger
   import Ecto.Query, warn: false
 
-  alias Kaffebase.CollectionNotifier
   alias Kaffebase.Repo
+  alias KaffebaseWeb.CollectionChannel
 
   @default_order [asc: :sort_order, asc: :name]
 
@@ -90,7 +90,7 @@ defmodule Kaffebase.Catalog.Crud do
 
   defp notify_change({:ok, record} = result, collection, action) do
     Logger.info("#{String.capitalize(collection)} #{action}: #{record.id}")
-    CollectionNotifier.broadcast_change(collection, action, record)
+    broadcast_change(collection, action, record)
     result
   end
 
@@ -103,7 +103,7 @@ defmodule Kaffebase.Catalog.Crud do
 
   defp notify_delete({:ok, record} = result, collection) do
     Logger.info("#{String.capitalize(collection)} delete: #{record.id}")
-    CollectionNotifier.broadcast_delete(collection, record.id)
+    broadcast_delete(collection, record)
     result
   end
 
@@ -117,4 +117,19 @@ defmodule Kaffebase.Catalog.Crud do
   defp schema_source(schema) do
     schema.__schema__(:source)
   end
+
+  # These collections are part of the menu structure, so notify menu subscribers
+  defp broadcast_change(collection, _action, _record)
+       when collection in ["category", "item", "customization_key", "customization_value"] do
+    CollectionChannel.broadcast_change("menu", "reload", %{})
+  end
+
+  defp broadcast_change(_collection, _action, _record), do: :ok
+
+  defp broadcast_delete(collection, _record)
+       when collection in ["category", "item", "customization_key", "customization_value"] do
+    CollectionChannel.broadcast_change("menu", "reload", %{})
+  end
+
+  defp broadcast_delete(_collection, _record), do: :ok
 end

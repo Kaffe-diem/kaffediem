@@ -1,6 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import { customizationKeys, customizationsByKey } from "$stores/menu";
+  import { menuIndexes } from "$stores/menu";
 </script>
 
 <h1 class="mb-8 text-3xl">Tilpasninger</h1>
@@ -15,12 +15,12 @@
       >Opprett en ny tilpasning</a
     >
   </div>
-  {#each $customizationKeys as key (key.id)}
+  {#each $menuIndexes.customization_keys as key (key.id)}
     <div>
       <div class="mb-4 flex flex-row items-center justify-between px-2">
         <span class="text-3xl">{key.name}</span>
         <div class="flex flex-row items-center gap-4">
-          {#if !key.enabled}
+          {#if !key.enable}
             <span class="badge badge-xl badge-soft badge-neutral italic">Deaktivert</span>
           {/if}
           <a
@@ -30,17 +30,17 @@
         </div>
       </div>
       <ul class="list-none">
-        {#each $customizationsByKey[key.id] ?? [] as customization (customization.id)}
+        {#each $menuIndexes.customizations_by_key[key.id] ?? [] as customization (customization.id)}
           <li class="m-2 flex flex-row justify-between">
             <span class="text-xl">{customization.name}</span>
             <div class="flex flex-row items-center gap-4">
-              {#if !customization.enabled}
+              {#if !customization.enable}
                 <span class="badge badge-xl badge-soft badge-neutral">Deaktivert</span>
               {/if}
               <a
                 href={resolve(`/admin/menu/customization/value/${customization.id}`)}
                 class="btn btn-lg"
-                style={key.labelColor ? `background-color: ${key.labelColor};` : null}>Rediger</a
+                style={key.label_color ? `background-color: ${key.label_color};` : null}>Rediger</a
               >
             </div>
           </li>

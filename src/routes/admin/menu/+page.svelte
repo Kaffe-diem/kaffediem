@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { categories, itemsByCategory } from "$stores/menu";
+  import { menuIndexes } from "$stores/menu";
   import type { Category, Item } from "$lib/types";
   import { resolve } from "$app/paths";
 </script>
@@ -16,7 +16,7 @@
     >
     <a href={resolve("/admin/menu/item/new")} class="btn btn-lg w-full">Opprett et nytt produkt</a>
   </div>
-  {#each $categories as category (category.id)}
+  {#each $menuIndexes.categories as category (category.id)}
     {@render CategorySection({ category })}
   {/each}
 </div>
@@ -26,7 +26,7 @@
     <div class="mb-4 flex flex-row items-center justify-between px-2">
       <span class="text-3xl">{category.name}</span>
       <div class="flex flex-row items-center gap-4">
-        {#if !category.enabled}
+        {#if !category.enable}
           <span class="badge badge-xl badge-soft badge-neutral italic">Deaktivert</span>
         {/if}
         <a href={resolve(`/admin/menu/category/${category.id}`)} class="btn btn-lg btn-neutral"
@@ -35,7 +35,7 @@
       </div>
     </div>
     <ul class="list-none">
-      {#each $itemsByCategory[category.id] ?? [] as item (item.id)}
+      {#each $menuIndexes.items_by_category[category.id] ?? [] as item (item.id)}
         {@render ItemCard({ item })}
       {/each}
     </ul>
@@ -46,7 +46,7 @@
   <li class="m-2 flex flex-row justify-between">
     <span class="text-xl">{item.name}</span>
     <div class="flex flex-row items-center gap-4">
-      {#if !item.enabled}
+      {#if !item.enable}
         <span class="badge badge-xl badge-soft badge-neutral">Deaktivert</span>
       {/if}
       <a href={resolve(`/admin/menu/item/${item.id}`)} class="btn btn-lg">Rediger</a>

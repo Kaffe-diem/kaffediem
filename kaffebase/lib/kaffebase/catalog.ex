@@ -7,8 +7,7 @@ defmodule Kaffebase.Catalog do
     Category,
     CustomizationKey,
     CustomizationValue,
-    Item,
-    ItemCustomization
+    Item
   }
 
   @doc """
@@ -20,8 +19,7 @@ defmodule Kaffebase.Catalog do
       "category" => Category,
       "item" => Item,
       "customization_key" => CustomizationKey,
-      "customization_value" => CustomizationValue,
-      "item_customization" => ItemCustomization
+      "customization_value" => CustomizationValue
     }
   end
 end

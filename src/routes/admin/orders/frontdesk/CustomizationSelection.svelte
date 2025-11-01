@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { CustomizationKey, CustomizationValue } from "$lib/types";
-  import { customizationKeys, customizationsByKey } from "$stores/menu";
+  import { menuIndexes } from "$stores/menu";
   import {
     selectedCustomizations,
     initializeCustomizations,
@@ -14,13 +14,13 @@
   });
 
   const isValid = (key: CustomizationKey) =>
-    key.enabled && $selectedCategory?.validCustomizations.includes(key.id);
+    key.enable && $selectedCategory?.valid_customizations.includes(key.id);
 </script>
 
 <div class="grid h-full grid-rows-[1fr_auto] overflow-y-auto">
-  {#if $customizationKeys.some(isValid)}
+  {#if $menuIndexes.customization_keys.some(isValid)}
     <div class="columns-2">
-      {#each $customizationKeys as key (key.id)}
+      {#each $menuIndexes.customization_keys as key (key.id)}
         {#if isValid(key)}
           {@render CustomizationCategory({ key })}
         {/if}
@@ -34,14 +34,14 @@
 </div>
 
 {#snippet CustomizationCategory({ key }: { key: CustomizationKey })}
-  {@const values = $customizationsByKey[key.id] ?? []}
-  {#if values.filter((value) => value.enabled).length > 0}
+  {@const values = $menuIndexes.customizations_by_key[key.id] ?? []}
+  {#if values.filter((value) => value.enable).length > 0}
     <div class="inline-grid w-full grid-cols-1 gap-y-2 p-2">
       <div class="text-primary font-bold xl:text-xl">
         {key.name}
       </div>
       {#each values as value (value.id)}
-        {#if value.enabled}
+        {#if value.enable}
           {@render CustomizationOption({ key, value })}
         {/if}
       {/each}
@@ -54,21 +54,21 @@
   <label
     class="btn flex w-full cursor-pointer transition-all duration-300 ease-in-out hover:brightness-90 focus:outline-none
       {selected ? 'ring-lg ring-accent text-white shadow-xl ring' : ''}"
-    style="background-color: {selected ? key.labelColor : ''};"
+    style="background-color: {selected ? key.label_color : ''};"
   >
     <input
-      type={key.multipleChoice ? "checkbox" : "radio"}
+      type={key.multiple_choice ? "checkbox" : "radio"}
       class="hidden"
       checked={selected}
       onclick={() => toggleCustomization(key, value)}
     />
     <span class="flex w-full justify-between font-normal">
       <span>{value.name}</span>
-      {#if value.priceChange != 0 && value.constantPrice}
-        <span>{value.priceChange},-</span>
+      {#if value.price_increment_nok != 0 && value.constant_price}
+        <span>{value.price_increment_nok},-</span>
       {/if}
-      {#if !value.constantPrice}
-        <span>{value.priceChange}%</span>
+      {#if !value.constant_price}
+        <span>{value.price_increment_nok}%</span>
       {/if}
     </span>
   </label>

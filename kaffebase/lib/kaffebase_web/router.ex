@@ -58,13 +58,6 @@ defmodule KaffebaseWeb.Router do
     put "/customization_value/records/:id", CustomizationValueController, :update
     delete "/customization_value/records/:id", CustomizationValueController, :delete
 
-    get "/item_customization/records", ItemCustomizationController, :index
-    post "/item_customization/records", ItemCustomizationController, :create
-    get "/item_customization/records/:id", ItemCustomizationController, :show
-    patch "/item_customization/records/:id", ItemCustomizationController, :update
-    put "/item_customization/records/:id", ItemCustomizationController, :update
-    delete "/item_customization/records/:id", ItemCustomizationController, :delete
-
     # Messages & status
     get "/message/records", MessageController, :index
     post "/message/records", MessageController, :create

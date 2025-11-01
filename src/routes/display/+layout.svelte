@@ -10,7 +10,7 @@
 
   let { children }: Props = $props();
   const activeMessage = $derived(
-    $messages.find((message) => message.id === $status.messageId) ?? {
+    $messages.find((message) => message.id === $status.message) ?? {
       id: "",
       title: "",
       subtitle: ""
@@ -18,7 +18,7 @@
   );
 </script>
 
-{#if ($status.showMessage && (activeMessage.title || activeMessage.subtitle)) || !$status.open}
+{#if ($status.show_message && (activeMessage.title || activeMessage.subtitle)) || !$status.open}
   <div
     class="flex {$status.open
       ? 'h-1/2 justify-start'

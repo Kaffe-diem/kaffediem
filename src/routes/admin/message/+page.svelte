@@ -17,7 +17,7 @@
   let saveState = $state<"saving" | "saved">("saved");
 
   const selectedMessage = $derived(
-    $messages.find((message) => message.id === $status.messageId) ?? {
+    $messages.find((message) => message.id === $status.message) ?? {
       id: "",
       title: "",
       subtitle: null
@@ -43,7 +43,7 @@
   };
 
   const handleStatusChange = (message: Message) => {
-    void patchStatus({ messageId: message.id });
+    void patchStatus({ message: message.id });
   };
 
   const handleTitleChange = (event: Event, message: Message) => {
@@ -61,7 +61,7 @@
 
   const toggleShowMessage = () => {
     const current = get(status);
-    void patchStatus({ showMessage: !current.showMessage });
+    void patchStatus({ show_message: !current.show_message });
   };
 
   const addMessage = () => {
@@ -143,7 +143,7 @@
         type="button"
         class="btn btn-xl mr-4 {$status.open ? '' : 'invisible'}"
         onclick={toggleShowMessage}
-        >{#if $status.showMessage}<Visible />{:else}<Hidden />{/if}</button
+        >{#if $status.show_message}<Visible />{:else}<Hidden />{/if}</button
       >
       <button type="button" class="btn btn-xl w-full" onclick={toggleOpen}
         >{$status.open ? "Åpent" : "Stengt"}</button

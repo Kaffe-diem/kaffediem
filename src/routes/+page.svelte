@@ -7,7 +7,7 @@
   import { resolve } from "$app/paths";
 
   const activeMessage = $derived(
-    $messages.find((message) => message.id === $status.messageId) ?? {
+    $messages.find((message) => message.id === $status.message) ?? {
       id: "",
       title: "",
       subtitle: ""
@@ -28,7 +28,7 @@
   <ul>
     {#if $status.open}
       <li>Vi er åpen!</li>
-      {#if $status.showMessage}
+      {#if $status.show_message}
         <br />
         <li class="font-bold">{activeMessage.title}</li>
         <li>{activeMessage.subtitle}</li>

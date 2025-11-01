@@ -6,9 +6,9 @@ defmodule Kaffebase.Content do
   require Logger
   import Ecto.Query, warn: false
 
-  alias Kaffebase.CollectionNotifier
   alias Kaffebase.Content.{Message, Status}
   alias Kaffebase.Repo
+  alias KaffebaseWeb.CollectionChannel
 
   # Messages -----------------------------------------------------------------
 
@@ -102,7 +102,7 @@ defmodule Kaffebase.Content do
 
   defp notify({:ok, record} = result, collection, action) do
     Logger.info("#{String.capitalize(collection)} #{action}: #{record.id}")
-    CollectionNotifier.broadcast_change(collection, action, record)
+    broadcast_change(collection, action, record)
     result
   end
 
@@ -115,7 +115,7 @@ defmodule Kaffebase.Content do
 
   defp notify_delete({:ok, record} = result, collection) do
     Logger.info("#{String.capitalize(collection)} delete: #{record.id}")
-    CollectionNotifier.broadcast_delete(collection, record.id)
+    broadcast_delete(collection, record)
     result
   end
 
@@ -125,4 +125,18 @@ defmodule Kaffebase.Content do
   end
 
   defp notify_delete(result, _collection), do: result
+
+  defp broadcast_change(collection, _action, _record)
+       when collection in ["message", "status"] do
+    CollectionChannel.broadcast_change("status", "reload", %{})
+  end
+
+  defp broadcast_change(_collection, _action, _record), do: :ok
+
+  defp broadcast_delete(collection, _record)
+       when collection in ["message", "status"] do
+    CollectionChannel.broadcast_change("status", "reload", %{})
+  end
+
+  defp broadcast_delete(_collection, _record), do: :ok
 end

@@ -7,7 +7,6 @@ defmodule KaffebaseWeb.CollectionChannel do
     CustomizationKey,
     CustomizationValue,
     Item,
-    ItemCustomization,
     Crud
   }
 
@@ -18,14 +17,22 @@ defmodule KaffebaseWeb.CollectionChannel do
     options = Map.get(payload, "options", %{})
     Logger.info("Client joining collection:#{collection} with options: #{inspect(options)}")
 
-    items = load_collection(collection, options)
-    Logger.info("Loaded #{length(items)} items for collection:#{collection}")
+    data = load_collection(collection, options)
+
+    {items_payload, count} =
+      case data do
+        %{tree: tree} = map when is_list(tree) -> {map, length(tree)}
+        list when is_list(list) -> {list, length(list)}
+        other -> {other, 1}
+      end
+
+    Logger.info("Loaded #{count} items for collection:#{collection}")
 
     response = %{
-      "items" => items,
+      "items" => items_payload,
       "page" => 1,
-      "perPage" => length(items),
-      "totalItems" => length(items),
+      "perPage" => count,
+      "totalItems" => count,
       "totalPages" => 1
     }
 
@@ -83,16 +90,72 @@ defmodule KaffebaseWeb.CollectionChannel do
     Crud.list(CustomizationValue, opts)
   end
 
-  defp load_collection("item_customization", _options) do
-    Crud.list(ItemCustomization, [order_by: []], [])
-  end
+  defp load_collection("menu", _options) do
+    categories = Crud.list(Category)
+    items = Crud.list(Item)
+    keys = Crud.list(CustomizationKey)
+    values = Crud.list(CustomizationValue)
 
-  defp load_collection("message", _options) do
-    Content.list_messages()
+    # Group items by category
+    items_by_category = Enum.group_by(items, & &1.category)
+
+    # Group values by key
+    values_by_key = Enum.group_by(values, & &1.belongs_to)
+
+    # Build category → items → customizations hierarchy
+    tree = Enum.map(categories, fn category ->
+      category_items =
+        items_by_category
+        |> Map.get(category.id, [])
+        |> Enum.map(fn item ->
+          # Find customization keys valid for this category
+          valid_key_ids = category.valid_customizations || []
+
+          customizations =
+            Enum.filter(keys, fn key -> key.id in valid_key_ids end)
+            |> Enum.map(fn key ->
+              %{
+                key: key,
+                values: Map.get(values_by_key, key.id, [])
+              }
+            end)
+
+          Map.merge(item, %{customizations: customizations})
+        end)
+
+      Map.merge(category, %{items: category_items})
+    end)
+    customizations_by_key =
+      Enum.into(keys, %{}, fn key ->
+        {key.id, Map.get(values_by_key, key.id, [])}
+      end)
+
+    %{
+      tree: tree,
+      indexes: %{
+        categories: categories,
+        items: items,
+        items_by_category: items_by_category,
+        customization_keys: keys,
+        customization_values: values,
+        customizations_by_key: customizations_by_key
+      }
+    }
   end
 
   defp load_collection("status", _options) do
-    Content.list_statuses()
+    statuses = Content.list_statuses()
+    messages = Content.list_messages()
+
+    %{
+      statuses: statuses,
+      messages: messages
+    }
+  end
+
+  # Legacy endpoints - keep for backwards compatibility during transition
+  defp load_collection("message", _options) do
+    Content.list_messages()
   end
 
   defp load_collection("order", options) do

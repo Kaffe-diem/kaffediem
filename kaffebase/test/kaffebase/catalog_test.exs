@@ -1,14 +1,11 @@
 defmodule Kaffebase.CatalogTest do
   use Kaffebase.DataCase
 
-  import Ecto.Query
-
   alias Kaffebase.Catalog.{
     Category,
     CustomizationKey,
     CustomizationValue,
     Item,
-    ItemCustomization,
     Crud
   }
 
@@ -16,7 +13,6 @@ defmodule Kaffebase.CatalogTest do
   alias Kaffebase.Repo
 
   setup do
-    Repo.delete_all(ItemCustomization)
     Repo.delete_all(CustomizationValue)
     Repo.delete_all(CustomizationKey)
     Repo.delete_all(Item)
@@ -55,24 +51,6 @@ defmodule Kaffebase.CatalogTest do
 
       result = Crud.list(CustomizationValue, [filter: {:belongs_to, key_a.id}])
       assert Enum.map(result, & &1.id) == [value_a.id]
-    end
-  end
-
-  describe "item customizations" do
-    test "list_item_customizations_by_ids/2 filters by ids" do
-      key = CatalogFixtures.customization_key_fixture()
-      value = CatalogFixtures.customization_value_fixture(%{key: key})
-      customization = CatalogFixtures.item_customization_fixture(%{key: key, values: [value]})
-      _other = CatalogFixtures.item_customization_fixture()
-
-      [loaded] =
-        ItemCustomization
-        |> where([ic], ic.id in ^[customization.id])
-        |> Repo.all()
-
-      assert loaded.id == customization.id
-      assert loaded.key == key.id
-      assert loaded.value == [value.id]
     end
   end
 end
