@@ -11,9 +11,9 @@ services:
     ports:
       - "4000:4000"
 
-  app:
+  frontend:
     build:
-      context: .
+      context: ./frontend
       target: production
       args:
         - PUBLIC_BACKEND_URL=${PUBLIC_BACKEND_URL:-http://backend:4000}
@@ -26,18 +26,20 @@ services:
     depends_on:
       backend:
         condition: service_started
+    ports:
+      - "3000:3000"
 
   tools:
     build:
       context: .
-      dockerfile: tools.Dockerfile
-    working_dir: /app
+      dockerfile: scripts/tools.Dockerfile
+    working_dir: /app/frontend
     environment:
       - PUBLIC_BACKEND_URL=${PUBLIC_BACKEND_URL:-http://backend:4000}
       - PUBLIC_BACKEND_WS=${PUBLIC_BACKEND_WS:-ws://backend:4000/socket}
     volumes:
       - ./:/app
-      - tools_node_modules:/app/node_modules
+      - tools_node_modules:/app/frontend/node_modules
 
 volumes:
   tools_node_modules:

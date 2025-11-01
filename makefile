@@ -11,10 +11,10 @@ export
 default: dev
 
 dev: .env.development migrate-up deps svelte_types
-	docker compose watch app backend
+	docker compose watch frontend backend
 
 logs:
-	docker compose logs -f backend app
+	docker compose logs -f frontend backend
 
 deps:
 	docker compose run --rm tools bun install --frozen-lockfile
@@ -32,8 +32,8 @@ migrate-down:
 # run the prod configuration locally
 # Make sure to run with the correct docker-compose file
 prod: migrate-up deps svelte_types
-	@docker-compose -f docker-compose.yml up -d backend app
-	@docker-compose -f docker-compose.yml logs -f backend app
+	@docker compose -f docker-compose.yml up -d frontend backend
+	@docker compose -f docker-compose.yml logs -f frontend backend
 
 # sync the database from github release
 kaffebase/kaffebase_dev.db:
@@ -61,8 +61,11 @@ kaffebase/kaffebase_dev.db:
 			rm -rf /tmp/backup.zip /tmp/backup_extract; \
 			exit 1; \
 		fi; \
+		rm -rf ../kaffebase/kaffebase_dev.db ../kaffebase/kaffebase_dev.db-shm ../kaffebase/kaffebase_dev.db-wal; \
+		rm -rf ../kaffebase/kaffebase_dev.db.db-shm ../kaffebase/kaffebase_dev.db.db-wal; \
+		touch ../kaffebase/kaffebase_dev.db-shm ../kaffebase/kaffebase_dev.db-wal; \
 		echo "✅ Installing database..."; \
-		cp "$$DB_FILE" kaffebase/kaffebase_dev.db; \
+		cp "$$DB_FILE" ../kaffebase/kaffebase_dev.db; \
 		rm -rf /tmp/backup.zip /tmp/backup_extract; \
 		echo "✅ Database sync complete!"; \
 	'

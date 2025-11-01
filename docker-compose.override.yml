@@ -43,8 +43,9 @@ services:
         - action: rebuild
           path: ./kaffebase/mix.exs
 
-  app:
+  frontend:
     build:
+      context: ./frontend
       target: development
     ports:
       - "5173:5173"
@@ -57,31 +58,31 @@ services:
     develop:
       watch:
         - action: sync
-          path: ./src
+          path: ./frontend/src
           target: /app/src
           ignore:
             - "node_modules/"
             - "**/*.test.ts"
             - "**/*.spec.ts"
         - action: sync
-          path: ./static
+          path: ./frontend/static
           target: /app/static
 
         - action: sync+restart
-          path: ./vite.config.ts
+          path: ./frontend/vite.config.ts
           target: /app/vite.config.ts
         - action: sync+restart
-          path: ./svelte.config.js
+          path: ./frontend/svelte.config.js
           target: /app/svelte.config.js
         - action: sync+restart
-          path: ./tsconfig.json
+          path: ./frontend/tsconfig.json
           target: /app/tsconfig.json
         - action: sync+restart
           path: ./.env
           target: /app/.env
 
         - action: rebuild
-          path: package.json
+          path: ./frontend/package.json
 
 volumes:
   svelte_kit_data:
