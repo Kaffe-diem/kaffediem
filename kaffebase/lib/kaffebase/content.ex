@@ -1,6 +1,6 @@
 defmodule Kaffebase.Content do
   @moduledoc """
-  Content context replacing PocketBase message and status collections.
+  Message and status context
   """
 
   require Logger

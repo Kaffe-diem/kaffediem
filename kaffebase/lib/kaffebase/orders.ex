@@ -1,6 +1,6 @@
 defmodule Kaffebase.Orders do
   @moduledoc """
-  Orders context providing PocketBase-compatible data access helpers.
+  Phoenix context representing orders in the system
   """
 
   require Logger
