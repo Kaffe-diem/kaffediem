@@ -30,27 +30,29 @@ defmodule Kaffebase.CatalogTest do
   end
 
   describe "items" do
-    test "list_items/1 filters by category" do
+    test "list_items/0 returns all items" do
       category_a = CatalogFixtures.category_fixture()
       category_b = CatalogFixtures.category_fixture()
 
       item_a = CatalogFixtures.item_fixture(%{category: category_a.id})
-      _item_b = CatalogFixtures.item_fixture(%{category: category_b.id})
+      item_b = CatalogFixtures.item_fixture(%{category: category_b.id})
 
-      result = Crud.list(Item, [filter: {:category, category_a.id}])
-      assert Enum.map(result, & &1.id) == [item_a.id]
+      result = Crud.list(Item)
+      assert length(result) == 2
+      assert Enum.map(result, & &1.id) |> Enum.sort() == [item_a.id, item_b.id] |> Enum.sort()
     end
   end
 
   describe "customization values" do
-    test "list_customization_values/1 filters by key" do
+    test "list_customization_values/0 returns all values" do
       key_a = CatalogFixtures.customization_key_fixture()
       key_b = CatalogFixtures.customization_key_fixture()
       value_a = CatalogFixtures.customization_value_fixture(%{key: key_a})
-      _value_b = CatalogFixtures.customization_value_fixture(%{key: key_b})
+      value_b = CatalogFixtures.customization_value_fixture(%{key: key_b})
 
-      result = Crud.list(CustomizationValue, [filter: {:belongs_to, key_a.id}])
-      assert Enum.map(result, & &1.id) == [value_a.id]
+      result = Crud.list(CustomizationValue)
+      assert length(result) == 2
+      assert Enum.map(result, & &1.id) |> Enum.sort() == [value_a.id, value_b.id] |> Enum.sort()
     end
   end
 end

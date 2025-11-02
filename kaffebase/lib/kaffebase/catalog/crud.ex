@@ -9,19 +9,16 @@ defmodule Kaffebase.Catalog.Crud do
   require Logger
   import Ecto.Query, warn: false
 
-  alias Kaffebase.Repo
+  alias Kaffebase.{BroadcastHelpers, Repo}
   alias KaffebaseWeb.CollectionChannel
 
   @default_order [asc: :sort_order, asc: :name]
 
   @doc """
   Returns all records for the given `schema`.
-
-  Supports optional filtering by including `{:filter, {field, value}}` entries in `opts`.
   """
   def list(schema, opts \\ [], default_order \\ @default_order) when is_atom(schema) do
     schema
-    |> maybe_apply_filters(opts)
     |> maybe_apply_order(opts[:order_by] || default_order)
     |> Repo.all()
   end
@@ -29,8 +26,8 @@ defmodule Kaffebase.Catalog.Crud do
   def get(schema, id) when is_atom(schema), do: Repo.get(schema, id)
   def get!(schema, id) when is_atom(schema), do: Repo.get!(schema, id)
 
-  def create(schema, attrs, collection \\ nil) when is_atom(schema) do
-    collection = collection || schema_source(schema)
+  def create(schema, attrs) when is_atom(schema) do
+    collection = schema_source(schema)
 
     schema
     |> struct()
@@ -39,8 +36,8 @@ defmodule Kaffebase.Catalog.Crud do
     |> notify_change(collection, "create")
   end
 
-  def update(schema, record, attrs, collection \\ nil) when is_atom(schema) do
-    collection = collection || schema_source(schema)
+  def update(schema, record, attrs) when is_atom(schema) do
+    collection = schema_source(schema)
 
     record
     |> schema.changeset(attrs)
@@ -48,37 +45,12 @@ defmodule Kaffebase.Catalog.Crud do
     |> notify_change(collection, "update")
   end
 
-  def delete(schema, record, collection \\ nil) when is_atom(schema) do
-    collection = collection || schema_source(schema)
+  def delete(schema, record) when is_atom(schema) do
+    collection = schema_source(schema)
 
     record
     |> Repo.delete()
     |> notify_delete(collection)
-  end
-
-  def change(schema, record, attrs \\ %{}) when is_atom(schema) do
-    schema.changeset(record, attrs)
-  end
-
-  defp maybe_apply_filters(query, opts) do
-    opts
-    |> Keyword.get_values(:filter)
-    |> Enum.reduce(query, fn
-      nil, q ->
-        q
-
-      {field, value}, q ->
-        where(q, [..., r], field(r, ^field) == ^value)
-
-      filters, q when is_list(filters) ->
-        Enum.reduce(filters, q, fn
-          {field, value}, inner_q -> where(inner_q, [..., r], field(r, ^field) == ^value)
-          _, inner_q -> inner_q
-        end)
-
-      _, q ->
-        q
-    end)
   end
 
   defp maybe_apply_order(query, nil), do: query
@@ -88,31 +60,13 @@ defmodule Kaffebase.Catalog.Crud do
     order_by(query, ^orderings)
   end
 
-  defp notify_change({:ok, record} = result, collection, action) do
-    Logger.info("#{String.capitalize(collection)} #{action}: #{record.id}")
-    broadcast_change(collection, action, record)
-    result
+  defp notify_change(result, collection, action) do
+    BroadcastHelpers.notify_change(result, collection, action, &broadcast_change/3)
   end
 
-  defp notify_change({:error, %Ecto.Changeset{} = changeset} = result, collection, action) do
-    Logger.warning("#{String.capitalize(collection)} #{action} failed: #{inspect(changeset.errors)}")
-    result
+  defp notify_delete(result, collection) do
+    BroadcastHelpers.notify_delete(result, collection, &broadcast_delete/2)
   end
-
-  defp notify_change(result, _collection, _action), do: result
-
-  defp notify_delete({:ok, record} = result, collection) do
-    Logger.info("#{String.capitalize(collection)} delete: #{record.id}")
-    broadcast_delete(collection, record)
-    result
-  end
-
-  defp notify_delete({:error, %Ecto.Changeset{} = changeset} = result, collection) do
-    Logger.warning("#{String.capitalize(collection)} delete failed: #{inspect(changeset.errors)}")
-    result
-  end
-
-  defp notify_delete(result, _collection), do: result
 
   defp schema_source(schema) do
     schema.__schema__(:source)

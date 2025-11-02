@@ -18,23 +18,7 @@ defmodule KaffebaseWeb.CollectionChannel do
     Logger.info("Client joining collection:#{collection} with options: #{inspect(options)}")
 
     data = load_collection(collection, options)
-
-    {items_payload, count} =
-      case data do
-        %{tree: tree} = map when is_list(tree) -> {map, length(tree)}
-        list when is_list(list) -> {list, length(list)}
-        other -> {other, 1}
-      end
-
-    Logger.info("Loaded #{count} items for collection:#{collection}")
-
-    response = %{
-      "items" => items_payload,
-      "page" => 1,
-      "perPage" => count,
-      "totalItems" => count,
-      "totalPages" => 1
-    }
+    response = %{"items" => data}
 
     {:ok, response, socket}
   end
@@ -56,10 +40,10 @@ defmodule KaffebaseWeb.CollectionChannel do
     KaffebaseWeb.Endpoint.broadcast(topic, "change", payload)
   end
 
-  def broadcast_delete(collection, record_id) do
+  def broadcast_delete(collection, record) do
     payload = %{
       "action" => "delete",
-      "record" => %{id: record_id}
+      "record" => %{id: record.id}
     }
 
     topic = "collection:" <> collection
@@ -68,30 +52,6 @@ defmodule KaffebaseWeb.CollectionChannel do
 
   def load_menu do
     load_collection("menu", %{})
-  end
-
-  defp load_collection("category", _options) do
-    Crud.list(Category)
-  end
-
-  defp load_collection("item", options) do
-    category_id = option(options, "category") || option(options, "category_id")
-    opts = build_filter_opts(:category, category_id)
-    Crud.list(Item, opts)
-  end
-
-  defp load_collection("customization_key", _options) do
-    Crud.list(CustomizationKey)
-  end
-
-  defp load_collection("customization_value", options) do
-    belongs_to =
-      option(options, "belongs_to") ||
-        option(options, "key") ||
-        option(options, "key_id")
-
-    opts = build_filter_opts(:belongs_to, belongs_to)
-    Crud.list(CustomizationValue, opts)
   end
 
   defp load_collection("menu", _options) do
@@ -156,39 +116,13 @@ defmodule KaffebaseWeb.CollectionChannel do
   end
 
   defp load_collection("order", options) do
-    opts =
-      []
-      |> maybe_put(:from_date, option(options, "from") || option(options, "from_date"))
-      |> maybe_put(:customer, option(options, "customer_id") || option(options, "customer"))
-      |> Keyword.put(:order_by, asc: :day_id, asc: :inserted_at)
+    opts = [order_by: [asc: :day_id, asc: :inserted_at]]
+    opts = if from_date = options["from_date"], do: Keyword.put(opts, :from_date, from_date), else: opts
+    opts = if customer_id = options["customer_id"], do: Keyword.put(opts, :customer, customer_id), else: opts
 
     Orders.list_orders(opts)
   end
 
+  # Unknown collections return empty list - client will get empty "items" response
   defp load_collection(_other, _options), do: []
-
-  defp option(options, key) when is_binary(key) do
-    case safe_atom(key) do
-      nil -> Map.get(options, key)
-      atom -> Map.get(options, key) || Map.get(options, atom)
-    end
-  end
-
-  defp option(options, key) when is_atom(key) do
-    Map.get(options, key) || Map.get(options, Atom.to_string(key))
-  end
-
-  defp option(_options, _key), do: nil
-
-  defp safe_atom(key) do
-    String.to_existing_atom(key)
-  rescue
-    ArgumentError -> nil
-  end
-
-  defp maybe_put(opts, _key, nil), do: opts
-  defp maybe_put(opts, key, value), do: Keyword.put(opts, key, value)
-
-  defp build_filter_opts(_field, nil), do: []
-  defp build_filter_opts(field, value), do: [filter: {field, value}]
 end
