@@ -121,14 +121,16 @@ defmodule Kaffebase.Catalog.Crud do
   # These collections are part of the menu structure, so notify menu subscribers
   defp broadcast_change(collection, _action, _record)
        when collection in ["category", "item", "customization_key", "customization_value"] do
-    CollectionChannel.broadcast_change("menu", "reload", %{})
+    menu_data = KaffebaseWeb.CollectionChannel.load_menu()
+    CollectionChannel.broadcast_change("menu", "update", menu_data)
   end
 
   defp broadcast_change(_collection, _action, _record), do: :ok
 
   defp broadcast_delete(collection, _record)
        when collection in ["category", "item", "customization_key", "customization_value"] do
-    CollectionChannel.broadcast_change("menu", "reload", %{})
+    menu_data = KaffebaseWeb.CollectionChannel.load_menu()
+    CollectionChannel.broadcast_change("menu", "update", menu_data)
   end
 
   defp broadcast_delete(_collection, _record), do: :ok

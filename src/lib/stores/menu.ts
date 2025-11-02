@@ -45,7 +45,15 @@ const emptyMenu: MenuPayload = {
 
 export const menu = createChannelStore<MenuPayload>("menu", {
   initialValue: emptyMenu,
-  extract: (response: unknown) => toMenuPayload((response as { items?: unknown })?.items)
+  extract: (response: unknown) => toMenuPayload((response as { items?: unknown })?.items),
+  onChange: (event, { set }) => {
+    const changeEvent = event as { action?: string; record?: unknown };
+
+    // we set the entire menu back on any patch
+    if (changeEvent?.action === "update" && changeEvent?.record) {
+      set(toMenuPayload(changeEvent.record));
+    }
+  }
 });
 
 export const menuTree = derived(menu, ($menu) => $menu.tree);

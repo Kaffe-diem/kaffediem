@@ -66,6 +66,10 @@ defmodule KaffebaseWeb.CollectionChannel do
     KaffebaseWeb.Endpoint.broadcast(topic, "change", payload)
   end
 
+  def load_menu do
+    load_collection("menu", %{})
+  end
+
   defp load_collection("category", _options) do
     Crud.list(Category)
   end
@@ -144,16 +148,9 @@ defmodule KaffebaseWeb.CollectionChannel do
   end
 
   defp load_collection("status", _options) do
-    statuses = Content.list_statuses()
-    messages = Content.list_messages()
-
-    %{
-      statuses: statuses,
-      messages: messages
-    }
+    Content.list_statuses()
   end
 
-  # Legacy endpoints - keep for backwards compatibility during transition
   defp load_collection("message", _options) do
     Content.list_messages()
   end

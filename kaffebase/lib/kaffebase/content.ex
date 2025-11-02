@@ -126,17 +126,7 @@ defmodule Kaffebase.Content do
 
   defp notify_delete(result, _collection), do: result
 
-  defp broadcast_change(collection, _action, _record)
-       when collection in ["message", "status"] do
-    CollectionChannel.broadcast_change("status", "reload", %{})
-  end
-
   defp broadcast_change(_collection, _action, _record), do: :ok
-
-  defp broadcast_delete(collection, _record)
-       when collection in ["message", "status"] do
-    CollectionChannel.broadcast_change("status", "reload", %{})
-  end
 
   defp broadcast_delete(_collection, _record), do: :ok
 end

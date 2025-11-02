@@ -1,5 +1,4 @@
-import { derived } from "svelte/store";
-import { apiPatch, createChannelStore, createCrudOperations } from "./collection";
+import { apiPatch, createCollection, createCrudOperations } from "./collection";
 import type { Message, Status } from "$lib/types";
 
 const emptyStatus: Status = {
@@ -9,31 +8,14 @@ const emptyStatus: Status = {
   message: null
 };
 
-type StatusPayload = {
-  messages: Message[];
-  status: Status;
-};
+export const messages = createCollection<Message, Message>("message", (data) => data);
 
-const statusChannel = createChannelStore<StatusPayload>("status", {
-  initialValue: { messages: [], status: emptyStatus },
-  extract: (response: unknown) => {
-    const items = (response as { items?: { messages?: unknown; statuses?: unknown } })?.items;
-    if (!items) return { messages: [], status: emptyStatus };
+const statusCollection = createCollection<Status, Status>("status", (data) => data);
 
-    const messages = Array.isArray(items.messages) ? (items.messages as Message[]) : [];
-    const statuses = Array.isArray(items.statuses) ? (items.statuses as Status[]) : [];
+// status is singleton, so we just get the first one
+import { derived } from "svelte/store";
+export const status = derived(statusCollection, ($statuses) => $statuses[0] ?? emptyStatus);
 
-    return {
-      messages,
-      status: statuses[0] ?? emptyStatus
-    };
-  }
-});
-
-export const messages = derived(statusChannel, ($statusChannel) => $statusChannel.messages);
-export const status = derived(statusChannel, ($statusChannel) => $statusChannel.status);
-
-// CRUD for messages
 export const {
   create: createMessage,
   update: updateMessage,
@@ -42,7 +24,6 @@ export const {
   toApi: (msg) => ({ title: msg.title, subtitle: msg.subtitle ?? null })
 });
 
-// Update status (only one record)
 export async function updateStatus(statusToUpdate: Status): Promise<void> {
   await apiPatch("status", statusToUpdate.id, {
     open: statusToUpdate.open,
@@ -52,5 +33,6 @@ export async function updateStatus(statusToUpdate: Status): Promise<void> {
 }
 
 export function destroyStatusChannel() {
-  statusChannel.destroy();
+  statusCollection.destroy();
+  messages.destroy();
 }
