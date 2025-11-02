@@ -1,0 +1,53 @@
+---
+title: Kaffediem Documentation
+description: Documentation for the Kaffediem coffee ordering system
+template: splash
+hero:
+  tagline: Documentation for developers and users of the Kaffediem coffee ordering system built by students from Amalie Skram at kodekafe.
+  image:
+    file: ../../assets/houston.webp
+  actions:
+    - text: Developer Docs
+      link: /dev/
+      icon: right-arrow
+      variant: primary
+    - text: User Guide
+      link: /user/
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Quick Links
+
+<CardGrid stagger>
+  <Card title="🚀 Getting Started" icon="rocket">
+    Set up your development environment and start contributing.
+
+    [Read the tutorial →](/dev/tutorials/getting-started/)
+  </Card>
+  <Card title="📚 Tutorials" icon="open-book">
+    Learn how to work with orders, customize the menu, and more.
+
+    [Browse tutorials →](/dev/)
+  </Card>
+  <Card title="🛠️ How-To Guides" icon="setting">
+    Task-oriented guides for common development workflows.
+
+    [View guides →](/dev/)
+  </Card>
+  <Card title="📖 Reference" icon="information">
+    API endpoints, types, database schema, and more.
+
+    [Explore reference →](/dev/)
+  </Card>
+</CardGrid>
+
+## Technology Stack
+
+**Backend:** Elixir/Phoenix with SQLite
+**Frontend:** SvelteKit with TypeScript
+**Real-time:** Phoenix Channels over WebSocket
+
+Built with ❤️ by students at [kodekafe](https://discord.gg/HC6UMSfrJN)
