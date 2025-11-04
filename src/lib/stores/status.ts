@@ -1,38 +1,52 @@
-import { apiPatch, createCollection, createCrudOperations } from "./collection";
-import type { Message, Status } from "$lib/types";
+import { writable } from "svelte/store";
+import { createCollection, apiPost, apiPatch, apiDelete } from "./collection";
+import {
+  messageFromApi,
+  messageToApi,
+  statusFromApi,
+  statusToApi,
+  type Message,
+  type Status
+} from "$lib/types";
+
+// Messages collection
+export const messages = createCollection("message", messageFromApi);
+
+// Status is singleton - only one record
+const statusCollection = createCollection("status", statusFromApi);
 
 const emptyStatus: Status = {
   id: "",
   open: false,
-  show_message: false,
-  message: null
+  showMessage: false,
+  messageId: null
 };
 
-export const messages = createCollection<Message, Message>("message", (data) => data);
+const { subscribe, set } = writable<Status>(emptyStatus);
 
-const statusCollection = createCollection<Status, Status>("status", (data) => data);
-
-// status is singleton, so we just get the first one
-import { derived } from "svelte/store";
-export const status = derived(statusCollection, ($statuses) => $statuses[0] ?? emptyStatus);
-
-export const {
-  create: createMessage,
-  update: updateMessage,
-  delete: deleteMessage
-} = createCrudOperations<Message>("message", {
-  toApi: (msg) => ({ title: msg.title, subtitle: msg.subtitle ?? null })
+// Subscribe to collection and grab first record
+statusCollection.subscribe((records) => {
+  set(records[0] ?? emptyStatus);
 });
 
-export async function updateStatus(statusToUpdate: Status): Promise<void> {
-  await apiPatch("status", statusToUpdate.id, {
-    open: statusToUpdate.open,
-    show_message: statusToUpdate.show_message,
-    message: statusToUpdate.message
-  });
+export const status = {
+  subscribe
+};
+
+// CRUD for messages
+export async function createMessage(msg: Message): Promise<void> {
+  await apiPost("message", messageToApi(msg));
 }
 
-export function destroyStatusChannel() {
-  statusCollection.destroy();
-  messages.destroy();
+export async function updateMessage(msg: Message): Promise<void> {
+  await apiPatch("message", msg.id, messageToApi(msg));
+}
+
+export async function deleteMessage(id: string): Promise<void> {
+  await apiDelete("message", id);
+}
+
+// Update status (only one record)
+export async function updateStatus(status: Status): Promise<void> {
+  await apiPatch("status", status.id, statusToApi(status));
 }

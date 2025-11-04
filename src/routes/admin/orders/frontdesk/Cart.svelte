@@ -13,7 +13,7 @@
   } from "$stores/cart";
   import auth from "$stores/auth";
   import { createOrder, orders } from "$stores/orders";
-  import { menuIndexes } from "$stores/menu";
+  import { customizationKeys } from "$stores/menu";
   import type { CustomizationValue } from "$lib/types";
   import CommentIcon from "$assets/CommentIcon.svelte";
   import CompleteOrder from "$assets/CompleteOrder.svelte";
@@ -23,13 +23,13 @@
   const mostRecentOrderId = $derived(
     $orders.length > 0
       ? $orders
-          .sort((a, b) => new Date(a.created ?? 0).getTime() - new Date(b.created ?? 0).getTime())
-          .at(-1)!.day_id
+          .sort((a, b) => new Date(a.createdAt!).getTime() - new Date(b.createdAt!).getTime())
+          .at(-1)!.dayId
       : undefined
   );
 
   const colors = $derived(
-    Object.fromEntries($menuIndexes.customization_keys.map((key) => [key.id, key.label_color]))
+    Object.fromEntries($customizationKeys.map((key) => [key.id, key.labelColor]))
   );
 
   const handleAddToCart = () => {
@@ -106,8 +106,8 @@
 {#snippet CustomizationBadge({ customization }: { customization: CustomizationValue })}
   <span
     class="badge badge-sm md:badge-md lg:badge-lg"
-    style={customization.belongs_to && colors[customization.belongs_to]
-      ? `background-color: ${colors[customization.belongs_to]}; color: white;`
+    style={customization.belongsTo && colors[customization.belongsTo]
+      ? `background-color: ${colors[customization.belongsTo]}; color: white;`
       : ""}
   >
     {customization.name}
@@ -147,7 +147,7 @@
       </div>
     </td>
     <td>
-      <span>{item.totalPrice},-</span>
+      <span>{item.price},-</span>
       {#if $editingIndex === index}
         <button class="btn btn-error ml-3" onclick={deleteEditingItem}><TrashIcon /></button>
       {/if}

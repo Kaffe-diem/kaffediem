@@ -1,18 +1,17 @@
 defmodule Kaffebase.Orders do
   @moduledoc """
-  Phoenix context representing orders in the system
+  Orders context providing PocketBase-compatible data access helpers.
   """
 
   require Logger
   import Ecto.Query, warn: false
 
   alias Ecto.{Changeset, Multi}
-  alias Kaffebase.Catalog.{Crud, CustomizationKey}
+  alias Kaffebase.CollectionNotifier
   alias Kaffebase.Orders.PlaceOrder
   alias Kaffebase.Orders.DayId
   alias Kaffebase.Orders.Order
   alias Kaffebase.Repo
-  alias KaffebaseWeb.CollectionChannel
 
   @spec list_orders(keyword()) :: [Order.t()]
   def list_orders(opts \\ []) do
@@ -21,14 +20,11 @@ defmodule Kaffebase.Orders do
     |> maybe_filter(:customer_id, opts[:customer_id] || opts[:customer])
     |> maybe_apply_order(opts[:order_by] || [asc: :day_id, asc: :inserted_at])
     |> Repo.all()
-    |> Enum.map(&enrich_order_with_colors/1)
   end
 
   @spec get_order!(String.t(), keyword()) :: Order.t()
   def get_order!(id, _opts \\ []) do
-    Order
-    |> Repo.get!(id)
-    |> enrich_order_with_colors()
+    Repo.get!(Order, id)
   end
 
   @spec create_order(map()) :: {:ok, Order.t()} | {:error, term()}
@@ -52,10 +48,9 @@ defmodule Kaffebase.Orders do
       |> Repo.transaction()
       |> case do
         {:ok, %{order: order}} ->
-          enriched_order = enrich_order_with_colors(order)
-          Logger.info("Order created: #{enriched_order.id}, day_id: #{enriched_order.day_id}")
-          broadcast_change("order", "create", enriched_order)
-          {:ok, enriched_order}
+          Logger.info("Order created: #{order.id}, day_id: #{order.day_id}")
+          broadcast_change("order", "create", order)
+          {:ok, order}
 
         {:error, _step, reason, _changes} ->
           Logger.error("Order creation failed: #{inspect(reason)}")
@@ -98,7 +93,6 @@ defmodule Kaffebase.Orders do
 
     Order
     |> Repo.all()
-    |> Enum.map(&enrich_order_with_colors/1)
     |> Enum.each(&broadcast_change("order", "update", &1))
 
     {count, nil}
@@ -109,31 +103,6 @@ defmodule Kaffebase.Orders do
     order
     |> Repo.delete()
     |> notify("order", "delete")
-  end
-
-  # --------------------------------------------------------------------------
-  # Order enrichment
-
-  defp enrich_order_with_colors(%Order{items: nil} = order), do: order
-
-  defp enrich_order_with_colors(%Order{items: items} = order) when is_list(items) do
-    keys = Crud.list(CustomizationKey) |> Map.new(& {&1.id, &1.label_color})
-
-    enriched_items =
-      Enum.map(items, fn item ->
-        enriched_customizations =
-          item
-          |> Map.get("customizations", [])
-          |> Enum.map(fn cust ->
-            key_id = Map.get(cust, "key_id")
-            label_color = Map.get(keys, key_id)
-            Map.put(cust, "label_color", label_color)
-          end)
-
-        Map.put(item, "customizations", enriched_customizations)
-      end)
-
-    %{order | items: enriched_items}
   end
 
   # --------------------------------------------------------------------------
@@ -180,11 +149,10 @@ defmodule Kaffebase.Orders do
   end
 
   defp notify({:ok, record} = result, "order", action) do
-    enriched_record = enrich_order_with_colors(record)
-    items_count = length(enriched_record.items || [])
-    Logger.info("Order #{action}: #{enriched_record.id} (#{items_count} items)")
+    items_count = length(record.items)
+    Logger.info("Order #{action}: #{record.id} (#{items_count} items)")
 
-    broadcast_change("order", action, enriched_record)
+    broadcast_change("order", action, record)
     result
   end
 
@@ -196,7 +164,7 @@ defmodule Kaffebase.Orders do
   defp notify(result, _collection, _action), do: result
 
   defp broadcast_change(collection, action, record) do
-    CollectionChannel.broadcast_change(collection, action, record)
+    CollectionNotifier.broadcast_change(collection, action, record)
   end
 
   defp next_day_id(repo) do

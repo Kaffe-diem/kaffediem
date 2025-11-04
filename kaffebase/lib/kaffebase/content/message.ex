@@ -17,19 +17,7 @@ defmodule Kaffebase.Content.Message do
   def changeset(message, attrs) do
     message
     |> cast(attrs, [:id, :subtitle, :title])
-    |> ensure_title_not_nil()
     |> maybe_put_id()
-  end
-
-  # the frontend rightfully sends null for empty title
-  # we want to still support it because messages are by
-  # default created without a title.
-  # todo: remove this and have frontend send a title on create
-  defp ensure_title_not_nil(changeset) do
-    case get_field(changeset, :title) do
-      nil -> put_change(changeset, :title, "")
-      _ -> changeset
-    end
   end
 
   defp maybe_put_id(changeset) do

@@ -6,27 +6,21 @@
 
 import { writable, derived, get } from "svelte/store";
 import type { Item, CustomizationValue, CustomizationKey } from "$lib/types";
-import { menuIndexes } from "./menu";
+import { customizationKeys, customizationValues, categories, getCategoryById, items } from "./menu";
 import { sumBy, groupBy, updateAt } from "$lib/utils";
 import { finalPrice } from "$lib/pricing";
 
 export interface CartItem extends Item {
   customizations: CustomizationValue[];
   basePrice: number;
-  totalPrice: number;
 }
 
 export const selectedItemId = writable<string | undefined>(undefined);
-const indexes = menuIndexes;
-
-export const selectedItem = derived([selectedItemId, indexes], ([$selectedItemId, $indexes]) =>
-  $indexes.items.find((item) => item.id === $selectedItemId)
+export const selectedItem = derived(selectedItemId, ($selectedItemId) =>
+  get(items).find((i) => i.id === $selectedItemId)
 );
-
-export const selectedCategory = derived([selectedItem, indexes], ([$selectedItem, $indexes]) =>
-  $selectedItem
-    ? $indexes.categories.find((category) => category.id === $selectedItem.category)
-    : undefined
+export const selectedCategory = derived(selectedItem, ($selectedItem) =>
+  $selectedItem ? getCategoryById($selectedItem?.category) : undefined
 );
 
 export const selectedCustomizations = writable<Record<string, CustomizationValue[]>>({});
@@ -37,20 +31,20 @@ export const selectedCustomizationsFlat = derived(
 
 export const cart = writable<CartItem[]>([]);
 
-export const totalPrice = derived(cart, ($cart) => sumBy($cart, (item) => item.totalPrice));
+export const totalPrice = derived(cart, ($cart) => sumBy($cart, (item) => item.price));
 
 export const editingIndex = writable<number | null>(null);
 
 const repriceItem = (item: CartItem): CartItem => {
   const base = item.basePrice;
   const price = finalPrice(base, get(selectedCustomizationsFlat));
-  return { ...item, basePrice: base, totalPrice: price } as CartItem;
+  return { ...item, basePrice: base, price } as CartItem;
 };
 
 const hydrateSelectedFromItem = (item: CartItem) => {
   const grouped = groupBy(
-    (item.customizations || []).filter((v) => Boolean(v.belongs_to)),
-    (v) => v.belongs_to as string
+    (item.customizations || []).filter((v) => Boolean(v.belongsTo)),
+    (v) => v.belongsTo as string
   );
   selectedCustomizations.set(grouped);
 };
@@ -83,12 +77,9 @@ const repriceEditingItemBySelections = () => {
 };
 
 const validateCustomizations = () => {
-  const category = get(selectedCategory);
-  const { customization_keys: keys } = get(indexes);
-  const valid = new Set(category?.valid_customizations ?? []);
-
-  for (const key of keys) {
-    const isValid = valid.has(key.id);
+  const category = get(categories).find((c) => c === get(selectedCategory));
+  for (const key of get(customizationKeys)) {
+    const isValid = category?.validCustomizations.includes(key.id);
     if (!isValid) {
       selectedCustomizations.update((c) => {
         c[key.id] = [];
@@ -99,14 +90,15 @@ const validateCustomizations = () => {
 };
 
 export const applyDefaults = () => {
-  const { customization_keys: keys, customization_values: values } = get(indexes);
+  const keys = get(customizationKeys);
+  const values = get(customizationValues);
   const selected = get(selectedCustomizations);
 
   for (const key of keys) {
     const current = selected[key.id] ?? [];
-    const defaultValue = values.find((val) => val.id === key.default_value);
+    const defaultValue = values.find((val) => val.id === key.defaultValue);
 
-    if (current.length === 0 && key.default_value && defaultValue?.enable) {
+    if (current.length === 0 && key.defaultValue && defaultValue?.enabled) {
       selected[key.id] = [defaultValue];
     }
   }
@@ -140,7 +132,7 @@ export const toggleCustomization = (key: CustomizationKey, value: CustomizationV
     const updatedSelections = updateSelectedCustomizations(
       currentSelections,
       value,
-      key.multiple_choice
+      key.multipleChoice
     );
     return { ...map, [key.id]: updatedSelections };
   });
@@ -170,7 +162,15 @@ export const handleSelectedItemChange = () => {
     cart.update((c) => {
       const item = get(selectedItem)!;
 
-      const updatedItem = buildCartItem(item, get(selectedCustomizationsFlat));
+      const basePrice = item.price;
+      const finalprice = finalPrice(basePrice, get(selectedCustomizationsFlat));
+
+      const updatedItem: CartItem = {
+        ...get(selectedItem),
+        price: Math.ceil(finalprice),
+        customizations: get(selectedCustomizationsFlat),
+        basePrice
+      } as CartItem;
 
       const newCart = [...c];
       newCart[index] = updatedItem!;
@@ -180,23 +180,22 @@ export const handleSelectedItemChange = () => {
 };
 
 export const addToCart = (item: Item) => {
-  cart.update((c) => [...c, buildCartItem(item, get(selectedCustomizationsFlat))]);
+  const basePrice = item.price;
+  const finalprice = finalPrice(basePrice, get(selectedCustomizationsFlat));
+
+  const itemToAdd: CartItem = {
+    ...item,
+    price: Math.ceil(finalprice),
+    customizations: get(selectedCustomizationsFlat),
+    basePrice
+  } as CartItem;
+
+  cart.update((c) => [...c, itemToAdd]);
   initializeCustomizations();
 };
 
 export const removeFromCart = (index: number) => {
   cart.update((c) => c.filter((_, i) => i !== index));
-};
-
-const buildCartItem = (item: Item, customizations: CustomizationValue[]): CartItem => {
-  const basePrice = item.price_nok;
-  const totalPrice = Math.ceil(finalPrice(basePrice, customizations));
-  return {
-    ...item,
-    totalPrice,
-    basePrice,
-    customizations
-  } as CartItem;
 };
 
 export const clearCart = () => {

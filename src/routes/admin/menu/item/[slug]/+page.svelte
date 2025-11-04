@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { menuIndexes, createItem, updateItem } from "$stores/menu";
+  import { items, categories, createItem, updateItem } from "$stores/menu";
   import type { Item } from "$lib/types";
   import { goto } from "$app/navigation";
 
@@ -14,21 +14,21 @@
   let itemName: string | undefined = $state();
   let itemPrice: number | undefined = $state();
   let itemCategory: string | undefined = $state();
-  let itemImage: string | null | undefined = $state();
+  let itemImage: string | undefined = $state();
   let itemEnabled: boolean = $state(true);
   let itemSort: number = $state(0);
 
   let exists: boolean = $state(false);
 
   $effect(() => {
-    const item = $menuIndexes.items.find((item) => item.id === id);
+    const item = $items.find((item) => item.id === id);
     if (item) {
       itemName = item.name;
-      itemPrice = item.price_nok;
+      itemPrice = item.price;
       itemCategory = item.category;
       itemImage = item.image;
-      itemEnabled = item.enable;
-      itemSort = item.sort_order;
+      itemEnabled = item.enabled;
+      itemSort = item.sortOrder;
 
       exists = true;
     }
@@ -62,16 +62,15 @@
     const payload: Item = {
       id: create ? "" : id,
       name: itemName,
-      price_nok: itemPrice,
+      price: itemPrice,
       category: itemCategory,
       image: itemImage ?? "",
-      enable: itemEnabled,
-      sort_order: itemSort,
-      imageFile: imageFile ?? undefined
+      enabled: itemEnabled,
+      sortOrder: itemSort
     };
 
-    if (!payload.imageFile) {
-      delete payload.imageFile;
+    if (imageFile) {
+      payload.imageFile = imageFile;
     }
 
     if (create) {
@@ -108,7 +107,7 @@
         <select class="select select-xl w-full" required bind:value={itemCategory}>
           {#if itemCategory || create}
             <option disabled value="" selected={create}>Velg en kategori</option>
-            {#each $menuIndexes.categories as category (category.id)}
+            {#each $categories as category (category.id)}
               <option value={category.id} selected={category.id == itemCategory}
                 >{category.name}</option
               >

@@ -45,7 +45,7 @@
         out:transitionSend|local={{ key: order.id }}
         animate:flip={{ duration: 225, easing: cubicOut }}
       >
-        {order.day_id}
+        {order.dayId}
       </div>
     {/each}
   </div>

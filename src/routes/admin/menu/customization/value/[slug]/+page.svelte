@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { menuIndexes, createCustomizationValue, updateCustomizationValue } from "$stores/menu";
+  import {
+    customizationKeys,
+    customizationValues,
+    createCustomizationValue,
+    updateCustomizationValue
+  } from "$stores/menu";
   import type { CustomizationValue } from "$lib/types";
   import { goto } from "$app/navigation";
 
@@ -21,14 +26,14 @@
   let exists: boolean = $state(true);
 
   $effect(() => {
-    const value = $menuIndexes.customization_values.find((value) => value.id === id);
+    const value = $customizationValues.find((value) => value.id === id);
     if (value) {
       customizationName = value.name;
-      customizationPrice = value.price_increment_nok;
-      customizationConstantPrice = value.constant_price;
-      customizationKey = value.belongs_to;
-      customizationEnabled = value.enable;
-      customizationSort = value.sort_order;
+      customizationPrice = value.priceChange;
+      customizationConstantPrice = value.constantPrice;
+      customizationKey = value.belongsTo;
+      customizationEnabled = value.enabled;
+      customizationSort = value.sortOrder;
 
       exists = true;
     }
@@ -42,11 +47,11 @@
     const payload: CustomizationValue = {
       id: create ? "" : id,
       name: customizationName,
-      price_increment_nok: customizationPrice,
-      constant_price: customizationConstantPrice,
-      belongs_to: customizationKey,
-      enable: customizationEnabled,
-      sort_order: customizationSort
+      priceChange: customizationPrice,
+      constantPrice: customizationConstantPrice,
+      belongsTo: customizationKey,
+      enabled: customizationEnabled,
+      sortOrder: customizationSort
     };
 
     if (create) {
@@ -105,7 +110,7 @@
         <select class="select select-xl w-full" required bind:value={customizationKey}>
           {#if customizationKey || create}
             <option disabled value="" selected={create}>Velg en kategori</option>
-            {#each $menuIndexes.customization_keys as category (category.id)}
+            {#each $customizationKeys as category (category.id)}
               <option value={category.id} selected={category.id == customizationKey}
                 >{category.name}</option
               >

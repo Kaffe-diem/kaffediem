@@ -5,8 +5,14 @@ defmodule KaffebaseWeb.ItemController do
 
   action_fallback KaffebaseWeb.FallbackController
 
-  def index(conn, _params) do
-    items = Crud.list(Item)
+  def index(conn, params) do
+    category_id = params["category"] || params["category_id"]
+
+    opts =
+      []
+      |> maybe_put_filter(category_id)
+
+    items = Crud.list(Item, opts)
     json(conn, items)
   end
 
@@ -40,4 +46,6 @@ defmodule KaffebaseWeb.ItemController do
     end
   end
 
+  defp maybe_put_filter(opts, nil), do: opts
+  defp maybe_put_filter(opts, category_id), do: Keyword.put(opts, :filter, {:category, category_id})
 end

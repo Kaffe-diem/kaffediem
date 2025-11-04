@@ -1,11 +1,14 @@
 defmodule Kaffebase.CatalogTest do
   use Kaffebase.DataCase
 
+  import Ecto.Query
+
   alias Kaffebase.Catalog.{
     Category,
     CustomizationKey,
     CustomizationValue,
     Item,
+    ItemCustomization,
     Crud
   }
 
@@ -13,6 +16,7 @@ defmodule Kaffebase.CatalogTest do
   alias Kaffebase.Repo
 
   setup do
+    Repo.delete_all(ItemCustomization)
     Repo.delete_all(CustomizationValue)
     Repo.delete_all(CustomizationKey)
     Repo.delete_all(Item)
@@ -30,29 +34,45 @@ defmodule Kaffebase.CatalogTest do
   end
 
   describe "items" do
-    test "list_items/0 returns all items" do
+    test "list_items/1 filters by category" do
       category_a = CatalogFixtures.category_fixture()
       category_b = CatalogFixtures.category_fixture()
 
       item_a = CatalogFixtures.item_fixture(%{category: category_a.id})
-      item_b = CatalogFixtures.item_fixture(%{category: category_b.id})
+      _item_b = CatalogFixtures.item_fixture(%{category: category_b.id})
 
-      result = Crud.list(Item)
-      assert length(result) == 2
-      assert Enum.map(result, & &1.id) |> Enum.sort() == [item_a.id, item_b.id] |> Enum.sort()
+      result = Crud.list(Item, [filter: {:category, category_a.id}])
+      assert Enum.map(result, & &1.id) == [item_a.id]
     end
   end
 
   describe "customization values" do
-    test "list_customization_values/0 returns all values" do
+    test "list_customization_values/1 filters by key" do
       key_a = CatalogFixtures.customization_key_fixture()
       key_b = CatalogFixtures.customization_key_fixture()
       value_a = CatalogFixtures.customization_value_fixture(%{key: key_a})
-      value_b = CatalogFixtures.customization_value_fixture(%{key: key_b})
+      _value_b = CatalogFixtures.customization_value_fixture(%{key: key_b})
 
-      result = Crud.list(CustomizationValue)
-      assert length(result) == 2
-      assert Enum.map(result, & &1.id) |> Enum.sort() == [value_a.id, value_b.id] |> Enum.sort()
+      result = Crud.list(CustomizationValue, [filter: {:belongs_to, key_a.id}])
+      assert Enum.map(result, & &1.id) == [value_a.id]
+    end
+  end
+
+  describe "item customizations" do
+    test "list_item_customizations_by_ids/2 filters by ids" do
+      key = CatalogFixtures.customization_key_fixture()
+      value = CatalogFixtures.customization_value_fixture(%{key: key})
+      customization = CatalogFixtures.item_customization_fixture(%{key: key, values: [value]})
+      _other = CatalogFixtures.item_customization_fixture()
+
+      [loaded] =
+        ItemCustomization
+        |> where([ic], ic.id in ^[customization.id])
+        |> Repo.all()
+
+      assert loaded.id == customization.id
+      assert loaded.key == key.id
+      assert loaded.value == [value.id]
     end
   end
 end

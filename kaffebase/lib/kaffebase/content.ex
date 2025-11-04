@@ -1,14 +1,14 @@
 defmodule Kaffebase.Content do
   @moduledoc """
-  Message and status context
+  Content context replacing PocketBase message and status collections.
   """
 
   require Logger
   import Ecto.Query, warn: false
 
-  alias Kaffebase.{BroadcastHelpers, Repo}
+  alias Kaffebase.CollectionNotifier
   alias Kaffebase.Content.{Message, Status}
-  alias KaffebaseWeb.CollectionChannel
+  alias Kaffebase.Repo
 
   # Messages -----------------------------------------------------------------
 
@@ -44,6 +44,9 @@ defmodule Kaffebase.Content do
     |> Repo.delete()
     |> notify_delete("message")
   end
+
+  @spec change_message(Message.t(), map()) :: Ecto.Changeset.t()
+  def change_message(%Message{} = message, attrs \\ %{}), do: Message.changeset(message, attrs)
 
   # Status -------------------------------------------------------------------
 
@@ -87,17 +90,39 @@ defmodule Kaffebase.Content do
     |> notify_delete("status")
   end
 
+  @spec change_status(Status.t(), map()) :: Ecto.Changeset.t()
+  def change_status(%Status{} = status, attrs \\ %{}), do: Status.changeset(status, attrs)
+
   # Helpers ------------------------------------------------------------------
 
   defp maybe_apply_order(query, nil), do: query
   defp maybe_apply_order(query, []), do: query
+
   defp maybe_apply_order(query, orderings), do: order_by(query, ^orderings)
 
-  defp notify(result, collection, action) do
-    BroadcastHelpers.notify_change(result, collection, action, &CollectionChannel.broadcast_change/3)
+  defp notify({:ok, record} = result, collection, action) do
+    Logger.info("#{String.capitalize(collection)} #{action}: #{record.id}")
+    CollectionNotifier.broadcast_change(collection, action, record)
+    result
   end
 
-  defp notify_delete(result, collection) do
-    BroadcastHelpers.notify_delete(result, collection, &CollectionChannel.broadcast_delete/2)
+  defp notify({:error, %Ecto.Changeset{} = changeset} = result, collection, action) do
+    Logger.warning("#{String.capitalize(collection)} #{action} failed: #{inspect(changeset.errors)}")
+    result
   end
+
+  defp notify(result, _collection, _action), do: result
+
+  defp notify_delete({:ok, record} = result, collection) do
+    Logger.info("#{String.capitalize(collection)} delete: #{record.id}")
+    CollectionNotifier.broadcast_delete(collection, record.id)
+    result
+  end
+
+  defp notify_delete({:error, %Ecto.Changeset{} = changeset} = result, collection) do
+    Logger.warning("#{String.capitalize(collection)} delete failed: #{inspect(changeset.errors)}")
+    result
+  end
+
+  defp notify_delete(result, _collection), do: result
 end

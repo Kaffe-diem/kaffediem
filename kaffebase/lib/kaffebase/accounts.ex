@@ -1,5 +1,6 @@
 defmodule Kaffebase.Accounts do
   @moduledoc """
+  Accounts context covering user data previously sourced from PocketBase.
   """
 
   import Ecto.Query, warn: false
