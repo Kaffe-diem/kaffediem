@@ -83,6 +83,32 @@ services:
         - action: rebuild
           path: package.json
 
+  docs:
+    build:
+      context: ./docs/starlight
+      dockerfile: Dockerfile
+      target: development
+    ports:
+      - "4321:4321"
+    volumes:
+      - ./docs/starlight/src:/app/src
+      - ./docs/starlight/public:/app/public
+      - ./docs/starlight/astro.config.mjs:/app/astro.config.mjs
+      - ./docs/starlight/tsconfig.json:/app/tsconfig.json
+    develop:
+      watch:
+        - action: sync
+          path: ./docs/starlight/src
+          target: /app/src
+        - action: sync
+          path: ./docs/starlight/public
+          target: /app/public
+        - action: sync+restart
+          path: ./docs/starlight/astro.config.mjs
+          target: /app/astro.config.mjs
+        - action: rebuild
+          path: ./docs/starlight/package.json
+
 volumes:
   svelte_kit_data:
   backend_deps:
