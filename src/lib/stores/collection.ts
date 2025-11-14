@@ -20,34 +20,26 @@ export function createCollection<Api, T extends { id: string }>(
     onCreate?: (item: T) => void;
   }
 ): Writable<T[]> & { destroy: () => void } {
-  const { subscribe, set, update } = writable<T[]>([]);
-  let channel: Channel | null = null;
-
-  const socket = getSocket();
-  if (socket) {
-    channel = socket.channel(`collection:${collectionName}`, {
-      options: options?.queryParams ?? {}
-    });
-
-    channel
-      .join()
-      .receive("ok", (payload: CollectionPayload<Api> | undefined) => {
-        const items = Array.isArray(payload?.items) ? payload.items : [];
-        set(items.map((item) => fromApi(item)));
-      })
-      .receive("error", (error: unknown) => {
-        console.error(`Failed to join ${collectionName}:`, error);
-        set([]);
-      });
-
-    channel.on("change", (event: ChangeEvent<Api>) => {
+  return createChannelStore<T[]>(collectionName, {
+    initialValue: [],
+    queryParams: options?.queryParams,
+    extract: (response: unknown) => {
+      const items = Array.isArray((response as CollectionPayload<Api>)?.items)
+        ? ((response as CollectionPayload<Api>).items ?? [])
+        : [];
+      return items.map(fromApi);
+    },
+    onChange: (rawEvent, { update }) => {
+      const event = rawEvent as ChangeEvent<Api>;
       if (!event?.record) return;
 
       switch (event.action) {
         case "create": {
-          const item = fromApi(event.record as Api);
-          options?.onCreate?.(item);
-          update((items) => [...items, item]);
+          update((items) => {
+            const item = fromApi(event.record as Api);
+            options?.onCreate?.(item);
+            return [...items, item];
+          });
           break;
         }
         case "update": {
@@ -71,7 +63,47 @@ export function createCollection<Api, T extends { id: string }>(
         default:
           break;
       }
-    });
+    }
+  });
+}
+
+type ChannelStoreOptions<T> = {
+  initialValue: T;
+  queryParams?: Record<string, string>;
+  extract: (response: unknown) => T;
+  onChange?: (
+    event: unknown,
+    helpers: { set: (value: T) => void; update: (updater: (value: T) => T) => void }
+  ) => void;
+};
+
+export function createChannelStore<T>(
+  channelName: string,
+  options: ChannelStoreOptions<T>
+): Writable<T> & { destroy: () => void } {
+  const { initialValue, queryParams = {}, extract, onChange } = options;
+  const { subscribe, set, update } = writable<T>(initialValue);
+  let channel: Channel | null = null;
+
+  const socket = getSocket();
+  if (socket) {
+    channel = socket.channel(`collection:${channelName}`, { options: queryParams });
+
+    channel
+      .join()
+      .receive("ok", (payload: unknown) => {
+        set(extract(payload));
+      })
+      .receive("error", (error: unknown) => {
+        console.error(`Failed to join ${channelName}:`, error);
+        set(initialValue);
+      });
+
+    if (onChange) {
+      channel.on("change", (event: unknown) => {
+        onChange(event, { set, update });
+      });
+    }
   }
 
   return {
@@ -87,7 +119,6 @@ export function createCollection<Api, T extends { id: string }>(
   };
 }
 
-// API methods
 const backendUrl = (() => {
   if (!PUBLIC_BACKEND_URL) return "";
   try {
@@ -147,4 +178,25 @@ export async function apiDelete(collection: string, id: string): Promise<void> {
     credentials: "include"
   });
   if (!res.ok) throw new Error(`DELETE ${url} failed: ${res.status}`);
+}
+
+export function createCrudOperations<T extends { id: string }>(
+  resourceName: string,
+  options?: {
+    toApi?: (entity: T) => unknown;
+  }
+) {
+  const toApi = options?.toApi ?? ((entity: T) => entity);
+
+  return {
+    create: async (entity: T): Promise<void> => {
+      await apiPost(resourceName, toApi(entity));
+    },
+    update: async (entity: T): Promise<void> => {
+      await apiPatch(resourceName, entity.id, toApi(entity));
+    },
+    delete: async (id: string): Promise<void> => {
+      await apiDelete(resourceName, id);
+    }
+  };
 }

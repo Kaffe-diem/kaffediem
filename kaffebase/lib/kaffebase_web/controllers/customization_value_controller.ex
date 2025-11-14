@@ -5,11 +5,8 @@ defmodule KaffebaseWeb.CustomizationValueController do
 
   action_fallback KaffebaseWeb.FallbackController
 
-  def index(conn, params) do
-    belongs_to = params["belongs_to"] || params["key"] || params["key_id"]
-
-    values = Crud.list(CustomizationValue, build_filter_opts(belongs_to))
-
+  def index(conn, _params) do
+    values = Crud.list(CustomizationValue)
     json(conn, values)
   end
 
@@ -43,6 +40,4 @@ defmodule KaffebaseWeb.CustomizationValueController do
     end
   end
 
-  defp build_filter_opts(nil), do: []
-  defp build_filter_opts(key_id), do: [filter: {:belongs_to, key_id}]
 end

@@ -7,11 +7,13 @@ defmodule KaffebaseWeb.OrderController do
   action_fallback KaffebaseWeb.FallbackController
 
   def index(conn, params) do
+    from_date = params["from_date"]
+    customer_id = params["customer_id"]
+
     opts =
-      []
-      |> maybe_put(:from_date, params["from"] || params["from_date"])
-      |> maybe_put(:customer, params["customer_id"] || params["customer"])
-      |> Keyword.put(:order_by, default_order())
+      [order_by: default_order()]
+      |> then(fn o -> if from_date, do: Keyword.put(o, :from_date, from_date), else: o end)
+      |> then(fn o -> if customer_id, do: Keyword.put(o, :customer, customer_id), else: o end)
 
     orders = Orders.list_orders(opts)
     json(conn, orders)
@@ -52,7 +54,4 @@ defmodule KaffebaseWeb.OrderController do
   end
 
   defp default_order, do: [asc: :day_id, asc: :inserted_at]
-
-  defp maybe_put(opts, _key, nil), do: opts
-  defp maybe_put(opts, key, value), do: Keyword.put(opts, key, value)
 end
