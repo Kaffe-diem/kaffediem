@@ -21,14 +21,14 @@ defmodule Kaffebase.Orders do
     |> maybe_filter(:customer_id, opts[:customer_id] || opts[:customer])
     |> maybe_apply_order(opts[:order_by] || [asc: :day_id, asc: :inserted_at])
     |> Repo.all()
-    |> Enum.map(&enrich_order_with_colors/1)
+    |> Enum.map(&attach_customization_colors/1)
   end
 
   @spec get_order!(String.t(), keyword()) :: Order.t()
   def get_order!(id, _opts \\ []) do
     Order
     |> Repo.get!(id)
-    |> enrich_order_with_colors()
+    |> attach_customization_colors()
   end
 
   @spec create_order(map()) :: {:ok, Order.t()} | {:error, term()}
@@ -52,10 +52,10 @@ defmodule Kaffebase.Orders do
       |> Repo.transaction()
       |> case do
         {:ok, %{order: order}} ->
-          enriched_order = enrich_order_with_colors(order)
-          Logger.info("Order created: #{enriched_order.id}, day_id: #{enriched_order.day_id}")
-          broadcast_change("order", "create", enriched_order)
-          {:ok, enriched_order}
+          snapshot = attach_customization_colors(order)
+          Logger.info("Order created: #{snapshot.id}, day_id: #{snapshot.day_id}")
+          broadcast_change("order", "create", snapshot)
+          {:ok, snapshot}
 
         {:error, _step, reason, _changes} ->
           Logger.error("Order creation failed: #{inspect(reason)}")
@@ -98,7 +98,7 @@ defmodule Kaffebase.Orders do
 
     Order
     |> Repo.all()
-    |> Enum.map(&enrich_order_with_colors/1)
+    |> Enum.map(&attach_customization_colors/1)
     |> Enum.each(&broadcast_change("order", "update", &1))
 
     {count, nil}
@@ -114,26 +114,26 @@ defmodule Kaffebase.Orders do
   # --------------------------------------------------------------------------
   # Order enrichment
 
-  defp enrich_order_with_colors(%Order{items: nil} = order), do: order
+  defp attach_customization_colors(%Order{items: nil} = order), do: order
 
-  defp enrich_order_with_colors(%Order{items: items} = order) when is_list(items) do
-    keys = Crud.list(CustomizationKey) |> Map.new(& {&1.id, &1.label_color})
+  defp attach_customization_colors(%Order{items: items} = order) when is_list(items) do
+    keys = Crud.list(CustomizationKey) |> Map.new(&{&1.id, &1.label_color})
 
-    enriched_items =
+    updated_items =
       Enum.map(items, fn item ->
+        customizations = Map.get(item, :customizations, [])
+
         enriched_customizations =
-          item
-          |> Map.get("customizations", [])
-          |> Enum.map(fn cust ->
-            key_id = Map.get(cust, "key_id")
+          Enum.map(customizations, fn customization ->
+            key_id = customization.key_id
             label_color = Map.get(keys, key_id)
-            Map.put(cust, "label_color", label_color)
+            Map.put(customization, :label_color, label_color)
           end)
 
-        Map.put(item, "customizations", enriched_customizations)
+        Map.put(item, :customizations, enriched_customizations)
       end)
 
-    %{order | items: enriched_items}
+    %{order | items: updated_items}
   end
 
   # --------------------------------------------------------------------------
@@ -180,11 +180,11 @@ defmodule Kaffebase.Orders do
   end
 
   defp notify({:ok, record} = result, "order", action) do
-    enriched_record = enrich_order_with_colors(record)
-    items_count = length(enriched_record.items || [])
-    Logger.info("Order #{action}: #{enriched_record.id} (#{items_count} items)")
+    snapshot = attach_customization_colors(record)
+    items_count = length(snapshot.items || [])
+    Logger.info("Order #{action}: #{snapshot.id} (#{items_count} items)")
 
-    broadcast_change("order", action, enriched_record)
+    broadcast_change("order", action, snapshot)
     result
   end
 
