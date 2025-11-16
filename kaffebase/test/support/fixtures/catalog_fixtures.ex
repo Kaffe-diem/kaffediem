@@ -35,7 +35,7 @@ defmodule Kaffebase.CatalogFixtures do
 
     defaults = %{
       name: unique_string("Item"),
-      category: category_id,
+      category_id: category_id,
       price_nok: Decimal.new("100"),
       enable: true,
       sort_order: 1,
@@ -92,7 +92,7 @@ defmodule Kaffebase.CatalogFixtures do
     value
   end
 
-  defp id_of(%{id: id}) when is_binary(id), do: id
-  defp id_of(%{"id" => id}) when is_binary(id), do: id
-  defp id_of(id) when is_binary(id), do: id
+  defp id_of(%{id: id}) when is_integer(id), do: id
+  defp id_of(%{"id" => id}) when is_integer(id), do: id
+  defp id_of(id) when is_integer(id), do: id
 end

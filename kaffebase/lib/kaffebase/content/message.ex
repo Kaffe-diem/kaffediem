@@ -2,10 +2,6 @@ defmodule Kaffebase.Content.Message do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Kaffebase.Ids
-
-  @primary_key {:id, :string, autogenerate: false}
-
   schema "message" do
     field :subtitle, :string
     field :title, :string
@@ -16,9 +12,8 @@ defmodule Kaffebase.Content.Message do
   @doc false
   def changeset(message, attrs) do
     message
-    |> cast(attrs, [:id, :subtitle, :title])
+    |> cast(attrs, [:subtitle, :title])
     |> ensure_title_not_nil()
-    |> maybe_put_id()
   end
 
   # the frontend rightfully sends null for empty title
@@ -28,14 +23,6 @@ defmodule Kaffebase.Content.Message do
   defp ensure_title_not_nil(changeset) do
     case get_field(changeset, :title) do
       nil -> put_change(changeset, :title, "")
-      _ -> changeset
-    end
-  end
-
-  defp maybe_put_id(changeset) do
-    case fetch_field(changeset, :id) do
-      {:data, nil} -> put_change(changeset, :id, Ids.generate())
-      {:changes, nil} -> put_change(changeset, :id, Ids.generate())
       _ -> changeset
     end
   end

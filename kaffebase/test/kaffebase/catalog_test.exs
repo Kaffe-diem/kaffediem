@@ -34,8 +34,8 @@ defmodule Kaffebase.CatalogTest do
       category_a = CatalogFixtures.category_fixture()
       category_b = CatalogFixtures.category_fixture()
 
-      item_a = CatalogFixtures.item_fixture(%{category: category_a.id})
-      item_b = CatalogFixtures.item_fixture(%{category: category_b.id})
+      item_a = CatalogFixtures.item_fixture(%{category: category_a})
+      item_b = CatalogFixtures.item_fixture(%{category: category_b})
 
       result = Crud.list(Item)
       assert length(result) == 2

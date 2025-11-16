@@ -14,6 +14,7 @@ defmodule Kaffebase.Orders.PlaceOrder do
 
   alias Kaffebase.Catalog.Item, as: CatalogItem
   alias Kaffebase.Orders.Order
+  alias Kaffebase.Repo
 
   @states Order.states()
 
@@ -23,8 +24,8 @@ defmodule Kaffebase.Orders.PlaceOrder do
 
     @primary_key false
     embedded_schema do
-      field :key, :string
-      field :value, {:array, :string}
+      field :key, :integer
+      field :value, {:array, :integer}
     end
   end
 
@@ -35,7 +36,7 @@ defmodule Kaffebase.Orders.PlaceOrder do
 
     @primary_key false
     embedded_schema do
-      field :item, :string
+      field :item, :integer
       field :catalog_item, :map, virtual: true
       embeds_many :customizations, ItemCustomization
     end
@@ -74,10 +75,14 @@ defmodule Kaffebase.Orders.PlaceOrder do
   def new(attrs) when is_map(attrs) do
     changeset = changeset(%__MODULE__{}, attrs)
 
-    with {:ok, _command} <- apply_action(changeset, :insert),
-         {:ok, snapshots} <- build_snapshots_from_changeset(changeset) do
+    with {:ok, _command} <- apply_action(changeset, :insert) do
+      items =
+        changeset
+        |> get_field(:items)
+        |> Enum.map(&snapshot_item(&1.catalog_item, &1.customizations))
+
       command = Ecto.Changeset.apply_changes(changeset)
-      {:ok, %{command | items: snapshots}}
+      {:ok, %{command | items: items}}
     end
   end
 
@@ -97,35 +102,28 @@ defmodule Kaffebase.Orders.PlaceOrder do
 
       item_id ->
         case Crud.get(CatalogItem, item_id) do
-          nil ->
-            add_error(changeset, :item, "not found")
-
-          catalog_item ->
-            # Store resolved catalog item for snapshot building
+          %CatalogItem{} = catalog_item ->
+            catalog_item = Repo.preload(catalog_item, :category)
             put_change(changeset, :catalog_item, catalog_item)
+
+          _ ->
+            add_error(changeset, :item, "not found")
         end
     end
   end
 
-  defp build_snapshots_from_changeset(changeset) do
-    items =
-      changeset
-      |> get_field(:items)
-      |> Enum.map(&build_item_snapshot/1)
-
-    {:ok, items}
-  end
-
-  defp build_item_snapshot(%Item{catalog_item: %{} = catalog_item} = item_input) do
-    snapshot_item(catalog_item, item_input.customizations)
-  end
-
   defp snapshot_item(catalog_item, customization_inputs) do
+    category_name =
+      case catalog_item.category do
+        %Kaffebase.Catalog.Category{name: name} -> name
+        _ -> ""
+      end
+
     %{
       item_id: catalog_item.id,
       name: catalog_item.name,
       price: Decimal.to_float(catalog_item.price_nok),
-      category: catalog_item.category,
+      category: category_name,
       customizations: build_customizations_snapshot(customization_inputs)
     }
   end

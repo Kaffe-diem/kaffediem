@@ -16,7 +16,7 @@ export interface CartItem extends Item {
   totalPrice: number;
 }
 
-export const selectedItemId = writable<string | undefined>(undefined);
+export const selectedItemId = writable<number | undefined>(undefined);
 const indexes = menuIndexes;
 
 export const selectedItem = derived([selectedItemId, indexes], ([$selectedItemId, $indexes]) =>
@@ -25,11 +25,11 @@ export const selectedItem = derived([selectedItemId, indexes], ([$selectedItemId
 
 export const selectedCategory = derived([selectedItem, indexes], ([$selectedItem, $indexes]) =>
   $selectedItem
-    ? $indexes.categories.find((category) => category.id === $selectedItem.category)
+    ? $indexes.categories.find((category) => category.id === $selectedItem.category_id)
     : undefined
 );
 
-export const selectedCustomizations = writable<Record<string, CustomizationValue[]>>({});
+export const selectedCustomizations = writable<Record<number, CustomizationValue[]>>({});
 export const selectedCustomizationsFlat = derived(
   selectedCustomizations,
   ($selectedCustomizations) => Object.values($selectedCustomizations).flat()
@@ -50,7 +50,7 @@ const repriceItem = (item: CartItem): CartItem => {
 const hydrateSelectedFromItem = (item: CartItem) => {
   const grouped = groupBy(
     (item.customizations || []).filter((v) => Boolean(v.belongs_to)),
-    (v) => v.belongs_to as string
+    (v) => v.belongs_to
   );
   selectedCustomizations.set(grouped);
 };
@@ -104,7 +104,9 @@ export const applyDefaults = () => {
 
   for (const key of keys) {
     const current = selected[key.id] ?? [];
-    const defaultValue = values.find((val) => val.id === key.default_value);
+    const defaultValue = key.default_value
+      ? values.find((val) => val.id === Number(key.default_value))
+      : undefined;
 
     if (current.length === 0 && key.default_value && defaultValue?.enable) {
       selected[key.id] = [defaultValue];
@@ -116,7 +118,7 @@ export const applyDefaults = () => {
 };
 
 export const initializeCustomizations = () => {
-  const map: Record<string, CustomizationValue[]> = {};
+  const map: Record<number, CustomizationValue[]> = {};
   selectedCustomizations.set(map);
   applyDefaults();
 };

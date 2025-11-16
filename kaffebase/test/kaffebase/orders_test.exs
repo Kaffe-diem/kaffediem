@@ -89,10 +89,10 @@ defmodule Kaffebase.OrdersTest do
       loaded = Orders.get_order!(order.id)
       [item_row] = loaded.items
 
-      customizations = item_row[:customizations]
+      customizations = item_row.customizations
       assert length(customizations) == 2
 
-      value_ids = Enum.map(customizations, & &1[:value_id]) |> Enum.sort()
+      value_ids = Enum.map(customizations, & &1.value_id) |> Enum.sort()
       assert value_ids == Enum.sort([value_a.id, value_b.id])
     end
 
@@ -220,8 +220,13 @@ defmodule Kaffebase.OrdersTest do
           items: [%{item: item.id}]
         })
         |> tap(fn {:ok, order} ->
+          old_time =
+            DateTime.utc_now()
+            |> DateTime.add(-2, :day)
+            |> DateTime.to_naive()
+            |> NaiveDateTime.truncate(:second)
           Repo.update!(
-            Ecto.Changeset.change(order, created: DateTime.add(DateTime.utc_now(), -2, :day))
+            Ecto.Changeset.change(order, inserted_at: old_time)
           )
         end)
 

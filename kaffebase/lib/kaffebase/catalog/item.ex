@@ -2,12 +2,10 @@ defmodule Kaffebase.Catalog.Item do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Kaffebase.Ids
-
-  @primary_key {:id, :string, autogenerate: false}
+  alias Kaffebase.Catalog.Category
 
   schema "item" do
-    field :category, :string
+    belongs_to :category, Category
     field :enable, :boolean
     field :image, :string
     field :name, :string
@@ -20,28 +18,27 @@ defmodule Kaffebase.Catalog.Item do
   @doc false
   def changeset(item, attrs) do
     item
-    |> cast(attrs, [:id, :category, :enable, :image, :name, :price_nok, :sort_order])
-    |> maybe_put_id()
-    |> validate_required([:name, :price_nok, :category])
-  end
-
-  defp maybe_put_id(changeset) do
-    case fetch_field(changeset, :id) do
-      {:data, nil} -> put_change(changeset, :id, Ids.generate())
-      {:changes, nil} -> put_change(changeset, :id, Ids.generate())
-      _ -> changeset
-    end
+    |> cast(attrs, [:category_id, :enable, :image, :name, :price_nok, :sort_order])
+    |> validate_required([:name, :price_nok, :category_id])
+    |> foreign_key_constraint(:category_id)
   end
 end
 
 defimpl Jason.Encoder, for: Kaffebase.Catalog.Item do
   def encode(item, opts) do
+    category_name =
+      case item.category do
+        %Kaffebase.Catalog.Category{name: name} -> name
+        _ -> nil
+      end
+
     Jason.Encode.map(
       %{
         id: item.id,
         name: item.name,
-        price_nok: if(item.price_nok, do: Decimal.to_float(item.price_nok), else: nil),
-        category: item.category,
+        price_nok: decimal_to_float(item.price_nok),
+        category_id: item.category_id,
+        category_name: category_name,
         image: item.image,
         enable: item.enable,
         sort_order: item.sort_order,
@@ -51,4 +48,8 @@ defimpl Jason.Encoder, for: Kaffebase.Catalog.Item do
       opts
     )
   end
+
+  defp decimal_to_float(nil), do: nil
+  defp decimal_to_float(%Decimal{} = decimal), do: Decimal.to_float(decimal)
+  defp decimal_to_float(number) when is_number(number), do: number
 end

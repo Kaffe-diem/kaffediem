@@ -2,17 +2,15 @@ defmodule Kaffebase.Orders.Order do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Kaffebase.Ids
-
   defmodule ItemCustomization do
     use Ecto.Schema
     import Ecto.Changeset
 
     @primary_key false
     embedded_schema do
-      field :key_id, :string
+      field :key_id, :integer
       field :key_name, :string
-      field :value_id, :string
+      field :value_id, :integer
       field :value_name, :string
       field :price_change, :float
       field :label_color, :string, virtual: true
@@ -33,7 +31,7 @@ defmodule Kaffebase.Orders.Order do
 
     @primary_key false
     embedded_schema do
-      field :item_id, :string
+      field :item_id, :integer
       field :name, :string
       field :price, :float
       field :category, :string
@@ -49,9 +47,9 @@ defmodule Kaffebase.Orders.Order do
   end
 
   @states [:received, :production, :completed, :dispatched]
-  @primary_key {:id, :string, autogenerate: false}
 
   schema "order" do
+    field :uuid, :string
     field :customer_id, :integer
     field :day_id, :integer
     embeds_many :items, ItemSnapshot, on_replace: :delete, source: :items_data
@@ -65,16 +63,23 @@ defmodule Kaffebase.Orders.Order do
   @doc false
   def changeset(order, attrs) do
     order
-    |> cast(attrs, [:id, :customer_id, :day_id, :missing_information, :state])
+    |> cast(attrs, [:uuid, :customer_id, :day_id, :missing_information, :state])
     |> cast_embed(:items, with: &ItemSnapshot.changeset/2)
-    |> maybe_put_id()
-    |> validate_required([:state])
+    |> maybe_put_uuid()
+    |> validate_required([:state, :uuid])
   end
 
   def states, do: @states
 
   def to_serializable_items(nil), do: []
   def to_serializable_items(items), do: Enum.map(items, &serialize_item/1)
+
+  defp maybe_put_uuid(changeset) do
+    case get_field(changeset, :uuid) do
+      nil -> put_change(changeset, :uuid, Ecto.UUID.generate())
+      _ -> changeset
+    end
+  end
 
   defp serialize_item(%ItemSnapshot{} = item) do
     %{
@@ -96,13 +101,6 @@ defmodule Kaffebase.Orders.Order do
       label_color: customization.label_color
     }
   end
-
-  defp maybe_put_id(changeset) do
-    case get_field(changeset, :id) do
-      nil -> put_change(changeset, :id, Ids.generate())
-      _ -> changeset
-    end
-  end
 end
 
 defimpl Jason.Encoder, for: Kaffebase.Orders.Order do
@@ -110,6 +108,7 @@ defimpl Jason.Encoder, for: Kaffebase.Orders.Order do
     Jason.Encode.map(
       %{
         id: order.id,
+        uuid: order.uuid,
         customer_id: order.customer_id,
         day_id: order.day_id,
         state: order.state,

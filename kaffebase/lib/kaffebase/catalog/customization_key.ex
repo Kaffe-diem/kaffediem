@@ -2,10 +2,6 @@ defmodule Kaffebase.Catalog.CustomizationKey do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Kaffebase.Ids
-
-  @primary_key {:id, :string, autogenerate: false}
-
   schema "customization_key" do
     field :default_value, :string
     field :enable, :boolean
@@ -21,7 +17,6 @@ defmodule Kaffebase.Catalog.CustomizationKey do
   def changeset(customization_key, attrs) do
     customization_key
     |> cast(attrs, [
-      :id,
       :default_value,
       :enable,
       :label_color,
@@ -29,16 +24,7 @@ defmodule Kaffebase.Catalog.CustomizationKey do
       :name,
       :sort_order
     ])
-    |> maybe_put_id()
     |> validate_required([:name])
-  end
-
-  defp maybe_put_id(changeset) do
-    case fetch_field(changeset, :id) do
-      {:data, nil} -> put_change(changeset, :id, Ids.generate())
-      {:changes, nil} -> put_change(changeset, :id, Ids.generate())
-      _ -> changeset
-    end
   end
 end
 

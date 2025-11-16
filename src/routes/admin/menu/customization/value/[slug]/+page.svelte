@@ -10,6 +10,7 @@
   let { data } = $props();
   const id = data.id;
   const create = id == "new";
+  const numericId = create ? undefined : Number(id);
 
   let customizationName: string | undefined = $state();
   let customizationPrice: number = $state(0);
@@ -21,12 +22,12 @@
   let exists: boolean = $state(true);
 
   $effect(() => {
-    const value = $menuIndexes.customization_values.find((value) => value.id === id);
+    const value = $menuIndexes.customization_values.find((value) => value.id === numericId);
     if (value) {
       customizationName = value.name;
       customizationPrice = value.price_increment_nok;
       customizationConstantPrice = value.constant_price;
-      customizationKey = value.belongs_to;
+      customizationKey = String(value.belongs_to);
       customizationEnabled = value.enable;
       customizationSort = value.sort_order;
 
@@ -40,11 +41,11 @@
     if (!customizationName || customizationKey === undefined) return;
 
     const payload: CustomizationValue = {
-      id: create ? "" : id,
+      id: create ? 0 : numericId ?? 0,
       name: customizationName,
       price_increment_nok: customizationPrice,
       constant_price: customizationConstantPrice,
-      belongs_to: customizationKey,
+      belongs_to: Number(customizationKey),
       enable: customizationEnabled,
       sort_order: customizationSort
     };
@@ -106,7 +107,7 @@
           {#if customizationKey || create}
             <option disabled value="" selected={create}>Velg en kategori</option>
             {#each $menuIndexes.customization_keys as category (category.id)}
-              <option value={category.id} selected={category.id == customizationKey}
+              <option value={String(category.id)} selected={String(category.id) === customizationKey}
                 >{category.name}</option
               >
             {/each}

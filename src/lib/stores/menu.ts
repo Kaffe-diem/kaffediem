@@ -19,10 +19,10 @@ export type MenuCategory = Category & {
 export type MenuIndexes = {
   categories: Category[];
   items: Item[];
-  items_by_category: Record<string, Item[]>;
+  items_by_category: Record<number, Item[]>;
   customization_keys: CustomizationKey[];
   customization_values: CustomizationValue[];
-  customizations_by_key: Record<string, CustomizationValue[]>;
+  customizations_by_key: Record<number, CustomizationValue[]>;
 };
 
 export type MenuPayload = {

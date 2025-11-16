@@ -2,7 +2,7 @@ import { apiPatch, createCollection, createCrudOperations } from "./collection";
 import type { Message, Status } from "$lib/types";
 
 const emptyStatus: Status = {
-  id: "",
+  id: 0,
   open: false,
   show_message: false,
   message: null

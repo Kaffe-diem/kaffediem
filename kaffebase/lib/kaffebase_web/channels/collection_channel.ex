@@ -10,7 +10,7 @@ defmodule KaffebaseWeb.CollectionChannel do
     Crud
   }
 
-  alias Kaffebase.{Content, Orders}
+  alias Kaffebase.{Content, Orders, Repo}
 
   @impl true
   def join("collection:" <> collection, payload, socket) do
@@ -56,41 +56,38 @@ defmodule KaffebaseWeb.CollectionChannel do
 
   defp load_collection("menu", _options) do
     categories = Crud.list(Category)
-    items = Crud.list(Item)
+    items = Crud.list(Item) |> Repo.preload(:category)
     keys = Crud.list(CustomizationKey)
     values = Crud.list(CustomizationValue)
 
-    # Group items by category
-    items_by_category = Enum.group_by(items, & &1.category)
-
-    # Group values by key
+    items_by_category = Enum.group_by(items, & &1.category_id)
     values_by_key = Enum.group_by(values, & &1.belongs_to)
 
-    # Build category → items → customizations hierarchy
-    tree = Enum.map(categories, fn category ->
-      category_items =
-        items_by_category
-        |> Map.get(category.id, [])
-        |> Enum.map(fn item ->
-          # Find customization keys valid for this category
-          valid_key_ids = category.valid_customizations || []
+    tree =
+      Enum.map(categories, fn category ->
+        valid_key_ids = category.valid_customizations || []
 
-          customizations =
-            Enum.filter(keys, fn key -> key.id in valid_key_ids end)
-            |> Enum.map(fn key ->
-              %{
-                key: key,
-                values: Map.get(values_by_key, key.id, [])
-              }
-            end)
+        category_items =
+          Map.get(items_by_category, category.id, [])
+          |> Enum.map(fn item ->
+            customizations =
+              keys
+              |> Enum.filter(&(&1.id in valid_key_ids))
+              |> Enum.map(fn key ->
+                %{
+                  key: key,
+                  values: Map.get(values_by_key, key.id, [])
+                }
+              end)
 
-          Map.merge(item, %{customizations: customizations})
-        end)
+            Map.put(item, :customizations, customizations)
+          end)
 
-      Map.merge(category, %{items: category_items})
-    end)
+        Map.put(category, :items, category_items)
+      end)
+
     customizations_by_key =
-      Enum.into(keys, %{}, fn key ->
+      Map.new(keys, fn key ->
         {key.id, Map.get(values_by_key, key.id, [])}
       end)
 
@@ -117,8 +114,16 @@ defmodule KaffebaseWeb.CollectionChannel do
 
   defp load_collection("order", options) do
     opts = [order_by: [asc: :day_id, asc: :inserted_at]]
-    opts = if from_date = options["from_date"], do: Keyword.put(opts, :from_date, from_date), else: opts
-    opts = if customer_id = options["customer_id"], do: Keyword.put(opts, :customer, customer_id), else: opts
+
+    opts =
+      if from_date = options["from_date"],
+        do: Keyword.put(opts, :from_date, from_date),
+        else: opts
+
+    opts =
+      if customer_id = options["customer_id"],
+        do: Keyword.put(opts, :customer, customer_id),
+        else: opts
 
     Orders.list_orders(opts)
   end

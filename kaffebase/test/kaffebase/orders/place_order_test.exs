@@ -39,7 +39,7 @@ defmodule Kaffebase.Orders.PlaceOrderTest do
       [snapshot] = command.items
       assert snapshot[:item_id] == item.id
       assert snapshot[:name] == item.name
-      assert snapshot[:price] == Decimal.to_string(item.price_nok)
+      assert snapshot[:price] == Decimal.to_float(item.price_nok)
 
       [customization] = snapshot[:customizations]
       assert customization[:key_id] == customization_key.id

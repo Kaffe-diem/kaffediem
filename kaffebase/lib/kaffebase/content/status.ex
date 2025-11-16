@@ -2,11 +2,6 @@ defmodule Kaffebase.Content.Status do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Kaffebase.Ids
-
-  @primary_key {:id, :string, autogenerate: false}
-  @foreign_key_type :string
-
   schema "status" do
     field :message, :string, source: :message
     field :open, :boolean
@@ -18,17 +13,8 @@ defmodule Kaffebase.Content.Status do
   @doc false
   def changeset(status, attrs) do
     status
-    |> cast(attrs, [:id, :message, :open, :show_message])
-    |> maybe_put_id()
+    |> cast(attrs, [:message, :open, :show_message])
     |> validate_required([:message])
-  end
-
-  defp maybe_put_id(changeset) do
-    case fetch_field(changeset, :id) do
-      {:data, nil} -> put_change(changeset, :id, Ids.generate())
-      {:changes, nil} -> put_change(changeset, :id, Ids.generate())
-      _ -> changeset
-    end
   end
 end
 

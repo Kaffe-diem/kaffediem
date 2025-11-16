@@ -23,17 +23,14 @@ defmodule Kaffebase.ContentFixtures do
   end
 
   def status_fixture(attrs \\ %{}) do
-    message = Map.get_lazy(attrs, :message, fn -> message_fixture() end)
-
     defaults = %{
-      message: message.id,
+      message: unique_string("Status message"),
       open: false,
       show_message: false
     }
 
     {:ok, status} =
       attrs
-      |> Map.delete(:message)
       |> Enum.into(defaults)
       |> Content.create_status()
 

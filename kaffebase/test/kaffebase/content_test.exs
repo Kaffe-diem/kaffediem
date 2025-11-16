@@ -22,12 +22,11 @@ defmodule Kaffebase.ContentTest do
 
   describe "status" do
     test "get_status!/1 retrieves status by id" do
-      message = ContentFixtures.message_fixture()
-      status = ContentFixtures.status_fixture(%{message: message})
+      status = ContentFixtures.status_fixture()
 
       loaded = Content.get_status!(status.id)
       assert loaded.id == status.id
-      assert loaded.message == message.id
+      assert loaded.message == status.message
     end
 
     test "get_singleton_status/0 returns nil when none" do
@@ -35,12 +34,11 @@ defmodule Kaffebase.ContentTest do
     end
 
     test "get_singleton_status/0 returns first status" do
-      message = ContentFixtures.message_fixture()
-      status = ContentFixtures.status_fixture(%{message: message})
+      status = ContentFixtures.status_fixture()
 
       loaded = Content.get_singleton_status()
       assert loaded.id == status.id
-      assert loaded.message == message.id
+      assert loaded.message == status.message
     end
   end
 end

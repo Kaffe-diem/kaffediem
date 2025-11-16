@@ -10,6 +10,7 @@
   let { data } = $props();
   const id = data.id;
   const create = id == "new";
+  const numericId = create ? undefined : Number(id);
   let customizationName: string | undefined = $state();
   let customizationEnabled: boolean = $state(true);
   let customizationColor: string | undefined = $state("#CCCCCC");
@@ -20,7 +21,7 @@
   let exists: boolean = $state(false);
 
   $effect(() => {
-    const key = $menuIndexes.customization_keys.find((key) => key.id === id);
+    const key = $menuIndexes.customization_keys.find((key) => key.id === numericId);
     if (key) {
       customizationName = key.name;
       customizationEnabled = key.enable;
@@ -92,8 +93,8 @@
         <legend class="fieldset-legend text-xl">Standard</legend>
         <select class="select select-xl w-full" bind:value={customizationDefaultValue}>
           <option value="">Ingen</option>
-          {#each $menuIndexes.customizations_by_key[id] ?? [] as customization (customization.id)}
-            <option value={customization.id}>
+          {#each $menuIndexes.customizations_by_key[numericId ?? -1] ?? [] as customization (customization.id)}
+            <option value={String(customization.id)} selected={String(customization.id) === customizationDefaultValue}>
               {customization.name}
             </option>
           {/each}

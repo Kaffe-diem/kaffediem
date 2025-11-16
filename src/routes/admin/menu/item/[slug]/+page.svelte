@@ -10,10 +10,11 @@
   let { data } = $props();
   const id = data.id;
   const create = id == "new";
+  const numericId = create ? undefined : Number(id);
 
   let itemName: string | undefined = $state();
   let itemPrice: number | undefined = $state();
-  let itemCategory: string | undefined = $state();
+  let itemCategoryId: string | undefined = $state();
   let itemImage: string | null | undefined = $state();
   let itemEnabled: boolean = $state(true);
   let itemSort: number = $state(0);
@@ -21,11 +22,11 @@
   let exists: boolean = $state(false);
 
   $effect(() => {
-    const item = $menuIndexes.items.find((item) => item.id === id);
+    const item = $menuIndexes.items.find((item) => item.id === numericId);
     if (item) {
       itemName = item.name;
       itemPrice = item.price_nok;
-      itemCategory = item.category;
+      itemCategoryId = String(item.category_id);
       itemImage = item.image;
       itemEnabled = item.enable;
       itemSort = item.sort_order;
@@ -57,13 +58,16 @@
   async function handleSubmit(event: SubmitEvent) {
     event.preventDefault();
 
-    if (!itemName || itemPrice === undefined || !itemCategory) return;
+    if (!itemName || itemPrice === undefined || !itemCategoryId) return;
+
+    const category_id = Number(itemCategoryId);
+    if (Number.isNaN(category_id)) return;
 
     const payload: Item = {
       id: create ? "" : id,
       name: itemName,
       price_nok: itemPrice,
-      category: itemCategory,
+      category_id,
       image: itemImage ?? "",
       enable: itemEnabled,
       sort_order: itemSort,
@@ -77,7 +81,7 @@
     if (create) {
       await createItem(payload);
     } else {
-      await updateItem({ ...payload, id });
+      await updateItem({ ...payload, id: numericId ?? 0 });
     }
     goto(resolve("/admin/menu"));
   }
@@ -105,11 +109,11 @@
     <div>
       <fieldset class="fieldset">
         <legend class="fieldset-legend text-xl">Kategori</legend>
-        <select class="select select-xl w-full" required bind:value={itemCategory}>
-          {#if itemCategory || create}
+        <select class="select select-xl w-full" required bind:value={itemCategoryId}>
+          {#if itemCategoryId || create}
             <option disabled value="" selected={create}>Velg en kategori</option>
             {#each $menuIndexes.categories as category (category.id)}
-              <option value={category.id} selected={category.id == itemCategory}
+              <option value={String(category.id)} selected={String(category.id) === itemCategoryId}
                 >{category.name}</option
               >
             {/each}

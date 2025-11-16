@@ -2,14 +2,12 @@ defmodule Kaffebase.Catalog.CustomizationValue do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Kaffebase.Ids
-
-  @primary_key {:id, :string, autogenerate: false}
+  alias Kaffebase.Catalog.CustomizationKey
 
   schema "customization_value" do
     field :constant_price, :boolean, source: :constant_price
     field :enable, :boolean
-    field :belongs_to, :string
+    belongs_to :customization_key, CustomizationKey, foreign_key: :belongs_to
     field :name, :string
     field :price_increment_nok, :decimal, source: :price_increment_nok
     field :sort_order, :integer
@@ -21,7 +19,6 @@ defmodule Kaffebase.Catalog.CustomizationValue do
   def changeset(customization_value, attrs) do
     customization_value
     |> cast(attrs, [
-      :id,
       :constant_price,
       :enable,
       :belongs_to,
@@ -29,16 +26,8 @@ defmodule Kaffebase.Catalog.CustomizationValue do
       :price_increment_nok,
       :sort_order
     ])
-    |> maybe_put_id()
     |> validate_required([:name, :belongs_to])
-  end
-
-  defp maybe_put_id(changeset) do
-    case fetch_field(changeset, :id) do
-      {:data, nil} -> put_change(changeset, :id, Ids.generate())
-      {:changes, nil} -> put_change(changeset, :id, Ids.generate())
-      _ -> changeset
-    end
+    |> foreign_key_constraint(:belongs_to, name: :customization_value_belongs_to_fkey)
   end
 end
 

@@ -14,16 +14,16 @@ export const State = OrderStateOptions;
 export type State = OrderState;
 
 export type OrderItemCustomization = {
-  key_id: string;
+  key_id: number;
   key_name: string;
-  value_id: string;
+  value_id: number;
   value_name: string;
   price_change: number;
   label_color?: string | null;
 };
 
 export type OrderItem = {
-  item_id: string;
+  item_id: number;
   name: string;
   price: number;
   category: string;
@@ -44,20 +44,21 @@ export type Order = {
 export type OrderItemSnapshot = OrderItem;
 
 export type Category = {
-  id: string;
+  id: number;
   name: string;
   sort_order: number;
   enable: boolean;
-  valid_customizations: string[];
+  valid_customizations: number[];
   created?: string;
   updated?: string;
 };
 
 export type Item = {
-  id: string;
+  id: number;
   name: string;
   price_nok: number;
-  category: string;
+  category_id: number;
+  category_name?: string | null;
   image: string | null;
   enable: boolean;
   sort_order: number;
@@ -67,7 +68,7 @@ export type Item = {
 };
 
 export type CustomizationKey = {
-  id: string;
+  id: number;
   name: string;
   enable: boolean;
   label_color: string | null;
@@ -79,11 +80,11 @@ export type CustomizationKey = {
 };
 
 export type CustomizationValue = {
-  id: string;
+  id: number;
   name: string;
   price_increment_nok: number;
   constant_price: boolean;
-  belongs_to: string;
+  belongs_to: number;
   enable: boolean;
   sort_order: number;
   created?: string;
@@ -91,7 +92,7 @@ export type CustomizationValue = {
 };
 
 export type Message = {
-  id: string;
+  id: number;
   title: string;
   subtitle: string | null;
   created?: string;
@@ -99,7 +100,7 @@ export type Message = {
 };
 
 export type Status = {
-  id: string;
+  id: number;
   open: boolean;
   show_message: boolean;
   message: string | null;
@@ -134,7 +135,7 @@ export function itemToApi(item: Item): FormData | Record<string, unknown> {
     const formData = new FormData();
     formData.append("name", item.name);
     formData.append("price_nok", item.price_nok.toString());
-    formData.append("category", item.category);
+    formData.append("category_id", item.category_id.toString());
     formData.append("enable", item.enable.toString());
     formData.append("sort_order", item.sort_order.toString());
     formData.append("image", item.imageFile);
@@ -144,7 +145,7 @@ export function itemToApi(item: Item): FormData | Record<string, unknown> {
   return {
     name: item.name,
     price_nok: item.price_nok,
-    category: item.category,
+    category_id: item.category_id,
     enable: item.enable,
     sort_order: item.sort_order,
     image: item.image

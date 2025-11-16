@@ -9,13 +9,14 @@
 
   let { data } = $props();
   const id = data.id;
-  const create = id == "new";
-  const category = $derived($menuIndexes.categories.find((category) => category.id === id));
+  const create = id === "new";
+  const numericId = create ? undefined : Number(id);
+  const category = $derived($menuIndexes.categories.find((category) => category.id === numericId));
 
   let categoryName: string | undefined = $state();
   let categorySort: number | undefined = $state();
   let categoryEnabled: boolean = $state(true);
-  let categoryValidCustomizations: string[] = $state([]);
+  let categoryValidCustomizations: number[] = $state([]);
 
   let exists: boolean = $state(false);
 
@@ -36,7 +37,7 @@
     if (!categoryName || categorySort === undefined) return;
 
     const payload: Category = {
-      id: create ? "" : id,
+      id: create ? 0 : Number(id),
       name: categoryName,
       sort_order: categorySort,
       enable: categoryEnabled,
@@ -46,7 +47,7 @@
     if (create) {
       await createCategory(payload);
     } else {
-      await updateCategory({ ...payload, id });
+      await updateCategory({ ...payload, id: numericId! });
     }
     goto(resolve("/admin/menu"));
   }

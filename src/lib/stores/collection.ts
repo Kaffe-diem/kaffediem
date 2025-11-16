@@ -5,14 +5,14 @@ import type { Channel } from "phoenix";
 
 type ChangeEvent<Api> = {
   action: "create" | "update" | "delete";
-  record: Api | { id?: string } | null;
+  record: Api | { id?: string | number } | null;
 };
 
 type CollectionPayload<Api> = {
   items?: Api[];
 };
 
-export function createCollection<Api, T extends { id: string }>(
+export function createCollection<Api, T extends { id: string | number }>(
   collectionName: string,
   fromApi: (data: Api) => T,
   options?: {
@@ -153,7 +153,7 @@ export async function apiPost(collection: string, body: unknown): Promise<void> 
   if (!res.ok) throw new Error(`POST ${url} failed: ${res.status}`);
 }
 
-export async function apiPatch(collection: string, id: string, body: unknown): Promise<void> {
+export async function apiPatch(collection: string, id: string | number, body: unknown): Promise<void> {
   const url = buildUrl(`/api/collections/${collection}/records/${id}`);
   const init: RequestInit = {
     method: "PATCH",
@@ -171,7 +171,7 @@ export async function apiPatch(collection: string, id: string, body: unknown): P
   if (!res.ok) throw new Error(`PATCH ${url} failed: ${res.status}`);
 }
 
-export async function apiDelete(collection: string, id: string): Promise<void> {
+export async function apiDelete(collection: string, id: string | number): Promise<void> {
   const url = buildUrl(`/api/collections/${collection}/records/${id}`);
   const res = await fetch(url, {
     method: "DELETE",
@@ -180,7 +180,7 @@ export async function apiDelete(collection: string, id: string): Promise<void> {
   if (!res.ok) throw new Error(`DELETE ${url} failed: ${res.status}`);
 }
 
-export function createCrudOperations<T extends { id: string }>(
+export function createCrudOperations<T extends { id: string | number }>(
   resourceName: string,
   options?: {
     toApi?: (entity: T) => unknown;
@@ -195,7 +195,7 @@ export function createCrudOperations<T extends { id: string }>(
     update: async (entity: T): Promise<void> => {
       await apiPatch(resourceName, entity.id, toApi(entity));
     },
-    delete: async (id: string): Promise<void> => {
+    delete: async (id: string | number): Promise<void> => {
       await apiDelete(resourceName, id);
     }
   };
