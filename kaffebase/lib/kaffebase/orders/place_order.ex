@@ -122,7 +122,7 @@ defmodule Kaffebase.Orders.PlaceOrder do
     %{
       item_id: catalog_item.id,
       name: catalog_item.name,
-      price: Decimal.to_float(catalog_item.price_nok),
+      price: catalog_item.price_nok,
       category: category_name,
       customizations: build_customizations_snapshot(customization_inputs)
     }
@@ -152,7 +152,7 @@ defmodule Kaffebase.Orders.PlaceOrder do
       key_name: key.name,
       value_id: value.id,
       value_name: value.name,
-      price_change: Decimal.to_float(value.price_increment_nok || 0)
+      price_change: value.price_increment_nok || 0
     }
   end
 end

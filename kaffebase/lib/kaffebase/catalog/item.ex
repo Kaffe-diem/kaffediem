@@ -9,7 +9,7 @@ defmodule Kaffebase.Catalog.Item do
     field :enable, :boolean
     field :image, :string
     field :name, :string
-    field :price_nok, :decimal, source: :price_nok
+    field :price_nok, :integer
     field :sort_order, :integer
 
     timestamps()
@@ -36,7 +36,7 @@ defimpl Jason.Encoder, for: Kaffebase.Catalog.Item do
       %{
         id: item.id,
         name: item.name,
-        price_nok: decimal_to_float(item.price_nok),
+        price_nok: item.price_nok,
         category_id: item.category_id,
         category_name: category_name,
         image: item.image,
@@ -48,8 +48,4 @@ defimpl Jason.Encoder, for: Kaffebase.Catalog.Item do
       opts
     )
   end
-
-  defp decimal_to_float(nil), do: nil
-  defp decimal_to_float(%Decimal{} = decimal), do: Decimal.to_float(decimal)
-  defp decimal_to_float(number) when is_number(number), do: number
 end

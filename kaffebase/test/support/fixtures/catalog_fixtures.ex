@@ -36,7 +36,7 @@ defmodule Kaffebase.CatalogFixtures do
     defaults = %{
       name: unique_string("Item"),
       category_id: category_id,
-      price_nok: Decimal.new("100"),
+      price_nok: 100,
       enable: true,
       sort_order: 1,
       image: ""
@@ -76,7 +76,7 @@ defmodule Kaffebase.CatalogFixtures do
     defaults = %{
       name: unique_string("Value"),
       belongs_to: key_id,
-      price_increment_nok: Decimal.new("10"),
+      price_increment_nok: 10,
       constant_price: false,
       enable: true,
       sort_order: 1

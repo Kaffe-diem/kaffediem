@@ -9,7 +9,7 @@ defmodule Kaffebase.Catalog.CustomizationValue do
     field :enable, :boolean
     belongs_to :customization_key, CustomizationKey, foreign_key: :belongs_to
     field :name, :string
-    field :price_increment_nok, :decimal, source: :price_increment_nok
+    field :price_increment_nok, :integer
     field :sort_order, :integer
 
     timestamps()
@@ -37,7 +37,7 @@ defimpl Jason.Encoder, for: Kaffebase.Catalog.CustomizationValue do
       %{
         id: value.id,
         name: value.name,
-        price_increment_nok: if(value.price_increment_nok, do: Decimal.to_float(value.price_increment_nok), else: nil),
+        price_increment_nok: value.price_increment_nok,
         constant_price: value.constant_price,
         belongs_to: value.belongs_to,
         enable: value.enable,
