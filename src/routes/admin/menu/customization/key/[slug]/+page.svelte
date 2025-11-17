@@ -40,7 +40,7 @@
     if (!customizationName) return;
 
     const payload: CustomizationKey = {
-      id: create ? "" : id,
+      id: create ? 0 : Number(id),
       name: customizationName,
       enable: customizationEnabled,
       label_color: customizationColor ?? "",
@@ -52,7 +52,7 @@
     if (create) {
       await createCustomizationKey(payload);
     } else {
-      await updateCustomizationKey({ ...payload, id });
+      await updateCustomizationKey({ ...payload, id: Number(id) });
     }
     goto(resolve("/admin/menu/customization"));
   }
@@ -94,7 +94,10 @@
         <select class="select select-xl w-full" bind:value={customizationDefaultValue}>
           <option value="">Ingen</option>
           {#each $menuIndexes.customizations_by_key[numericId ?? -1] ?? [] as customization (customization.id)}
-            <option value={String(customization.id)} selected={String(customization.id) === customizationDefaultValue}>
+            <option
+              value={String(customization.id)}
+              selected={String(customization.id) === customizationDefaultValue}
+            >
               {customization.name}
             </option>
           {/each}

@@ -153,7 +153,11 @@ export async function apiPost(collection: string, body: unknown): Promise<void> 
   if (!res.ok) throw new Error(`POST ${url} failed: ${res.status}`);
 }
 
-export async function apiPatch(collection: string, id: string | number, body: unknown): Promise<void> {
+export async function apiPatch(
+  collection: string,
+  id: string | number,
+  body: unknown
+): Promise<void> {
   const url = buildUrl(`/api/collections/${collection}/records/${id}`);
   const init: RequestInit = {
     method: "PATCH",

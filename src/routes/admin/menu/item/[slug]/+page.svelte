@@ -64,7 +64,7 @@
     if (Number.isNaN(category_id)) return;
 
     const payload: Item = {
-      id: create ? "" : id,
+      id: create ? 0 : Number(id),
       name: itemName,
       price_nok: itemPrice,
       category_id,

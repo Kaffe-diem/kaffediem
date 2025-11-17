@@ -5,7 +5,7 @@ const emptyStatus: Status = {
   id: 0,
   open: false,
   show_message: false,
-  message: null
+  message_id: null
 };
 
 export const messages = createCollection<Message, Message>("message", (data) => data);
@@ -28,7 +28,7 @@ export async function updateStatus(statusToUpdate: Status): Promise<void> {
   await apiPatch("status", statusToUpdate.id, {
     open: statusToUpdate.open,
     show_message: statusToUpdate.show_message,
-    message: statusToUpdate.message
+    message_id: statusToUpdate.message_id
   });
 }
 

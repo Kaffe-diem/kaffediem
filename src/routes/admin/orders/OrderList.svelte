@@ -121,9 +121,9 @@
   customization
 }: {
   customization: {
-    key_id: string;
+    key_id: number;
     key_name: string;
-    value_id: string;
+    value_id: number;
     value_name: string;
     price_change: number;
     label_color?: string | null;

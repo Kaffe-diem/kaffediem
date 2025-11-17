@@ -41,7 +41,7 @@
     if (!customizationName || customizationKey === undefined) return;
 
     const payload: CustomizationValue = {
-      id: create ? 0 : numericId ?? 0,
+      id: create ? 0 : (numericId ?? 0),
       name: customizationName,
       price_increment_nok: customizationPrice,
       constant_price: customizationConstantPrice,
@@ -53,7 +53,7 @@
     if (create) {
       await createCustomizationValue(payload);
     } else {
-      await updateCustomizationValue({ ...payload, id });
+      await updateCustomizationValue({ ...payload, id: numericId ?? 0 });
     }
     goto(resolve("/admin/menu/customization"));
   }
@@ -107,8 +107,9 @@
           {#if customizationKey || create}
             <option disabled value="" selected={create}>Velg en kategori</option>
             {#each $menuIndexes.customization_keys as category (category.id)}
-              <option value={String(category.id)} selected={String(category.id) === customizationKey}
-                >{category.name}</option
+              <option
+                value={String(category.id)}
+                selected={String(category.id) === customizationKey}>{category.name}</option
               >
             {/each}
           {/if}

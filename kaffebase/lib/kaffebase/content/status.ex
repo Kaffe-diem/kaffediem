@@ -3,7 +3,7 @@ defmodule Kaffebase.Content.Status do
   import Ecto.Changeset
 
   schema "status" do
-    field :message, :string, source: :message
+    field :message_id, :integer
     field :open, :boolean
     field :show_message, :boolean, source: :show_message
 
@@ -13,8 +13,7 @@ defmodule Kaffebase.Content.Status do
   @doc false
   def changeset(status, attrs) do
     status
-    |> cast(attrs, [:message, :open, :show_message])
-    |> validate_required([:message])
+    |> cast(attrs, [:message_id, :open, :show_message])
   end
 end
 
@@ -25,7 +24,7 @@ defimpl Jason.Encoder, for: Kaffebase.Content.Status do
         id: status.id,
         open: status.open,
         show_message: status.show_message,
-        message: status.message,
+        message_id: status.message_id,
         inserted_at: status.inserted_at,
         updated_at: status.updated_at
       },

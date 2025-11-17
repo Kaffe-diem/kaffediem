@@ -6,8 +6,8 @@ import { toasts } from "$stores/toastStore";
 type CreateOrderPayload = {
   customer_id: number;
   items: {
-    item: string;
-    customizations: { key: string; value: string[] }[];
+    item: number;
+    customizations: { key: number; value: number[] }[];
   }[];
   state: OrderState;
   missing_information: boolean;
@@ -29,7 +29,7 @@ const undoStack: { orderId: string; previousState: OrderState }[] = [];
 // Order operations
 export async function createOrder(
   customerId: string | number,
-  items: { id: string; customizations?: { id: string; belongs_to?: string }[] }[],
+  items: { id: number; customizations?: { id: number; belongs_to?: number }[] }[],
   missingInfo: boolean
 ): Promise<void> {
   const customerIdNumber =

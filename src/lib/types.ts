@@ -103,7 +103,7 @@ export type Status = {
   id: number;
   open: boolean;
   show_message: boolean;
-  message: string | null;
+  message_id: number | null;
   created?: string;
   updated?: string;
 };

@@ -17,7 +17,7 @@
   let saveState = $state<"saving" | "saved">("saved");
 
   const selectedMessage = $derived(
-    $messages.find((message) => message.id === $status.message) ?? {
+    $messages.find((message) => message.id === $status.message_id) ?? {
       id: "",
       title: "",
       subtitle: null
@@ -43,7 +43,7 @@
   };
 
   const handleStatusChange = (message: Message) => {
-    void patchStatus({ message: message.id });
+    void patchStatus({ message_id: message.id });
   };
 
   const handleTitleChange = (event: Event, message: Message) => {
@@ -65,7 +65,7 @@
   };
 
   const addMessage = () => {
-    const baseMessage: Message = { id: "", title: "", subtitle: null };
+    const baseMessage: Message = { id: 0, title: "", subtitle: null };
     void createMessage(baseMessage);
   };
 

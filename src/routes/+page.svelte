@@ -7,7 +7,7 @@
   import { resolve } from "$app/paths";
 
   const activeMessage = $derived(
-    $messages.find((message) => message.id === $status.message) ?? {
+    $messages.find((message) => message.id === $status.message_id) ?? {
       id: "",
       title: "",
       subtitle: ""
