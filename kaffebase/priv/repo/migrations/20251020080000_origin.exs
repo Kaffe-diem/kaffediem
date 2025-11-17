@@ -76,7 +76,7 @@ defmodule Kaffebase.Repo.Migrations.Origin do
     create_if_not_exists table(:status) do
       add :open, :boolean, default: false, null: false
       add :show_message, :boolean, default: false, null: false
-      add :message, :string
+      add :message_id, :integer
       timestamps(type: :utc_datetime_usec)
     end
 
