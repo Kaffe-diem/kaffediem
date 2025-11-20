@@ -6,7 +6,7 @@ export
 # These targets do not produce output.
 # If missing and make sees a file named the same as the target
 # then make will not run the target.
-.PHONY: default dev logs deps migrate-up migrate-down prod svelte_types format lint clean test ensure-db-files
+.PHONY: default dev logs deps migrate-up migrate-down prod svelte_types format lint clean test ensure-db-files docs docs-build
 
 default: dev
 
@@ -87,6 +87,14 @@ lint: deps
 #  this kind of works, but right now we're copying dev db, so some tests will fail as base data changes
 test:
 	docker compose run --rm -e MIX_ENV=test backend sh -lc "mix ecto.create && cp -f /app/kaffebase_dev.db /app/kaffebase_test.db && mix test"
+
+docs:
+	@echo "Starting docs dev server with hot-reload on http://localhost:4321"
+	@docker compose watch docs
+
+docs-build:
+	@echo "Building and running docs in production mode on http://localhost:3000"
+	@docker compose up --build docs
 
 clean:
 	-docker volume rm kaffediem_backend_build kaffediem_backend_deps
