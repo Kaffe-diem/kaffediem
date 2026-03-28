@@ -27,6 +27,19 @@ services:
       backend:
         condition: service_started
 
+  docs:
+    build:
+      context: ./docs/starlight
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   tools:
     build:
       context: .
